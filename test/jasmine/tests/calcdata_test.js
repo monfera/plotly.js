@@ -220,6 +220,24 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][3].y).toEqual(12);
                 expect(gd.calcdata[0][4].y).toEqual(15);
             });
+
+            it('should output categories in explicitly supplied order first, if not all categories are covered', function() {
+
+                Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
+                    type: 'category',
+                    categorymode: 'explicit',
+                    categories: ['b','a','x','c']
+                }});
+
+                expect(gd.calcdata[0][0].y).toEqual(13);
+                expect(gd.calcdata[0][1].y).toEqual(11);
+                expect(gd.calcdata[0][2].y).toEqual(15);
+
+                // The order of the rest is unspecified, no need to check. Alternative: make _both_ categorymode and
+                // categories effective; categories would take precedence and the remaining items would be sorted
+                // based on the categorymode. This of course means that the mere presence of categories triggers this
+                // behavior, rather than an explicit 'explicit' categorymode.
+            });
         });
     });
 });
