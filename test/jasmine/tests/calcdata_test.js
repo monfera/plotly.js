@@ -116,6 +116,19 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][3].y).toEqual(14);
                 expect(gd.calcdata[0][4].y).toEqual(12);
             });
+
+            it('should output categories in ascending domain alphanumerical order, excluding undefined', function() {
+
+                Plotly.plot(gd, [{x: ['c',undefined,'e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
+                    type: 'category',
+                    categorymode: 'domain-alphanumerical-ascending'
+                }});
+
+                expect(gd.calcdata[0][0].y).toEqual(11);
+                expect(gd.calcdata[0][1].y).toEqual(15);
+                expect(gd.calcdata[0][2].y).toEqual(14);
+                expect(gd.calcdata[0][3].y).toEqual(12);
+            });
         });
 
         describe('codomain numerical category ordering', function() {
@@ -147,6 +160,20 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][3].y).toEqual(12);
                 expect(gd.calcdata[0][4].y).toEqual(11);
             });
+
+            it('should output categories in descending codomain numerical order, excluding nulls', function() {
+
+                Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,null,13,14]}], { xaxis: {
+                    type: 'category',
+                    categorymode: 'codomain-numerical-descending'
+                }});
+
+                expect(gd.calcdata[0][0].y).toEqual(15);
+                expect(gd.calcdata[0][1].y).toEqual(14);
+                expect(gd.calcdata[0][2].y).toEqual(12);
+                expect(gd.calcdata[0][3].y).toEqual(11);
+
+            });
         });
 
         describe('explicit category ordering', function() {
@@ -164,6 +191,19 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][2].y).toEqual(14);
                 expect(gd.calcdata[0][3].y).toEqual(12);
                 expect(gd.calcdata[0][4].y).toEqual(15);
+            });
+
+            it('should output categories in explicitly supplied order, independent of trace order, pruned', function() {
+
+                Plotly.plot(gd, [{x: ['c',undefined,'e','b','d'], y: [15,11,12,null,14]}], { xaxis: {
+                    type: 'category',
+                    categorymode: 'explicit',
+                    categories: ['b','a','d','e','c']
+                }});
+
+                expect(gd.calcdata[0][0].y).toEqual(13);
+                expect(gd.calcdata[0][1].y).toEqual(14);
+                expect(gd.calcdata[0][2].y).toEqual(15);
             });
         });
     });
