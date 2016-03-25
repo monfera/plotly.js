@@ -205,6 +205,21 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][1].y).toEqual(14);
                 expect(gd.calcdata[0][2].y).toEqual(15);
             });
+
+            it('should output categories in explicitly supplied order even if not all categories are present', function() {
+
+                Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
+                    type: 'category',
+                    categorymode: 'explicit',
+                    categories: ['y','b','x','a','d','z','e','c']
+                }});
+
+                expect(gd.calcdata[0][0].y).toEqual(13);
+                expect(gd.calcdata[0][1].y).toEqual(11);
+                expect(gd.calcdata[0][2].y).toEqual(14);
+                expect(gd.calcdata[0][3].y).toEqual(12);
+                expect(gd.calcdata[0][4].y).toEqual(15);
+            });
         });
     });
 });
