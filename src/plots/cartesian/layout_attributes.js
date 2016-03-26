@@ -446,6 +446,33 @@ module.exports = {
             'Only has an effect if `anchor` is set to *free*.'
         ].join(' ')
     },
+    categorymode: {
+        valType: 'enumerated',
+        values: [
+            'trace', 'category ascending', 'category descending',
+            'value ascending', 'value descending','array'
+        ],
+        dflt: 'trace',
+        role: 'style',
+        description: [
+            'Specifies the ordering logic for the case of categorical variables.',
+            'By default, plotly uses *trace*, which specifies the order that is present in the data supplied.',
+            'Set `categorymode` to *category ascending* or *category descending* if order should be determined by',
+            'the alphanumerical order of the category names.',
+            'Set `categorymode` to *value ascending* or *value descending* if order should be determined by the',
+            'numerical order of the values.'
+        ].join(' ')
+    },
+    categories: {
+        valType: 'data_array',
+        role: 'style',
+        description: [
+            'Sets the order in which categories on this axis appear.',
+            'Only has an effect if `categorymode` is set to *array*.',
+            'Used with `categorymode`.'
+        ].join(' ')
+    },
+
 
     _deprecated: {
         autotick: {

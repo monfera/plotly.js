@@ -47,11 +47,11 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][4].y).toEqual(14);
             });
 
-            it('should output categories in the given order if trace-order is explicitly specified', function() {
+            it('should output categories in the given order if `trace` order is explicitly specified', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
-                    categorymode: 'trace-order'
+                    categorymode: 'trace'
                     // Wouldn't it be preferred to supply a function and plotly would have several functions like this?
                     // E.g. it's easier for symbol completion (whereas there's no symbol completion on string config)
                     // See arguments from Mike Bostock, highlighted in medium green here:
@@ -78,7 +78,7 @@ describe('calculated data and points', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
-                    categorymode: 'domain-alphanumerical-ascending'
+                    categorymode: 'category ascending'
                 }});
 
                 expect(gd.calcdata[0][0].y).toEqual(11);
@@ -92,7 +92,7 @@ describe('calculated data and points', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
-                    categorymode: 'domain-alphanumerical-descending'
+                    categorymode: 'category descending'
                 }});
 
                 expect(gd.calcdata[0][0].y).toEqual(12);
@@ -106,7 +106,7 @@ describe('calculated data and points', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
-                    categorymode: 'domain-alphanumerical-ascending',
+                    categorymode: 'category ascending',
                     categories: ['b','a','d','e','c'] // These must be ignored. Alternative: error?
                 }});
 
@@ -121,7 +121,7 @@ describe('calculated data and points', function() {
 
                 Plotly.plot(gd, [{x: ['c',undefined,'e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
-                    categorymode: 'domain-alphanumerical-ascending'
+                    categorymode: 'category ascending'
                 }});
 
                 expect(gd.calcdata[0][0].y).toEqual(11);
@@ -137,7 +137,7 @@ describe('calculated data and points', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
-                    categorymode: 'codomain-numerical-ascending'
+                    categorymode: 'value ascending'
                 }});
 
                 expect(gd.calcdata[0][0].y).toEqual(11);
@@ -151,7 +151,7 @@ describe('calculated data and points', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
-                    categorymode: 'codomain-numerical-descending'
+                    categorymode: 'value descending'
                 }});
 
                 expect(gd.calcdata[0][0].y).toEqual(15);
@@ -165,7 +165,7 @@ describe('calculated data and points', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,null,13,14]}], { xaxis: {
                     type: 'category',
-                    categorymode: 'codomain-numerical-descending'
+                    categorymode: 'value descending'
                 }});
 
                 expect(gd.calcdata[0][0].y).toEqual(15);
@@ -182,7 +182,7 @@ describe('calculated data and points', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
-                    categorymode: 'explicit',
+                    categorymode: 'array',
                     categories: ['b','a','d','e','c']
                 }});
 
@@ -197,7 +197,7 @@ describe('calculated data and points', function() {
 
                 Plotly.plot(gd, [{x: ['c',undefined,'e','b','d'], y: [15,11,12,null,14]}], { xaxis: {
                     type: 'category',
-                    categorymode: 'explicit',
+                    categorymode: 'array',
                     categories: ['b','a','d','e','c']
                 }});
 
@@ -210,7 +210,7 @@ describe('calculated data and points', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
-                    categorymode: 'explicit',
+                    categorymode: 'array',
                     categories: ['y','b','x','a','d','z','e','c']
                 }});
 
@@ -225,7 +225,7 @@ describe('calculated data and points', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
-                    categorymode: 'explicit',
+                    categorymode: 'array',
                     categories: ['b','a','x','c']
                 }});
 
