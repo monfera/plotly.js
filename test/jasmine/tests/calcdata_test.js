@@ -107,7 +107,7 @@ describe('calculated data and points', function() {
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
                     categorymode: 'category ascending',
-                    categories: ['b','a','d','e','c'] // These must be ignored. Alternative: error?
+                    categorylist: ['b','a','d','e','c'] // These must be ignored. Alternative: error?
                 }});
 
                 expect(gd.calcdata[0][0].y).toEqual(11);
@@ -183,7 +183,7 @@ describe('calculated data and points', function() {
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
                     categorymode: 'array',
-                    categories: ['b','a','d','e','c']
+                    categorylist: ['b','a','d','e','c']
                 }});
 
                 expect(gd.calcdata[0][0].y).toEqual(13);
@@ -198,7 +198,7 @@ describe('calculated data and points', function() {
                 Plotly.plot(gd, [{x: ['c',undefined,'e','b','d'], y: [15,11,12,null,14]}], { xaxis: {
                     type: 'category',
                     categorymode: 'array',
-                    categories: ['b','a','d','e','c']
+                    categorylist: ['b','a','d','e','c']
                 }});
 
                 expect(gd.calcdata[0][0].y).toEqual(13);
@@ -211,7 +211,7 @@ describe('calculated data and points', function() {
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
                     categorymode: 'array',
-                    categories: ['y','b','x','a','d','z','e','c']
+                    categorylist: ['y','b','x','a','d','z','e','c']
                 }});
 
                 expect(gd.calcdata[0][0].y).toEqual(13);
@@ -226,7 +226,7 @@ describe('calculated data and points', function() {
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
                     categorymode: 'array',
-                    categories: ['b','a','x','c']
+                    categorylist: ['b','a','x','c']
                 }});
 
                 expect(gd.calcdata[0][0].y).toEqual(13);
