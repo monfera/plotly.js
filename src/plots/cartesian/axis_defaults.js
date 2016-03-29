@@ -121,6 +121,9 @@ module.exports = function handleAxisDefaults(containerIn, containerOut, coerce, 
         delete containerOut.zerolinewidth;
     }
 
+    containerOut.categorymode = containerIn.categorymode;
+    containerOut.categorylist = containerIn.categorylist;
+
     return containerOut;
 };
 

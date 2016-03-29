@@ -832,7 +832,7 @@ function doCalcdata(gd) {
         fullData = gd._fullData,
         fullLayout = gd._fullLayout;
 
-    var i, trace, module, cd;
+    var i, trace, module, cd, ax;
 
     var calcdata = gd.calcdata = new Array(fullData.length);
 
@@ -851,10 +851,14 @@ function doCalcdata(gd) {
     fullLayout._piecolormap = {};
     fullLayout._piedefaultcolorcount = 0;
 
-    // delete category list, if there is one, so we start over
+    // initialize category list, if there is one, so we start over
     // to be filled in later by ax.d2c
     for(i = 0; i < axList.length; i++) {
-        axList[i]._categories = [];
+
+        ax = axList[i];
+        ax._categories = ax.categorymode === 'array'
+            ? ax.categorylist || []
+            : [];
     }
 
     for(i = 0; i < fullData.length; i++) {
