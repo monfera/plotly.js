@@ -64,6 +64,20 @@ module.exports = function handleAxisDefaults(containerIn, containerOut, coerce, 
         }
     }
 
+    containerOut._initialCategories = axType === 'category' ?
+
+        containerIn.categorymode === 'array' ?
+
+            containerOut.categorylist.slice() :
+
+            [].concat.apply([], options.data.map(function(d) {return d[letter]}))
+                .filter(function(element, index, array) {return index === array.indexOf(element);})
+                .sort(({
+                    'category ascending':  d3.ascending,
+                    'category descending': d3.descending
+                })[containerIn.categorymode]) :
+        [];
+
     setConvert(containerOut);
 
     coerce('title', defaultTitle);
@@ -120,9 +134,6 @@ module.exports = function handleAxisDefaults(containerIn, containerOut, coerce, 
         delete containerOut.zerolinecolor;
         delete containerOut.zerolinewidth;
     }
-
-    containerOut.categorymode = containerIn.categorymode;
-    containerOut.categorylist = containerIn.categorylist;
 
     return containerOut;
 };
