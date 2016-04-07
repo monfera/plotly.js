@@ -52,15 +52,9 @@ describe('calculated data and points', function() {
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
                     categorymode: 'trace'
-                    // Wouldn't it be preferred to supply a function and plotly would have several functions like this?
-                    // E.g. it's easier for symbol completion (whereas there's no symbol completion on string config)
-                    // See arguments from Mike Bostock, highlighted in medium green here:
-                    // https://medium.com/@mbostock/what-makes-software-good-943557f8a488#eef9
-                    // Plus if it's a function, then users can roll their own.
-                    //
                     // Also, if axis tick order is made configurable, shouldn't we make trace order configurable?
                     // Trace order as in, if a line or curve is drawn through points, what's the trace sequence.
-                    // These are two orthogonal concepts. In this round, I'm assuming that the trace order is implied
+                    // These are two orthogonal concepts. Currently, the trace order is implied
                     // by the order the {x,y} arrays are specified.
                 }});
 
@@ -214,11 +208,14 @@ describe('calculated data and points', function() {
                     categorylist: ['y','b','x','a','d','z','e','c']
                 }});
 
-                expect(gd.calcdata[0][0].y).toEqual(13);
-                expect(gd.calcdata[0][1].y).toEqual(11);
-                expect(gd.calcdata[0][2].y).toEqual(14);
-                expect(gd.calcdata[0][3].y).toEqual(12);
-                expect(gd.calcdata[0][4].y).toEqual(15);
+                expect(gd.calcdata[0][0].y).toEqual(null);
+                expect(gd.calcdata[0][1].y).toEqual(13);
+                expect(gd.calcdata[0][2].y).toEqual(null);
+                expect(gd.calcdata[0][3].y).toEqual(11);
+                expect(gd.calcdata[0][4].y).toEqual(14);
+                expect(gd.calcdata[0][5].y).toEqual(null);
+                expect(gd.calcdata[0][6].y).toEqual(12);
+                expect(gd.calcdata[0][7].y).toEqual(15);
             });
 
             it('should output categories in explicitly supplied order first, if not all categories are covered', function() {
@@ -231,7 +228,8 @@ describe('calculated data and points', function() {
 
                 expect(gd.calcdata[0][0].y).toEqual(13);
                 expect(gd.calcdata[0][1].y).toEqual(11);
-                expect(gd.calcdata[0][2].y).toEqual(15);
+                expect(gd.calcdata[0][2].y).toEqual(null);
+                expect(gd.calcdata[0][3].y).toEqual(15);
 
                 // The order of the rest is unspecified, no need to check. Alternative: make _both_ categorymode and
                 // categories effective; categories would take precedence and the remaining items would be sorted
