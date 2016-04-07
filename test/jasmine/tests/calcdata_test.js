@@ -82,18 +82,18 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 3, y: 14}));
             });
 
-            it('should output categories in descending domain alphanumerical order', function() {
+            fit('should output categories in descending domain alphanumerical order', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
                     categorymode: 'category descending'
                 }});
 
-                expect(gd.calcdata[0][0].y).toEqual(12);
-                expect(gd.calcdata[0][1].y).toEqual(14);
-                expect(gd.calcdata[0][2].y).toEqual(15);
-                expect(gd.calcdata[0][3].y).toEqual(13);
-                expect(gd.calcdata[0][4].y).toEqual(11);
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 2, y: 15}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 4, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 0, y: 12}));
+                expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 3, y: 13}));
+                expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 1, y: 14}));
             });
 
             it('should output categories in categorymode order even if category array is defined', function() {
