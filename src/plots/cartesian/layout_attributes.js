@@ -453,7 +453,7 @@ module.exports = {
             'value ascending', 'value descending','array'
         ],
         dflt: 'trace',
-        role: 'style',
+        role: 'info',
         description: [
             'Specifies the ordering logic for the case of categorical variables.',
             'By default, plotly uses *trace*, which specifies the order that is present in the data supplied.',
@@ -468,7 +468,7 @@ module.exports = {
     },
     categorylist: {
         valType: 'data_array',
-        role: 'style',
+        role: 'info',
         description: [
             'Sets the order in which categories on this axis appear.',
             'Only has an effect if `categorymode` is set to *array*.',
