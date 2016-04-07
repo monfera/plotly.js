@@ -30,7 +30,7 @@ describe('calculated data and points', function() {
         });
     });
 
-    xdescribe('category ordering', function() {
+    describe('category ordering', function() {
 
         describe('default category ordering reified', function() {
 
@@ -68,6 +68,8 @@ describe('calculated data and points', function() {
 
         describe('domain alphanumerical category ordering', function() {
 
+            // TODO augment test cases with selection on the DOM to ensure that ticks are there in proper order
+
             it('should output categories in ascending domain alphanumerical order', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
@@ -82,7 +84,7 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 3, y: 14}));
             });
 
-            fit('should output categories in descending domain alphanumerical order', function() {
+            it('should output categories in descending domain alphanumerical order', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
@@ -104,11 +106,11 @@ describe('calculated data and points', function() {
                     categorylist: ['b','a','d','e','c'] // These must be ignored. Alternative: error?
                 }});
 
-                expect(gd.calcdata[0][0].y).toEqual(11);
-                expect(gd.calcdata[0][1].y).toEqual(13);
-                expect(gd.calcdata[0][2].y).toEqual(15);
-                expect(gd.calcdata[0][3].y).toEqual(14);
-                expect(gd.calcdata[0][4].y).toEqual(12);
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 2, y: 15}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 0, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 4, y: 12}));
+                expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 1, y: 13}));
+                expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 3, y: 14}));
             });
 
             it('should output categories in ascending domain alphanumerical order, excluding undefined', function() {
@@ -118,14 +120,14 @@ describe('calculated data and points', function() {
                     categorymode: 'category ascending'
                 }});
 
-                expect(gd.calcdata[0][0].y).toEqual(11);
-                expect(gd.calcdata[0][1].y).toEqual(15);
-                expect(gd.calcdata[0][2].y).toEqual(14);
-                expect(gd.calcdata[0][3].y).toEqual(12);
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 1, y: 15}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 3, y: 12}));
+                expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 0, y: 13}));
+                expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 2, y: 14}));
             });
         });
 
-        describe('codomain numerical category ordering', function() {
+        xdescribe('codomain numerical category ordering', function() {
 
             it('should output categories in ascending codomain numerical order', function() {
 
@@ -170,7 +172,7 @@ describe('calculated data and points', function() {
             });
         });
 
-        describe('explicit category ordering', function() {
+        fdescribe('explicit category ordering', function() {
 
             it('should output categories in explicitly supplied order, independent of trace order', function() {
 
@@ -180,11 +182,11 @@ describe('calculated data and points', function() {
                     categorylist: ['b','a','d','e','c']
                 }});
 
-                expect(gd.calcdata[0][0].y).toEqual(13);
-                expect(gd.calcdata[0][1].y).toEqual(11);
-                expect(gd.calcdata[0][2].y).toEqual(14);
-                expect(gd.calcdata[0][3].y).toEqual(12);
-                expect(gd.calcdata[0][4].y).toEqual(15);
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 4, y: 15}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 3, y: 12}));
+                expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 0, y: 13}));
+                expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 2, y: 14}));
             });
 
             it('should output categories in explicitly supplied order, independent of trace order, pruned', function() {
@@ -195,9 +197,11 @@ describe('calculated data and points', function() {
                     categorylist: ['b','a','d','e','c']
                 }});
 
-                expect(gd.calcdata[0][0].y).toEqual(13);
-                expect(gd.calcdata[0][1].y).toEqual(14);
-                expect(gd.calcdata[0][2].y).toEqual(15);
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 4, y: 15}));
+                expect(gd.calcdata[0][1]).toEqual({ x: false, y: false});
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 3, y: 12}));
+                expect(gd.calcdata[0][3]).toEqual({ x: false, y: false});
+                expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 2, y: 14}));
             });
 
             it('should output categories in explicitly supplied order even if not all categories are present', function() {
@@ -205,20 +209,50 @@ describe('calculated data and points', function() {
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
                     categorymode: 'array',
-                    categorylist: ['y','b','x','a','d','z','e','c']
+                    categorylist: ['b','x','a','d','z','e','c']
                 }});
 
-                expect(gd.calcdata[0][0].y).toEqual(null);
-                expect(gd.calcdata[0][1].y).toEqual(13);
-                expect(gd.calcdata[0][2].y).toEqual(null);
-                expect(gd.calcdata[0][3].y).toEqual(11);
-                expect(gd.calcdata[0][4].y).toEqual(14);
-                expect(gd.calcdata[0][5].y).toEqual(null);
-                expect(gd.calcdata[0][6].y).toEqual(12);
-                expect(gd.calcdata[0][7].y).toEqual(15);
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 6, y: 15}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 2, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 5, y: 12}));
+                expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 0, y: 13}));
+                expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 3, y: 14}));
             });
 
-            it('should output categories in explicitly supplied order first, if not all categories are covered', function() {
+            it('should output categories in explicitly supplied order even if some missing categories were at the beginning or end of categorylist', function() {
+
+                // TODO WARNING: THIS CASE *PASSES* BUT THE UNPOPULATED CATEGORIES AT THE EDGES AREN'T RENDERED IN THE DOM
+                // TODO enhance test cases with selection on the DOM to ensure that all unpopulated ticks are present
+
+                Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
+                    type: 'category',
+                    categorymode: 'array',
+                    categorylist: ['s','y','b','x','a','d','z','e','c', 'q', 'k']
+                }});
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 7, y: 15}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 3, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 6, y: 12}));
+                expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 1, y: 13}));
+                expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 4, y: 14}));
+            });
+
+            it('should output categories in explicitly supplied order even if not all categories are present, and should interact with a null value orthogonally', function() {
+
+                Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,null,12,13,14]}], { xaxis: {
+                    type: 'category',
+                    categorymode: 'array',
+                    categorylist: ['b','x','a','d','z','e','c']
+                }});
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 6, y: 15}));
+                expect(gd.calcdata[0][1]).toEqual({x: false, y: false});
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 5, y: 12}));
+                expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 0, y: 13}));
+                expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 3, y: 14}));
+            });
+
+            fit('should output categories in explicitly supplied order first, if not all categories are covered', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
@@ -226,10 +260,11 @@ describe('calculated data and points', function() {
                     categorylist: ['b','a','x','c']
                 }});
 
-                expect(gd.calcdata[0][0].y).toEqual(13);
-                expect(gd.calcdata[0][1].y).toEqual(11);
-                expect(gd.calcdata[0][2].y).toEqual(null);
-                expect(gd.calcdata[0][3].y).toEqual(15);
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 3, y: 15}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 4, y: 12}));
+                expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 0, y: 13}));
+                expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 5, y: 14}));
 
                 // The order of the rest is unspecified, no need to check. Alternative: make _both_ categorymode and
                 // categories effective; categories would take precedence and the remaining items would be sorted
