@@ -172,7 +172,7 @@ describe('calculated data and points', function() {
             });
         });
 
-        fdescribe('explicit category ordering', function() {
+        describe('explicit category ordering', function() {
 
             it('should output categories in explicitly supplied order, independent of trace order', function() {
 
@@ -252,7 +252,7 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 3, y: 14}));
             });
 
-            fit('should output categories in explicitly supplied order first, if not all categories are covered', function() {
+            it('should output categories in explicitly supplied order first, if not all categories are covered', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
