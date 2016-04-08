@@ -236,6 +236,25 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 4, y: 14}));
             });
 
+            it('should output categories in explicitly supplied order even if some missing categories were at the beginning or end of categorylist', function() {
+
+                // The auto-range feature currently eliminates unutilized category ticks on the left/right edge
+                // BUT keeps it if a data point with null is added; test is almost identical to the one above
+                // except that it explicitly adds an axis tick for y
+
+                Plotly.plot(gd, [{x: ['c','a','e','b','d', 'y'], y: [15,11,12,13,14, null]}], { xaxis: {
+                    type: 'category',
+                    categorymode: 'array',
+                    categorylist: ['y','b','x','a','d','z','e','c', 'q', 'k']
+                }});
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 7, y: 15}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 3, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 6, y: 12}));
+                expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 1, y: 13}));
+                expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 4, y: 14}));
+            });
+
             it('should output categories in explicitly supplied order even if not all categories are present, and should interact with a null value orthogonally', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,null,12,13,14]}], { xaxis: {
