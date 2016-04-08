@@ -221,13 +221,12 @@ describe('calculated data and points', function() {
 
             it('should output categories in explicitly supplied order even if some missing categories were at the beginning or end of categorylist', function() {
 
-                // TODO WARNING: THIS CASE *PASSES* BUT THE UNPOPULATED CATEGORIES AT THE EDGES AREN'T RENDERED IN THE DOM
-                // TODO enhance test cases with selection on the DOM to ensure that all unpopulated ticks are present
+                // The auto-range feature currently eliminates unutilized category ticks on the left/right edge
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
                     categorymode: 'array',
-                    categorylist: ['s','y','b','x','a','d','z','e','c', 'q', 'k']
+                    categorylist: ['y','b','x','a','d','z','e','c', 'q', 'k']
                 }});
 
                 expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 7, y: 15}));
