@@ -290,5 +290,41 @@ describe('calculated data and points', function() {
                 // behavior, rather than an explicit 'explicit' categorymode.
             });
         });
+
+        describe('ordering tests in the presence of multiple traces', function() {
+
+            it('baseline testing for the unordered, disjunct case', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Switch', 'Plug', 'Cord', 'Fuse', 'Bulb'];
+                var x3 = ['Pump', 'Leak', 'Seals'];
+
+                Plotly.plot(gd, [{
+                    x: x1,
+                    y: x1.map(function(d, i) {return i + 10;})
+                }, {
+                    x: x2,
+                    y: x2.map(function(d, i) {return i + 20;})
+                }, {
+                    x: x3,
+                    y: x3.map(function(d, i) {return i + 30;})
+                }]);
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  0, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  3, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  4, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  5, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  6, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  7, y: 24}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  8, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  9, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 10, y: 32}));
+            });
+
+        });
     });
 });
