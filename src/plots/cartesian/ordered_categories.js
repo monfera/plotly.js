@@ -23,22 +23,28 @@ var d3 = require('d3');
  */
 module.exports = function orderedCategories(axisLetter, categorymode, categorylist, data) {
 
-    return categorymode === 'array' ?
-
-        // just return a copy of the specified array ...
-        (Array.isArray(categorylist) ? categorylist : []).slice() :
-
-        // ... or take the union of all encountered tick keys and sort them as specified
-        // (could be simplified with lodash-fp or ramda)
-
-        ['category ascending', 'category descending'].indexOf(categorymode) > -1 ?
-
-            [].concat.apply([], data.map(function(d) {return d[axisLetter];}))
-                .filter(function(element, index, array) {return index === array.indexOf(element);})
-                .sort(({
-                    'category ascending': d3.ascending,
-                    'category descending': d3.descending
-                })[categorymode]) :
-
-            [].slice();
+    if(categorymode === 'array') {
+        // just return a copy of the specified array, if any
+        return (Array.isArray(categorylist) ? categorylist : []).slice();
+    } else if(['category ascending', 'category descending'].indexOf(categorymode) === -1) {
+        return [].slice();
+    } else {
+        var traceLines = data.map(function(d) {return d[axisLetter];});
+        var categoryMap = {}; // hashmap is O(1);
+        var i, j, tracePoints, category;
+        for(i = 0; i < traceLines.length; i++) {
+            tracePoints = traceLines[i];
+            for(j = 0; j < tracePoints.length; j++) {
+                category = tracePoints[j];
+                if(!categoryMap[category]) {
+                    categoryMap[category] = true;
+                }
+            }
+        }
+        return Object.keys(categoryMap)
+            .sort(({
+                'category ascending': d3.ascending,
+                'category descending': d3.descending
+            })[categorymode]);
+    }
 };
