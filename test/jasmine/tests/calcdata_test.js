@@ -127,7 +127,8 @@ describe('calculated data and points', function() {
             });
         });
 
-        xdescribe('codomain numerical category ordering', function() {
+/*
+        describe('codomain numerical category ordering', function() {
 
             it('should output categories in ascending codomain numerical order', function() {
 
@@ -171,6 +172,7 @@ describe('calculated data and points', function() {
 
             });
         });
+*/
 
         describe('explicit category ordering', function() {
 
@@ -447,5 +449,344 @@ describe('calculated data and points', function() {
             });
         });
 
+        describe('ordering tests in the presence of multiple traces - partially overlapping', function() {
+
+            it('baseline testing for the unordered, partially overlapping case', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Switch', 'Plug', 'Cord', 'Fuse', 'Bulb'];
+                var x3 = ['Pump', 'Leak', 'Bearing', 'Seals'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;})},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;})},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;})}
+                ]);
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  0, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  3, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  4, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  5, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  6, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  7, y: 24}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  8, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  9, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
+                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x: 10, y: 33}));
+            });
+
+            it('category order follows the trace order (even if categorylist is specified)', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Switch', 'Plug', 'Cord', 'Fuse', 'Bulb'];
+                var x3 = ['Pump', 'Leak', 'Bearing', 'Seals'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;})},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;})},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;})}
+                ], { xaxis: {
+                    // type: 'category', // commented out to rely on autotyping for added realism
+                    categorymode: 'trace',
+                    categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
+                }});
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  0, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  3, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  4, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  5, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  6, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  7, y: 24}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  8, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  9, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
+                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x: 10, y: 33}));
+            });
+
+            it('category order is category ascending (even if categorylist is specified)', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Switch', 'Plug', 'Cord', 'Fuse', 'Bulb'];
+                var x3 = ['Pump', 'Leak', 'Bearing', 'Seals'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;})},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;})},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;})}
+                ], { xaxis: {
+                    // type: 'category', // commented out to rely on autotyping for added realism
+                    categorymode: 'category ascending',
+                    categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
+                    // this is the expected sorted outcome: ['Bearing','Bulb','Cord','Fuse','Gear','Leak','Motor','Plug','Pump','Seals','Switch']
+                }});
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  4, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  0, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  6, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 10, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  7, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  2, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  3, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  1, y: 24}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  8, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  5, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  0, y: 32}));
+                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x:  9, y: 33}));
+            });
+
+            it('category order is category descending (even if categorylist is specified)', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Switch', 'Plug', 'Cord', 'Fuse', 'Bulb'];
+                var x3 = ['Pump', 'Leak', 'Bearing', 'Seals'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;})},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;})},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;})}
+                ], { xaxis: {
+                    // type: 'category', // commented out to rely on autotyping for added realism
+                    categorymode: 'category descending',
+                    categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
+                    // this is the expected sorted outcome: ["Switch", "Seals", "Pump", "Plug", "Motor", "Leak", "Gear", "Fuse", "Cord", "Bulb", "Bearing"]
+                }});
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  6, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 10, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  4, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  3, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  8, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  7, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  9, y: 24}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  2, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  5, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 10, y: 32}));
+                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x:  1, y: 33}));
+            });
+
+            it('category order follows categorylist', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Switch', 'Plug', 'Cord', 'Fuse', 'Bulb'];
+                var x3 = ['Pump', 'Leak', 'Bearing', 'Seals'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;})},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;})},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;})}
+                ], { xaxis: {
+                    // type: 'category', // commented out to rely on autotyping for added realism
+                    categorymode: 'array',
+                    categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
+                }});
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  9, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  6, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  5, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  8, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  7, y: 24}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  4, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 10, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
+                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x:  3, y: 33}));
+            });
+        });
+
+        describe('ordering tests in the presence of multiple traces - fully overlapping', function() {
+
+            it('baseline testing for the unordered, fully overlapping case', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Bearing', 'Gear', 'Motor'];
+                var x3 = ['Motor', 'Gear', 'Bearing'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;})},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;})},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;})}
+                ]);
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  0, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  1, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  0, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  2, y: 22}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  2, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  0, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
+            });
+
+            it('category order follows the trace order (even if categorylist is specified)', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Bearing', 'Gear', 'Motor'];
+                var x3 = ['Motor', 'Gear', 'Bearing'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;})},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;})},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;})}
+                ], { xaxis: {
+                    // type: 'category', // commented out to rely on autotyping for added realism
+                    categorymode: 'trace',
+                    categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
+                }});
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  0, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  1, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  0, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  2, y: 22}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  2, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  0, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
+            });
+
+            it('category order is category ascending (even if categorylist is specified)', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Bearing', 'Gear', 'Motor'];
+                var x3 = ['Motor', 'Gear', 'Bearing'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;})},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;})},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;})}
+                ], { xaxis: {
+                    // type: 'category', // commented out to rely on autotyping for added realism
+                    categorymode: 'category ascending',
+                    categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
+                    // this is the expected sorted outcome: ['Bearing','Bulb','Cord','Fuse','Gear','Leak','Motor','Plug','Pump','Seals','Switch']
+                }});
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  1, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  0, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  1, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  2, y: 22}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  2, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  1, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  0, y: 32}));
+            });
+
+            it('category order is category descending (even if categorylist is specified)', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Bearing', 'Gear', 'Motor'];
+                var x3 = ['Motor', 'Gear', 'Bearing'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;})},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;})},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;})}
+                ], { xaxis: {
+                    // type: 'category', // commented out to rely on autotyping for added realism
+                    categorymode: 'category descending',
+                    categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
+                    // this is the expected sorted outcome: ["Switch", "Seals", "Pump", "Plug", "Motor", "Leak", "Gear", "Fuse", "Cord", "Bulb", "Bearing"]
+                }});
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  1, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  2, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  0, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  2, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  1, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  0, y: 22}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  0, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  1, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  2, y: 32}));
+            });
+
+            it('category order follows categorylist', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Bearing', 'Gear', 'Motor'];
+                var x3 = ['Motor', 'Gear', 'Bearing'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;})},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;})},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;})}
+                ], {
+                    xaxis: {
+                        // type: 'category', // commented out to rely on autotyping for added realism
+                        categorymode: 'array',
+                        categorylist: ['Bearing','Motor','Gear']
+                    }
+                });
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  2, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  0, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  1, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  2, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  1, y: 22}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  1, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  2, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  0, y: 32}));
+            });
+
+            it('category order follows categorylist even if data is sparse', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Bearing', 'Gear', 'Motor'];
+                var x3 = ['Motor', 'Gear', 'Bearing'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;})},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;})},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;})}
+                ], {
+                    xaxis: {
+                        // type: 'category', // commented out to rely on autotyping for added realism
+                        categorymode: 'array',
+                        categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
+                    }
+                });
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  9, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  1, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  9, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  2, y: 22}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  2, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  9, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
+            });
+        });
     });
 });
