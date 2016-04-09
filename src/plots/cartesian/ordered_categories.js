@@ -11,6 +11,27 @@
 
 var d3 = require('d3');
 
+function flattenUniqueSort(axisLetter, categorymode, data) {
+    var traceLines = data.map(function(d) {return d[axisLetter];});
+    var categoryMap = {}; // hashmap is O(1);
+    var i, j, tracePoints, category;
+    for(i = 0; i < traceLines.length; i++) {
+        tracePoints = traceLines[i];
+        for(j = 0; j < tracePoints.length; j++) {
+            category = tracePoints[j];
+            if(!categoryMap[category]) {
+                categoryMap[category] = true;
+            }
+        }
+    }
+    return Object.keys(categoryMap)
+        .sort(({
+            'category ascending': d3.ascending,
+            'category descending': d3.descending
+        })[categorymode]);
+
+}
+
 
 /**
  * This pure function returns the ordered categories for specified axisLetter, categorymode, categorylist and data.
@@ -21,6 +42,7 @@ var d3 = require('d3');
  * order of the unique categories encountered in the data for specified axisLetter.
  *
  */
+
 module.exports = function orderedCategories(axisLetter, categorymode, categorylist, data) {
 
     if(categorymode === 'array') {
@@ -29,22 +51,6 @@ module.exports = function orderedCategories(axisLetter, categorymode, categoryli
     } else if(['category ascending', 'category descending'].indexOf(categorymode) === -1) {
         return [].slice();
     } else {
-        var traceLines = data.map(function(d) {return d[axisLetter];});
-        var categoryMap = {}; // hashmap is O(1);
-        var i, j, tracePoints, category;
-        for(i = 0; i < traceLines.length; i++) {
-            tracePoints = traceLines[i];
-            for(j = 0; j < tracePoints.length; j++) {
-                category = tracePoints[j];
-                if(!categoryMap[category]) {
-                    categoryMap[category] = true;
-                }
-            }
-        }
-        return Object.keys(categoryMap)
-            .sort(({
-                'category ascending': d3.ascending,
-                'category descending': d3.descending
-            })[categorymode]);
+        return flattenUniqueSort(axisLetter, categorymode, data);
     }
 };
