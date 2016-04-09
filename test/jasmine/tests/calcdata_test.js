@@ -788,5 +788,75 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
             });
         });
+
+        describe('ordering and stacking combined', function() {
+
+            it('partially overlapping category order follows categorylist and stacking produces expected results', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Switch', 'Plug', 'Cord', 'Fuse', 'Bulb'];
+                var x3 = ['Pump', 'Leak', 'Bearing', 'Seals'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;}), type: 'bar'},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;}), type: 'bar'},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;}), type: 'bar'}
+                ], {
+                    barmode: 'stack',
+                    xaxis: {
+                        // type: 'category', // commented out to rely on autotyping for added realism
+                        categorymode: 'array',
+                        categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
+                    }
+                });
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  9, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  6, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  5, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  8, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  7, y: 24}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  4, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 10, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 11 + 32}));
+                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x:  3, y: 33}));
+            })
+
+            it('fully overlapping - category order follows categorylist and stacking produces expected results', function() {
+
+                var x1 = ['Gear', 'Bearing', 'Motor'];
+                var x2 = ['Bearing', 'Gear', 'Motor'];
+                var x3 = ['Motor', 'Gear', 'Bearing'];
+
+                Plotly.plot(gd, [
+                    {x: x1, y: x1.map(function(d, i) {return i + 10;}), type: 'bar'},
+                    {x: x2, y: x2.map(function(d, i) {return i + 20;}), type: 'bar'},
+                    {x: x3, y: x3.map(function(d, i) {return i + 30;}), type: 'bar'}
+                ], {
+                    barmode: 'stack',
+                    xaxis: {
+                        // type: 'category', // commented out to rely on autotyping for added realism
+                        categorymode: 'array',
+                        categorylist: ['Bearing','Motor','Gear']
+                    }
+                });
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  2, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  0, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  1, y: 12}));
+
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 11 + 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  2, y: 10 + 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  1, y: 12 + 22}));
+
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  1, y: 12 + 22 + 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  2, y: 10 + 21 + 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  0, y: 11 + 20 + 32}));
+            });
+        });
     });
 });
