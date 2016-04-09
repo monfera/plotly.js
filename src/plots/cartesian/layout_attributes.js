@@ -449,8 +449,8 @@ module.exports = {
     categorymode: {
         valType: 'enumerated',
         values: [
-            'trace', 'category ascending', 'category descending',
-            /*'value ascending', 'value descending',*/ 'array' // value ascending / descending to be implemented later
+            'trace', 'category ascending', 'category descending', 'array'
+            /*, 'value ascending', 'value descending'*/ // value ascending / descending to be implemented later
         ],
         dflt: 'trace',
         role: 'info',

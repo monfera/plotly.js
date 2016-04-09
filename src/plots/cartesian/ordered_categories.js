@@ -11,7 +11,8 @@
 
 var d3 = require('d3');
 
-function flattenUniqueSort(axisLetter, sortFunction, data) {
+// flattenUnique :: String -> [[String]] -> Object
+function flattenUnique(axisLetter, data) {
     var traceLines = data.map(function(d) {return d[axisLetter];});
     var categoryMap = {}; // hashmap is O(1);
     var i, j, tracePoints, category;
@@ -24,8 +25,12 @@ function flattenUniqueSort(axisLetter, sortFunction, data) {
             }
         }
     }
-    return Object.keys(categoryMap)
-        .sort(sortFunction);
+    return categoryMap;
+}
+
+// flattenUniqueSort :: String -> Function -> [[String]] -> [String]
+function flattenUniqueSort(axisLetter, sortFunction, data) {
+    return Object.keys(flattenUnique(axisLetter, data)).sort(sortFunction);
 }
 
 
@@ -37,14 +42,18 @@ function flattenUniqueSort(axisLetter, sortFunction, data) {
  * If categorymode is 'category ascending' or 'category descending', the result is an array of ascending or descending
  * order of the unique categories encountered in the data for specified axisLetter.
  *
+ * See cartesian/layout_attributes.js for the definition of categorymode and categorylist
+ *
  */
 
+// orderedCategories :: String -> String -> [String] -> [[String]] -> [String]
 module.exports = function orderedCategories(axisLetter, categorymode, categorylist, data) {
 
     switch(categorymode) {
-        case 'array': return (Array.isArray(categorylist) ? categorylist : []).slice();
+        case 'array': return Array.isArray(categorylist) ? categorylist : [];
         case 'category ascending': return flattenUniqueSort(axisLetter, d3.ascending, data);
         case 'category descending': return flattenUniqueSort(axisLetter, d3.descending, data);
-        default: return [].slice();
+        case 'trace': return [];
+        default: return [];
     }
 };
