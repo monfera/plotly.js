@@ -68,8 +68,6 @@ describe('calculated data and points', function() {
 
         describe('domain alphanumerical category ordering', function() {
 
-            // TODO augment test cases with selection on the DOM to ensure that ticks are there in proper order
-
             it('should output categories in ascending domain alphanumerical order', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
@@ -223,8 +221,6 @@ describe('calculated data and points', function() {
 
             it('should output categories in explicitly supplied order even if some missing categories were at the beginning or end of categorylist', function() {
 
-                // The auto-range feature currently eliminates unutilized category ticks on the left/right edge
-
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
                     type: 'category',
                     categorymode: 'array',
@@ -236,6 +232,14 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 6, y: 12}));
                 expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 1, y: 13}));
                 expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 4, y: 14}));
+
+                // The auto-range feature currently eliminates unused category ticks on the left/right axis tails.
+                // The below test case reifies this current behavior, and checks proper order of categories kept.
+
+                var domTickTexts = Array.prototype.slice.call(document.querySelectorAll('g.xtick'))
+                    .map(function(e) {return e.__data__.text;});
+
+                expect(domTickTexts).toEqual(['b', 'x', 'a', 'd', 'z', 'e', 'c']);  // y, q and k has no data points
             });
 
             it('should output categories in explicitly supplied order even if some missing categories were at the beginning or end of categorylist', function() {
@@ -255,6 +259,11 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 6, y: 12}));
                 expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 1, y: 13}));
                 expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 4, y: 14}));
+
+                var domTickTexts = Array.prototype.slice.call(document.querySelectorAll('g.xtick'))
+                    .map(function(e) {return e.__data__.text;});
+
+                expect(domTickTexts).toEqual(['y', 'b', 'x', 'a', 'd', 'z', 'e', 'c']);  // q, k has no data; y is null
             });
 
             it('should output categories in explicitly supplied order even if not all categories are present, and should interact with a null value orthogonally', function() {
