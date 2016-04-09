@@ -11,7 +11,7 @@
 
 var d3 = require('d3');
 
-function flattenUniqueSort(axisLetter, categorymode, data) {
+function flattenUniqueSort(axisLetter, sortFunction, data) {
     var traceLines = data.map(function(d) {return d[axisLetter];});
     var categoryMap = {}; // hashmap is O(1);
     var i, j, tracePoints, category;
@@ -25,11 +25,7 @@ function flattenUniqueSort(axisLetter, categorymode, data) {
         }
     }
     return Object.keys(categoryMap)
-        .sort(({
-            'category ascending': d3.ascending,
-            'category descending': d3.descending
-        })[categorymode]);
-
+        .sort(sortFunction);
 }
 
 
@@ -45,12 +41,10 @@ function flattenUniqueSort(axisLetter, categorymode, data) {
 
 module.exports = function orderedCategories(axisLetter, categorymode, categorylist, data) {
 
-    if(categorymode === 'array') {
-        // just return a copy of the specified array, if any
-        return (Array.isArray(categorylist) ? categorylist : []).slice();
-    } else if(['category ascending', 'category descending'].indexOf(categorymode) === -1) {
-        return [].slice();
-    } else {
-        return flattenUniqueSort(axisLetter, categorymode, data);
+    switch(categorymode) {
+        case 'array': return (Array.isArray(categorylist) ? categorylist : []).slice();
+        case 'category ascending': return flattenUniqueSort(axisLetter, d3.ascending, data);
+        case 'category descending': return flattenUniqueSort(axisLetter, d3.descending, data);
+        default: return [].slice();
     }
 };
