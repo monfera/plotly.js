@@ -307,18 +307,18 @@ describe('calculated data and points', function() {
                     {x: x3, y: x3.map(function(d, i) {return i + 30;})}
                 ]);
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  0, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 0, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 2, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  3, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  4, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  5, y: 22}));
-                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  6, y: 23}));
-                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  7, y: 24}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 3, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 4, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 5, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x: 6, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x: 7, y: 24}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  8, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  9, y: 31}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 8, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 9, y: 31}));
                 expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 10, y: 32}));
             });
 
@@ -338,18 +338,18 @@ describe('calculated data and points', function() {
                     categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
                 }});
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  0, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 0, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 2, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  3, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  4, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  5, y: 22}));
-                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  6, y: 23}));
-                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  7, y: 24}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 3, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 4, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 5, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x: 6, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x: 7, y: 24}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  8, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  9, y: 31}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 8, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 9, y: 31}));
                 expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 10, y: 32}));
             });
 
@@ -370,19 +370,19 @@ describe('calculated data and points', function() {
                     // this is the expected sorted outcome: ['Bearing','Bulb','Cord','Fuse','Gear','Leak','Motor','Plug','Pump','Seals','Switch']
                 }});
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  4, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  0, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  6, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 4, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 0, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 6, y: 12}));
 
                 expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 10, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  7, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  2, y: 22}));
-                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  3, y: 23}));
-                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  1, y: 24}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 7, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 2, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x: 3, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x: 1, y: 24}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  8, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  5, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  9, y: 32}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 8, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 5, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 9, y: 32}));
             });
 
             it('category order is category descending (even if categorylist is specified)', function() {
@@ -402,19 +402,19 @@ describe('calculated data and points', function() {
                     // this is the expected sorted outcome: ["Switch", "Seals", "Pump", "Plug", "Motor", "Leak", "Gear", "Fuse", "Cord", "Bulb", "Bearing"]
                 }});
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  6, y: 10}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 6, y: 10}));
                 expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 10, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  4, y: 12}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 4, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  3, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  8, y: 22}));
-                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  7, y: 23}));
-                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  9, y: 24}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 0, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 3, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 8, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x: 7, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x: 9, y: 24}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  2, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  5, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 2, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 5, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 1, y: 32}));
             });
 
             it('category order follows categorylist', function() {
@@ -433,19 +433,19 @@ describe('calculated data and points', function() {
                     categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
                 }});
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  9, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 9, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 2, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  6, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  5, y: 22}));
-                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  8, y: 23}));
-                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  7, y: 24}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 0, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 6, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 5, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x: 8, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x: 7, y: 24}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  4, y: 30}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 4, y: 30}));
                 expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 10, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  3, y: 32}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 3, y: 32}));
             });
         });
 
@@ -463,19 +463,19 @@ describe('calculated data and points', function() {
                     {x: x3, y: x3.map(function(d, i) {return i + 30;})}
                 ]);
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  0, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 0, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 2, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  3, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  4, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  5, y: 22}));
-                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  6, y: 23}));
-                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  7, y: 24}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 3, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 4, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 5, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x: 6, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x: 7, y: 24}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  8, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  9, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 8, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 9, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 1, y: 32}));
                 expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x: 10, y: 33}));
             });
 
@@ -495,19 +495,19 @@ describe('calculated data and points', function() {
                     categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
                 }});
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  0, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 0, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 2, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  3, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  4, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  5, y: 22}));
-                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  6, y: 23}));
-                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  7, y: 24}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 3, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 4, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 5, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x: 6, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x: 7, y: 24}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  8, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  9, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 8, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 9, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 1, y: 32}));
                 expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x: 10, y: 33}));
             });
 
@@ -528,20 +528,20 @@ describe('calculated data and points', function() {
                     // this is the expected sorted outcome: ['Bearing','Bulb','Cord','Fuse','Gear','Leak','Motor','Plug','Pump','Seals','Switch']
                 }});
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  4, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  0, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  6, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 4, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 0, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 6, y: 12}));
 
                 expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 10, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  7, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  2, y: 22}));
-                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  3, y: 23}));
-                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  1, y: 24}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 7, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 2, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x: 3, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x: 1, y: 24}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  8, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  5, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  0, y: 32}));
-                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x:  9, y: 33}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 8, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 5, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 0, y: 32}));
+                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x: 9, y: 33}));
             });
 
             it('category order is category descending (even if categorylist is specified)', function() {
@@ -561,20 +561,20 @@ describe('calculated data and points', function() {
                     // this is the expected sorted outcome: ["Switch", "Seals", "Pump", "Plug", "Motor", "Leak", "Gear", "Fuse", "Cord", "Bulb", "Bearing"]
                 }});
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  6, y: 10}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 6, y: 10}));
                 expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 10, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  4, y: 12}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 4, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  3, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  8, y: 22}));
-                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  7, y: 23}));
-                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  9, y: 24}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 0, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 3, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 8, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x: 7, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x: 9, y: 24}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  2, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  5, y: 31}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 2, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 5, y: 31}));
                 expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 10, y: 32}));
-                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x:  1, y: 33}));
+                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x: 1, y: 33}));
             });
 
             it('category order follows categorylist', function() {
@@ -593,20 +593,20 @@ describe('calculated data and points', function() {
                     categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
                 }});
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  9, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 9, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 2, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  6, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  5, y: 22}));
-                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  8, y: 23}));
-                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  7, y: 24}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 0, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 6, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 5, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x: 8, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x: 7, y: 24}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  4, y: 30}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 4, y: 30}));
                 expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 10, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
-                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x:  3, y: 33}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 1, y: 32}));
+                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x: 3, y: 33}));
             });
         });
 
@@ -624,17 +624,17 @@ describe('calculated data and points', function() {
                     {x: x3, y: x3.map(function(d, i) {return i + 30;})}
                 ]);
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  0, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 0, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 2, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  1, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  0, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  2, y: 22}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 1, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 0, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 2, y: 22}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  2, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  0, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 2, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 0, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 1, y: 32}));
             });
 
             it('category order follows the trace order (even if categorylist is specified)', function() {
@@ -653,17 +653,17 @@ describe('calculated data and points', function() {
                     categorylist: ['Switch','Bearing','Motor','Seals','Pump','Cord','Plug','Bulb','Fuse','Gear','Leak']
                 }});
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  0, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 0, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 2, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  1, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  0, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  2, y: 22}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 1, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 0, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 2, y: 22}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  2, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  0, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 2, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 0, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 1, y: 32}));
             });
 
             it('category order is category ascending (even if categorylist is specified)', function() {
@@ -683,17 +683,17 @@ describe('calculated data and points', function() {
                     // this is the expected sorted outcome: ['Bearing','Bulb','Cord','Fuse','Gear','Leak','Motor','Plug','Pump','Seals','Switch']
                 }});
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  1, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  0, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 1, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 0, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 2, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  1, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  2, y: 22}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 0, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 1, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 2, y: 22}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  2, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  1, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  0, y: 32}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 2, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 1, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 0, y: 32}));
             });
 
             it('category order is category descending (even if categorylist is specified)', function() {
@@ -713,17 +713,17 @@ describe('calculated data and points', function() {
                     // this is the expected sorted outcome: ["Switch", "Seals", "Pump", "Plug", "Motor", "Leak", "Gear", "Fuse", "Cord", "Bulb", "Bearing"]
                 }});
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  1, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  2, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  0, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 1, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 2, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 0, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  2, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  1, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  0, y: 22}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 2, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 1, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 0, y: 22}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  0, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  1, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  2, y: 32}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 0, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 1, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 2, y: 32}));
             });
 
             it('category order follows categorylist', function() {
@@ -744,17 +744,17 @@ describe('calculated data and points', function() {
                     }
                 });
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  2, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  0, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  1, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 2, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 0, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 1, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  2, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  1, y: 22}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 0, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 2, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 1, y: 22}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  1, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  2, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  0, y: 32}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 1, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 2, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 0, y: 32}));
             });
 
             it('category order follows categorylist even if data is sparse', function() {
@@ -775,17 +775,17 @@ describe('calculated data and points', function() {
                     }
                 });
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  9, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 9, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 2, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  1, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  9, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  2, y: 22}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 1, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 9, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 2, y: 22}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  2, y: 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  9, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 32}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 2, y: 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 9, y: 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 1, y: 32}));
             });
         });
 
@@ -810,21 +810,21 @@ describe('calculated data and points', function() {
                     }
                 });
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  9, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  1, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  2, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 9, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 2, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  6, y: 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  5, y: 22}));
-                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x:  8, y: 23}));
-                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x:  7, y: 24}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 0, y: 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 6, y: 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 5, y: 22}));
+                expect(gd.calcdata[1][3]).toEqual(jasmine.objectContaining({x: 8, y: 23}));
+                expect(gd.calcdata[1][4]).toEqual(jasmine.objectContaining({x: 7, y: 24}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  4, y: 30}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 4, y: 30}));
                 expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 10, y: 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  1, y: 11 + 32}));
-                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x:  3, y: 33}));
-            })
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 1, y: 11 + 32}));
+                expect(gd.calcdata[2][3]).toEqual(jasmine.objectContaining({x: 3, y: 33}));
+            });
 
             it('fully overlapping - category order follows categorylist and stacking produces expected results', function() {
 
@@ -845,17 +845,17 @@ describe('calculated data and points', function() {
                     }
                 });
 
-                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x:  2, y: 10}));
-                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x:  0, y: 11}));
-                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x:  1, y: 12}));
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 2, y: 10}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 0, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 1, y: 12}));
 
-                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x:  0, y: 11 + 20}));
-                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x:  2, y: 10 + 21}));
-                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x:  1, y: 12 + 22}));
+                expect(gd.calcdata[1][0]).toEqual(jasmine.objectContaining({x: 0, y: 11 + 20}));
+                expect(gd.calcdata[1][1]).toEqual(jasmine.objectContaining({x: 2, y: 10 + 21}));
+                expect(gd.calcdata[1][2]).toEqual(jasmine.objectContaining({x: 1, y: 12 + 22}));
 
-                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x:  1, y: 12 + 22 + 30}));
-                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x:  2, y: 10 + 21 + 31}));
-                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x:  0, y: 11 + 20 + 32}));
+                expect(gd.calcdata[2][0]).toEqual(jasmine.objectContaining({x: 1, y: 12 + 22 + 30}));
+                expect(gd.calcdata[2][1]).toEqual(jasmine.objectContaining({x: 2, y: 10 + 21 + 31}));
+                expect(gd.calcdata[2][2]).toEqual(jasmine.objectContaining({x: 0, y: 11 + 20 + 32}));
             });
         });
     });
