@@ -16,7 +16,9 @@ function flattenUnique(axisLetter, data) {
     var traceLines = data.map(function(d) {return d[axisLetter];});
     // Can't use a hashmap, which is O(1), because ES5 maps coerce keys to strings. If it ever becomes a bottleneck,
     // code can be separated: a hashmap (JS object) based version if all values encountered are strings; and
-    // downgrading to this O(log(n)) array on the first encounter of a non-string value.
+    // downgrading to this O(n) array on the first encounter of a non-string value.
+    // Another possible speedup is bisection, but it's probably slower on the small array
+    // sizes typical of categorical axis values.
     var categoryArray = [];
     var i, j, tracePoints, category;
     for(i = 0; i < traceLines.length; i++) {
