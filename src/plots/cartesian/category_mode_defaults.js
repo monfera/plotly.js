@@ -6,34 +6,34 @@
 * LICENSE file in the root directory of this source tree.
 */
 
-
 'use strict';
+
+var layoutAttributes = require('./layout_attributes');
 
 module.exports = function handleCategoryModeDefaults(containerIn, containerOut, coerce) {
 
-    if(containerIn.type === 'category') {
+    if(containerIn.type !== 'category') return;
 
-        var validCategories = ['trace', 'category ascending', 'category descending', 'array'];
+    var validCategories = layoutAttributes.categorymode.values;
 
-        var properCategoryList = Array.isArray(containerIn.categorylist) && containerIn.categorylist.length > 0;
+    var properCategoryList = Array.isArray(containerIn.categorylist) && containerIn.categorylist.length > 0;
 
-        if(validCategories.indexOf(containerIn.categorymode) === -1 && properCategoryList) {
+    if(validCategories.indexOf(containerIn.categorymode) === -1 && properCategoryList) {
 
-            // when unspecified or invalid, use the default, unless categorylist implies 'array'
-            coerce('categorymode', 'array'); // promote to 'array'
+        // when unspecified or invalid, use the default, unless categorylist implies 'array'
+        coerce('categorymode', 'array'); // promote to 'array'
 
-        } else if(containerIn.categorymode === 'array' && !properCategoryList) {
+    } else if(containerIn.categorymode === 'array' && !properCategoryList) {
 
-            // when mode is 'array' but no list is given, revert to default
+        // when mode is 'array' but no list is given, revert to default
 
-            containerIn.categorymode = 'trace'; // revert to default
-            coerce('categorymode');
+        containerIn.categorymode = 'trace'; // revert to default
+        coerce('categorymode');
 
-        } else {
+    } else {
 
-            // otherwise use the supplied mode, or the default one if unsupplied or invalid
-            coerce('categorymode');
+        // otherwise use the supplied mode, or the default one if unsupplied or invalid
+        coerce('categorymode');
 
-        }
     }
 };

@@ -364,7 +364,7 @@ describe('Test axes', function() {
                 });
                 expect(gd._fullLayout.xaxis.categorymode).toBe('array');
             });
-            
+
             it('should switch categorymode on "array" if it is not supplied but categorylist is supplied', function() {
                 PlotlyInternal.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], {
                     xaxis: {type: 'category', categorylist: ['b','a','d','e','c']}
