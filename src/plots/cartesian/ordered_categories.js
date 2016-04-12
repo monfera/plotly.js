@@ -11,32 +11,44 @@
 
 var d3 = require('d3');
 
-// flattenUnique :: String -> [[String]] -> Object
-function flattenUnique(axisLetter, data) {
-    var traceLines = data.map(function(d) {return d[axisLetter];});
-    // Can't use a hashmap, which is O(1), because ES5 maps coerce keys to strings. If it ever becomes a bottleneck,
-    // code can be separated: a hashmap (JS object) based version if all values encountered are strings; and
-    // downgrading to this O(n) array on the first encounter of a non-string value.
-    // Another possible speedup is bisection, but it's probably slower on the small array
-    // sizes typical of categorical axis values.
-    var categoryArray = [];
-    var i, j, tracePoints, category;
-    for(i = 0; i < traceLines.length; i++) {
-        tracePoints = traceLines[i];
-        for(j = 0; j < tracePoints.length; j++) {
-            category = tracePoints[j];
-            if(category === null || category === undefined) continue;
-            if(categoryArray.indexOf(category) === -1) {
-                categoryArray.push(category);
-            }
-        }
-    }
-    return categoryArray;
-}
-
 // flattenUniqueSort :: String -> Function -> [[String]] -> [String]
 function flattenUniqueSort(axisLetter, sortFunction, data) {
-    return flattenUnique(axisLetter, data).sort(sortFunction);
+
+    // Bisection based insertion sort of distinct values for logarithmic time complexity.
+    // Can't use a hashmap, which is O(1), because ES5 maps coerce keys to strings. If it ever becomes a bottleneck,
+    // code can be separated: a hashmap (JS object) based version if all values encountered are strings; and
+    // downgrading to this O(log(n)) array on the first encounter of a non-string value.
+
+    var categoryArray = [];
+
+    var traceLines = data.map(function(d) {return d[axisLetter];});
+
+    var i, j, tracePoints, category, insertionIndex;
+
+    var bisector = d3.bisector(sortFunction).left;
+
+    for(i = 0; i < traceLines.length; i++) {
+
+        tracePoints = traceLines[i];
+
+        for(j = 0; j < tracePoints.length; j++) {
+
+            category = tracePoints[j];
+
+            // skip loop: ignore null and undefined categories
+            if(category === null || category === undefined) continue;
+
+            insertionIndex = bisector(categoryArray, category);
+
+            // skip loop on already encountered values
+            if(insertionIndex < categoryArray.length - 1 && categoryArray[insertionIndex] === category) continue;
+
+            // insert value
+            categoryArray.splice(insertionIndex, 0, category);
+        }
+    }
+
+    return categoryArray;
 }
 
 
