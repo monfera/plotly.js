@@ -4,10 +4,10 @@
         "y": [15,11,12,13,14]}
     ],
     "layout": {
+        "title": "categorylist with truncated tails (y, q, k not plotted)",
         "xaxis": {
-            "title": "category ascending",
             "type": "category",
-            "categorymode": "category ascending",
+            "categorymode": "array",
             "categorylist": ["y","b","x","a","d","z","e","c", "q", "k"]
         }}
 }
