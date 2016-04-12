@@ -17,7 +17,9 @@ var Plots = require('../plots');
 var layoutAttributes = require('./layout_attributes');
 var handleTickValueDefaults = require('./tick_value_defaults');
 var handleTickDefaults = require('./tick_defaults');
+var handleCategoryModeDefaults = require('./category_mode_defaults');
 var setConvert = require('./set_convert');
+var orderedCategories = require('./ordered_categories');
 var cleanDatum = require('./clean_datum');
 var axisIds = require('./axis_ids');
 
@@ -64,6 +66,10 @@ module.exports = function handleAxisDefaults(containerIn, containerOut, coerce, 
         }
     }
 
+    containerOut._initialCategories = axType === 'category' ?
+        orderedCategories(letter, containerIn.categorymode, containerIn.categorylist, options.data) :
+        [];
+
     setConvert(containerOut);
 
     coerce('title', defaultTitle);
@@ -91,6 +97,7 @@ module.exports = function handleAxisDefaults(containerIn, containerOut, coerce, 
 
     handleTickValueDefaults(containerIn, containerOut, coerce, axType);
     handleTickDefaults(containerIn, containerOut, coerce, axType, options);
+    handleCategoryModeDefaults(containerIn, containerOut, coerce);
 
     var lineColor = Lib.coerce2(containerIn, containerOut, layoutAttributes, 'linecolor'),
         lineWidth = Lib.coerce2(containerIn, containerOut, layoutAttributes, 'linewidth'),
