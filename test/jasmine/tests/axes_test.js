@@ -7,8 +7,8 @@ var Color = require('@src/components/color');
 var handleTickValueDefaults = require('@src/plots/cartesian/tick_value_defaults');
 var Axes = PlotlyInternal.Axes;
 
-var createGraph = require('../assets/create_graph_div');
-var destroyGraph = require('../assets/destroy_graph_div');
+var createGraphDiv = require('../assets/create_graph_div');
+var destroyGraphDiv = require('../assets/destroy_graph_div');
 
 
 describe('Test axes', function() {
@@ -326,10 +326,10 @@ describe('Test axes', function() {
             gd;
 
         beforeEach(function() {
-            gd = createGraph();
+            gd = createGraphDiv();
         });
 
-        afterEach(destroyGraph);
+        afterEach(destroyGraphDiv);
 
         it('should set defaults on bad inputs', function() {
             var layout = {
