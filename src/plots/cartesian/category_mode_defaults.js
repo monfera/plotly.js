@@ -20,7 +20,7 @@ module.exports = function handleCategoryModeDefaults(containerIn, containerOut, 
         if(validCategories.indexOf(containerIn.categorymode) === -1 && properCategoryList) {
 
             // when unspecified or invalid, use the default, unless categorylist implies 'array'
-            coerce('categorymode', 'array'); // promote to 'array
+            coerce('categorymode', 'array'); // promote to 'array'
 
         } else if(containerIn.categorymode === 'array' && !properCategoryList) {
 
