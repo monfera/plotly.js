@@ -14,23 +14,27 @@ var d3 = require('d3');
 // flattenUnique :: String -> [[String]] -> Object
 function flattenUnique(axisLetter, data) {
     var traceLines = data.map(function(d) {return d[axisLetter];});
-    var categoryMap = {}; // hashmap is O(1);
+    // Can't use a hashmap, which is O(1), because ES5 maps coerce keys to strings. If it ever becomes a bottleneck,
+    // code can be separated: a hashmap (JS object) based version if all values encountered are strings; and
+    // downgrading to this O(log(n)) array on the first encounter of a non-string value.
+    var categoryArray = [];
     var i, j, tracePoints, category;
     for(i = 0; i < traceLines.length; i++) {
         tracePoints = traceLines[i];
         for(j = 0; j < tracePoints.length; j++) {
             category = tracePoints[j];
-            if(!categoryMap[category]) {
-                categoryMap[category] = true;
+            if(category === null || category === undefined) continue;
+            if(categoryArray.indexOf(category) === -1) {
+                categoryArray.push(category);
             }
         }
     }
-    return categoryMap;
+    return categoryArray;
 }
 
 // flattenUniqueSort :: String -> Function -> [[String]] -> [String]
 function flattenUniqueSort(axisLetter, sortFunction, data) {
-    return Object.keys(flattenUnique(axisLetter, data)).sort(sortFunction);
+    return flattenUnique(axisLetter, data).sort(sortFunction);
 }
 
 
@@ -50,7 +54,7 @@ function flattenUniqueSort(axisLetter, sortFunction, data) {
 module.exports = function orderedCategories(axisLetter, categorymode, categorylist, data) {
 
     switch(categorymode) {
-        case 'array': return Array.isArray(categorylist) ? categorylist : [];
+        case 'array': return Array.isArray(categorylist) ? categorylist.slice() : [];
         case 'category ascending': return flattenUniqueSort(axisLetter, d3.ascending, data);
         case 'category descending': return flattenUniqueSort(axisLetter, d3.descending, data);
         case 'trace': return [];

@@ -96,6 +96,20 @@ describe('calculated data and points', function() {
                 expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 1, y: 14}));
             });
 
+            it('should output categories in ascending domain alphanumerical order even if categories are all numbers', function() {
+
+                Plotly.plot(gd, [{x: [3,1,5,2,4], y: [15,11,12,13,14]}], { xaxis: {
+                    type: 'category',
+                    categorymode: 'category ascending'
+                }});
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 2, y: 15}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 0, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 4, y: 12}));
+                expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 1, y: 13}));
+                expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 3, y: 14}));
+            });
+
             it('should output categories in categorymode order even if category array is defined', function() {
 
                 Plotly.plot(gd, [{x: ['c','a','e','b','d'], y: [15,11,12,13,14]}], { xaxis: {
@@ -180,6 +194,21 @@ describe('calculated data and points', function() {
                     type: 'category',
                     categorymode: 'array',
                     categorylist: ['b','a','d','e','c']
+                }});
+
+                expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 4, y: 15}));
+                expect(gd.calcdata[0][1]).toEqual(jasmine.objectContaining({x: 1, y: 11}));
+                expect(gd.calcdata[0][2]).toEqual(jasmine.objectContaining({x: 3, y: 12}));
+                expect(gd.calcdata[0][3]).toEqual(jasmine.objectContaining({x: 0, y: 13}));
+                expect(gd.calcdata[0][4]).toEqual(jasmine.objectContaining({x: 2, y: 14}));
+            });
+
+            it('should output categories in explicitly supplied order even if category values are all numbers', function() {
+
+                Plotly.plot(gd, [{x: [3,1,5,2,4], y: [15,11,12,13,14]}], { xaxis: {
+                    type: 'category',
+                    categorymode: 'array',
+                    categorylist: [2,1,4,5,3]
                 }});
 
                 expect(gd.calcdata[0][0]).toEqual(jasmine.objectContaining({x: 4, y: 15}));
