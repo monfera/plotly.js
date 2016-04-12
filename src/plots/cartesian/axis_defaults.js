@@ -17,6 +17,7 @@ var Plots = require('../plots');
 var layoutAttributes = require('./layout_attributes');
 var handleTickValueDefaults = require('./tick_value_defaults');
 var handleTickDefaults = require('./tick_defaults');
+var handleCategoryModeDefaults = require('./category_mode_defaults');
 var setConvert = require('./set_convert');
 var orderedCategories = require('./ordered_categories');
 var cleanDatum = require('./clean_datum');
@@ -96,6 +97,7 @@ module.exports = function handleAxisDefaults(containerIn, containerOut, coerce, 
 
     handleTickValueDefaults(containerIn, containerOut, coerce, axType);
     handleTickDefaults(containerIn, containerOut, coerce, axType, options);
+    handleCategoryModeDefaults(containerIn, containerOut, coerce);
 
     var lineColor = Lib.coerce2(containerIn, containerOut, layoutAttributes, 'linecolor'),
         lineWidth = Lib.coerce2(containerIn, containerOut, layoutAttributes, 'linewidth'),
