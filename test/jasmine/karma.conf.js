@@ -43,7 +43,7 @@ func.defaultConfig = {
     // list of files / patterns to load in the browser
     //
     // N.B. this field is filled below
-    files: [],
+    files: ['tests/gl_plot_interact_test.js'],
 
     exclude: [],
 
