@@ -64,20 +64,81 @@ describe('gl3d plots', function() {
         gd = createGraphDiv();
     });
 
-    afterEach(function() {
+    afterEach(function() {return
         Plotly.purge(gd);
         destroyGraphDiv();
     });
 
-    it('should respond to drag interactions with mock of unset camera', function(done) {
-        testEvents(makePlot(gd, require('@mocks/gl3d_scatter3d-connectgaps.json')))
-            .then(null, failTest) // current linter balks on .catch with 'dot-notation'; fixme a linter
+    fit('should respond to drag interactions with mock of partially set camera', function(done) {
+
+        var mock = require('@mocks/gl3d_moonshot.json')
+
+        var data = mock.data
+        var s = data[0]
+
+        var layout = mock.layout
+
+        var X = []
+        var Y = []
+        var Z = []
+        var I = []
+        var J = []
+        var K = []
+
+        var circleRadius = 10;
+        var trianglesPerCircle = 4
+        var rowCount = 2;
+        var heightIncrement = 5;
+
+        var angle, x, y, z, h, c, mate1, mate2;
+
+        var offset = false;
+        var index = 0;
+
+        for(h = 0; h < rowCount; h++) {
+
+            z = h * heightIncrement;
+
+            for (c = 0; c < trianglesPerCircle; c++) {
+
+                angle = (c + (offset ? 0.5 : 0)) * Math.PI * 2 / trianglesPerCircle;
+
+                x = Math.cos(angle) * circleRadius; // could be cached
+                y = Math.sin(angle) * circleRadius; // could be cached
+
+                X.push(x);
+                Y.push(y);
+                Z.push(z);
+
+                mate1 = index - trianglesPerCircle;
+                mate2 = index - trianglesPerCircle + 1 - (c === trianglesPerCircle - 1  ? trianglesPerCircle : 0);
+
+                if(mate1 >= 0 && mate2 >= 0) {
+
+                    I.push(index); J.push(mate1); K.push(mate2);
+
+                }
+
+                index++;
+            }
+
+            offset = !offset;
+        }
+
+
+        s.x = X;
+        s.y = Y;
+        s.z = Z;
+        s.i = I;
+        s.j = J;
+        s.k = K;
+
+        window.gd = gd
+        window.data = data
+        window.Plotly = Plotly
+
+        Plotly.plot(gd, data, layout)
             .then(done);
     });
 
-    it('should respond to drag interactions with mock of partially set camera', function(done) {
-        testEvents(makePlot(gd, require('@mocks/gl3d_errorbars_zx.json')))
-            .then(null, failTest)
-            .then(done);
-    });
 });
