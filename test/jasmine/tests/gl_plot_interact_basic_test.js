@@ -8,7 +8,6 @@ var createGraphDiv = require('../assets/create_graph_div');
 var destroyGraphDiv = require('../assets/destroy_graph_div');
 var failTest = require('../assets/fail_test');
 
-
 // Expected shape of projection-related data
 var cameraStructure = {
     up: {x: jasmine.any(Number), y: jasmine.any(Number), z: jasmine.any(Number)},
@@ -56,6 +55,18 @@ function testEvents(plot) {
         });
 }
 
+function colorface(F, ratio) {
+    
+    F.push([
+        'rgb(',
+        Math.round(ratio * 255),
+        ',',
+        Math.round(0),
+        ',',
+        Math.round(255 - ratio * 255),
+        ')'].join(""));
+}
+
 describe('gl3d plots', function() {
 
     var gd;
@@ -84,11 +95,12 @@ describe('gl3d plots', function() {
         var I = []
         var J = []
         var K = []
+        var F = []
 
         var circleRadius = 10;
-        var trianglesPerCircle = 4
-        var rowCount = 2;
-        var heightIncrement = 5;
+        var trianglesPerCircle = 40
+        var rowCount = 100;
+        var heightIncrement = 4;
 
         var angle, x, y, z, h, c, mate1a, mate1b, mate2a, mate2b;
 
@@ -116,6 +128,7 @@ describe('gl3d plots', function() {
 
                 if(mate1a >= 0 && mate1b >= 0) {
                     I.push(index); J.push(mate1a); K.push(mate1b);
+                    colorface(F, h / rowCount);
                 }
 
                 // winding order: clockwise
@@ -124,6 +137,7 @@ describe('gl3d plots', function() {
 
                 if(mate2a >= 0 && mate2b >= 0) {
                     I.push(index); J.push(mate2a); K.push(mate2b);
+                    colorface(F, h / rowCount);
                 }
 
 
@@ -133,16 +147,26 @@ describe('gl3d plots', function() {
             offset = !offset;
         }
 
+        X.push(100)
+        X.push(-100)
+        Y.push(100)
+        Y.push(-100)
+        Z.push(100)
+        Z.push(-100)
 
-        s.x = X;
-        s.y = Y;
-        s.z = Z;
-        s.i = I;
-        s.j = J;
-        s.k = K;
+        if(1) {
+            s.x = X;
+            s.y = Y;
+            s.z = Z;
+            s.i = I;
+            s.j = J;
+            s.k = K;
+            s.facecolor = F;
+        }
 
         window.gd = gd
         window.data = data
+        window.s = s
         window.Plotly = Plotly
 
         Plotly.plot(gd, data, layout)
