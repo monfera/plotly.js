@@ -82,20 +82,20 @@ function addFace(i, j, k, index, I, J, K, F) {
 
 function addSphere(x, y, z, r, i, X, Y, Z, I, J, K, F) {
 
-    addVertex(-1 + x,  r + y,  0 + z, X, Y, Z);
-    addVertex( 1 + x,  r + y,  0 + z, X, Y, Z);
-    addVertex(-1 + x, -r + y,  0 + z, X, Y, Z);
-    addVertex( 1 + x, -r + y,  0 + z, X, Y, Z);
+    addVertex(-r + x,  r + y,  0 + z, X, Y, Z);
+    addVertex( r + x,  r + y,  0 + z, X, Y, Z);
+    addVertex(-r + x, -r + y,  0 + z, X, Y, Z);
+    addVertex( r + x, -r + y,  0 + z, X, Y, Z);
 
-    addVertex( 0 + x, -1 + y,  r + z, X, Y, Z);
-    addVertex( 0 + x,  1 + y,  r + z, X, Y, Z);
-    addVertex( 0 + x, -1 + y, -r + z, X, Y, Z);
-    addVertex( 0 + x,  1 + y, -r + z, X, Y, Z);
+    addVertex( 0 + x, -r + y,  r + z, X, Y, Z);
+    addVertex( 0 + x,  r + y,  r + z, X, Y, Z);
+    addVertex( 0 + x, -r + y, -r + z, X, Y, Z);
+    addVertex( 0 + x,  r + y, -r + z, X, Y, Z);
 
-    addVertex( r + x,  0 + y, -1 + z, X, Y, Z);
-    addVertex( r + x,  0 + y,  1 + z, X, Y, Z);
-    addVertex(-r + x,  0 + y, -1 + z, X, Y, Z);
-    addVertex(-r + x,  0 + y,  1 + z, X, Y, Z);
+    addVertex( r + x,  0 + y, -r + z, X, Y, Z);
+    addVertex( r + x,  0 + y,  r + z, X, Y, Z);
+    addVertex(-r + x,  0 + y, -r + z, X, Y, Z);
+    addVertex(-r + x,  0 + y,  r + z, X, Y, Z);
 
     addFace(0, 11, 5, i, I, J, K, F);
     addFace(0, 5, 1, i, I, J, K, F);
@@ -176,7 +176,7 @@ describe('gl3d plots', function() {
         function radius(z) {
             return circleRadius + circleRadius / 2 * Math.sin(33 + z / 27);
         }
-
+        
         for(t = 0; t < tCount; t++) {
 
             z = t * heightIncrement;
@@ -226,7 +226,7 @@ describe('gl3d plots', function() {
             y  = 200 * Math.random() - 100;
             z  = 400 * Math.random();
 
-            index = addSphere(x, y, z, 10, index, X, Y, Z, I, J, K, F)
+            index = addSphere(x, y, z, 5, index, X, Y, Z, I, J, K, F)
 
         }
 
