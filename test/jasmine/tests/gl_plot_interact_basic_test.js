@@ -99,10 +99,11 @@ describe('gl3d plots', function() {
 
         var circleRadius = 15;
         var trianglesPerCircle = 40
+        var tCount = 100;
         var rowCount = 100;
         var heightIncrement = 4;
 
-        var angle, x, y, z, h, c, mate1a, mate1b, mate2a, mate2b;
+        var angle, t, x, y, z, t, c, mate1a, mate1b, mate2a, mate2b;
 
         var offset = false;
         var index = 0;
@@ -119,9 +120,9 @@ describe('gl3d plots', function() {
             return circleRadius + circleRadius / 2 * Math.sin(33 + z / 27);
         }
 
-        for(h = 0; h < rowCount; h++) {
+        for(t = 0; t < tCount; t++) {
 
-            z = h * heightIncrement;
+            z = t * heightIncrement;
 
             for (c = 0; c < trianglesPerCircle; c++) {
 
@@ -140,7 +141,7 @@ describe('gl3d plots', function() {
 
                 if(mate1a >= 0 && mate1b >= 0) {
                     I.push(index); J.push(mate1a); K.push(mate1b);
-                    colorface(F, h / rowCount);
+                    colorface(F, t / rowCount);
                 }
 
                 // winding order: clockwise
@@ -149,7 +150,7 @@ describe('gl3d plots', function() {
 
                 if(mate2a >= 0 && mate2b >= 0) {
                     I.push(index); J.push(mate2a); K.push(mate2b);
-                    colorface(F, h / rowCount);
+                    colorface(F, t / rowCount);
                 }
 
 
