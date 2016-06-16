@@ -56,14 +56,14 @@ function testEvents(plot) {
 }
 
 function colorface(F, ratio) {
-    
+
     F.push([
         'rgb(',
-        Math.round(ratio * 255),
+        Math.round(ratio * 127 + 128),
         ',',
         Math.round(0),
         ',',
-        Math.round(255 - ratio * 255),
+        Math.round(255 - ratio * 127),
         ')'].join(""));
 }
 
@@ -97,7 +97,7 @@ describe('gl3d plots', function() {
         var K = []
         var F = []
 
-        var circleRadius = 10;
+        var circleRadius = 5;
         var trianglesPerCircle = 40
         var rowCount = 100;
         var heightIncrement = 4;
