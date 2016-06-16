@@ -112,7 +112,7 @@ describe('gl3d plots', function() {
         }
 
         function centerY(z) {
-            return 20 * Math.sin(z/37);
+            return 40 * Math.sin(z/37);
         }
 
         function radius(z) {
