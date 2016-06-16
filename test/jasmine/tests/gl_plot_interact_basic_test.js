@@ -67,6 +67,63 @@ function colorface(F, ratio) {
         ')'].join(""));
 }
 
+function addVertex(x, y, z, X, Y, Z) {
+    X.push(x);
+    Y.push(y);
+    Z.push(z);
+}
+
+function addFace(i, j, k, index, I, J, K, F) {
+    I.push(i + index);
+    J.push(j + index);
+    K.push(k + index);
+    F.push('rgb(64,255,54)');
+}
+
+function addSphere(x, y, z, r, i, X, Y, Z, I, J, K, F) {
+
+    addVertex(-1 + x,  r + y,  0 + z, X, Y, Z);
+    addVertex( 1 + x,  r + y,  0 + z, X, Y, Z);
+    addVertex(-1 + x, -r + y,  0 + z, X, Y, Z);
+    addVertex( 1 + x, -r + y,  0 + z, X, Y, Z);
+
+    addVertex( 0 + x, -1 + y,  r + z, X, Y, Z);
+    addVertex( 0 + x,  1 + y,  r + z, X, Y, Z);
+    addVertex( 0 + x, -1 + y, -r + z, X, Y, Z);
+    addVertex( 0 + x,  1 + y, -r + z, X, Y, Z);
+
+    addVertex( r + x,  0 + y, -1 + z, X, Y, Z);
+    addVertex( r + x,  0 + y,  1 + z, X, Y, Z);
+    addVertex(-r + x,  0 + y, -1 + z, X, Y, Z);
+    addVertex(-r + x,  0 + y,  1 + z, X, Y, Z);
+
+    addFace(0, 11, 5, i, I, J, K, F);
+    addFace(0, 5, 1, i, I, J, K, F);
+    addFace(0, 1, 7, i, I, J, K, F);
+    addFace(0, 7, 10, i, I, J, K, F);
+    addFace(0, 10, 11, i, I, J, K, F);
+
+    addFace(1, 5, 9, i, I, J, K, F);
+    addFace(5, 11, 4, i, I, J, K, F);
+    addFace(11, 10, 2, i, I, J, K, F);
+    addFace(10, 7, 6, i, I, J, K, F);
+    addFace(7, 1, 8, i, I, J, K, F);
+
+    addFace(3, 9, 4, i, I, J, K, F);
+    addFace(3, 4, 2, i, I, J, K, F);
+    addFace(3, 2, 6, i, I, J, K, F);
+    addFace(3, 6, 8, i, I, J, K, F);
+    addFace(3, 8, 9, i, I, J, K, F);
+
+    addFace(4, 9, 5, i, I, J, K, F);
+    addFace(2, 4, 11, i, I, J, K, F);
+    addFace(6, 2, 10, i, I, J, K, F);
+    addFace(8, 6, 7, i, I, J, K, F);
+    addFace(9, 8, 1, i, I, J, K, F);
+
+    return i + 12; // 20 faces per sphere
+}
+
 describe('gl3d plots', function() {
 
     var gd;
@@ -103,7 +160,7 @@ describe('gl3d plots', function() {
         var rowCount = 100;
         var heightIncrement = 4;
 
-        var angle, t, x, y, z, t, c, mate1a, mate1b, mate2a, mate2b;
+        var angle, t, x, y, z, c, mate1a, mate1b, mate2a, mate2b;
 
         var offset = false;
         var index = 0;
@@ -158,6 +215,19 @@ describe('gl3d plots', function() {
             }
 
             offset = !offset;
+        }
+
+        var pointCount = 20;
+        var n;
+
+        for(n = 0; n < pointCount; n++) {
+
+            x  = 200 * Math.random() - 100;
+            y  = 200 * Math.random() - 100;
+            z  = 400 * Math.random();
+
+            index = addSphere(x, y, z, 10, index, X, Y, Z, I, J, K, F)
+
         }
 
         X.push(100)
