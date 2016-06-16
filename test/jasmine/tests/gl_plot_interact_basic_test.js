@@ -90,7 +90,7 @@ describe('gl3d plots', function() {
         var rowCount = 2;
         var heightIncrement = 5;
 
-        var angle, x, y, z, h, c, mate1, mate2;
+        var angle, x, y, z, h, c, mate1a, mate1b, mate2a, mate2b;
 
         var offset = false;
         var index = 0;
@@ -110,14 +110,22 @@ describe('gl3d plots', function() {
                 Y.push(y);
                 Z.push(z);
 
-                mate1 = index - trianglesPerCircle;
-                mate2 = index - trianglesPerCircle + 1 - (c === trianglesPerCircle - 1  ? trianglesPerCircle : 0);
+                // winding order: clockwise
+                mate1a = index - trianglesPerCircle + 1 - (c === trianglesPerCircle - 1  ? trianglesPerCircle : 0);
+                mate1b = index - trianglesPerCircle;
 
-                if(mate1 >= 0 && mate2 >= 0) {
-
-                    I.push(index); J.push(mate1); K.push(mate2);
-
+                if(mate1a >= 0 && mate1b >= 0) {
+                    I.push(index); J.push(mate1a); K.push(mate1b);
                 }
+
+                // winding order: clockwise
+                mate2a = index - trianglesPerCircle;
+                mate2b = index - 1 + (c === 0 ? trianglesPerCircle : 0);
+
+                if(mate2a >= 0 && mate2b >= 0) {
+                    I.push(index); J.push(mate2a); K.push(mate2b);
+                }
+
 
                 index++;
             }
