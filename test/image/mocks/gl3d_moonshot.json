@@ -48,6 +48,7 @@
       "showticklabels": false,
       "showspikes": false
     },
+    "hovermode": false,
     "camera": {
       "center": {
         "x": 0,
