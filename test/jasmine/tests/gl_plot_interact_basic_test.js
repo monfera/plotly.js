@@ -97,7 +97,7 @@ describe('gl3d plots', function() {
         var K = []
         var F = []
 
-        var circleRadius = 5;
+        var circleRadius = 15;
         var trianglesPerCircle = 40
         var rowCount = 100;
         var heightIncrement = 4;
@@ -107,6 +107,18 @@ describe('gl3d plots', function() {
         var offset = false;
         var index = 0;
 
+        function centerX(z) {
+            return 40 * Math.cos(z/20);
+        }
+
+        function centerY(z) {
+            return 20 * Math.sin(z/37);
+        }
+
+        function radius(z) {
+            return circleRadius + circleRadius / 2 * Math.sin(33 + z / 27);
+        }
+
         for(h = 0; h < rowCount; h++) {
 
             z = h * heightIncrement;
@@ -115,8 +127,8 @@ describe('gl3d plots', function() {
 
                 angle = (c + (offset ? 0.5 : 0)) * Math.PI * 2 / trianglesPerCircle;
 
-                x = Math.cos(angle) * circleRadius; // could be cached
-                y = Math.sin(angle) * circleRadius; // could be cached
+                x = centerX(z) + Math.cos(angle) * radius(z); // could be cached
+                y = centerY(z) + Math.sin(angle) * radius(z); // could be cached
 
                 X.push(x);
                 Y.push(y);
