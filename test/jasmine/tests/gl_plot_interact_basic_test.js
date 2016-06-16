@@ -61,7 +61,7 @@ function colorface(F, ratio) {
         'rgb(',
         Math.round(ratio * 127 + 128),
         ',',
-        Math.round(0),
+        Math.round(32),
         ',',
         Math.round(255 - ratio * 127),
         ')'].join(""));
