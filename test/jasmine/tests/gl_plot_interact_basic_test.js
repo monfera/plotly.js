@@ -73,10 +73,10 @@ function addVertex(x, y, z, X, Y, Z) {
     Z.push(z);
 }
 
-function addFace(i, j, k, index, I, J, K, F) {
-    I.push(i + index);
-    J.push(j + index);
-    K.push(k + index);
+function addFace(i, j, k, I, J, K, F) {
+    I.push(i);
+    J.push(j);
+    K.push(k);
     F.push('rgb(64,255,54)');
 }
 
@@ -91,46 +91,44 @@ function sphereModel() {
     var K = [];
     var F = [];
 
-    var x = 0, y = 0, z = 0;
+    addVertex(-1,  1,  0, X, Y, Z);
+    addVertex( 1,  1,  0, X, Y, Z);
+    addVertex(-1, -1,  0, X, Y, Z);
+    addVertex( 1, -1,  0, X, Y, Z);
 
-    addVertex(-1 + x,  1 + y,  0 + z, X, Y, Z);
-    addVertex( 1 + x,  1 + y,  0 + z, X, Y, Z);
-    addVertex(-1 + x, -1 + y,  0 + z, X, Y, Z);
-    addVertex( 1 + x, -1 + y,  0 + z, X, Y, Z);
+    addVertex( 0, -1,  1, X, Y, Z);
+    addVertex( 0,  1,  1, X, Y, Z);
+    addVertex( 0, -1, -1, X, Y, Z);
+    addVertex( 0,  1, -1, X, Y, Z);
 
-    addVertex( 0 + x, -1 + y,  1 + z, X, Y, Z);
-    addVertex( 0 + x,  1 + y,  1 + z, X, Y, Z);
-    addVertex( 0 + x, -1 + y, -1 + z, X, Y, Z);
-    addVertex( 0 + x,  1 + y, -1 + z, X, Y, Z);
+    addVertex( 1,  0, -1, X, Y, Z);
+    addVertex( 1,  0,  1, X, Y, Z);
+    addVertex(-1,  0, -1, X, Y, Z);
+    addVertex(-1,  0,  1, X, Y, Z);
 
-    addVertex( 1 + x,  0 + y, -1 + z, X, Y, Z);
-    addVertex( 1 + x,  0 + y,  1 + z, X, Y, Z);
-    addVertex(-1 + x,  0 + y, -1 + z, X, Y, Z);
-    addVertex(-1 + x,  0 + y,  1 + z, X, Y, Z);
+    addFace(0, 11, 5, I, J, K, F);
+    addFace(0, 5, 1, I, J, K, F);
+    addFace(0, 1, 7, I, J, K, F);
+    addFace(0, 7, 10, I, J, K, F);
+    addFace(0, 10, 11, I, J, K, F);
 
-    addFace(0, 11, 5, 0, I, J, K, F);
-    addFace(0, 5, 1, 0, I, J, K, F);
-    addFace(0, 1, 7, 0, I, J, K, F);
-    addFace(0, 7, 10, 0, I, J, K, F);
-    addFace(0, 10, 11, 0, I, J, K, F);
+    addFace(1, 5, 9, I, J, K, F);
+    addFace(5, 11, 4, I, J, K, F);
+    addFace(11, 10, 2, I, J, K, F);
+    addFace(10, 7, 6, I, J, K, F);
+    addFace(7, 1, 8, I, J, K, F);
 
-    addFace(1, 5, 9, 0, I, J, K, F);
-    addFace(5, 11, 4, 0, I, J, K, F);
-    addFace(11, 10, 2, 0, I, J, K, F);
-    addFace(10, 7, 6, 0, I, J, K, F);
-    addFace(7, 1, 8, 0, I, J, K, F);
+    addFace(3, 9, 4, I, J, K, F);
+    addFace(3, 4, 2, I, J, K, F);
+    addFace(3, 2, 6, I, J, K, F);
+    addFace(3, 6, 8, I, J, K, F);
+    addFace(3, 8, 9, I, J, K, F);
 
-    addFace(3, 9, 4, 0, I, J, K, F);
-    addFace(3, 4, 2, 0, I, J, K, F);
-    addFace(3, 2, 6, 0, I, J, K, F);
-    addFace(3, 6, 8, 0, I, J, K, F);
-    addFace(3, 8, 9, 0, I, J, K, F);
-
-    addFace(4, 9, 5, 0, I, J, K, F);
-    addFace(2, 4, 11, 0, I, J, K, F);
-    addFace(6, 2, 10, 0, I, J, K, F);
-    addFace(8, 6, 7, 0, I, J, K, F);
-    addFace(9, 8, 1, 0, I, J, K, F);
+    addFace(4, 9, 5, I, J, K, F);
+    addFace(2, 4, 11, I, J, K, F);
+    addFace(6, 2, 10, I, J, K, F);
+    addFace(8, 6, 7, I, J, K, F);
+    addFace(9, 8, 1, I, J, K, F);
 
     var model = {
         x: X,
