@@ -145,23 +145,34 @@ function sphereModel() {
     return model
 }
 
-function nconcat(a, b) {
-    [].splice.apply(a, [a.length, 0].concat(b));
-}
-
 var m = sphereModel();
 
-function addSphere(x, y, z, r, i, X, Y, Z, I, J, K, F) {
+function addSphere(x, y, z, r, vOffset, X, Y, Z, I, J, K, F) {
 
-    nconcat(X, m.x.map(function(d) {return x + d * r;}));
-    nconcat(Y, m.y.map(function(d) {return y + d * r;}));
-    nconcat(Z, m.z.map(function(d) {return z + d * r;}));
-    nconcat(I, m.i.map(function(d) {return i + d;}));
-    nconcat(J, m.j.map(function(d) {return i + d;}));
-    nconcat(K, m.k.map(function(d) {return i + d;}));
-    nconcat(F, m.f);
+    var v, p;
 
-    return i + 12; // 20 faces per sphere
+    var mx = m.x;
+    var my = m.y;
+    var mz = m.z;
+    var mi = m.i;
+    var mj = m.j;
+    var mk = m.k;
+    var mf = m.f;
+
+    for(v = 0; v < mx.length; v++) {
+        X.push(x + mx[v] * r);
+        Y.push(y + my[v] * r);
+        Z.push(z + mz[v] * r);
+    }
+
+    for(p = 0; p < mi.length; p++) {
+        I.push(vOffset + mi[p]);
+        J.push(vOffset + mj[p]);
+        K.push(vOffset + mk[p]);
+        F.push(mf[p]);
+    }
+
+    return vOffset + mx.length;
 }
 
 describe('gl3d plots', function() {
