@@ -88,7 +88,7 @@ function addFace(I, J, K, F, i, j, k, f) {
     F.push(f);
 }
 
-function sphereModel() {
+function unitIcosahedron() {
 
     var X = [];
     var Y = [];
@@ -262,21 +262,19 @@ function increaseLoD(m) {
     return model;
 }
 
-var m0 = sphereModel();
-
-var m = increaseLoD(increaseLoD(increaseLoD(m0)));
+var unitSphere = increaseLoD(increaseLoD(increaseLoD(unitIcosahedron())));
 
 function addSphere(x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
 
     var v, p;
 
-    var mx = m.x;
-    var my = m.y;
-    var mz = m.z;
-    var mi = m.i;
-    var mj = m.j;
-    var mk = m.k;
-    var mf = m.f;
+    var mx = unitSphere.x;
+    var my = unitSphere.y;
+    var mz = unitSphere.z;
+    var mi = unitSphere.i;
+    var mj = unitSphere.j;
+    var mk = unitSphere.k;
+    var mf = unitSphere.f;
 
     for(v = 0; v < mx.length; v++) {
         X.push(x + mx[v] * r);
