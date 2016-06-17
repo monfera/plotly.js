@@ -68,10 +68,9 @@ function colorface(F, ratio) {
 }
 
 function addVertex(X, Y, Z, x, y, z) {
-    var length = Math.sqrt(x * x + y * y + z * z);
-    X.push(x / length);
-    Y.push(y / length);
-    Z.push(z / length);
+    X.push(x);
+    Y.push(y);
+    Z.push(z);
 }
 
 function randomColor() {
@@ -88,6 +87,44 @@ function addFace(I, J, K, F, i, j, k, f) {
     F.push(f);
 }
 
+function unitCylinder() {
+
+    var X = [];
+    var Y = [];
+    var Z = [];
+
+    var I = [];
+    var J = [];
+    var K = [];
+    var F = [];
+
+    var av = addVertex.bind(null, X, Y, Z);
+    var af = addFace.bind(null, I, J, K, F);
+
+    var quadCount = 10;
+    var angle;
+
+    for(q = 0; q < quadCount; q++) {
+
+        angle = q * Math.PI * 2 / quadCount;
+
+
+
+    }
+
+    var model = {
+        x: X,
+        y: Y,
+        z: Z,
+        i: I,
+        j: J,
+        k: K,
+        f: F
+    };
+
+    return model;
+}
+
 function unitIcosahedron() {
 
     var X = [];
@@ -99,25 +136,26 @@ function unitIcosahedron() {
     var K = [];
     var F = [];
 
-    var t = (1 + Math.sqrt(5)) / 2;
+    var s = Math.sqrt((5 - Math.sqrt(5)) / 10);
+    var t = Math.sqrt((5 + Math.sqrt(5)) / 10);
 
     var av = addVertex.bind(null, X, Y, Z);
     var af = addFace.bind(null, I, J, K, F);
 
-    av(-1,  t,  0);
-    av( 1,  t,  0);
-    av(-1, -t,  0);
-    av( 1, -t,  0);
+    av(-s,  t,  0);
+    av( s,  t,  0);
+    av(-s, -t,  0);
+    av( s, -t,  0);
 
-    av( 0, -1,  t);
-    av( 0,  1,  t);
-    av( 0, -1, -t);
-    av( 0,  1, -t);
+    av( 0, -s,  t);
+    av( 0,  s,  t);
+    av( 0, -s, -t);
+    av( 0,  s, -t);
 
-    av( t,  0, -1);
-    av( t,  0,  1);
-    av(-t,  0, -1);
-    av(-t,  0,  1);
+    av( t,  0, -s);
+    av( t,  0,  s);
+    av(-t,  0, -s);
+    av(-t,  0,  s);
 
     af(0, 5, 11);
     af(0, 1, 5);
@@ -262,7 +300,7 @@ function increaseLoD(m) {
     return model;
 }
 
-var unitSphere = increaseLoD(increaseLoD(increaseLoD(unitIcosahedron())));
+var unitSphere = ((increaseLoD(increaseLoD(increaseLoD(increaseLoD(unitIcosahedron()))))));
 
 function addSphere(x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
 
