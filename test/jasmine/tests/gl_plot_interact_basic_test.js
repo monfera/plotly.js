@@ -264,7 +264,7 @@ function increaseLoD(m) {
 
 var m0 = sphereModel();
 
-var m = (increaseLoD(increaseLoD(m0)));
+var m = increaseLoD(increaseLoD(increaseLoD(m0)));
 
 function addSphere(x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
 
@@ -397,7 +397,7 @@ fdescribe('gl3d plots', function() {
             y  = 200 * Math.random() - 100;
             z  = 200 * Math.random() - 100;
 
-            index = addSphere(x, y, z, randomColor(), 3, index, X, Y, Z, I, J, K, F)
+            index = addSphere(x, y, z, randomColor(), 5, index, X, Y, Z, I, J, K, F)
 
         }
 
