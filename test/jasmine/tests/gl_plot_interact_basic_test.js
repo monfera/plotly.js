@@ -87,7 +87,7 @@ function addFace(I, J, K, F, i, j, k, f) {
     F.push(f);
 }
 
-function unitCylinder() {
+function unitCylinderMaker() {
 
     var X = [];
     var Y = [];
@@ -101,15 +101,24 @@ function unitCylinder() {
     var av = addVertex.bind(null, X, Y, Z);
     var af = addFace.bind(null, I, J, K, F);
 
-    var quadCount = 10;
-    var angle;
+    var quadCount = 36;
+    var triangleCount = 2 * quadCount;
+    var q, angle, v;
 
     for(q = 0; q < quadCount; q++) {
 
         angle = q * Math.PI * 2 / quadCount;
 
+        av(Math.cos(angle), Math.sin(angle), 0);
+        av(Math.cos(angle), Math.sin(angle), 1);
+    }
 
+    for(q = 0; q < quadCount; q++) {
 
+        v = 2 * q;
+
+        af(                      v, (v + 1), (v + 2) % triangleCount);
+        af((v + 2) % triangleCount, (v + 1), (v + 3) % triangleCount);
     }
 
     var model = {
@@ -124,6 +133,8 @@ function unitCylinder() {
 
     return model;
 }
+
+var unitCylinder = unitCylinderMaker();
 
 function unitIcosahedron() {
 
@@ -302,17 +313,17 @@ function increaseLoD(m) {
 
 var unitSphere = ((increaseLoD(increaseLoD(increaseLoD(increaseLoD(unitIcosahedron()))))));
 
-function addSphere(x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
+function addSphere(geom, x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
 
     var v, p;
 
-    var mx = unitSphere.x;
-    var my = unitSphere.y;
-    var mz = unitSphere.z;
-    var mi = unitSphere.i;
-    var mj = unitSphere.j;
-    var mk = unitSphere.k;
-    var mf = unitSphere.f;
+    var mx = geom.x;
+    var my = geom.y;
+    var mz = geom.z;
+    var mi = geom.i;
+    var mj = geom.j;
+    var mk = geom.k;
+    var mf = geom.f;
 
     for(v = 0; v < mx.length; v++) {
         X.push(x + mx[v] * r);
@@ -424,8 +435,19 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 100;
+        var pointCount = 10;
+        var lineCount = 10;
         var n;
+
+        for(n = 0; n < lineCount; n++) {
+
+            x  = 200 * Math.random() - 100;
+            y  = 200 * Math.random() - 100;
+            z  = 200 * Math.random() - 100;
+
+            index = addSphere(unitCylinder, x, y, z, randomColor(), 5, index, X, Y, Z, I, J, K, F)
+
+        }
 
         for(n = 0; n < pointCount; n++) {
 
@@ -433,7 +455,7 @@ fdescribe('gl3d plots', function() {
             y  = 200 * Math.random() - 100;
             z  = 200 * Math.random() - 100;
 
-            index = addSphere(x, y, z, randomColor(), 5, index, X, Y, Z, I, J, K, F)
+            index = addSphere(unitSphere, x, y, z, randomColor(), 5, index, X, Y, Z, I, J, K, F)
 
         }
 
