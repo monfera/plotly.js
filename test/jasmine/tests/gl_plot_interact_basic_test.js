@@ -80,46 +80,86 @@ function addFace(i, j, k, index, I, J, K, F) {
     F.push('rgb(64,255,54)');
 }
 
+function sphereModel() {
+
+    var X = [];
+    var Y = [];
+    var Z = [];
+
+    var I = [];
+    var J = [];
+    var K = [];
+    var F = [];
+
+    var x = 0, y = 0, z = 0;
+
+    addVertex(-1 + x,  1 + y,  0 + z, X, Y, Z);
+    addVertex( 1 + x,  1 + y,  0 + z, X, Y, Z);
+    addVertex(-1 + x, -1 + y,  0 + z, X, Y, Z);
+    addVertex( 1 + x, -1 + y,  0 + z, X, Y, Z);
+
+    addVertex( 0 + x, -1 + y,  1 + z, X, Y, Z);
+    addVertex( 0 + x,  1 + y,  1 + z, X, Y, Z);
+    addVertex( 0 + x, -1 + y, -1 + z, X, Y, Z);
+    addVertex( 0 + x,  1 + y, -1 + z, X, Y, Z);
+
+    addVertex( 1 + x,  0 + y, -1 + z, X, Y, Z);
+    addVertex( 1 + x,  0 + y,  1 + z, X, Y, Z);
+    addVertex(-1 + x,  0 + y, -1 + z, X, Y, Z);
+    addVertex(-1 + x,  0 + y,  1 + z, X, Y, Z);
+
+    addFace(0, 11, 5, 0, I, J, K, F);
+    addFace(0, 5, 1, 0, I, J, K, F);
+    addFace(0, 1, 7, 0, I, J, K, F);
+    addFace(0, 7, 10, 0, I, J, K, F);
+    addFace(0, 10, 11, 0, I, J, K, F);
+
+    addFace(1, 5, 9, 0, I, J, K, F);
+    addFace(5, 11, 4, 0, I, J, K, F);
+    addFace(11, 10, 2, 0, I, J, K, F);
+    addFace(10, 7, 6, 0, I, J, K, F);
+    addFace(7, 1, 8, 0, I, J, K, F);
+
+    addFace(3, 9, 4, 0, I, J, K, F);
+    addFace(3, 4, 2, 0, I, J, K, F);
+    addFace(3, 2, 6, 0, I, J, K, F);
+    addFace(3, 6, 8, 0, I, J, K, F);
+    addFace(3, 8, 9, 0, I, J, K, F);
+
+    addFace(4, 9, 5, 0, I, J, K, F);
+    addFace(2, 4, 11, 0, I, J, K, F);
+    addFace(6, 2, 10, 0, I, J, K, F);
+    addFace(8, 6, 7, 0, I, J, K, F);
+    addFace(9, 8, 1, 0, I, J, K, F);
+
+    var model = {
+        x: X,
+        y: Y,
+        z: Z,
+        i: I,
+        j: J,
+        k: K,
+        f: F
+    }
+
+    return model
+}
+
+function nconcat(a, b) {
+    [].splice.apply(a, [a.length, 0].concat(b));
+}
+
+var m = sphereModel();
+
 function addSphere(x, y, z, r, i, X, Y, Z, I, J, K, F) {
 
-    addVertex(-r + x,  r + y,  0 + z, X, Y, Z);
-    addVertex( r + x,  r + y,  0 + z, X, Y, Z);
-    addVertex(-r + x, -r + y,  0 + z, X, Y, Z);
-    addVertex( r + x, -r + y,  0 + z, X, Y, Z);
-
-    addVertex( 0 + x, -r + y,  r + z, X, Y, Z);
-    addVertex( 0 + x,  r + y,  r + z, X, Y, Z);
-    addVertex( 0 + x, -r + y, -r + z, X, Y, Z);
-    addVertex( 0 + x,  r + y, -r + z, X, Y, Z);
-
-    addVertex( r + x,  0 + y, -r + z, X, Y, Z);
-    addVertex( r + x,  0 + y,  r + z, X, Y, Z);
-    addVertex(-r + x,  0 + y, -r + z, X, Y, Z);
-    addVertex(-r + x,  0 + y,  r + z, X, Y, Z);
-
-    addFace(0, 11, 5, i, I, J, K, F);
-    addFace(0, 5, 1, i, I, J, K, F);
-    addFace(0, 1, 7, i, I, J, K, F);
-    addFace(0, 7, 10, i, I, J, K, F);
-    addFace(0, 10, 11, i, I, J, K, F);
-
-    addFace(1, 5, 9, i, I, J, K, F);
-    addFace(5, 11, 4, i, I, J, K, F);
-    addFace(11, 10, 2, i, I, J, K, F);
-    addFace(10, 7, 6, i, I, J, K, F);
-    addFace(7, 1, 8, i, I, J, K, F);
-
-    addFace(3, 9, 4, i, I, J, K, F);
-    addFace(3, 4, 2, i, I, J, K, F);
-    addFace(3, 2, 6, i, I, J, K, F);
-    addFace(3, 6, 8, i, I, J, K, F);
-    addFace(3, 8, 9, i, I, J, K, F);
-
-    addFace(4, 9, 5, i, I, J, K, F);
-    addFace(2, 4, 11, i, I, J, K, F);
-    addFace(6, 2, 10, i, I, J, K, F);
-    addFace(8, 6, 7, i, I, J, K, F);
-    addFace(9, 8, 1, i, I, J, K, F);
+    nconcat(X, m.x.map(function(d) {return x + d * r;}));
+    nconcat(Y, m.y.map(function(d) {return y + d * r;}));
+    nconcat(Z, m.z.map(function(d) {return z + d * r;}));
+    nconcat(I, m.i.map(function(d) {return i + d;}));
+    nconcat(J, m.j.map(function(d) {return i + d;}));
+    nconcat(K, m.k.map(function(d) {return i + d;}));
+    nconcat(F, m.f);
 
     return i + 12; // 20 faces per sphere
 }
@@ -176,7 +216,7 @@ describe('gl3d plots', function() {
         function radius(z) {
             return circleRadius + circleRadius / 2 * Math.sin(33 + z / 27);
         }
-        
+
         for(t = 0; t < tCount; t++) {
 
             z = t * heightIncrement;
