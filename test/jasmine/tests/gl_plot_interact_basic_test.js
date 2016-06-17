@@ -73,15 +73,18 @@ function addVertex(X, Y, Z, x, y, z) {
     Z.push(z);
 }
 
+function randomColor() {
+    return 'rgb('
+        + Math.floor(256 * Math.random()) + ','
+        + Math.floor(256 * Math.random()) + ','
+        + Math.floor(256 * Math.random()) + ')';
+}
+
 function addFace(I, J, K, F, i, j, k) {
     I.push(i);
     J.push(j);
     K.push(k);
-    F.push('rgb('
-        + Math.floor(256 * Math.random()) + ','
-        + Math.floor(256 * Math.random()) + ','
-        + Math.floor(256 * Math.random()) + ')'
-    );
+    F.push(randomColor());
 }
 
 function sphereModel() {
@@ -115,29 +118,29 @@ function sphereModel() {
     av(-t,  0, -1);
     av(-t,  0,  1);
 
-    af(0, 11, 5);
-    af(0, 5, 1);
-    af(0, 1, 7);
-    af(0, 7, 10);
-    af(0, 10, 11);
+    af(0, 5, 11);
+    af(0, 1, 5);
+    af(0, 7, 1);
+    af(0, 10, 7);
+    af(0, 11, 10);
 
-    af(1, 5, 9);
-    af(5, 11, 4);
-    af(11, 10, 2);
-    af(10, 7, 6);
-    af(7, 1, 8);
+    af(1, 9, 5);
+    af(5, 4, 11);
+    af(11, 2, 10);
+    af(10, 6, 7);
+    af(7, 8, 1);
 
-    af(3, 9, 4);
-    af(3, 4, 2);
-    af(3, 2, 6);
-    af(3, 6, 8);
-    af(3, 8, 9);
+    af(3, 4, 9);
+    af(3, 2, 4);
+    af(3, 6, 2);
+    af(3, 8, 6);
+    af(3, 9, 8);
 
-    af(4, 9, 5);
-    af(2, 4, 11);
-    af(6, 2, 10);
-    af(8, 6, 7);
-    af(9, 8, 1);
+    af(4, 5, 9);
+    af(2, 11, 4);
+    af(6, 10, 2);
+    af(8, 7, 6);
+    af(9, 1, 8);
 
     var model = {
         x: X,
@@ -147,18 +150,117 @@ function sphereModel() {
         j: J,
         k: K,
         f: F
-    }
+    };
 
-    return model
+    return model;
 }
 
 function increaseLoD(m) {
-    return m;
+
+    var I = [];
+    var J = [];
+    var K = [];
+    var F = [];
+
+    var p;
+
+    var mx = m.x.slice();
+    var my = m.y.slice();
+    var mz = m.z.slice();
+    var mi = m.i;
+    var mj = m.j;
+    var mk = m.k;
+    var mf = m.f;
+
+    var midx1, midy1, midz1, midx2, midy2, midz2, midx3, midy3, midz3, v1, v2, v3, midi1, midi2, midi3, k;
+
+    var vCache = {};
+
+    for(p = 0; p < mi.length; p++) {
+
+        v1 = mi[p];
+        v2 = mj[p];
+        v3 = mk[p];
+
+        k = [v1, v2];
+        if(vCache[k.join()]) {
+            midi1 = vCache[k.join()];
+        } else {
+            midx1 = (mx[v1] + mx[v2]) / 2;
+            midy1 = (my[v1] + my[v2]) / 2;
+            midz1 = (mz[v1] + mz[v2]) / 2;
+            mx.push(midx1);
+            my.push(midy1);
+            mz.push(midz1);
+            midi1 = mx.length - 1; // vertex index to the newly created midpoint
+            vCache[k.join()] = midi1;
+        }
+
+        k = [v2, v3];
+        if(vCache[k.join()]) {
+            midi2 = vCache[k.join()];
+        } else {
+            midx2 = (mx[v2] + mx[v3]) / 2;
+            midy2 = (my[v2] + my[v3]) / 2;
+            midz2 = (mz[v2] + mz[v3]) / 2;
+            mx.push(midx2);
+            my.push(midy2);
+            mz.push(midz2);
+            midi2 = mx.length - 1; // vertex index to the newly created midpoint
+            vCache[k.join()] = midi2;
+        }
+
+        k = [v3, v1];
+        if(vCache[k.join()]) {
+            midi2 = vCache[k.join()];
+        } else {
+            midx3 = (mx[v3] + mx[v1]) / 2;
+            midy3 = (my[v3] + my[v1]) / 2;
+            midz3 = (mz[v3] + mz[v1]) / 2;
+            mx.push(midx3);
+            my.push(midy3);
+            mz.push(midz3);
+            midi3 = mx.length - 1; // vertex index to the newly created midpoint
+            vCache[k.join()] = midi3;
+        }
+
+        I.push(mi[p]);
+        J.push(midi1);
+        K.push(midi3);
+        F.push(randomColor());
+
+        I.push(mj[p]);
+        J.push(midi2);
+        K.push(midi1);
+        F.push(randomColor());
+
+        I.push(mk[p]);
+        J.push(midi3);
+        K.push(midi2);
+        F.push(randomColor());
+
+        I.push(midi1);
+        J.push(midi2);
+        K.push(midi3);
+        F.push(randomColor());
+    }
+
+    var model = {
+        x: mx,
+        y: my,
+        z: mz,
+        i: I,
+        j: J,
+        k: K,
+        f: F
+    };
+
+    return model;
 }
 
 var m0 = sphereModel();
 
-var m = increaseLoD(m0);
+var m = (increaseLoD(m0));
 
 function addSphere(x, y, z, r, vOffset, X, Y, Z, I, J, K, F) {
 
@@ -188,7 +290,7 @@ function addSphere(x, y, z, r, vOffset, X, Y, Z, I, J, K, F) {
     return vOffset + mx.length;
 }
 
-describe('gl3d plots', function() {
+fdescribe('gl3d plots', function() {
 
     var gd;
 
