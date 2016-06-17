@@ -313,7 +313,7 @@ function increaseLoD(m) {
 
 var unitSphere = ((increaseLoD(increaseLoD(increaseLoD(increaseLoD(unitIcosahedron()))))));
 
-function addSphere(geom, x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
+function addPointMarker(geom, x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
 
     var v, p;
 
@@ -329,6 +329,34 @@ function addSphere(geom, x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
         X.push(x + mx[v] * r);
         Y.push(y + my[v] * r);
         Z.push(z + mz[v] * r);
+    }
+
+    for(p = 0; p < mi.length; p++) {
+        I.push(vOffset + mi[p]);
+        J.push(vOffset + mj[p]);
+        K.push(vOffset + mk[p]);
+        F.push(f);
+    }
+
+    return vOffset + mx.length;
+}
+
+function addLine(geom, x1, y1, z1, x2, y2, z2, f, r, vOffset, X, Y, Z, I, J, K, F) {
+
+    var v, p;
+
+    var mx = geom.x;
+    var my = geom.y;
+    var mz = geom.z;
+    var mi = geom.i;
+    var mj = geom.j;
+    var mk = geom.k;
+    var mf = geom.f;
+
+    for(v = 0; v < mx.length; v++) {
+        X.push(x1 + mx[v] * r);
+        Y.push(y1 + my[v] * r);
+        Z.push(z1 + mz[v] * r);
     }
 
     for(p = 0; p < mi.length; p++) {
@@ -435,30 +463,58 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 10;
+        var pointCount = 30;
         var lineCount = 10;
         var n;
 
-        for(n = 0; n < lineCount; n++) {
+        var points = {
+            x: [],
+            y: [],
+            z: []
+        }
 
-            x  = 200 * Math.random() - 100;
-            y  = 200 * Math.random() - 100;
-            z  = 200 * Math.random() - 100;
-
-            index = addSphere(unitCylinder, x, y, z, randomColor(), 5, index, X, Y, Z, I, J, K, F)
-
+        for(n = 0; n < pointCount; n++) {
+            points.x.push(200 * Math.random() - 100);
+            points.y.push(200 * Math.random() - 100);
+            points.z.push(200 * Math.random() - 100);
         }
 
         for(n = 0; n < pointCount; n++) {
 
-            x  = 200 * Math.random() - 100;
-            y  = 200 * Math.random() - 100;
-            z  = 200 * Math.random() - 100;
+            x  = points.x[n];
+            y  = points.y[n];
+            z  = points.z[n];
 
-            index = addSphere(unitSphere, x, y, z, randomColor(), 5, index, X, Y, Z, I, J, K, F)
-
+            index = addPointMarker(unitSphere, x, y, z, randomColor(), 5, index, X, Y, Z, I, J, K, F)
         }
 
+        var pointCache = {}, point1, point2, x2, y2, z2;
+
+        n = lineCount;
+        while(n-- > 0) {
+
+            point1 = Math.floor(pointCount * Math.random());
+            point2 = Math.floor(pointCount * Math.random());
+
+            if(!pointCache[point1] && !pointCache[point2]) {
+
+                pointCache[point1] = true;
+                pointCache[point2] = true;
+
+                x = points.x[point1];
+                y = points.y[point1];
+                z = points.z[point1];
+
+                x2 = points.x[point2];
+                y2 = points.y[point2];
+                z2 = points.z[point2];
+
+                index = addLine(unitCylinder, x, y, z, x2, y2, z2, randomColor(), 5, index, X, Y, Z, I, J, K, F)
+            }
+        }
+
+
+        // Extend the place to ensure correct aspect ratio
         X.push(100)
         X.push(-100)
         Y.push(100)
