@@ -77,7 +77,11 @@ function addFace(I, J, K, F, i, j, k) {
     I.push(i);
     J.push(j);
     K.push(k);
-    F.push('rgb(64,255,54)');
+    F.push('rgb('
+        + Math.floor(256 * Math.random()) + ','
+        + Math.floor(256 * Math.random()) + ','
+        + Math.floor(256 * Math.random()) + ')'
+    );
 }
 
 function sphereModel() {
@@ -91,23 +95,25 @@ function sphereModel() {
     var K = [];
     var F = [];
 
+    var t = (1 + Math.sqrt(5)) / 2;
+
     var av = addVertex.bind(null, X, Y, Z);
     var af = addFace.bind(null, I, J, K, F);
 
-    av(-1,  1,  0);
-    av( 1,  1,  0);
-    av(-1, -1,  0);
-    av( 1, -1,  0);
+    av(-1,  t,  0);
+    av( 1,  t,  0);
+    av(-1, -t,  0);
+    av( 1, -t,  0);
 
-    av( 0, -1,  1);
-    av( 0,  1,  1);
-    av( 0, -1, -1);
-    av( 0,  1, -1);
+    av( 0, -1,  t);
+    av( 0,  1,  t);
+    av( 0, -1, -t);
+    av( 0,  1, -t);
 
-    av( 1,  0, -1);
-    av( 1,  0,  1);
-    av(-1,  0, -1);
-    av(-1,  0,  1);
+    av( t,  0, -1);
+    av( t,  0,  1);
+    av(-t,  0, -1);
+    av(-t,  0,  1);
 
     af(0, 11, 5);
     af(0, 5, 1);
@@ -146,7 +152,13 @@ function sphereModel() {
     return model
 }
 
-var m = sphereModel();
+function increaseLoD(m) {
+    return m;
+}
+
+var m0 = sphereModel();
+
+var m = increaseLoD(m0);
 
 function addSphere(x, y, z, r, vOffset, X, Y, Z, I, J, K, F) {
 
@@ -229,6 +241,7 @@ describe('gl3d plots', function() {
             return circleRadius + circleRadius / 2 * Math.sin(33 + z / 27);
         }
 
+        if(0)
         for(t = 0; t < tCount; t++) {
 
             z = t * heightIncrement;
@@ -269,16 +282,16 @@ describe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 20;
+        var pointCount = 1;
         var n;
 
         for(n = 0; n < pointCount; n++) {
 
-            x  = 200 * Math.random() - 100;
-            y  = 200 * Math.random() - 100;
-            z  = 400 * Math.random();
+            x  = 0//200 * Math.random() - 100;
+            y  = 0//200 * Math.random() - 100;
+            z  = 0//400 * Math.random();
 
-            index = addSphere(x, y, z, 5, index, X, Y, Z, I, J, K, F)
+            index = addSphere(x, y, z, 100, index, X, Y, Z, I, J, K, F)
 
         }
 
