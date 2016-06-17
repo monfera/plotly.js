@@ -16,10 +16,11 @@
         "z": -100
       },
       "lighting": {
-        "ambient": 0.2,
+        "ambient": 0.4,
         "diffuse": 2,
-        "specular": 1,
-        "roughness": 0.3
+        "specular": 0.5,
+        "fresnel": 0,
+        "roughness": 0.4
       }}
   ],"layout":{
   "width": 1000,
@@ -59,7 +60,7 @@
       "eye": {
         "x": 0,
         "y": 0,
-        "z": 3
+        "z": 2
       },
       "up": {
         "x": 1,
