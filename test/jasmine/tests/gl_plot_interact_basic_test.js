@@ -68,9 +68,10 @@ function colorface(F, ratio) {
 }
 
 function addVertex(X, Y, Z, x, y, z) {
-    X.push(x);
-    Y.push(y);
-    Z.push(z);
+    var length = Math.sqrt(x * x + y * y + z * z);
+    X.push(x / length);
+    Y.push(y / length);
+    Z.push(z / length);
 }
 
 function randomColor() {
@@ -172,7 +173,7 @@ function increaseLoD(m) {
     var mk = m.k;
     var mf = m.f;
 
-    var midx1, midy1, midz1, midx2, midy2, midz2, midx3, midy3, midz3, v1, v2, v3, midi1, midi2, midi3, k;
+    var midx1, midy1, midz1, midx2, midy2, midz2, midx3, midy3, midz3, v1, v2, v3, midi1, midi2, midi3, k, length;
 
     var vCache = {};
 
@@ -189,9 +190,10 @@ function increaseLoD(m) {
             midx1 = (mx[v1] + mx[v2]) / 2;
             midy1 = (my[v1] + my[v2]) / 2;
             midz1 = (mz[v1] + mz[v2]) / 2;
-            mx.push(midx1);
-            my.push(midy1);
-            mz.push(midz1);
+            length = Math.sqrt(midx1 * midx1 + midy1 * midy1 + midz1 * midz1);
+            mx.push(midx1 / length);
+            my.push(midy1 / length);
+            mz.push(midz1 / length);
             midi1 = mx.length - 1; // vertex index to the newly created midpoint
             vCache[k.join()] = midi1;
         }
@@ -203,9 +205,10 @@ function increaseLoD(m) {
             midx2 = (mx[v2] + mx[v3]) / 2;
             midy2 = (my[v2] + my[v3]) / 2;
             midz2 = (mz[v2] + mz[v3]) / 2;
-            mx.push(midx2);
-            my.push(midy2);
-            mz.push(midz2);
+            length = Math.sqrt(midx2 * midx2 + midy2 * midy2 + midz2 * midz2);
+            mx.push(midx2 / length);
+            my.push(midy2 / length);
+            mz.push(midz2 / length);
             midi2 = mx.length - 1; // vertex index to the newly created midpoint
             vCache[k.join()] = midi2;
         }
@@ -217,9 +220,10 @@ function increaseLoD(m) {
             midx3 = (mx[v3] + mx[v1]) / 2;
             midy3 = (my[v3] + my[v1]) / 2;
             midz3 = (mz[v3] + mz[v1]) / 2;
-            mx.push(midx3);
-            my.push(midy3);
-            mz.push(midz3);
+            length = Math.sqrt(midx3 * midx3 + midy3 * midy3 + midz3 * midz3);
+            mx.push(midx3 / length);
+            my.push(midy3 / length);
+            mz.push(midz3 / length);
             midi3 = mx.length - 1; // vertex index to the newly created midpoint
             vCache[k.join()] = midi3;
         }
