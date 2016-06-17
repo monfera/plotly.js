@@ -341,7 +341,7 @@ function addPointMarker(geom, x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
     return vOffset + mx.length;
 }
 
-function addLine(geom, x1, y1, z1, x2, y2, z2, f, r, vOffset, X, Y, Z, I, J, K, F) {
+function addLine(geom, x1, y1, z1, x2, y2, z2, f, r, l, vOffset, X, Y, Z, I, J, K, F) {
 
     var v, p;
 
@@ -356,7 +356,7 @@ function addLine(geom, x1, y1, z1, x2, y2, z2, f, r, vOffset, X, Y, Z, I, J, K, 
     for(v = 0; v < mx.length; v++) {
         X.push(x1 + mx[v] * r);
         Y.push(y1 + my[v] * r);
-        Z.push(z1 + mz[v] * r);
+        Z.push(z1 + mz[v] * l);
     }
 
     for(p = 0; p < mi.length; p++) {
@@ -488,10 +488,10 @@ fdescribe('gl3d plots', function() {
             index = addPointMarker(unitSphere, x, y, z, randomColor(), 5, index, X, Y, Z, I, J, K, F)
         }
 
-        var pointCache = {}, point1, point2, x2, y2, z2;
+        var pointCache = {}, point1, point2, x2, y2, z2, distance;
 
         n = lineCount;
-        while(n-- > 0) {
+        while(n > 0) {
 
             point1 = Math.floor(pointCount * Math.random());
             point2 = Math.floor(pointCount * Math.random());
@@ -500,6 +500,7 @@ fdescribe('gl3d plots', function() {
 
                 pointCache[point1] = true;
                 pointCache[point2] = true;
+                n--;
 
                 x = points.x[point1];
                 y = points.y[point1];
@@ -509,7 +510,9 @@ fdescribe('gl3d plots', function() {
                 y2 = points.y[point2];
                 z2 = points.z[point2];
 
-                index = addLine(unitCylinder, x, y, z, x2, y2, z2, randomColor(), 5, index, X, Y, Z, I, J, K, F)
+                distance = Math.sqrt(Math.pow(x2 - x, 2) + Math.pow(y2 - y, 2) + Math.pow(z2 - z, 2));
+
+                index = addLine(unitCylinder, x, y, z, x2, y2, z2, randomColor(), 2, distance, index, X, Y, Z, I, J, K, F)
             }
         }
 
