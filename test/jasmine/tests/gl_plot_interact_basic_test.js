@@ -67,13 +67,13 @@ function colorface(F, ratio) {
         ')'].join(""));
 }
 
-function addVertex(x, y, z, X, Y, Z) {
+function addVertex(X, Y, Z, x, y, z) {
     X.push(x);
     Y.push(y);
     Z.push(z);
 }
 
-function addFace(i, j, k, I, J, K, F) {
+function addFace(I, J, K, F, i, j, k) {
     I.push(i);
     J.push(j);
     K.push(k);
@@ -91,44 +91,47 @@ function sphereModel() {
     var K = [];
     var F = [];
 
-    addVertex(-1,  1,  0, X, Y, Z);
-    addVertex( 1,  1,  0, X, Y, Z);
-    addVertex(-1, -1,  0, X, Y, Z);
-    addVertex( 1, -1,  0, X, Y, Z);
+    var av = addVertex.bind(null, X, Y, Z);
+    var af = addFace.bind(null, I, J, K, F);
 
-    addVertex( 0, -1,  1, X, Y, Z);
-    addVertex( 0,  1,  1, X, Y, Z);
-    addVertex( 0, -1, -1, X, Y, Z);
-    addVertex( 0,  1, -1, X, Y, Z);
+    av(-1,  1,  0);
+    av( 1,  1,  0);
+    av(-1, -1,  0);
+    av( 1, -1,  0);
 
-    addVertex( 1,  0, -1, X, Y, Z);
-    addVertex( 1,  0,  1, X, Y, Z);
-    addVertex(-1,  0, -1, X, Y, Z);
-    addVertex(-1,  0,  1, X, Y, Z);
+    av( 0, -1,  1);
+    av( 0,  1,  1);
+    av( 0, -1, -1);
+    av( 0,  1, -1);
 
-    addFace(0, 11, 5, I, J, K, F);
-    addFace(0, 5, 1, I, J, K, F);
-    addFace(0, 1, 7, I, J, K, F);
-    addFace(0, 7, 10, I, J, K, F);
-    addFace(0, 10, 11, I, J, K, F);
+    av( 1,  0, -1);
+    av( 1,  0,  1);
+    av(-1,  0, -1);
+    av(-1,  0,  1);
 
-    addFace(1, 5, 9, I, J, K, F);
-    addFace(5, 11, 4, I, J, K, F);
-    addFace(11, 10, 2, I, J, K, F);
-    addFace(10, 7, 6, I, J, K, F);
-    addFace(7, 1, 8, I, J, K, F);
+    af(0, 11, 5);
+    af(0, 5, 1);
+    af(0, 1, 7);
+    af(0, 7, 10);
+    af(0, 10, 11);
 
-    addFace(3, 9, 4, I, J, K, F);
-    addFace(3, 4, 2, I, J, K, F);
-    addFace(3, 2, 6, I, J, K, F);
-    addFace(3, 6, 8, I, J, K, F);
-    addFace(3, 8, 9, I, J, K, F);
+    af(1, 5, 9);
+    af(5, 11, 4);
+    af(11, 10, 2);
+    af(10, 7, 6);
+    af(7, 1, 8);
 
-    addFace(4, 9, 5, I, J, K, F);
-    addFace(2, 4, 11, I, J, K, F);
-    addFace(6, 2, 10, I, J, K, F);
-    addFace(8, 6, 7, I, J, K, F);
-    addFace(9, 8, 1, I, J, K, F);
+    af(3, 9, 4);
+    af(3, 4, 2);
+    af(3, 2, 6);
+    af(3, 6, 8);
+    af(3, 8, 9);
+
+    af(4, 9, 5);
+    af(2, 4, 11);
+    af(6, 2, 10);
+    af(8, 6, 7);
+    af(9, 8, 1);
 
     var model = {
         x: X,
