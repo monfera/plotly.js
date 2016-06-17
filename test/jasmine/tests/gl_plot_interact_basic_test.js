@@ -81,11 +81,11 @@ function randomColor() {
         + Math.floor(256 * Math.random()) + ')';
 }
 
-function addFace(I, J, K, F, i, j, k) {
+function addFace(I, J, K, F, i, j, k, f) {
     I.push(i);
     J.push(j);
     K.push(k);
-    F.push(randomColor());
+    F.push(f);
 }
 
 function sphereModel() {
@@ -231,22 +231,22 @@ function increaseLoD(m) {
         I.push(mi[p]);
         J.push(midi1);
         K.push(midi3);
-        F.push(randomColor());
+        F.push(mf[p]);
 
         I.push(mj[p]);
         J.push(midi2);
         K.push(midi1);
-        F.push(randomColor());
+        F.push(mf[p]);
 
         I.push(mk[p]);
         J.push(midi3);
         K.push(midi2);
-        F.push(randomColor());
+        F.push(mf[p]);
 
         I.push(midi1);
         J.push(midi2);
         K.push(midi3);
-        F.push(randomColor());
+        F.push(mf[p]);
     }
 
     var model = {
@@ -264,9 +264,9 @@ function increaseLoD(m) {
 
 var m0 = sphereModel();
 
-var m = (increaseLoD(m0));
+var m = (increaseLoD(increaseLoD(m0)));
 
-function addSphere(x, y, z, r, vOffset, X, Y, Z, I, J, K, F) {
+function addSphere(x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
 
     var v, p;
 
@@ -288,7 +288,7 @@ function addSphere(x, y, z, r, vOffset, X, Y, Z, I, J, K, F) {
         I.push(vOffset + mi[p]);
         J.push(vOffset + mj[p]);
         K.push(vOffset + mk[p]);
-        F.push(mf[p]);
+        F.push(f);
     }
 
     return vOffset + mx.length;
@@ -388,16 +388,16 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 1;
+        var pointCount = 100;
         var n;
 
         for(n = 0; n < pointCount; n++) {
 
-            x  = 0//200 * Math.random() - 100;
-            y  = 0//200 * Math.random() - 100;
-            z  = 0//400 * Math.random();
+            x  = 200 * Math.random() - 100;
+            y  = 200 * Math.random() - 100;
+            z  = 200 * Math.random() - 100;
 
-            index = addSphere(x, y, z, 100, index, X, Y, Z, I, J, K, F)
+            index = addSphere(x, y, z, randomColor(), 3, index, X, Y, Z, I, J, K, F)
 
         }
 
