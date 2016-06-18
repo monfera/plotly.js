@@ -357,10 +357,19 @@ function addLine(geom, x1, y1, z1, x2, y2, z2, f, r, l, vOffset, X, Y, Z, I, J, 
     var yd = y2 - y1;
     var zd = z2 - z1;
 
+    var xRad = Math.atan2(zd, xd);
+    var yRad = Math.atan2(zd, yd);
+    var x, y, z;
+
     for(v = 0; v < mx.length; v++) {
-        X.push((1 - mz[v]) * x1 + mx[v] * r + mz[v] * x2);
-        Y.push((1 - mz[v]) * y1 + my[v] * r + mz[v] * y2);
-        Z.push((1 - mz[v]) * z1 + mz[v] * z2);
+
+        x = (1 - mz[v]) * x1 + mx[v] * r + mz[v] * x2;
+        y = (1 - mz[v]) * y1 + my[v] * r + mz[v] * y2;
+        z = (1 - mz[v]) * z1 + mz[v] * z2;
+
+        X.push(x);
+        Y.push(y);
+        Z.push(z);
     }
 
     for(p = 0; p < mi.length; p++) {
@@ -407,7 +416,7 @@ fdescribe('gl3d plots', function() {
         var trianglesPerCircle = 40
         var tCount = 100;
         var rowCount = 100;
-        var heightIncrement = 4;
+        var heightIncrement = 1;
 
         var angle, t, x, y, z, c, mate1a, mate1b, mate2a, mate2b;
 
@@ -429,7 +438,7 @@ fdescribe('gl3d plots', function() {
         if(0)
         for(t = 0; t < tCount; t++) {
 
-            z = t * heightIncrement;
+            z = t * heightIncrement - 100;
 
             for (c = 0; c < trianglesPerCircle; c++) {
 
@@ -477,11 +486,21 @@ fdescribe('gl3d plots', function() {
             z: []
         }
 
+/*
         for(n = 0; n < pointCount; n++) {
             points.x.push(200 * Math.random() - 100);
             points.y.push(200 * Math.random() - 100);
             points.z.push(200 * Math.random() - 100);
         }
+*/
+
+        points.x.push(0);
+        points.y.push(0);
+        points.z.push(0);
+
+        points.x.push(100);
+        points.y.push(0);
+        points.z.push(100);
 
         for(n = 0; n < pointCount; n++) {
 
