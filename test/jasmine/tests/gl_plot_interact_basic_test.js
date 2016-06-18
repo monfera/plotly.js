@@ -123,7 +123,7 @@ function cylinderMaker(r, uu, vv, ww) {
         x = 1; y = 0; z = 0;
     }
 
-    length = Math.sqrt(x * x + y * y + z * z);
+    length = Math.sqrt(x * x + y * y + z * z) / r;
     x /= length;
     y /= length;
     z /= length;
@@ -553,14 +553,15 @@ fdescribe('gl3d plots', function() {
             z: []
         }
 
-/*
+
         for(n = 0; n < pointCount; n++) {
             points.x.push(200 * Math.random() - 100);
             points.y.push(200 * Math.random() - 100);
             points.z.push(200 * Math.random() - 100);
         }
-*/
 
+
+/*
         points.x.push(1);
         points.y.push(2);
         points.z.push(3);
@@ -568,6 +569,7 @@ fdescribe('gl3d plots', function() {
         points.x.push(4);
         points.y.push(4);
         points.z.push(4);
+*/
 
         for(n = 0; n < pointCount; n++) {
 
@@ -575,7 +577,7 @@ fdescribe('gl3d plots', function() {
             y  = points.y[n];
             z  = points.z[n];
 
-            index = addPointMarker(unitSphere, x, y, z, randomColor(), 1, index, X, Y, Z, I, J, K, F)
+            index = addPointMarker(unitSphere, x, y, z, randomColor(), 4, index, X, Y, Z, I, J, K, F)
         }
 
         var pointCache = {}, point1, point2, x2, y2, z2, distance;
@@ -583,8 +585,8 @@ fdescribe('gl3d plots', function() {
         n = lineCount;
         while(n > 0) {
 
-            point1 = 0//Math.floor(pointCount * Math.random());
-            point2 = 1//Math.floor(pointCount * Math.random());
+            point1 = Math.floor(pointCount * Math.random());
+            point2 = Math.floor(pointCount * Math.random());
 
             if(!(point1 === point2) && !pointCache[[point1,point2].join()] && !pointCache[[point2,point1].join()]) {
 
@@ -599,18 +601,18 @@ fdescribe('gl3d plots', function() {
                 y2 = points.y[point2];
                 z2 = points.z[point2];
 
-                index = addLine(cylinderMaker(1, x2-x, y2-y, z2-z), x, y, z, randomColor(), index, X, Y, Z, I, J, K, F)
+                index = addLine(cylinderMaker(4, x2-x, y2-y, z2-z), x, y, z, randomColor(), index, X, Y, Z, I, J, K, F)
             }
         }
 
 
         // Extend the place to ensure correct aspect ratio
-        X.push(10)
-        X.push(-1)
-        Y.push(10)
-        Y.push(-1)
-        Z.push(10)
-        Z.push(-1)
+        X.push(-100)
+        X.push(100)
+        Y.push(-100)
+        Y.push(100)
+        Z.push(-100)
+        Z.push(100)
 
         if(1) {
             s.x = X;
