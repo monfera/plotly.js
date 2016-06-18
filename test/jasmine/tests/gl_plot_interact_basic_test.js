@@ -543,8 +543,8 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 2;
-        var lineCount = 1;
+        var pointCount = 20;
+        var lineCount = 30;
         var n;
 
         var points = {
@@ -577,7 +577,7 @@ fdescribe('gl3d plots', function() {
             y  = points.y[n];
             z  = points.z[n];
 
-            index = addPointMarker(unitSphere, x, y, z, randomColor(), 4, index, X, Y, Z, I, J, K, F)
+            index = addPointMarker(unitSphere, x, y, z, randomColor(), 7, index, X, Y, Z, I, J, K, F)
         }
 
         var pointCache = {}, point1, point2, x2, y2, z2, distance;
