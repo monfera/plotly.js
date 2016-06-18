@@ -543,8 +543,8 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 20;
-        var lineCount = 30;
+        var pointCount = 100;
+        var lineCount = 100;
         var n;
 
         var points = {
@@ -553,11 +553,24 @@ fdescribe('gl3d plots', function() {
             z: []
         }
 
+        var pointCache = {}, pointx, pointy, pointz;
 
-        for(n = 0; n < pointCount; n++) {
-            points.x.push(200 * Math.random() - 100);
-            points.y.push(200 * Math.random() - 100);
-            points.z.push(200 * Math.random() - 100);
+        n = pointCount;
+        while(n > 0) {
+
+            pointx = Math.round((200 * Math.random() - 100) / 20) * 20;
+            pointy = Math.round((200 * Math.random() - 100) / 20) * 20;
+            pointz = Math.round((200 * Math.random() - 100) / 20) * 20;
+
+            if(!pointCache[[pointx, pointy, pointz].join()]) {
+
+                pointCache[[pointx, pointy, pointz].join()] = true;
+
+                points.x.push(pointx);
+                points.y.push(pointy);
+                points.z.push(pointz);
+                n--;
+            }
         }
 
 
@@ -571,16 +584,7 @@ fdescribe('gl3d plots', function() {
         points.z.push(4);
 */
 
-        for(n = 0; n < pointCount; n++) {
-
-            x  = points.x[n];
-            y  = points.y[n];
-            z  = points.z[n];
-
-            index = addPointMarker(unitSphere, x, y, z, randomColor(), 7, index, X, Y, Z, I, J, K, F)
-        }
-
-        var pointCache = {}, point1, point2, x2, y2, z2, distance;
+        var lineCache = {}, point1, point2, x2, y2, z2, distance;
 
         n = lineCount;
         while(n > 0) {
@@ -588,9 +592,16 @@ fdescribe('gl3d plots', function() {
             point1 = Math.floor(pointCount * Math.random());
             point2 = Math.floor(pointCount * Math.random());
 
-            if(!(point1 === point2) && !pointCache[[point1,point2].join()] && !pointCache[[point2,point1].join()]) {
+            if(
+                !(point1 === point2) && !lineCache[[point1,point2].join()] && !lineCache[[point2,point1].join()]
+                && [
+                    points.x[point1] ===  points.x[point2],
+                    points.y[point1] ===  points.y[point2],
+                    points.z[point1] ===  points.z[point2]
+                ].reduce(function(a,b) {return a + b}, 0) === 2
+            ) {
 
-                pointCache[[point1,point2].join()] = true;
+                lineCache[[point1,point2].join()] = true;
                 n--;
 
                 x = points.x[point1];
@@ -601,7 +612,21 @@ fdescribe('gl3d plots', function() {
                 y2 = points.y[point2];
                 z2 = points.z[point2];
 
-                index = addLine(cylinderMaker(4, x2-x, y2-y, z2-z), x, y, z, randomColor(), index, X, Y, Z, I, J, K, F)
+                index = addLine(cylinderMaker(1 + 3 * Math.random(), x2-x, y2-y, z2-z), x, y, z, randomColor(), index, X, Y, Z, I, J, K, F)
+            }
+        }
+
+        var members = Object.keys(lineCache).join().split(",").map(parseFloat);
+
+        for(n = 0; n < pointCount; n++) {
+
+            if(members.indexOf(n) !== -1) {
+
+                x = points.x[n];
+                y = points.y[n];
+                z = points.z[n];
+
+                index = addPointMarker(unitSphere, x, y, z, randomColor(), 4, index, X, Y, Z, I, J, K, F)
             }
         }
 
