@@ -30,23 +30,23 @@
   "scene": {
     "datascale": [1, 1, 1],
     "xaxis": {
-      "title": "x",
+      "title": "",
       "showgrid": false,
-      "zeroline": true,
+      "zeroline": false,
       "showticklabels": false,
       "showspikes": false
     },
     "yaxis": {
-      "title": "y",
+      "title": "",
       "showgrid": false,
-      "zeroline": true,
+      "zeroline": false,
       "showticklabels": false,
       "showspikes": false
     },
     "zaxis": {
-      "title": "z",
+      "title": "",
       "showgrid": false,
-      "zeroline": true,
+      "zeroline": false,
       "showticklabels": false,
       "showspikes": false
     },
