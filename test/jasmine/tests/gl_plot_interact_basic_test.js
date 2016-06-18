@@ -101,7 +101,7 @@ function cylinderMaker(r, uu, vv, ww, f1, f2) {
     var av = addVertex.bind(null, X, Y, Z);
     var af = addFace.bind(null, I, J, K, F);
 
-    var quadCount = 18;
+    var quadCount = 36;
     var triangleCount = 2 * quadCount;
     var q, a, vert, sa, ca;
 
@@ -543,9 +543,9 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 5;
+        var pointCount = 1000;
         var lineCount = 100;
-        var n;
+        var n, r, c;
 
         var points = {
             x: [],
@@ -557,21 +557,21 @@ fdescribe('gl3d plots', function() {
 
             for(n = 0; n < pointCount; n++) {
 
-                x = Math.round((200 * Math.random() - 100) / 20) * 20;
-                y = Math.round((200 * Math.random() - 100) / 20) * 20;
-                z = Math.round((200 * Math.random() - 100) / 20) * 20;
+                x = n * 0.2 - 100;
+                y = Math.cos(n / 100) * 100;
+                z = Math.sin(n / 100) * 100;
 
                 points.x.push(x);
                 points.y.push(y);
                 points.z.push(z);
 
-                index = addPointMarker(unitSphere, x, y, z, randomColor(), 4, index, X, Y, Z, I, J, K, F)
+                //index = addPointMarker(unitSphere, x, y, z, 'rgb(255,255,255)', 4, index, X, Y, Z, I, J, K, F)
             }
 
-            for(n = 0; n < pointCount - 1; n++) {
+            for(n = 2; n < pointCount - 2; n++) {
 
-                point1 = n;
-                point2 = n + 1;
+                point1 = n - 2;
+                point2 = n + 2;
 
                 x = points.x[point1];
                 y = points.y[point1];
@@ -581,9 +581,13 @@ fdescribe('gl3d plots', function() {
                 y2 = points.y[point2];
                 z2 = points.z[point2];
 
-                index = addLine(cylinderMaker(4, x2 - x, y2 - y, z2 - z, randomColor(), randomColor()), x, y, z, index, X, Y, Z, I, J, K, F)
+                r = 10 + 5 * Math.sin(n / 20);
+
+                c = 'rgb(' + Math.round(256 * n / (pointCount - 1)) + ',0,' + Math.round(256 * (pointCount - 1 - n) / (pointCount - 1)) + ')';
+
+                index = addLine(cylinderMaker(r, x2 - x, y2 - y, z2 - z, c, c), x, y, z, index, X, Y, Z, I, J, K, F)
             }
-            
+
         } else {
 
             var pointCache = {}, pointx, pointy, pointz;
