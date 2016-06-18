@@ -87,7 +87,7 @@ function addFace(I, J, K, F, i, j, k, f) {
     F.push(f);
 }
 
-function cylinderMaker(r, uu, vv, ww) {
+function cylinderMaker(r, uu, vv, ww, f1, f2) {
 
     var X = [];
     var Y = [];
@@ -101,7 +101,7 @@ function cylinderMaker(r, uu, vv, ww) {
     var av = addVertex.bind(null, X, Y, Z);
     var af = addFace.bind(null, I, J, K, F);
 
-    var quadCount = 36;
+    var quadCount = 18;
     var triangleCount = 2 * quadCount;
     var q, a, vert, sa, ca;
 
@@ -148,8 +148,8 @@ function cylinderMaker(r, uu, vv, ww) {
 
         vert = 2 * q;
 
-        af(                      vert, (vert + 1), (vert + 2) % triangleCount);
-        af((vert + 2) % triangleCount, (vert + 1), (vert + 3) % triangleCount);
+        af(                      vert, (vert + 1), (vert + 2) % triangleCount, f1);
+        af((vert + 2) % triangleCount, (vert + 1), (vert + 3) % triangleCount, f2);
     }
 
     var model = {
@@ -420,7 +420,7 @@ function addPointMarker(geom, x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
     return vOffset + mx.length;
 }
 //       addLine(cylinderMaker(20, x2-x, y2-y, z2-z), x, y, z, randomColor(), index, X, Y, Z, I, J, K, F)
-function addLine(geom, x1, y1, z1, f, vOffset, X, Y, Z, I, J, K, F) {
+function addLine(geom, x1, y1, z1, vOffset, X, Y, Z, I, J, K, F) {
 
     var v, p;
 
@@ -443,7 +443,7 @@ function addLine(geom, x1, y1, z1, f, vOffset, X, Y, Z, I, J, K, F) {
         I.push(vOffset + mi[p]);
         J.push(vOffset + mj[p]);
         K.push(vOffset + mk[p]);
-        F.push(f);
+        F.push(mf[p]);
     }
 
     return vOffset + mx.length;
@@ -612,7 +612,7 @@ fdescribe('gl3d plots', function() {
                 y2 = points.y[point2];
                 z2 = points.z[point2];
 
-                index = addLine(cylinderMaker(1 + 3 * Math.random(), x2-x, y2-y, z2-z), x, y, z, randomColor(), index, X, Y, Z, I, J, K, F)
+                index = addLine(cylinderMaker(1 + 3 * Math.random(), x2-x, y2-y, z2-z, randomColor(), randomColor()), x, y, z, index, X, Y, Z, I, J, K, F)
             }
         }
 
