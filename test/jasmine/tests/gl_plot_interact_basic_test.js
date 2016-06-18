@@ -353,10 +353,14 @@ function addLine(geom, x1, y1, z1, x2, y2, z2, f, r, l, vOffset, X, Y, Z, I, J, 
     var mk = geom.k;
     var mf = geom.f;
 
+    var xd = x2 - x1;
+    var yd = y2 - y1;
+    var zd = z2 - z1;
+
     for(v = 0; v < mx.length; v++) {
-        X.push(x1 + mx[v] * r);
-        Y.push(y1 + my[v] * r);
-        Z.push(z1 + mz[v] * l);
+        X.push((1 - mz[v]) * x1 + mx[v] * r + mz[v] * x2);
+        Y.push((1 - mz[v]) * y1 + my[v] * r + mz[v] * y2);
+        Z.push((1 - mz[v]) * z1 + mz[v] * z2);
     }
 
     for(p = 0; p < mi.length; p++) {
@@ -463,8 +467,8 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 30;
-        var lineCount = 10;
+        var pointCount =100;
+        var lineCount = 500;
         var n;
 
         var points = {
@@ -496,10 +500,9 @@ fdescribe('gl3d plots', function() {
             point1 = Math.floor(pointCount * Math.random());
             point2 = Math.floor(pointCount * Math.random());
 
-            if(!pointCache[point1] && !pointCache[point2]) {
+            if(!pointCache[[point1,point2].join()] && !pointCache[[point2,point1].join()]) {
 
-                pointCache[point1] = true;
-                pointCache[point2] = true;
+                pointCache[[point1,point2].join()] = true;
                 n--;
 
                 x = points.x[point1];
