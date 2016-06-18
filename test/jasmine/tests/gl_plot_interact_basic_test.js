@@ -543,7 +543,7 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 100;
+        var pointCount = 5;
         var lineCount = 100;
         var n;
 
@@ -553,56 +553,25 @@ fdescribe('gl3d plots', function() {
             z: []
         }
 
-        var pointCache = {}, pointx, pointy, pointz;
+        if(true) {
 
-        n = pointCount;
-        while(n > 0) {
+            for(n = 0; n < pointCount; n++) {
 
-            pointx = Math.round((200 * Math.random() - 100) / 20) * 20;
-            pointy = Math.round((200 * Math.random() - 100) / 20) * 20;
-            pointz = Math.round((200 * Math.random() - 100) / 20) * 20;
+                x = Math.round((200 * Math.random() - 100) / 20) * 20;
+                y = Math.round((200 * Math.random() - 100) / 20) * 20;
+                z = Math.round((200 * Math.random() - 100) / 20) * 20;
 
-            if(!pointCache[[pointx, pointy, pointz].join()]) {
+                points.x.push(x);
+                points.y.push(y);
+                points.z.push(z);
 
-                pointCache[[pointx, pointy, pointz].join()] = true;
-
-                points.x.push(pointx);
-                points.y.push(pointy);
-                points.z.push(pointz);
-                n--;
+                index = addPointMarker(unitSphere, x, y, z, randomColor(), 4, index, X, Y, Z, I, J, K, F)
             }
-        }
 
+            for(n = 0; n < pointCount - 1; n++) {
 
-/*
-        points.x.push(1);
-        points.y.push(2);
-        points.z.push(3);
-
-        points.x.push(4);
-        points.y.push(4);
-        points.z.push(4);
-*/
-
-        var lineCache = {}, point1, point2, x2, y2, z2, distance;
-
-        n = lineCount;
-        while(n > 0) {
-
-            point1 = Math.floor(pointCount * Math.random());
-            point2 = Math.floor(pointCount * Math.random());
-
-            if(
-                !(point1 === point2) && !lineCache[[point1,point2].join()] && !lineCache[[point2,point1].join()]
-                && [
-                    points.x[point1] ===  points.x[point2],
-                    points.y[point1] ===  points.y[point2],
-                    points.z[point1] ===  points.z[point2]
-                ].reduce(function(a,b) {return a + b}, 0) === 2
-            ) {
-
-                lineCache[[point1,point2].join()] = true;
-                n--;
+                point1 = n;
+                point2 = n + 1;
 
                 x = points.x[point1];
                 y = points.y[point1];
@@ -612,24 +581,91 @@ fdescribe('gl3d plots', function() {
                 y2 = points.y[point2];
                 z2 = points.z[point2];
 
-                index = addLine(cylinderMaker(1 + 3 * Math.random(), x2-x, y2-y, z2-z, randomColor(), randomColor()), x, y, z, index, X, Y, Z, I, J, K, F)
+                index = addLine(cylinderMaker(4, x2 - x, y2 - y, z2 - z, randomColor(), randomColor()), x, y, z, index, X, Y, Z, I, J, K, F)
             }
-        }
+            
+        } else {
 
-        var members = Object.keys(lineCache).join().split(",").map(parseFloat);
+            var pointCache = {}, pointx, pointy, pointz;
 
-        for(n = 0; n < pointCount; n++) {
+            n = pointCount;
+            while (n > 0) {
 
-            if(members.indexOf(n) !== -1) {
+                pointx = Math.round((200 * Math.random() - 100) / 20) * 20;
+                pointy = Math.round((200 * Math.random() - 100) / 20) * 20;
+                pointz = Math.round((200 * Math.random() - 100) / 20) * 20;
 
-                x = points.x[n];
-                y = points.y[n];
-                z = points.z[n];
+                if (!pointCache[[pointx, pointy, pointz].join()]) {
 
-                index = addPointMarker(unitSphere, x, y, z, randomColor(), 4, index, X, Y, Z, I, J, K, F)
+                    pointCache[[pointx, pointy, pointz].join()] = true;
+
+                    points.x.push(pointx);
+                    points.y.push(pointy);
+                    points.z.push(pointz);
+                    n--;
+                }
             }
-        }
 
+
+            /*
+             points.x.push(1);
+             points.y.push(2);
+             points.z.push(3);
+
+             points.x.push(4);
+             points.y.push(4);
+             points.z.push(4);
+             */
+
+            var lineCache = {}, point1, point2, x2, y2, z2, distance;
+
+            n = lineCount;
+            while (n > 0) {
+
+                point1 = Math.floor(pointCount * Math.random());
+                point2 = Math.floor(pointCount * Math.random());
+
+                if (
+                    !(point1 === point2) && !lineCache[[point1, point2].join()] && !lineCache[[point2, point1].join()]
+                    && [
+                        points.x[point1] === points.x[point2],
+                        points.y[point1] === points.y[point2],
+                        points.z[point1] === points.z[point2]
+                    ].reduce(function (a, b) {
+                        return a + b
+                    }, 0) === 2
+                ) {
+
+                    lineCache[[point1, point2].join()] = true;
+                    n--;
+
+                    x = points.x[point1];
+                    y = points.y[point1];
+                    z = points.z[point1];
+
+                    x2 = points.x[point2];
+                    y2 = points.y[point2];
+                    z2 = points.z[point2];
+
+                    index = addLine(cylinderMaker(1 + 3 * Math.random(), x2 - x, y2 - y, z2 - z, randomColor(), randomColor()), x, y, z, index, X, Y, Z, I, J, K, F)
+                }
+            }
+
+            var members = Object.keys(lineCache).join().split(",").map(parseFloat);
+
+            for (n = 0; n < pointCount; n++) {
+
+                if (members.indexOf(n) !== -1) {
+
+                    x = points.x[n];
+                    y = points.y[n];
+                    z = points.z[n];
+
+                    index = addPointMarker(unitSphere, x, y, z, randomColor(), 4, index, X, Y, Z, I, J, K, F)
+                }
+            }
+
+        }
 
         // Extend the place to ensure correct aspect ratio
         X.push(-100)
