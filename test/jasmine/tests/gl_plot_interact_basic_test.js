@@ -87,6 +87,85 @@ function addFace(I, J, K, F, i, j, k, f) {
     F.push(f);
 }
 
+function cylinderMaker(r, uu, vv, ww) {
+
+    var X = [];
+    var Y = [];
+    var Z = [];
+
+    var I = [];
+    var J = [];
+    var K = [];
+    var F = [];
+
+    var av = addVertex.bind(null, X, Y, Z);
+    var af = addFace.bind(null, I, J, K, F);
+
+    var quadCount = 36;
+    var triangleCount = 2 * quadCount;
+    var q, a, vert, sa, ca;
+
+    var x, y, z, xx, yy, zz;
+
+    var length = Math.sqrt(uu * uu + vv * vv + ww * ww);
+
+    var u = uu / length;
+    var v = vv / length;
+    var w = ww / length;
+
+    if(w > 1e-3) {
+        x = -1; y = -1; z = (u + v) / w;
+    } else if(v > 1e-3) {
+        x = -1; y = (u + w) / v; z = -1;
+    } else if(u > 1e-3) {
+        x = (v + w) / u; y = -1; z = -1;
+    } else {
+        x = 1; y = 0; z = 0;
+    }
+
+    length = Math.sqrt(x * x + y * y + z * z);
+    x /= length;
+    y /= length;
+    z /= length;
+
+    for(q = 0; q < quadCount; q++) {
+
+        a = q * Math.PI * 2 / quadCount;
+
+        sa = Math.sin(a);
+        ca = Math.cos(a);
+
+
+        xx = u*(u*x+v*y+w*z)+(x*(v*v+w*w)-u*(v*y+w*z))*ca+(v*z-w*y)*sa;
+        yy = v*(u*x+v*y+w*z)+(y*(u*u+w*w)-v*(u*x+w*z))*ca+(w*x-u*z)*sa;
+        zz = w*(u*x+v*y+w*z)+(z*(u*u+v*v)-w*(u*x+v*y))*ca+(u*y-v*x)*sa;
+
+        av(xx, yy, zz);
+        av(xx + uu, yy + vv, zz + ww);
+    }
+
+    for(q = 0; q < quadCount; q++) {
+
+        vert = 2 * q;
+
+        af(                      vert, (vert + 1), (vert + 2) % triangleCount);
+        af((vert + 2) % triangleCount, (vert + 1), (vert + 3) % triangleCount);
+    }
+
+    var model = {
+        x: X,
+        y: Y,
+        z: Z,
+        i: I,
+        j: J,
+        k: K,
+        f: F
+    };
+
+    return model;
+}
+
+
 function unitCylinderMaker() {
 
     var X = [];
@@ -340,8 +419,8 @@ function addPointMarker(geom, x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
 
     return vOffset + mx.length;
 }
-
-function addLine(geom, x1, y1, z1, x2, y2, z2, f, r, l, vOffset, X, Y, Z, I, J, K, F) {
+//       addLine(cylinderMaker(20, x2-x, y2-y, z2-z), x, y, z, randomColor(), index, X, Y, Z, I, J, K, F)
+function addLine(geom, x1, y1, z1, f, vOffset, X, Y, Z, I, J, K, F) {
 
     var v, p;
 
@@ -353,28 +432,11 @@ function addLine(geom, x1, y1, z1, x2, y2, z2, f, r, l, vOffset, X, Y, Z, I, J, 
     var mk = geom.k;
     var mf = geom.f;
 
-    var xd = x2 - x1;
-    var yd = y2 - y1;
-    var zd = z2 - z1;
-
-    var xRad = Math.atan2(zd, xd) - Math.PI / 2; // normal
-    var yRad = Math.atan2(zd, yd) - Math.PI / 2; // normal
-    var x0, y0, z0;
-    var x, y, z;
-
     for(v = 0; v < mx.length; v++) {
 
-        x0 = mx[v];
-        y0 = my[v];
-        z0 = mz[v];
-
-        x = x0 * Math.cos(xRad);
-        y = y0 * Math.cos(yRad);
-        z = x0 * Math.sin(xRad) + y0 * Math.sin(yRad);
-
-        X.push(r * x + z0 * x2 + (1 - z0) * x1);
-        Y.push(r * y + z0 * y2 + (1 - z0) * y1);
-        Z.push(r * z + z0 * z2 + (1 - z0) * z1);
+        X.push(mx[v] + x1);
+        Y.push(my[v] + y1);
+        Z.push(mz[v] + z1);
     }
 
     for(p = 0; p < mi.length; p++) {
@@ -499,13 +561,13 @@ fdescribe('gl3d plots', function() {
         }
 */
 
-        points.x.push(0);
-        points.y.push(0);
-        points.z.push(0);
+        points.x.push(1);
+        points.y.push(2);
+        points.z.push(3);
 
-        points.x.push(0);
-        points.y.push(100);
-        points.z.push(100);
+        points.x.push(4);
+        points.y.push(4);
+        points.z.push(4);
 
         for(n = 0; n < pointCount; n++) {
 
@@ -513,7 +575,7 @@ fdescribe('gl3d plots', function() {
             y  = points.y[n];
             z  = points.z[n];
 
-            index = addPointMarker(unitSphere, x, y, z, randomColor(), 20, index, X, Y, Z, I, J, K, F)
+            index = addPointMarker(unitSphere, x, y, z, randomColor(), 1, index, X, Y, Z, I, J, K, F)
         }
 
         var pointCache = {}, point1, point2, x2, y2, z2, distance;
@@ -521,8 +583,8 @@ fdescribe('gl3d plots', function() {
         n = lineCount;
         while(n > 0) {
 
-            point1 = Math.floor(pointCount * Math.random());
-            point2 = Math.floor(pointCount * Math.random());
+            point1 = 0//Math.floor(pointCount * Math.random());
+            point2 = 1//Math.floor(pointCount * Math.random());
 
             if(!(point1 === point2) && !pointCache[[point1,point2].join()] && !pointCache[[point2,point1].join()]) {
 
@@ -537,20 +599,18 @@ fdescribe('gl3d plots', function() {
                 y2 = points.y[point2];
                 z2 = points.z[point2];
 
-                distance = Math.sqrt(Math.pow(x2 - x, 2) + Math.pow(y2 - y, 2) + Math.pow(z2 - z, 2));
-
-                index = addLine(unitCylinder, x, y, z, x2, y2, z2, randomColor(), 20, distance, index, X, Y, Z, I, J, K, F)
+                index = addLine(cylinderMaker(1, x2-x, y2-y, z2-z), x, y, z, randomColor(), index, X, Y, Z, I, J, K, F)
             }
         }
 
 
         // Extend the place to ensure correct aspect ratio
-        X.push(100)
-        X.push(0)
-        Y.push(100)
-        Y.push(0)
-        Z.push(100)
-        Z.push(0)
+        X.push(10)
+        X.push(-1)
+        Y.push(10)
+        Y.push(-1)
+        Z.push(10)
+        Z.push(-1)
 
         if(1) {
             s.x = X;
