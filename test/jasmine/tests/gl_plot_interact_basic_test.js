@@ -87,6 +87,16 @@ function addFace(I, J, K, F, i, j, k, f) {
     F.push(f);
 }
 
+var quadCount = 36;
+
+var sinVector = [];
+var cosVector = [];
+for(var q = 0; q < quadCount; q++) {
+    var a = q * Math.PI * 2 / quadCount;
+    sinVector.push(Math.sin(a));
+    cosVector.push(Math.cos(a));
+}
+
 function cylinderMaker(r, uu, vv, ww, f1, f2, cont) {
 
     var X = [];
@@ -101,7 +111,6 @@ function cylinderMaker(r, uu, vv, ww, f1, f2, cont) {
     var av = addVertex.bind(null, X, Y, Z);
     var af = addFace.bind(null, I, J, K, F);
 
-    var quadCount = 36;
     var triangleCount = 2 * quadCount;
     var q, a, vert, sa, ca;
 
@@ -128,19 +137,28 @@ function cylinderMaker(r, uu, vv, ww, f1, f2, cont) {
     y /= length;
     z /= length;
 
+    var xxb = u*(u*x+v*y+w*z);
+    var yyb = v*(u*x+v*y+w*z);
+    var zzb = w*(u*x+v*y+w*z);
+
+    var xxc = x*(v*v+w*w)-u*(v*y+w*z);
+    var yyc = y*(u*u+w*w)-v*(u*x+w*z);
+    var zzc = z*(u*u+v*v)-w*(u*x+v*y);
+
+    var xxs = v*z-w*y;
+    var yys = w*x-u*z;
+    var zzs = u*y-v*x;
+
     for(q = 0; q < quadCount; q++) {
 
-        a = q * Math.PI * 2 / quadCount;
+        sa = sinVector[q];
+        ca = cosVector[q];
 
-        sa = Math.sin(a);
-        ca = Math.cos(a);
+        xx = xxb+xxc*ca+xxs*sa;
+        yy = yyb+yyc*ca+yys*sa;
+        zz = zzb+zzc*ca+zzs*sa;
 
-
-        xx = u*(u*x+v*y+w*z)+(x*(v*v+w*w)-u*(v*y+w*z))*ca+(v*z-w*y)*sa;
-        yy = v*(u*x+v*y+w*z)+(y*(u*u+w*w)-v*(u*x+w*z))*ca+(w*x-u*z)*sa;
-        zz = w*(u*x+v*y+w*z)+(z*(u*u+v*v)-w*(u*x+v*y))*ca+(u*y-v*x)*sa;
-
-        if(!cont) av(xx, yy, zz);
+        av(xx, yy, zz);
         av(xx + uu, yy + vv, zz + ww);
     }
 
