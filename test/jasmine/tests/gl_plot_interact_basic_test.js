@@ -87,7 +87,7 @@ function addFace(I, J, K, F, i, j, k, f) {
     F.push(f);
 }
 
-function cylinderMaker(r, uu, vv, ww, f1, f2) {
+function cylinderMaker(r, uu, vv, ww, f1, f2, cont) {
 
     var X = [];
     var Y = [];
@@ -140,7 +140,7 @@ function cylinderMaker(r, uu, vv, ww, f1, f2) {
         yy = v*(u*x+v*y+w*z)+(y*(u*u+w*w)-v*(u*x+w*z))*ca+(w*x-u*z)*sa;
         zz = w*(u*x+v*y+w*z)+(z*(u*u+v*v)-w*(u*x+v*y))*ca+(u*y-v*x)*sa;
 
-        av(xx, yy, zz);
+        if(!cont) av(xx, yy, zz);
         av(xx + uu, yy + vv, zz + ww);
     }
 
@@ -543,7 +543,7 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 1000;
+        var pointCount = 50;
         var lineCount = 100;
         var n, r, c;
 
@@ -557,21 +557,21 @@ fdescribe('gl3d plots', function() {
 
             for(n = 0; n < pointCount; n++) {
 
-                x = n * 0.2 - 100;
-                y = Math.cos(n / 100) * 100;
-                z = Math.sin(n / 100) * 100;
+                x = 1000 * n / pointCount * 0.2 - 100;
+                y = Math.cos(10 * n / pointCount) * 100;
+                z = Math.sin(10 * n / pointCount) * 100;
 
                 points.x.push(x);
                 points.y.push(y);
                 points.z.push(z);
 
-                //index = addPointMarker(unitSphere, x, y, z, 'rgb(255,255,255)', 4, index, X, Y, Z, I, J, K, F)
+                if(n === 0 || n === Math.round(pointCount / 2) || n === pointCount - 1) index = addPointMarker(unitSphere, x, y, z, 'rgb(64,64,128)', 15, index, X, Y, Z, I, J, K, F)
             }
 
-            for(n = 2; n < pointCount - 2; n++) {
+            for(n = 0; n < pointCount - 1; n++) {
 
-                point1 = n - 2;
-                point2 = n + 2;
+                point1 = n;
+                point2 = n + 1;
 
                 x = points.x[point1];
                 y = points.y[point1];
@@ -581,11 +581,11 @@ fdescribe('gl3d plots', function() {
                 y2 = points.y[point2];
                 z2 = points.z[point2];
 
-                r = 10 + 5 * Math.sin(n / 20);
+                r = 10 + 5 * Math.sin(1000 * n / pointCount / 20);
 
                 c = 'rgb(' + Math.round(256 * n / (pointCount - 1)) + ',0,' + Math.round(256 * (pointCount - 1 - n) / (pointCount - 1)) + ')';
 
-                index = addLine(cylinderMaker(r, x2 - x, y2 - y, z2 - z, c, c), x, y, z, index, X, Y, Z, I, J, K, F)
+                index = addLine(cylinderMaker(r, x2 - x, y2 - y, z2 - z, c, c, false), x, y, z, index, X, Y, Z, I, J, K, F)
             }
 
         } else {
