@@ -656,13 +656,14 @@ fdescribe('gl3d plots', function() {
 
         var pointCount = 20;
         var lineCount = 100;
-        var n, r, r2, c;
+        var n, r, r2, c, c2;
 
         var points = {
             x: [],
             y: [],
             z: [],
-            r: []
+            r: [],
+            c: []
         }
 
         if(true) {
@@ -673,12 +674,13 @@ fdescribe('gl3d plots', function() {
                 y = Math.cos(10 * n / pointCount) * 100;
                 z = Math.sin(10 * n / pointCount) * 100;
                 r = 10 + 5 * Math.sin(1000 * n / pointCount / 20);
+                c = [Math.round(256 * n / (pointCount - 1)),0,Math.round(256 * (pointCount - 1 - n) / (pointCount - 1))];
 
                 points.x.push(x);
                 points.y.push(y);
                 points.z.push(z);
                 points.r.push(r);
-
+                points.c.push(c);
             }
 
             for(n = 0; n < pointCount; n++) {
@@ -689,7 +691,8 @@ fdescribe('gl3d plots', function() {
                 x: [],
                 y: [],
                 z: [],
-                r: []
+                r: [],
+                c: []
             };
 
             var upsamplingFactor = 100; // convert every original point to as many upsampled points
@@ -705,6 +708,11 @@ fdescribe('gl3d plots', function() {
                     renderedPoints.y.push(c2*points.y[n]+c1*points.y[n+1]);
                     renderedPoints.z.push(c2*points.z[n]+c1*points.z[n+1]);
                     renderedPoints.r.push(c2*points.r[n]+c1*points.r[n+1]);
+                    renderedPoints.c.push([
+                        c2*points.c[n][0]+c1*points.c[n+1][0], // r
+                        c2*points.c[n][1]+c1*points.c[n+1][1], // g
+                        c2*points.c[n][2]+c1*points.c[n+1][2]  // b
+                    ]);
                 }
 
             }
@@ -718,15 +726,15 @@ fdescribe('gl3d plots', function() {
                 y = renderedPoints.y[point1];
                 z = renderedPoints.z[point1];
                 r = renderedPoints.r[point1];
+                c = 'rgb(' + renderedPoints.c[point1].join() + ')';
 
                 x2 = renderedPoints.x[point2];
                 y2 = renderedPoints.y[point2];
                 z2 = renderedPoints.z[point2];
                 r2 = renderedPoints.r[point2];
+                c2 = 'rgb(' + renderedPoints.c[point2].join() + ')';
 
-                c = 'rgb(' + Math.round(256 * n / (upsampledPointCount - 1)) + ',0,' + Math.round(256 * (upsampledPointCount - 1 - n) / (upsampledPointCount - 1)) + ')';
-
-                index = addLine(cylinderMaker(r, r2, x2 - x, y2 - y, z2 - z, c, c, n > 0), x, y, z, index, X, Y, Z, I, J, K, F)
+                index = addLine(cylinderMaker(r, r2, x2 - x, y2 - y, z2 - z, c, c2, n > 0), x, y, z, index, X, Y, Z, I, J, K, F)
             }
 
         } else {
