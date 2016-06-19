@@ -146,7 +146,7 @@ for(var q = 0; q < quadCount; q++) {
 
 var lastGymbal = null;
 
-function cylinderMaker(r, uu, vv, ww, f1, f2, continuable) {
+function cylinderMaker(r1, r2, uu, vv, ww, f1, f2, continuable) {
 
     var X = [];
     var Y = [];
@@ -192,22 +192,24 @@ function cylinderMaker(r, uu, vv, ww, f1, f2, continuable) {
     }
     var cont = continuable && sameGymbal;
 
-    length = Math.sqrt(x * x + y * y + z * z) / r;
+    var xxb, yyb, zzb, xxc, yyc, zzc, xxs, yys, zzs;
+
+    length = Math.sqrt(x * x + y * y + z * z) / r1;
     x /= length;
     y /= length;
     z /= length;
 
-    var xxb = u*(u*x+v*y+w*z);
-    var yyb = v*(u*x+v*y+w*z);
-    var zzb = w*(u*x+v*y+w*z);
+    xxb = u*(u*x+v*y+w*z);
+    yyb = v*(u*x+v*y+w*z);
+    zzb = w*(u*x+v*y+w*z);
 
-    var xxc = x*(v*v+w*w)-u*(v*y+w*z);
-    var yyc = y*(u*u+w*w)-v*(u*x+w*z);
-    var zzc = z*(u*u+v*v)-w*(u*x+v*y);
+    xxc = x*(v*v+w*w)-u*(v*y+w*z);
+    yyc = y*(u*u+w*w)-v*(u*x+w*z);
+    zzc = z*(u*u+v*v)-w*(u*x+v*y);
 
-    var xxs = v*z-w*y;
-    var yys = w*x-u*z;
-    var zzs = u*y-v*x;
+    xxs = v*z-w*y;
+    yys = w*x-u*z;
+    zzs = u*y-v*x;
 
     var o = cont ? -quadCount : 0; // offset for possible welding (cont == true)
 
@@ -223,6 +225,23 @@ function cylinderMaker(r, uu, vv, ww, f1, f2, continuable) {
 
             av(xx, yy, zz);
         }
+
+    length = Math.sqrt(x * x + y * y + z * z) / r2; // renormalize it for the other circle
+    x /= length;
+    y /= length;
+    z /= length;
+
+    xxb = u*(u*x+v*y+w*z);
+    yyb = v*(u*x+v*y+w*z);
+    zzb = w*(u*x+v*y+w*z);
+
+    xxc = x*(v*v+w*w)-u*(v*y+w*z);
+    yyc = y*(u*u+w*w)-v*(u*x+w*z);
+    zzc = z*(u*u+v*v)-w*(u*x+v*y);
+
+    xxs = v*z-w*y;
+    yys = w*x-u*z;
+    zzs = u*y-v*x;
 
     for(q = 0; q < quadCount; q++) {
 
@@ -637,12 +656,13 @@ fdescribe('gl3d plots', function() {
 
         var pointCount = 20;
         var lineCount = 100;
-        var n, r, c;
+        var n, r, r2, c;
 
         var points = {
             x: [],
             y: [],
-            z: []
+            z: [],
+            r: []
         }
 
         if(true) {
@@ -652,10 +672,13 @@ fdescribe('gl3d plots', function() {
                 x = 1000 * n / pointCount * 0.2 - 100;
                 y = Math.cos(10 * n / pointCount) * 100;
                 z = Math.sin(10 * n / pointCount) * 100;
+                r = 10 + 5 * Math.sin(1000 * n / pointCount / 20);
 
                 points.x.push(x);
                 points.y.push(y);
                 points.z.push(z);
+                points.r.push(r);
+
             }
 
             for(n = 0; n < pointCount; n++) {
@@ -663,12 +686,30 @@ fdescribe('gl3d plots', function() {
             }
 
             var renderedPoints = {
-                x: points.x,
-                y: points.y,
-                z: points.z
+                x: [],
+                y: [],
+                z: [],
+                r: []
             };
 
+            var upsamplingFactor = 100; // convert every original point to as many upsampled points
+            var upsampledPointCount = (pointCount - 1) * upsamplingFactor; // intervals with beginning / end original points can't be used
             for(n = 0; n < pointCount - 1; n++) {
+
+                for(var m = 0; m < upsamplingFactor; m++) {
+
+                    var c1 = m / upsamplingFactor;
+                    var c2 = (upsamplingFactor - m) / upsamplingFactor;
+
+                    renderedPoints.x.push(c2*points.x[n]+c1*points.x[n+1]);
+                    renderedPoints.y.push(c2*points.y[n]+c1*points.y[n+1]);
+                    renderedPoints.z.push(c2*points.z[n]+c1*points.z[n+1]);
+                    renderedPoints.r.push(c2*points.r[n]+c1*points.r[n+1]);
+                }
+
+            }
+
+            for(n = 0; n < upsampledPointCount - 1; n++) {
 
                 point1 = n;
                 point2 = n + 1;
@@ -676,16 +717,16 @@ fdescribe('gl3d plots', function() {
                 x = renderedPoints.x[point1];
                 y = renderedPoints.y[point1];
                 z = renderedPoints.z[point1];
+                r = renderedPoints.r[point1];
 
                 x2 = renderedPoints.x[point2];
                 y2 = renderedPoints.y[point2];
                 z2 = renderedPoints.z[point2];
+                r2 = renderedPoints.r[point2];
 
-                r = 10 + 5 * Math.sin(1000 * n / pointCount / 20);
+                c = 'rgb(' + Math.round(256 * n / (upsampledPointCount - 1)) + ',0,' + Math.round(256 * (upsampledPointCount - 1 - n) / (upsampledPointCount - 1)) + ')';
 
-                c = 'rgb(' + Math.round(256 * n / (pointCount - 1)) + ',0,' + Math.round(256 * (pointCount - 1 - n) / (pointCount - 1)) + ')';
-
-                index = addLine(cylinderMaker(r, x2 - x, y2 - y, z2 - z, c, c, n > 0), x, y, z, index, X, Y, Z, I, J, K, F)
+                index = addLine(cylinderMaker(r, r2, x2 - x, y2 - y, z2 - z, c, c, n > 0), x, y, z, index, X, Y, Z, I, J, K, F)
             }
 
         } else {
