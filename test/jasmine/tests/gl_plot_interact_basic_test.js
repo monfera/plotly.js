@@ -696,7 +696,7 @@ fdescribe('gl3d plots', function() {
                 c: []
             };
 
-            var upsamplingFactor = 3; // convert every original point to as many upsampled points
+            var upsamplingFactor = 10; // convert every original point to as many upsampled points
             var upsampledPointCount = (pointCount - 3) * upsamplingFactor; // intervals with beginning / end original points can't be used
             for(n = 1; n < pointCount - 2; n++) {
 
@@ -726,8 +726,10 @@ fdescribe('gl3d plots', function() {
                         var c1 = m / upsamplingFactor;
                         var c2 = (upsamplingFactor - m) / upsamplingFactor;
 
-                        rp.x.push(c2 * p.x[n] + c1 * p.x[n + 1]);
-                        rp.y.push(c2 * p.y[n] + c1 * p.y[n + 1]);
+                        var xy = catmullRom(0, [p.x[n - 1], p.x[n], p.x[n + 1], p.x[n + 2]], [p.y[n - 1], p.y[n], p.y[n + 1], p.y[n + 2]], c1 + 1);
+
+                        rp.x.push(xy[0] /*c2 * p.x[n] + c1 * p.x[n + 1]*/);
+                        rp.y.push(xy[1] /*c2 * p.y[n] + c1 * p.y[n + 1]*/);
                         rp.z.push(c2 * p.z[n] + c1 * p.z[n + 1]);
                         rp.r.push(1 || catmullRom(0, [0, 1, 2, 3], [p.r[n - 1], p.r[n], p.r[n + 1], p.r[n + 2]], c1 + 1 )[1]);
                         rp.c.push([
