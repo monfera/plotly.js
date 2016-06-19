@@ -87,12 +87,12 @@ function addFace(I, J, K, F, i, j, k, f) {
     F.push(f);
 }
 
-function catmullRom(alpha, x, y, Tratio) {
+function catmullRom(alpha, x, y, z, Tratio) {
 
     var t = [0];
     var d, c1, c2, i;
     for(i = 0; i < 3; i++) {
-        t[i + 1] = Math.pow(Math.sqrt(Math.pow(x[i + 1] - x[i], 2) + Math.pow(y[i + 1] - y[i], 2)), alpha) + t[i];
+        t[i + 1] = Math.pow(Math.sqrt(Math.pow(x[i + 1] - x[i], 2) + Math.pow(y[i + 1] - y[i], 2) + Math.pow(z[i + 1] - z[i], 2)), alpha) + t[i];
     }
 
     var T = t[1] + Tratio * (t[2] - t[1]);
@@ -102,38 +102,44 @@ function catmullRom(alpha, x, y, Tratio) {
     c2 = (T - t[0]) / d;
     var A1x = c1*x[0] + c2*x[1];
     var A1y = c1*y[0] + c2*y[1];
+    var A1z = c1*z[0] + c2*z[1];
 
     d = t[2] - t[1];
     c1 = (t[2] - T) / d;
     c2 = (T - t[1]) / d;
     var A2x = c1*x[1] + c2*x[2];
     var A2y = c1*y[1] + c2*y[2];
+    var A2z = c1*z[1] + c2*z[2];
 
     d = t[3] - t[2];
     c1 = (t[3] - T) / d;
     c2 = (T - t[2]) / d;
     var A3x = c1*x[2] + c2*x[3];
     var A3y = c1*y[2] + c2*y[3];
+    var A3z = c1*z[2] + c2*z[3];
 
     d = t[2] - t[0];
     c1 = (t[2] - T) / d;
     c2 = (T - t[0]) / d;
     var B1x = c1*A1x + c2*A2x;
     var B1y = c1*A1y + c2*A2y;
+    var B1z = c1*A1z + c2*A2z;
 
     d = t[3] - t[1];
     c1 = (t[3] - T) / d;
     c2 = (T - t[1]) / d;
     var B2x = c1*A2x + c2*A3x;
     var B2y = c1*A2y + c2*A3y;
+    var B2z = c1*A2z + c2*A3z;
 
     d = t[2] - t[1];
     c1 = (t[2] - T) / d;
     c2 = (T - t[1]) / d;
     var Cx = c1*B1x + c2*B2x;
     var Cy = c1*B1y + c2*B2y;
+    var Cz = c1*B1z + c2*B2z;
 
-    return [Cx, Cy];
+    return [Cx, Cy, Cz];
 }
 
 var quadCount = 36;
@@ -674,7 +680,7 @@ fdescribe('gl3d plots', function() {
 
                 x = 1000 * n / pointCount * 0.2 - 100;
                 y = Math.cos(10 * n / pointCount) * 100;
-                z = 0 * Math.sin(10 * n / pointCount) * 100;
+                z = Math.sin(10 * n / pointCount) * 100;
                 r = 10 + 5 * Math.sin(1000 * n / pointCount / 20);
                 c = [Math.round(256 * n / (pointCount - 1)),0,Math.round(256 * (pointCount - 1 - n) / (pointCount - 1))];
 
@@ -728,11 +734,11 @@ fdescribe('gl3d plots', function() {
                         var c1 = m / upsamplingFactor;
                         var c2 = (upsamplingFactor - m) / upsamplingFactor;
 
-                        var xy = catmullRom(0.5, [p.x[n], p.x[n+1], p.x[n + 2], p.x[n + 3]], [p.y[n ], p.y[n+1], p.y[n + 2], p.y[n + 3]], c1);
+                        var xyz = catmullRom(0.5, [p.x[n], p.x[n+1], p.x[n + 2], p.x[n + 3]], [p.y[n ], p.y[n+1], p.y[n + 2], p.y[n + 3]], [p.z[n ], p.z[n+1], p.z[n + 2], p.z[n + 3]], c1);
 
-                        rp.x.push(xy[0] /*c2 * p.x[n] + c1 * p.x[n + 1]*/);
-                        rp.y.push(xy[1] /*c2 * p.y[n] + c1 * p.y[n + 1]*/);
-                        rp.z.push(c2 * p.z[n] + c1 * p.z[n + 1]);
+                        rp.x.push(xyz[0] /*c2 * p.x[n] + c1 * p.x[n + 1]*/);
+                        rp.y.push(xyz[1] /*c2 * p.y[n] + c1 * p.y[n + 1]*/);
+                        rp.z.push(xyz[2] /*c2 * p.z[n] + c1 * p.z[n + 1]*/);
                         rp.r.push(1 || catmullRom(0, [0, 1, 2, 3], [p.r[n - 1], p.r[n], p.r[n + 1], p.r[n + 2]], c1 + 1 )[1]);
                         rp.c.push([
                             c2 * p.c[n][0] + c1 * p.c[n + 1][0], // r
