@@ -654,7 +654,7 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 20;
+        var pointCount = 10;
         var lineCount = 100;
         var n, r, r2, c, c2;
 
@@ -728,7 +728,7 @@ fdescribe('gl3d plots', function() {
                         rp.x.push(c2 * p.x[n] + c1 * p.x[n + 1]);
                         rp.y.push(c2 * p.y[n] + c1 * p.y[n + 1]);
                         rp.z.push(c2 * p.z[n] + c1 * p.z[n + 1]);
-                        rp.r.push(catmullRom(0.5, [0, 1, 2, 3], [p.r[n - 1], p.r[n], p.r[n + 1], p.r[n + 2]], c1 + 1 )[1]);
+                        rp.r.push(1 || catmullRom(0, [0, 1, 2, 3], [p.r[n - 1], p.r[n], p.r[n + 1], p.r[n + 2]], c1 + 1 )[1]);
                         rp.c.push([
                             c2 * p.c[n][0] + c1 * p.c[n + 1][0], // r
                             c2 * p.c[n][1] + c1 * p.c[n + 1][1], // g
