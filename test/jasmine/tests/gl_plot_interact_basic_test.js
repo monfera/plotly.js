@@ -672,7 +672,7 @@ fdescribe('gl3d plots', function() {
 
                 x = 1000 * n / pointCount * 0.2 - 100;
                 y = Math.cos(10 * n / pointCount) * 100;
-                z = Math.sin(10 * n / pointCount) * 100;
+                z = 0 * Math.sin(10 * n / pointCount) * 100;
                 r = 10 + 5 * Math.sin(1000 * n / pointCount / 20);
                 c = [Math.round(256 * n / (pointCount - 1)),0,Math.round(256 * (pointCount - 1 - n) / (pointCount - 1))];
 
@@ -684,7 +684,8 @@ fdescribe('gl3d plots', function() {
             }
 
             for(n = 0; n < pointCount; n++) {
-           //     if(n === 0 || n === Math.round(pointCount / 2) || n === pointCount - 1) index = addPointMarker(unitSphere, x, y, z, 'rgb(64,64,128)', 15, index, X, Y, Z, I, J, K, F)
+                // if(true || n === 0 || n === Math.round(pointCount / 2) || n === pointCount - 1)
+                index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 3, index, X, Y, Z, I, J, K, F)
             }
 
             var rp = {
@@ -695,7 +696,7 @@ fdescribe('gl3d plots', function() {
                 c: []
             };
 
-            var upsamplingFactor = 100; // convert every original point to as many upsampled points
+            var upsamplingFactor = 3; // convert every original point to as many upsampled points
             var upsampledPointCount = (pointCount - 3) * upsamplingFactor; // intervals with beginning / end original points can't be used
             for(n = 1; n < pointCount - 2; n++) {
 
@@ -735,12 +736,21 @@ fdescribe('gl3d plots', function() {
                             c2 * p.c[n][2] + c1 * p.c[n + 1][2]  // b
                         ]);
 
+
+
                     }
                 }
 
             }
+            // last segment
+            rp.x.push(p.x[pointCount - 2]);
+            rp.y.push(p.y[pointCount - 2]);
+            rp.z.push(p.z[pointCount - 2]);
+            rp.r.push(1);
+            rp.c.push(p.c[pointCount - 2]);
 
-            for(n = 0; n < upsampledPointCount - 1; n++) {
+
+            for(n = 0; n < upsampledPointCount; n++) {
 
                 point1 = n;
                 point2 = n + 1;
@@ -757,7 +767,8 @@ fdescribe('gl3d plots', function() {
                 r2 = rp.r[point2];
                 c2 = 'rgb(' + rp.c[point2].join() + ')';
 
-                index = addLine(cylinderMaker(r, r2, x2 - x, y2 - y, z2 - z, c, c2, n > 0), x, y, z, index, X, Y, Z, I, J, K, F)
+                index = addPointMarker(unitSphere, x, y, z, 'rgb(64,64,255)', 1.1, index, X, Y, Z, I, J, K, F)
+                index = addLine(cylinderMaker(r, r2, x2 - x, y2 - y, z2 - z, c, c2, false), x, y, z, index, X, Y, Z, I, J, K, F)
             }
 
         } else {
