@@ -91,8 +91,8 @@ function catmullRom(alpha, x, y, T) {
 
     var t = [0];
     var d, c1, c2, i;
-    for(i = 1; i < 4; i++) {
-        t[i] = Math.pow(Math.sqrt(Math.pow(x[i + 1] - x[i], 2) + Math.pow(y[i + 1] - y[i], 2)), 0.5) + t[i - 1];
+    for(i = 0; i < 3; i++) {
+        t[i + 1] = Math.pow(Math.sqrt(Math.pow(x[i + 1] - x[i], 2) + Math.pow(y[i + 1] - y[i], 2)), alpha) + t[i];
     }
 
     d = t[1] - t[0];
@@ -658,7 +658,7 @@ fdescribe('gl3d plots', function() {
         var lineCount = 100;
         var n, r, r2, c, c2;
 
-        var points = {
+        var p = {
             x: [],
             y: [],
             z: [],
@@ -676,18 +676,18 @@ fdescribe('gl3d plots', function() {
                 r = 10 + 5 * Math.sin(1000 * n / pointCount / 20);
                 c = [Math.round(256 * n / (pointCount - 1)),0,Math.round(256 * (pointCount - 1 - n) / (pointCount - 1))];
 
-                points.x.push(x);
-                points.y.push(y);
-                points.z.push(z);
-                points.r.push(r);
-                points.c.push(c);
+                p.x.push(x);
+                p.y.push(y);
+                p.z.push(z);
+                p.r.push(r);
+                p.c.push(c);
             }
 
             for(n = 0; n < pointCount; n++) {
-                if(n === 0 || n === Math.round(pointCount / 2) || n === pointCount - 1) index = addPointMarker(unitSphere, x, y, z, 'rgb(64,64,128)', 15, index, X, Y, Z, I, J, K, F)
+           //     if(n === 0 || n === Math.round(pointCount / 2) || n === pointCount - 1) index = addPointMarker(unitSphere, x, y, z, 'rgb(64,64,128)', 15, index, X, Y, Z, I, J, K, F)
             }
 
-            var renderedPoints = {
+            var rp = {
                 x: [],
                 y: [],
                 z: [],
@@ -696,23 +696,46 @@ fdescribe('gl3d plots', function() {
             };
 
             var upsamplingFactor = 100; // convert every original point to as many upsampled points
-            var upsampledPointCount = (pointCount - 1) * upsamplingFactor; // intervals with beginning / end original points can't be used
-            for(n = 0; n < pointCount - 1; n++) {
+            var upsampledPointCount = (pointCount - 3) * upsamplingFactor; // intervals with beginning / end original points can't be used
+            for(n = 1; n < pointCount - 2; n++) {
 
                 for(var m = 0; m < upsamplingFactor; m++) {
 
-                    var c1 = m / upsamplingFactor;
-                    var c2 = (upsamplingFactor - m) / upsamplingFactor;
+                    if('centripetal' == 'linear') {
 
-                    renderedPoints.x.push(c2*points.x[n]+c1*points.x[n+1]);
-                    renderedPoints.y.push(c2*points.y[n]+c1*points.y[n+1]);
-                    renderedPoints.z.push(c2*points.z[n]+c1*points.z[n+1]);
-                    renderedPoints.r.push(c2*points.r[n]+c1*points.r[n+1]);
-                    renderedPoints.c.push([
-                        c2*points.c[n][0]+c1*points.c[n+1][0], // r
-                        c2*points.c[n][1]+c1*points.c[n+1][1], // g
-                        c2*points.c[n][2]+c1*points.c[n+1][2]  // b
-                    ]);
+                        // linear (well... adjust indices)
+
+                        var c1 = m / upsamplingFactor;
+                        var c2 = (upsamplingFactor - m) / upsamplingFactor;
+
+                        rp.x.push(c2 * p.x[n] + c1 * p.x[n + 1]);
+                        rp.y.push(c2 * p.y[n] + c1 * p.y[n + 1]);
+                        rp.z.push(c2 * p.z[n] + c1 * p.z[n + 1]);
+                        rp.r.push(c2 * p.r[n] + c1 * p.r[n + 1]);
+                        rp.c.push([
+                            c2 * p.c[n][0] + c1 * p.c[n + 1][0], // r
+                            c2 * p.c[n][1] + c1 * p.c[n + 1][1], // g
+                            c2 * p.c[n][2] + c1 * p.c[n + 1][2]  // b
+                        ]);
+
+                    } else {
+
+                        // centripetal
+
+                        var c1 = m / upsamplingFactor;
+                        var c2 = (upsamplingFactor - m) / upsamplingFactor;
+
+                        rp.x.push(c2 * p.x[n] + c1 * p.x[n + 1]);
+                        rp.y.push(c2 * p.y[n] + c1 * p.y[n + 1]);
+                        rp.z.push(c2 * p.z[n] + c1 * p.z[n + 1]);
+                        rp.r.push(catmullRom(0.5, [0, 1, 2, 3], [p.r[n - 1], p.r[n], p.r[n + 1], p.r[n + 2]], c1 + 1 )[1]);
+                        rp.c.push([
+                            c2 * p.c[n][0] + c1 * p.c[n + 1][0], // r
+                            c2 * p.c[n][1] + c1 * p.c[n + 1][1], // g
+                            c2 * p.c[n][2] + c1 * p.c[n + 1][2]  // b
+                        ]);
+
+                    }
                 }
 
             }
@@ -722,17 +745,17 @@ fdescribe('gl3d plots', function() {
                 point1 = n;
                 point2 = n + 1;
 
-                x = renderedPoints.x[point1];
-                y = renderedPoints.y[point1];
-                z = renderedPoints.z[point1];
-                r = renderedPoints.r[point1];
-                c = 'rgb(' + renderedPoints.c[point1].join() + ')';
+                x = rp.x[point1];
+                y = rp.y[point1];
+                z = rp.z[point1];
+                r = rp.r[point1];
+                c = 'rgb(' + rp.c[point1].join() + ')';
 
-                x2 = renderedPoints.x[point2];
-                y2 = renderedPoints.y[point2];
-                z2 = renderedPoints.z[point2];
-                r2 = renderedPoints.r[point2];
-                c2 = 'rgb(' + renderedPoints.c[point2].join() + ')';
+                x2 = rp.x[point2];
+                y2 = rp.y[point2];
+                z2 = rp.z[point2];
+                r2 = rp.r[point2];
+                c2 = 'rgb(' + rp.c[point2].join() + ')';
 
                 index = addLine(cylinderMaker(r, r2, x2 - x, y2 - y, z2 - z, c, c2, n > 0), x, y, z, index, X, Y, Z, I, J, K, F)
             }
@@ -752,9 +775,9 @@ fdescribe('gl3d plots', function() {
 
                     pointCache[[pointx, pointy, pointz].join()] = true;
 
-                    points.x.push(pointx);
-                    points.y.push(pointy);
-                    points.z.push(pointz);
+                    p.x.push(pointx);
+                    p.y.push(pointy);
+                    p.z.push(pointz);
                     n--;
                 }
             }
@@ -781,9 +804,9 @@ fdescribe('gl3d plots', function() {
                 if (
                     !(point1 === point2) && !lineCache[[point1, point2].join()] && !lineCache[[point2, point1].join()]
                     && [
-                        points.x[point1] === points.x[point2],
-                        points.y[point1] === points.y[point2],
-                        points.z[point1] === points.z[point2]
+                        p.x[point1] === p.x[point2],
+                        p.y[point1] === p.y[point2],
+                        p.z[point1] === p.z[point2]
                     ].reduce(function (a, b) {
                         return a + b
                     }, 0) === 2
@@ -792,13 +815,13 @@ fdescribe('gl3d plots', function() {
                     lineCache[[point1, point2].join()] = true;
                     n--;
 
-                    x = points.x[point1];
-                    y = points.y[point1];
-                    z = points.z[point1];
+                    x = p.x[point1];
+                    y = p.y[point1];
+                    z = p.z[point1];
 
-                    x2 = points.x[point2];
-                    y2 = points.y[point2];
-                    z2 = points.z[point2];
+                    x2 = p.x[point2];
+                    y2 = p.y[point2];
+                    z2 = p.z[point2];
 
                     index = addLine(cylinderMaker(1 + 3 * Math.random(), x2 - x, y2 - y, z2 - z, randomColor(), randomColor()), x, y, z, index, X, Y, Z, I, J, K, F)
                 }
@@ -810,9 +833,9 @@ fdescribe('gl3d plots', function() {
 
                 if (members.indexOf(n) !== -1) {
 
-                    x = points.x[n];
-                    y = points.y[n];
-                    z = points.z[n];
+                    x = p.x[n];
+                    y = p.y[n];
+                    z = p.z[n];
 
                     index = addPointMarker(unitSphere, x, y, z, randomColor(), 4, index, X, Y, Z, I, J, K, F)
                 }
