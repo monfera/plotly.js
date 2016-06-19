@@ -97,7 +97,9 @@ for(var q = 0; q < quadCount; q++) {
     cosVector.push(Math.cos(a));
 }
 
-function cylinderMaker(r, uu, vv, ww, f1, f2, cont) {
+var lastGymbal = null;
+
+function cylinderMaker(r, uu, vv, ww, f1, f2, continuable) {
 
     var X = [];
     var Y = [];
@@ -121,15 +123,27 @@ function cylinderMaker(r, uu, vv, ww, f1, f2, cont) {
     var v = vv / length;
     var w = ww / length;
 
-    if(w > 1e-3) {
+    // Gymbaling (fixme switch to quaternion based solution when time permits)
+    var sameGymbal;
+    var epsilon = 1e-9;
+    if(w > epsilon) {
         x = -1; y = -1; z = (u + v) / w;
-    } else if(v > 1e-3) {
+        sameGymbal = lastGymbal === 1;
+        lastGymbal = 1;
+    } else if(v > epsilon) {
         x = -1; y = (u + w) / v; z = -1;
-    } else if(u > 1e-3) {
+        sameGymbal = lastGymbal === 2;
+        lastGymbal = 2;
+    } else if(u > epsilon) {
         x = (v + w) / u; y = -1; z = -1;
+        sameGymbal = lastGymbal === 3;
+        lastGymbal = 3;
     } else {
         x = 1; y = 0; z = 0;
+        sameGymbal = lastGymbal === 3;
+        lastGymbal = 3;
     }
+    var cont = continuable && sameGymbal;
 
     length = Math.sqrt(x * x + y * y + z * z) / r;
     x /= length;
@@ -148,17 +162,20 @@ function cylinderMaker(r, uu, vv, ww, f1, f2, cont) {
     var yys = w*x-u*z;
     var zzs = u*y-v*x;
 
-    for(q = 0; q < quadCount; q++) {
+    var o = cont ? -quadCount : 0; // offset for possible welding (cont == true)
 
-        sa = sinVector[q];
-        ca = cosVector[q];
+    if(!cont)
+        for(q = 0; q < quadCount; q++) {
 
-        xx = xxb+xxc*ca+xxs*sa;
-        yy = yyb+yyc*ca+yys*sa;
-        zz = zzb+zzc*ca+zzs*sa;
+            sa = sinVector[q];
+            ca = cosVector[q];
 
-        av(xx, yy, zz);
-    }
+            xx = xxb+xxc*ca+xxs*sa;
+            yy = yyb+yyc*ca+yys*sa;
+            zz = zzb+zzc*ca+zzs*sa;
+
+            av(xx, yy, zz);
+        }
 
     for(q = 0; q < quadCount; q++) {
 
@@ -176,8 +193,8 @@ function cylinderMaker(r, uu, vv, ww, f1, f2, cont) {
 
         vert = q;
 
-        af(vert, vert + quadCount, (vert + 1) % quadCount, f1);
-        af((vert + 1) % quadCount, vert + quadCount, (vert + 1) % quadCount + quadCount, f2);
+        af(vert + o, vert + quadCount + o, (vert + 1) % quadCount + o, f1);
+        af((vert + 1) % quadCount + o, vert + quadCount + o, (vert + 1) % quadCount + quadCount + o, f2);
     }
 
     var model = {
@@ -189,7 +206,7 @@ function cylinderMaker(r, uu, vv, ww, f1, f2, cont) {
         k: K,
         f: F
     };
-
+//if(cont) debugger
     return model;
 }
 
@@ -571,7 +588,7 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 50;
+        var pointCount = 5000;
         var lineCount = 100;
         var n, r, c;
 
@@ -613,7 +630,7 @@ fdescribe('gl3d plots', function() {
 
                 c = 'rgb(' + Math.round(256 * n / (pointCount - 1)) + ',0,' + Math.round(256 * (pointCount - 1 - n) / (pointCount - 1)) + ')';
 
-                index = addLine(cylinderMaker(r, x2 - x, y2 - y, z2 - z, c, c, false), x, y, z, index, X, Y, Z, I, J, K, F)
+                index = addLine(cylinderMaker(r, x2 - x, y2 - y, z2 - z, c, c, n > 0), x, y, z, index, X, Y, Z, I, J, K, F)
             }
 
         } else {
