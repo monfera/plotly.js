@@ -87,6 +87,53 @@ function addFace(I, J, K, F, i, j, k, f) {
     F.push(f);
 }
 
+function catmullRom(alpha, x, y, T) {
+
+    var t = [0];
+    var d, c1, c2, i;
+    for(i = 1; i < 4; i++) {
+        t[i] = Math.pow(Math.sqrt(Math.pow(x[i + 1] - x[i], 2) + Math.pow(y[i + 1] - y[i], 2)), 0.5) + t[i - 1];
+    }
+
+    d = t[1] - t[0];
+    c1 = (t[1] - T) / d;
+    c2 = (T - t[0]) / d;
+    var A1x = c1*x[0] + c2*x[1];
+    var A1y = c1*y[0] + c2*y[1];
+
+    d = t[2] - t[1];
+    c1 = (t[2] - T) / d;
+    c2 = (T - t[1]) / d;
+    var A2x = c1*x[1] + c2*x[2];
+    var A2y = c1*y[1] + c2*y[2];
+
+    d = t[3] - t[2];
+    c1 = (t[3] - T) / d;
+    c2 = (T - t[2]) / d;
+    var A3x = c1*x[2] + c2*x[3];
+    var A3y = c1*y[2] + c2*y[3];
+
+    d = t[2] - t[0];
+    c1 = (t[2] - T) / d;
+    c2 = (T - t[0]) / d;
+    var B1x = c1*A1x + c2*A2x;
+    var B1y = c1*A1y + c2*A2y;
+
+    d = t[3] - t[1];
+    c1 = (t[3] - T) / d;
+    c2 = (T - t[1]) / d;
+    var B2x = c1*A2x + c2*A3x;
+    var B2y = c1*A2y + c2*A3y;
+
+    d = t[2] - t[1];
+    c1 = (t[2] - T) / d;
+    c2 = (T - t[1]) / d;
+    var Cx = c1*B1x + c2*B2x;
+    var Cy = c1*B1y + c2*B2y;
+
+    return [Cx, Cy];
+}
+
 var quadCount = 36;
 
 var sinVector = [];
@@ -588,7 +635,7 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 5000;
+        var pointCount = 20;
         var lineCount = 100;
         var n, r, c;
 
@@ -609,22 +656,30 @@ fdescribe('gl3d plots', function() {
                 points.x.push(x);
                 points.y.push(y);
                 points.z.push(z);
+            }
 
+            for(n = 0; n < pointCount; n++) {
                 if(n === 0 || n === Math.round(pointCount / 2) || n === pointCount - 1) index = addPointMarker(unitSphere, x, y, z, 'rgb(64,64,128)', 15, index, X, Y, Z, I, J, K, F)
             }
+
+            var renderedPoints = {
+                x: points.x,
+                y: points.y,
+                z: points.z
+            };
 
             for(n = 0; n < pointCount - 1; n++) {
 
                 point1 = n;
                 point2 = n + 1;
 
-                x = points.x[point1];
-                y = points.y[point1];
-                z = points.z[point1];
+                x = renderedPoints.x[point1];
+                y = renderedPoints.y[point1];
+                z = renderedPoints.z[point1];
 
-                x2 = points.x[point2];
-                y2 = points.y[point2];
-                z2 = points.z[point2];
+                x2 = renderedPoints.x[point2];
+                y2 = renderedPoints.y[point2];
+                z2 = renderedPoints.z[point2];
 
                 r = 10 + 5 * Math.sin(1000 * n / pointCount / 20);
 
