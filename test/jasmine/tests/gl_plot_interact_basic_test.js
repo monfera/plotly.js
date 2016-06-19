@@ -685,7 +685,7 @@ fdescribe('gl3d plots', function() {
 
             for(n = 0; n < pointCount; n++) {
                 // if(true || n === 0 || n === Math.round(pointCount / 2) || n === pointCount - 1)
-                index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 3, index, X, Y, Z, I, J, K, F)
+                index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 0.5, index, X, Y, Z, I, J, K, F)
             }
 
             var rp = {
@@ -698,7 +698,7 @@ fdescribe('gl3d plots', function() {
 
             var upsamplingFactor = 10; // convert every original point to as many upsampled points
             var upsampledPointCount = (pointCount - 3) * upsamplingFactor; // intervals with beginning / end original points can't be used
-            for(n = 1; n < pointCount - 2; n++) {
+            for(n = 6; n < pointCount - 3; n++) {
 
                 for(var m = 0; m < upsamplingFactor; m++) {
 
@@ -745,14 +745,16 @@ fdescribe('gl3d plots', function() {
 
             }
             // last segment
+/*
             rp.x.push(p.x[pointCount - 2]);
             rp.y.push(p.y[pointCount - 2]);
             rp.z.push(p.z[pointCount - 2]);
             rp.r.push(1);
             rp.c.push(p.c[pointCount - 2]);
+*/
 
 
-            for(n = 0; n < upsampledPointCount; n++) {
+            for(n = 0; n < rp.x.length-1; n++) {
 
                 point1 = n;
                 point2 = n + 1;
