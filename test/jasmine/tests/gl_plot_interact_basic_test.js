@@ -111,8 +111,7 @@ function cylinderMaker(r, uu, vv, ww, f1, f2, cont) {
     var av = addVertex.bind(null, X, Y, Z);
     var af = addFace.bind(null, I, J, K, F);
 
-    var triangleCount = 2 * quadCount;
-    var q, a, vert, sa, ca;
+    var q, vert, sa, ca;
 
     var x, y, z, xx, yy, zz;
 
@@ -159,15 +158,26 @@ function cylinderMaker(r, uu, vv, ww, f1, f2, cont) {
         zz = zzb+zzc*ca+zzs*sa;
 
         av(xx, yy, zz);
+    }
+
+    for(q = 0; q < quadCount; q++) {
+
+        sa = sinVector[q];
+        ca = cosVector[q];
+
+        xx = xxb+xxc*ca+xxs*sa;
+        yy = yyb+yyc*ca+yys*sa;
+        zz = zzb+zzc*ca+zzs*sa;
+
         av(xx + uu, yy + vv, zz + ww);
     }
 
     for(q = 0; q < quadCount; q++) {
 
-        vert = 2 * q;
+        vert = q;
 
-        af(                      vert, (vert + 1), (vert + 2) % triangleCount, f1);
-        af((vert + 2) % triangleCount, (vert + 1), (vert + 3) % triangleCount, f2);
+        af(vert, vert + quadCount, (vert + 1) % quadCount, f1);
+        af((vert + 1) % quadCount, vert + quadCount, (vert + 1) % quadCount + quadCount, f2);
     }
 
     var model = {
