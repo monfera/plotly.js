@@ -693,7 +693,7 @@ fdescribe('gl3d plots', function() {
 
             for(n = 0; n < pointCount; n++) {
                 // if(true || n === 0 || n === Math.round(pointCount / 2) || n === pointCount - 1)
-                index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 1.5, index, X, Y, Z, I, J, K, F)
+                index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 7, index, X, Y, Z, I, J, K, F)
             }
 
             var rp = {
@@ -704,7 +704,7 @@ fdescribe('gl3d plots', function() {
                 c: []
             };
 
-            var upsamplingFactor = 10; // convert every original point to as many upsampled points
+            var upsamplingFactor = 100; // convert every original point to as many upsampled points
             var upsampledPointCount = (pointCount - 3) * upsamplingFactor; // intervals with beginning / end original points can't be used
             for(n = 0; n < pointCount - 3; n++) {
 
@@ -739,7 +739,7 @@ fdescribe('gl3d plots', function() {
                         rp.x.push(xyz[0] /*c2 * p.x[n] + c1 * p.x[n + 1]*/);
                         rp.y.push(xyz[1] /*c2 * p.y[n] + c1 * p.y[n + 1]*/);
                         rp.z.push(xyz[2] /*c2 * p.z[n] + c1 * p.z[n + 1]*/);
-                        rp.r.push(1 || catmullRom(0, [0, 1, 2, 3], [p.r[n - 1], p.r[n], p.r[n + 1], p.r[n + 2]], c1 + 1 )[1]);
+                        rp.r.push(5 || catmullRom(0, [0, 1, 2, 3], [p.r[n - 1], p.r[n], p.r[n + 1], p.r[n + 2]], c1 + 1 )[1]);
                         rp.c.push([
                             c2 * p.c[n][0] + c1 * p.c[n + 1][0], // r
                             c2 * p.c[n][1] + c1 * p.c[n + 1][1], // g
@@ -757,7 +757,7 @@ fdescribe('gl3d plots', function() {
             rp.x.push(p.x[pointCount - 2]);
             rp.y.push(p.y[pointCount - 2]);
             rp.z.push(p.z[pointCount - 2]);
-            rp.r.push(1);
+            rp.r.push(5);
             rp.c.push(p.c[pointCount - 2]);
 
 
@@ -779,7 +779,7 @@ fdescribe('gl3d plots', function() {
                 r2 = rp.r[point2];
                 c2 = 'rgb(' + rp.c[point2].join() + ')';
 
-                index = addPointMarker(unitSphere, x, y, z, 'rgb(64,64,255)', 1.1, index, X, Y, Z, I, J, K, F)
+                //index = addPointMarker(unitSphere, x, y, z, 'rgb(64,64,255)', 1.1, index, X, Y, Z, I, J, K, F)
                 index = addLine(cylinderMaker(r, r2, x2 - x, y2 - y, z2 - z, c, c2, false), x, y, z, index, X, Y, Z, I, J, K, F)
             }
 
