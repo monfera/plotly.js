@@ -89,52 +89,52 @@ function addFace(I, J, K, F, i, j, k, f) {
 
 function catmullRom(alpha, x, y, z, Tratio) {
 
-    var t = [0];
-    var d, c1, c2, i;
-    for(i = 0; i < 3; i++) {
-        t[i + 1] = Math.pow(Math.sqrt(Math.pow(x[i + 1] - x[i], 2) + Math.pow(y[i + 1] - y[i], 2) + Math.pow(z[i + 1] - z[i], 2)), alpha) + t[i];
-    }
+    var t0 = 0;
+    var d, c1, c2;
+    var t1 = Math.pow(Math.sqrt(Math.pow(x[1] - x[0], 2) + Math.pow(y[1] - y[0], 2) + Math.pow(z[1] - z[0], 2)), alpha) + t0;
+    var t2 = Math.pow(Math.sqrt(Math.pow(x[2] - x[1], 2) + Math.pow(y[2] - y[1], 2) + Math.pow(z[2] - z[1], 2)), alpha) + t1;
+    var t3 = Math.pow(Math.sqrt(Math.pow(x[3] - x[2], 2) + Math.pow(y[3] - y[2], 2) + Math.pow(z[3] - z[2], 2)), alpha) + t2;
 
-    var T = t[1] + Tratio * (t[2] - t[1]);
+    var T = t1 + Tratio * (t2 - t1);
 
-    d = t[1] - t[0];
-    c1 = (t[1] - T) / d;
-    c2 = (T - t[0]) / d;
+    d = t1 - t0;
+    c1 = (t1 - T) / d;
+    c2 = (T - t0) / d;
     var A1x = c1*x[0] + c2*x[1];
     var A1y = c1*y[0] + c2*y[1];
     var A1z = c1*z[0] + c2*z[1];
 
-    d = t[2] - t[1];
-    c1 = (t[2] - T) / d;
-    c2 = (T - t[1]) / d;
+    d = t2 - t1;
+    c1 = (t2 - T) / d;
+    c2 = (T - t1) / d;
     var A2x = c1*x[1] + c2*x[2];
     var A2y = c1*y[1] + c2*y[2];
     var A2z = c1*z[1] + c2*z[2];
 
-    d = t[3] - t[2];
-    c1 = (t[3] - T) / d;
-    c2 = (T - t[2]) / d;
+    d = t3 - t2;
+    c1 = (t3 - T) / d;
+    c2 = (T - t2) / d;
     var A3x = c1*x[2] + c2*x[3];
     var A3y = c1*y[2] + c2*y[3];
     var A3z = c1*z[2] + c2*z[3];
 
-    d = t[2] - t[0];
-    c1 = (t[2] - T) / d;
-    c2 = (T - t[0]) / d;
+    d = t2 - t0;
+    c1 = (t2 - T) / d;
+    c2 = (T - t0) / d;
     var B1x = c1*A1x + c2*A2x;
     var B1y = c1*A1y + c2*A2y;
     var B1z = c1*A1z + c2*A2z;
 
-    d = t[3] - t[1];
-    c1 = (t[3] - T) / d;
-    c2 = (T - t[1]) / d;
+    d = t3 - t1;
+    c1 = (t3 - T) / d;
+    c2 = (T - t1) / d;
     var B2x = c1*A2x + c2*A3x;
     var B2y = c1*A2y + c2*A3y;
     var B2z = c1*A2z + c2*A3z;
 
-    d = t[2] - t[1];
-    c1 = (t[2] - T) / d;
-    c2 = (T - t[1]) / d;
+    d = t2 - t1;
+    c1 = (t2 - T) / d;
+    c2 = (T - t1) / d;
     var Cx = c1*B1x + c2*B2x;
     var Cy = c1*B1y + c2*B2y;
     var Cz = c1*B1z + c2*B2z;
