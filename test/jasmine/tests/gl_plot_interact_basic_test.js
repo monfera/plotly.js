@@ -692,10 +692,10 @@ fdescribe('gl3d plots', function() {
 
             for(n = 0; n < pointCount; n++) {
 
-                x = 200 * Math.random() - 100; //1000 * n / pointCount * 0.2 - 100;
+                x = 1000 * n / pointCount * 0.2 - 100;
                 y = Math.cos(10 * n / pointCount) * 100;
                 z = Math.sin(10 * n / pointCount) * 100;
-                r = 2 + 5 * Math.random(); //5 + 2 * Math.sin(1000 * n / pointCount / 20);
+                r = 1//2 + 5 * Math.random(); //5 + 2 * Math.sin(1000 * n / pointCount / 20);
                 c = Math.random(); //n / (pointCount - 1);
 
                 p.x.push(x);
