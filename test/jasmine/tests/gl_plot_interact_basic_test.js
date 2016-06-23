@@ -169,7 +169,7 @@ for(var q = 0; q < quadCount; q++) {
 var lastGymbal = null;
 
 function cylinderMaker(r1, r2, uu, vv, ww, f1, f2, continuable) {
-
+if(Math.abs(r1 - 1) > 1e-6  || Math.abs(r2 - 1) > 1e-6) console.log(r1, r2);
     var X = [];
     var Y = [];
     var Z = [];
@@ -195,15 +195,15 @@ function cylinderMaker(r1, r2, uu, vv, ww, f1, f2, continuable) {
     // Gymbaling (fixme switch to quaternion based solution when time permits)
     var sameGymbal;
     var epsilon = 1e-9;
-    if(w > epsilon) {
+    if(Math.abs(w) > epsilon) {
         x = -1; y = -1; z = (u + v) / w;
         sameGymbal = lastGymbal === 1;
         lastGymbal = 1;
-    } else if(v > epsilon) {
+    } else if(Math.abs(v) > epsilon) {
         x = -1; y = (u + w) / v; z = -1;
         sameGymbal = lastGymbal === 2;
         lastGymbal = 2;
-    } else if(u > epsilon) {
+    } else if(Math.abs(u) > epsilon) {
         x = (v + w) / u; y = -1; z = -1;
         sameGymbal = lastGymbal === 3;
         lastGymbal = 3;
@@ -676,7 +676,7 @@ fdescribe('gl3d plots', function() {
             offset = !offset;
         }
 
-        var pointCount = 10;
+        var pointCount = 6;
         var lineCount = 100;
         var n, r, r2, c, c2;
 
@@ -692,9 +692,9 @@ fdescribe('gl3d plots', function() {
 
             for(n = 0; n < pointCount; n++) {
 
-                x = 1000 * n / pointCount * 0.2 - 100;
-                y = Math.cos(10 * n / pointCount) * 100;
-                z = Math.sin(10 * n / pointCount) * 100;
+                z = 0//1000 * n / pointCount * 0.2 - 100;
+                x = Math.cos(10 * n / 10) * 100;
+                y = Math.sin(10 * n / 10) * 100;
                 r = 1//2 + 5 * Math.random(); //5 + 2 * Math.sin(1000 * n / pointCount / 20);
                 c = Math.random(); //n / (pointCount - 1);
 
@@ -705,7 +705,7 @@ fdescribe('gl3d plots', function() {
                 p.c.push(c);
             }
 
-            var selfClosing = true;
+            var selfClosing = false;
             if(selfClosing) {
                 p.x.push(p.x[0]);
                 p.y.push(p.y[0]);
@@ -797,13 +797,6 @@ fdescribe('gl3d plots', function() {
             }
             // last segment
 
-            if(!selfClosing) {
-                rp.x.push(p.x[p.x.length - 2]);
-                rp.y.push(p.y[p.x.length - 2]);
-                rp.z.push(p.z[p.x.length - 2]);
-                rp.r.push(p.r[p.x.length - 2]);
-                rp.c.push(colorer(p.c[p.x.length - 2]));
-            }
 
 
             for(n = 0; n < rp.x.length-1; n++) {
