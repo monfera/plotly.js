@@ -563,14 +563,6 @@ fdescribe('gl3d plots', function() {
 
         var layout = mock.layout
 
-        var X = []
-        var Y = []
-        var Z = []
-        var I = []
-        var J = []
-        var K = []
-        var F = []
-
         var x, y, z;
 
         var index = 0;
@@ -578,10 +570,6 @@ fdescribe('gl3d plots', function() {
         var n, r, r2, c, c1, c2;
 
         var p = makeCircularSampleModel();
-
-        for(n = 0; n < p.x.length; n++) {
-            index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 10, index, X, Y, Z, I, J, K, F);
-        }
 
         var rp = {
             x: [],
@@ -615,7 +603,15 @@ fdescribe('gl3d plots', function() {
             }
         }
 
-        for(n = 0; n < rp.x.length-1; n++) {
+        var X = []
+        var Y = []
+        var Z = []
+        var I = []
+        var J = []
+        var K = []
+        var F = []
+        
+        for(n = 0; n < rp.x.length- 1; n++) {
 
             var point1 = n;
             var point2 = n + 1;
@@ -634,6 +630,11 @@ fdescribe('gl3d plots', function() {
 
             index = addLine(cylinderMaker(r, r2, x2 - x, y2 - y, z2 - z, c, c2, n > 0), x, y, z, index, X, Y, Z, I, J, K, F);
         }
+
+        for(n = 0; n < p.x.length; n++) {
+            index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 10, index, X, Y, Z, I, J, K, F);
+        }
+
 
         // Extend the place to ensure correct aspect ratio
         X.push(-100)
