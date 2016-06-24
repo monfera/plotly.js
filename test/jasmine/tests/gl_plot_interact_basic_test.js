@@ -55,29 +55,10 @@ function testEvents(plot) {
         });
 }
 
-function colorface(F, ratio) {
-
-    F.push([
-        'rgb(',
-        Math.round(ratio * 127 + 128),
-        ',',
-        Math.round(32),
-        ',',
-        Math.round(255 - ratio * 127),
-        ')'].join(""));
-}
-
 function addVertex(X, Y, Z, x, y, z) {
     X.push(x);
     Y.push(y);
     Z.push(z);
-}
-
-function randomColor() {
-    return 'rgb('
-        + Math.floor(256 * Math.random()) + ','
-        + Math.floor(256 * Math.random()) + ','
-        + Math.floor(256 * Math.random()) + ')';
 }
 
 function addFace(I, J, K, F, i, j, k, f) {
@@ -169,7 +150,7 @@ for(var q = 0; q < quadCount; q++) {
 var lastGymbal = null;
 
 function cylinderMaker(r1, r2, uu, vv, ww, f1, f2, continuable) {
-if(Math.abs(r1 - 1) > 1e-6  || Math.abs(r2 - 1) > 1e-6) console.log(r1, r2);
+
     var X = [];
     var Y = [];
     var Z = [];
@@ -192,7 +173,7 @@ if(Math.abs(r1 - 1) > 1e-6  || Math.abs(r2 - 1) > 1e-6) console.log(r1, r2);
     var v = vv / length;
     var w = ww / length;
 
-    // Gymbaling (fixme switch to quaternion based solution when time permits)
+    // Gymbaling (switch to quaternion based solution when time permits)
     var sameGymbal;
     var epsilon = 1e-9;
     if(Math.abs(w) > epsilon) {
@@ -294,59 +275,9 @@ if(Math.abs(r1 - 1) > 1e-6  || Math.abs(r2 - 1) > 1e-6) console.log(r1, r2);
         k: K,
         f: F
     };
-//if(cont) debugger
-    return model;
-}
-
-
-function unitCylinderMaker() {
-
-    var X = [];
-    var Y = [];
-    var Z = [];
-
-    var I = [];
-    var J = [];
-    var K = [];
-    var F = [];
-
-    var av = addVertex.bind(null, X, Y, Z);
-    var af = addFace.bind(null, I, J, K, F);
-
-    var quadCount = 36;
-    var triangleCount = 2 * quadCount;
-    var q, angle, v;
-
-    for(q = 0; q < quadCount; q++) {
-
-        angle = q * Math.PI * 2 / quadCount;
-
-        av(Math.cos(angle), Math.sin(angle), 0);
-        av(Math.cos(angle), Math.sin(angle), 1);
-    }
-
-    for(q = 0; q < quadCount; q++) {
-
-        v = 2 * q;
-
-        af(                      v, (v + 1), (v + 2) % triangleCount);
-        af((v + 2) % triangleCount, (v + 1), (v + 3) % triangleCount);
-    }
-
-    var model = {
-        x: X,
-        y: Y,
-        z: Z,
-        i: I,
-        j: J,
-        k: K,
-        f: F
-    };
 
     return model;
 }
-
-var unitCylinder = unitCylinderMaker();
 
 function unitIcosahedron() {
 
@@ -523,7 +454,7 @@ function increaseLoD(m) {
     return model;
 }
 
-var unitSphere = ((increaseLoD(increaseLoD(increaseLoD(increaseLoD(unitIcosahedron()))))));
+var unitSphere = increaseLoD(increaseLoD(increaseLoD(increaseLoD(unitIcosahedron()))));
 
 function addPointMarker(geom, x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
 
@@ -535,7 +466,6 @@ function addPointMarker(geom, x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
     var mi = geom.i;
     var mj = geom.j;
     var mk = geom.k;
-    var mf = geom.f;
 
     for(v = 0; v < mx.length; v++) {
         X.push(x + mx[v] * r);
@@ -552,7 +482,7 @@ function addPointMarker(geom, x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
 
     return vOffset + mx.length;
 }
-//       addLine(cylinderMaker(20, x2-x, y2-y, z2-z), x, y, z, randomColor(), index, X, Y, Z, I, J, K, F)
+
 function addLine(geom, x1, y1, z1, vOffset, X, Y, Z, I, J, K, F) {
 
     var v, p;
@@ -580,6 +510,10 @@ function addLine(geom, x1, y1, z1, vOffset, X, Y, Z, I, J, K, F) {
     }
 
     return vOffset + mx.length;
+}
+
+function colorer(d) {
+    return [Math.round(255 * d), 0, Math.round(255 * (1 - d))];
 }
 
 fdescribe('gl3d plots', function() {
@@ -612,73 +546,12 @@ fdescribe('gl3d plots', function() {
         var K = []
         var F = []
 
-        var circleRadius = 15;
-        var trianglesPerCircle = 40
-        var tCount = 100;
-        var rowCount = 100;
-        var heightIncrement = 1;
+        var x, y, z;
 
-        var angle, t, x, y, z, c, mate1a, mate1b, mate2a, mate2b;
-
-        var offset = false;
         var index = 0;
 
-        function centerX(z) {
-            return 40 * Math.cos(z/20);
-        }
-
-        function centerY(z) {
-            return 40 * Math.sin(z/37);
-        }
-
-        function radius(z) {
-            return circleRadius + circleRadius / 2 * Math.sin(33 + z / 27);
-        }
-
-        if(0)
-        for(t = 0; t < tCount; t++) {
-
-            z = t * heightIncrement - 100;
-
-            for (c = 0; c < trianglesPerCircle; c++) {
-
-                angle = (c + (offset ? 0.5 : 0)) * Math.PI * 2 / trianglesPerCircle;
-
-                x = centerX(z) + Math.cos(angle) * radius(z); // could be cached
-                y = centerY(z) + Math.sin(angle) * radius(z); // could be cached
-
-                X.push(x);
-                Y.push(y);
-                Z.push(z);
-
-                // winding order: clockwise
-                mate1a = index - trianglesPerCircle + 1 - (c === trianglesPerCircle - 1  ? trianglesPerCircle : 0);
-                mate1b = index - trianglesPerCircle;
-
-                if(mate1a >= 0 && mate1b >= 0) {
-                    I.push(index); J.push(mate1a); K.push(mate1b);
-                    colorface(F, t / rowCount);
-                }
-
-                // winding order: clockwise
-                mate2a = index - trianglesPerCircle;
-                mate2b = index - 1 + (c === 0 ? trianglesPerCircle : 0);
-
-                if(mate2a >= 0 && mate2b >= 0) {
-                    I.push(index); J.push(mate2a); K.push(mate2b);
-                    colorface(F, t / rowCount);
-                }
-
-
-                index++;
-            }
-
-            offset = !offset;
-        }
-
-        var pointCount = 6;
-        var lineCount = 100;
-        var n, r, r2, c, c2;
+        var pointCount = 10;
+        var n, r, r2, c, c1, c2;
 
         var p = {
             x: [],
@@ -688,219 +561,75 @@ fdescribe('gl3d plots', function() {
             c: []
         }
 
-        if(true) {
+        for(n = 0; n < pointCount; n++) {
 
-            for(n = 0; n < pointCount; n++) {
+            z = 1000 * n / pointCount * 0.2 - 100;
+            x = Math.cos(10 * n / pointCount) * 100;
+            y = Math.sin(10 * n / pointCount) * 100;
+            r = 5 + 2 * Math.sin(1000 * n / pointCount / 20);
+            c = Math.random();
 
-                z = 0//1000 * n / pointCount * 0.2 - 100;
-                x = Math.cos(10 * n / 10) * 100;
-                y = Math.sin(10 * n / 10) * 100;
-                r = 1//2 + 5 * Math.random(); //5 + 2 * Math.sin(1000 * n / pointCount / 20);
-                c = Math.random(); //n / (pointCount - 1);
+            p.x.push(x);
+            p.y.push(y);
+            p.z.push(z);
+            p.r.push(r);
+            p.c.push(c);
+        }
 
-                p.x.push(x);
-                p.y.push(y);
-                p.z.push(z);
-                p.r.push(r);
-                p.c.push(c);
+        for(n = 0; n < p.x.length; n++) {
+            index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 10, index, X, Y, Z, I, J, K, F);
+        }
+
+        var rp = {
+            x: [],
+            y: [],
+            z: [],
+            r: [],
+            c: []
+        };
+
+        var upsamplingFactor = 100; // convert every original point to as many upsampled points
+        for(n = 0; n < p.x.length - 3; n++) {
+
+            for(var m = 0; m < upsamplingFactor; m++) {
+
+                c1 = m / upsamplingFactor;
+                c2 = (upsamplingFactor - m) / upsamplingFactor;
+
+                var xyzrf = catmullRom(
+                    [p.x[n], p.x[n + 1], p.x[n + 2], p.x[n + 3]],
+                    [p.y[n], p.y[n + 1], p.y[n + 2], p.y[n + 3]],
+                    [p.z[n], p.z[n + 1], p.z[n + 2], p.z[n + 3]],
+                    [p.r[n], p.r[n + 1], p.r[n + 2], p.r[n + 3]],
+                    [p.c[n], p.c[n + 1], p.c[n + 2], p.c[n + 3]],
+                    c1);
+
+                rp.x.push(xyzrf[0]);
+                rp.y.push(xyzrf[1]);
+                rp.z.push(xyzrf[2]);
+                rp.r.push(xyzrf[3]);
+                rp.c.push(colorer(xyzrf[4]));
             }
+        }
 
-            var selfClosing = false;
-            if(selfClosing) {
-                p.x.push(p.x[0]);
-                p.y.push(p.y[0]);
-                p.z.push(p.z[0]);
-                p.r.push(p.r[0]);
-                p.c.push(p.c[0]);
-                p.x.push(p.x[1]);
-                p.y.push(p.y[1]);
-                p.z.push(p.z[1]);
-                p.r.push(p.r[1]);
-                p.c.push(p.c[1]);
-                p.x.unshift(p.x[p.x.length - 3]);
-                p.y.unshift(p.y[p.y.length - 3]);
-                p.z.unshift(p.z[p.z.length - 3]);
-                p.r.unshift(p.r[p.r.length - 3]);
-                p.c.unshift(p.c[p.c.length - 3]);
-                p.x.unshift(p.x[p.x.length - 4]);
-                p.y.unshift(p.y[p.y.length - 4]);
-                p.z.unshift(p.z[p.z.length - 4]);
-                p.r.unshift(p.r[p.r.length - 4]);
-                p.c.unshift(p.c[p.c.length - 4]);
-            }
+        for(n = 0; n < rp.x.length-1; n++) {
 
-            for(n = 0; n < p.x.length; n++) {
-                // if(true || n === 0 || n === Math.round(pointCount / 2) || n === pointCount - 1)
-                index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 7, index, X, Y, Z, I, J, K, F)
-            }
+            var point1 = n;
+            var point2 = n + 1;
 
-            var rp = {
-                x: [],
-                y: [],
-                z: [],
-                r: [],
-                c: []
-            };
+            x = rp.x[point1];
+            y = rp.y[point1];
+            z = rp.z[point1];
+            r = rp.r[point1];
+            c = 'rgb(' + rp.c[point1].join() + ')';
 
-            function colorer(d) {
-                return [Math.round(255 * d), 0, Math.round(255 * (1 - d))];
-            }
+            var x2 = rp.x[point2];
+            var y2 = rp.y[point2];
+            var z2 = rp.z[point2];
+            r2 = rp.r[point2];
+            c2 = 'rgb(' + rp.c[point2].join() + ')';
 
-            var upsamplingFactor = 100; // convert every original point to as many upsampled points
-            for(n = 0; n < p.x.length - 3; n++) {
-
-                for(var m = 0; m < upsamplingFactor; m++) {
-
-                    if('centripetal' == 'linear') {
-
-                        // linear (well... adjust indices)
-
-                        var c1 = m / upsamplingFactor;
-                        var c2 = (upsamplingFactor - m) / upsamplingFactor;
-
-                        rp.x.push(c2 * p.x[n] + c1 * p.x[n + 1]);
-                        rp.y.push(c2 * p.y[n] + c1 * p.y[n + 1]);
-                        rp.z.push(c2 * p.z[n] + c1 * p.z[n + 1]);
-                        rp.r.push(c2 * p.r[n] + c1 * p.r[n + 1]);
-                        rp.c.push([
-                            c2 * p.c[n][0] + c1 * p.c[n + 1][0], // r
-                            c2 * p.c[n][1] + c1 * p.c[n + 1][1], // g
-                            c2 * p.c[n][2] + c1 * p.c[n + 1][2]  // b
-                        ]);
-
-                    } else {
-
-                        // centripetal
-
-                        var c1 = m / upsamplingFactor;
-                        var c2 = (upsamplingFactor - m) / upsamplingFactor;
-
-                        var xyzrf = catmullRom(
-                            [p.x[n], p.x[n + 1], p.x[n + 2], p.x[n + 3]],
-                            [p.y[n], p.y[n + 1], p.y[n + 2], p.y[n + 3]],
-                            [p.z[n], p.z[n + 1], p.z[n + 2], p.z[n + 3]],
-                            [p.r[n], p.r[n + 1], p.r[n + 2], p.r[n + 3]],
-                            [p.c[n], p.c[n + 1], p.c[n + 2], p.c[n + 3]],
-                            c1);
-
-                        rp.x.push(xyzrf[0]);
-                        rp.y.push(xyzrf[1]);
-                        rp.z.push(xyzrf[2]);
-                        rp.r.push(xyzrf[3]);
-                        rp.c.push(colorer(xyzrf[4]));
-
-
-
-                    }
-                }
-
-            }
-            // last segment
-
-
-
-            for(n = 0; n < rp.x.length-1; n++) {
-
-                point1 = n;
-                point2 = n + 1;
-
-                x = rp.x[point1];
-                y = rp.y[point1];
-                z = rp.z[point1];
-                r = rp.r[point1];
-                c = 'rgb(' + rp.c[point1].join() + ')';
-
-                x2 = rp.x[point2];
-                y2 = rp.y[point2];
-                z2 = rp.z[point2];
-                r2 = rp.r[point2];
-                c2 = 'rgb(' + rp.c[point2].join() + ')';
-
-                //index = addPointMarker(unitSphere, x, y, z, 'rgb(64,64,255)', 1.1, index, X, Y, Z, I, J, K, F)
-                index = addLine(cylinderMaker(r, r2, x2 - x, y2 - y, z2 - z, c, c2, false), x, y, z, index, X, Y, Z, I, J, K, F)
-            }
-
-        } else {
-
-            var pointCache = {}, pointx, pointy, pointz;
-
-            n = pointCount;
-            while (n > 0) {
-
-                pointx = Math.round((200 * Math.random() - 100) / 20) * 20;
-                pointy = Math.round((200 * Math.random() - 100) / 20) * 20;
-                pointz = Math.round((200 * Math.random() - 100) / 20) * 20;
-
-                if (!pointCache[[pointx, pointy, pointz].join()]) {
-
-                    pointCache[[pointx, pointy, pointz].join()] = true;
-
-                    p.x.push(pointx);
-                    p.y.push(pointy);
-                    p.z.push(pointz);
-                    n--;
-                }
-            }
-
-
-            /*
-             points.x.push(1);
-             points.y.push(2);
-             points.z.push(3);
-
-             points.x.push(4);
-             points.y.push(4);
-             points.z.push(4);
-             */
-
-            var lineCache = {}, point1, point2, x2, y2, z2, distance;
-
-            n = lineCount;
-            while (n > 0) {
-
-                point1 = Math.floor(pointCount * Math.random());
-                point2 = Math.floor(pointCount * Math.random());
-
-                if (
-                    !(point1 === point2) && !lineCache[[point1, point2].join()] && !lineCache[[point2, point1].join()]
-                    && [
-                        p.x[point1] === p.x[point2],
-                        p.y[point1] === p.y[point2],
-                        p.z[point1] === p.z[point2]
-                    ].reduce(function (a, b) {
-                        return a + b
-                    }, 0) === 2
-                ) {
-
-                    lineCache[[point1, point2].join()] = true;
-                    n--;
-
-                    x = p.x[point1];
-                    y = p.y[point1];
-                    z = p.z[point1];
-
-                    x2 = p.x[point2];
-                    y2 = p.y[point2];
-                    z2 = p.z[point2];
-
-                    index = addLine(cylinderMaker(1 + 3 * Math.random(), x2 - x, y2 - y, z2 - z, randomColor(), randomColor()), x, y, z, index, X, Y, Z, I, J, K, F)
-                }
-            }
-
-            var members = Object.keys(lineCache).join().split(",").map(parseFloat);
-
-            for (n = 0; n < pointCount; n++) {
-
-                if (members.indexOf(n) !== -1) {
-
-                    x = p.x[n];
-                    y = p.y[n];
-                    z = p.z[n];
-
-                    index = addPointMarker(unitSphere, x, y, z, randomColor(), 4, index, X, Y, Z, I, J, K, F)
-                }
-            }
-
+            index = addLine(cylinderMaker(r, r2, x2 - x, y2 - y, z2 - z, c, c2, n > 0), x, y, z, index, X, Y, Z, I, J, K, F);
         }
 
         // Extend the place to ensure correct aspect ratio
@@ -911,15 +640,13 @@ fdescribe('gl3d plots', function() {
         Z.push(-100)
         Z.push(100)
 
-        if(1) {
-            s.x = X;
-            s.y = Y;
-            s.z = Z;
-            s.i = I;
-            s.j = J;
-            s.k = K;
-            s.facecolor = F;
-        }
+        s.x = X;
+        s.y = Y;
+        s.z = Z;
+        s.i = I;
+        s.j = J;
+        s.k = K;
+        s.facecolor = F;
 
         window.gd = gd
         window.data = data
