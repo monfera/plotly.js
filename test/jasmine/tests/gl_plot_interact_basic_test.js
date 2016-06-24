@@ -149,7 +149,11 @@ for(var q = 0; q < quadCount; q++) {
 
 var lastGymbal = null;
 
-function cylinderMaker(r1, r2, uu, vv, ww, f1, f2, continuable) {
+function cylinderMaker(r1, r2, x1, x2, y1, y2, z1, z2, f1, f2, continuable) {
+
+    var uu = x2 - x1;
+    var vv = y2 - y1;
+    var ww = z2 - z1;
 
     var X = [];
     var Y = [];
@@ -226,7 +230,7 @@ function cylinderMaker(r1, r2, uu, vv, ww, f1, f2, continuable) {
             yy = yyb+yyc*ca+yys*sa;
             zz = zzb+zzc*ca+zzs*sa;
 
-            av(xx, yy, zz);
+            av(xx + x1, yy + y1, zz + z1); // with translation
         }
 
     length = Math.sqrt(x * x + y * y + z * z) / r2; // renormalize it for the other circle
@@ -255,7 +259,7 @@ function cylinderMaker(r1, r2, uu, vv, ww, f1, f2, continuable) {
         yy = yyb+yyc*ca+yys*sa;
         zz = zzb+zzc*ca+zzs*sa;
 
-        av(xx + uu, yy + vv, zz + ww);
+        av(xx + uu + x1, yy + vv + y1, zz + ww + z1); // with translation
     }
 
     for(q = 0; q < quadCount; q++) {
@@ -483,7 +487,7 @@ function addPointMarker(geom, x, y, z, f, r, vOffset, X, Y, Z, I, J, K, F) {
     return vOffset + mx.length;
 }
 
-function addLine(geom, x1, y1, z1, vOffset, X, Y, Z, I, J, K, F) {
+function addLine(geom, vOffset, X, Y, Z, I, J, K, F) {
 
     var v, p;
 
@@ -497,9 +501,9 @@ function addLine(geom, x1, y1, z1, vOffset, X, Y, Z, I, J, K, F) {
 
     for(v = 0; v < mx.length; v++) {
 
-        X.push(mx[v] + x1);
-        Y.push(my[v] + y1);
-        Z.push(mz[v] + z1);
+        X.push(mx[v]);
+        Y.push(my[v]);
+        Z.push(mz[v]);
     }
 
     for(p = 0; p < mi.length; p++) {
@@ -603,15 +607,9 @@ fdescribe('gl3d plots', function() {
             }
         }
 
-        var X = []
-        var Y = []
-        var Z = []
-        var I = []
-        var J = []
-        var K = []
-        var F = []
-        
-        for(n = 0; n < rp.x.length- 1; n++) {
+        var cylinderModels = [];
+
+        for(n = 0; n < rp.x.length - 1; n++) {
 
             var point1 = n;
             var point2 = n + 1;
@@ -628,7 +626,19 @@ fdescribe('gl3d plots', function() {
             r2 = rp.r[point2];
             c2 = 'rgb(' + rp.c[point2].join() + ')';
 
-            index = addLine(cylinderMaker(r, r2, x2 - x, y2 - y, z2 - z, c, c2, n > 0), x, y, z, index, X, Y, Z, I, J, K, F);
+            cylinderModels.push(cylinderMaker(r, r2, x, x2, y, y2, z, z2, c, c2, n > 0));
+        }
+
+        var X = []
+        var Y = []
+        var Z = []
+        var I = []
+        var J = []
+        var K = []
+        var F = []
+
+        for(n = 0; n < rp.x.length - 1; n++) {
+            index = addLine(cylinderModels[n], index, X, Y, Z, I, J, K, F);
         }
 
         for(n = 0; n < p.x.length; n++) {
