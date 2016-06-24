@@ -516,6 +516,31 @@ function colorer(d) {
     return [Math.round(255 * d), 0, Math.round(255 * (1 - d))];
 }
 
+function makeCircularSampleModel() {
+
+    var pointCount = 10;
+    var n;
+
+    var p = {
+        x: [],
+        y: [],
+        z: [],
+        r: [],
+        c: []
+    }
+
+    for (n = 0; n < pointCount; n++) {
+
+        p.x.push(Math.cos(10 * n / pointCount) * 100);
+        p.y.push(Math.sin(10 * n / pointCount) * 100);
+        p.z.push(1000 * n / pointCount * 0.2 - 100);
+        p.r.push(5 + 2 * Math.sin(1000 * n / pointCount / 20));
+        p.c.push(0.5 + Math.sin(n * 2) / 2);
+    }
+
+    return p;
+}
+
 fdescribe('gl3d plots', function() {
 
     var gd;
@@ -550,31 +575,9 @@ fdescribe('gl3d plots', function() {
 
         var index = 0;
 
-        var pointCount = 10;
         var n, r, r2, c, c1, c2;
 
-        var p = {
-            x: [],
-            y: [],
-            z: [],
-            r: [],
-            c: []
-        }
-
-        for(n = 0; n < pointCount; n++) {
-
-            z = 1000 * n / pointCount * 0.2 - 100;
-            x = Math.cos(10 * n / pointCount) * 100;
-            y = Math.sin(10 * n / pointCount) * 100;
-            r = 5 + 2 * Math.sin(1000 * n / pointCount / 20);
-            c = Math.random();
-
-            p.x.push(x);
-            p.y.push(y);
-            p.z.push(z);
-            p.r.push(r);
-            p.c.push(c);
-        }
+        var p = makeCircularSampleModel();
 
         for(n = 0; n < p.x.length; n++) {
             index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 10, index, X, Y, Z, I, J, K, F);
