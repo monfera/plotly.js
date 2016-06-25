@@ -39,4 +39,5 @@ module.exports = function markerDefaults(traceIn, traceOut, defaultColor, layout
         coerce('marker.sizemode');
     }
 
+    return lineColor;
 };

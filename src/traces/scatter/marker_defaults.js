@@ -13,12 +13,15 @@ var markerBasicDefaults = require('./marker_basic_defaults');
 var hasColorscale = require('../../components/colorscale/has_colorscale');
 var colorscaleDefaults = require('../../components/colorscale/defaults');
 
+var subTypes = require('./subtypes');
+
 // common to 'scatter', 'scatter3d', 'scattergeo' and 'scattergl'
 module.exports = function markerDefaults(traceIn, traceOut, defaultColor, layout, coerce) {
 
     var defaultMLC;
 
-    markerBasicDefaults(traceIn, traceOut, defaultColor, layout, coerce);
+    var isBubble = subTypes.isBubble(traceIn)
+    var lineColor = markerBasicDefaults(traceIn, traceOut, defaultColor, layout, coerce);
 
     coerce('marker.symbol');
 
