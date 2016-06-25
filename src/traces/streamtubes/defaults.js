@@ -48,10 +48,6 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
         handleTextDefaults(traceIn, traceOut, layout, coerce);
     }
 
-    var lineColor = (traceOut.line || {}).color,
-        markerColor = (traceOut.marker || {}).color;
-    if(coerce('surfaceaxis') >= 0) coerce('surfacecolor', lineColor || markerColor);
-
     var dims = ['x', 'y', 'z'];
     for(var i = 0; i < 3; ++i) {
         var projection = 'projection.' + dims[i];

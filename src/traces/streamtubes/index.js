@@ -28,8 +28,7 @@ Streamtubes.meta = {
         'is set in `x`, `y`, `z`.',
         'Text (appearing either on the chart or on hover only) is via `text`.',
         'Bubble charts are achieved by setting `marker.size` and/or `marker.color`',
-        'Projections are achieved via `projection`.',
-        'Surface fills are achieved via `surfaceaxis`.'
+        'Projections are achieved via `projection`.'
     ].join(' ')
 };
 

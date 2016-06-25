@@ -12,8 +12,6 @@
 var createLinePlot = require('gl-line3d');
 var createScatterPlot = require('gl-scatter3d');
 var createErrorBars = require('gl-error3d');
-var createMesh = require('gl-mesh3d');
-var triangulate = require('delaunay-triangulate');
 
 var Lib = require('../../lib');
 var str2RgbaArray = require('../../lib/str2rgbarray');
@@ -31,7 +29,6 @@ function LineWithMarkers(scene, uid) {
     this.scatterPlot = null;
     this.errorBars = null;
     this.textMarkers = null;
-    this.delaunayMesh = null;
     this.color = null;
     this.mode = '';
     this.dataPoints = [];
@@ -48,7 +45,6 @@ var proto = LineWithMarkers.prototype;
 proto.handlePick = function(selection) {
     if(selection.object &&
         (selection.object === this.linePlot ||
-         selection.object === this.delaunayMesh ||
          selection.object === this.textMarkers ||
          selection.object === this.scatterPlot)) {
         if(selection.object.highlight) {
@@ -73,36 +69,6 @@ proto.handlePick = function(selection) {
         return true;
     }
 };
-
-function constructDelaunay(points, color, axis) {
-    var u = (axis + 1) % 3;
-    var v = (axis + 2) % 3;
-    var filteredPoints = [];
-    var filteredIds = [];
-    var i;
-
-    for(i = 0; i < points.length; ++i) {
-        var p = points[i];
-        if(isNaN(p[u]) || !isFinite(p[u]) ||
-           isNaN(p[v]) || !isFinite(p[v])) {
-            continue;
-        }
-        filteredPoints.push([p[u], p[v]]);
-        filteredIds.push(i);
-    }
-    var cells = triangulate(filteredPoints);
-    for(i = 0; i < cells.length; ++i) {
-        var c = cells[i];
-        for(var j = 0; j < c.length; ++j) {
-            c[j] = filteredIds[c[j]];
-        }
-    }
-    return {
-        positions: points,
-        cells: cells,
-        meshColor: color
-    };
-}
 
 function calculateErrorParams(errors) {
     var capSize = [0.0, 0.0, 0.0],
@@ -137,7 +103,7 @@ function calculateTextOffset(tp) {
 
 
 function calculateSize(sizeIn, sizeFn) {
-    // rough parity with Plotly 2D markers
+    // parity with scatter3d markers
     return sizeFn(sizeIn * 4);
 }
 
@@ -246,9 +212,6 @@ function convertPlotlyOptions(scene, data) {
     params.errorColor = errorParams.color;
     params.errorLineWidth = errorParams.lineWidth;
     params.errorCapSize = errorParams.capSize;
-
-    params.delaunayAxis = data.surfaceaxis;
-    params.delaunayColor = str2RgbaArray(data.surfacecolor);
 
     return params;
 }
@@ -402,27 +365,6 @@ proto.update = function(data) {
         this.errorBars = createErrorBars(errorOptions);
         this.scene.glplot.add(this.errorBars);
     }
-
-    if(options.delaunayAxis >= 0) {
-        var delaunayOptions = constructDelaunay(
-            options.position,
-            options.delaunayColor,
-            options.delaunayAxis
-        );
-        delaunayOptions.opacity = data.opacity;
-
-        if(this.delaunayMesh) {
-            this.delaunayMesh.update(delaunayOptions);
-        } else {
-            delaunayOptions.gl = gl;
-            this.delaunayMesh = createMesh(delaunayOptions);
-            this.scene.glplot.add(this.delaunayMesh);
-        }
-    } else if(this.delaunayMesh) {
-        this.scene.glplot.remove(this.delaunayMesh);
-        this.delaunayMesh.dispose();
-        this.delaunayMesh = null;
-    }
 };
 
 proto.dispose = function() {
@@ -441,10 +383,6 @@ proto.dispose = function() {
     if(this.textMarkers) {
         this.scene.glplot.remove(this.textMarkers);
         this.textMarkers.dispose();
-    }
-    if(this.delaunayMesh) {
-        this.scene.glplot.remove(this.delaunayMesh);
-        this.delaunayMesh.dispose();
     }
 };
 

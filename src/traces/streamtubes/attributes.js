@@ -75,22 +75,6 @@ module.exports = {
     }),
     mode: extendFlat({}, scatterAttrs.mode,  // shouldn't this be on-par with 2D?
         {dflt: 'lines+markers'}),
-    surfaceaxis: {
-        valType: 'enumerated',
-        role: 'info',
-        values: [-1, 0, 1, 2],
-        dflt: -1,
-        description: [
-            'If *-1*, the scatter points are not fill with a surface',
-            'If *0*, *1*, *2*, the scatter points are filled with',
-            'a Delaunay surface about the x, y, z respectively.'
-        ].join(' ')
-    },
-    surfacecolor: {
-        valType: 'color',
-        role: 'style',
-        description: 'Sets the surface fill color.'
-    },
     projection: {
         x: makeProjectionAttr('x'),
         y: makeProjectionAttr('y'),
