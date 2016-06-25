@@ -23,10 +23,9 @@ Streamtubes.categories = ['gl3d', 'markerColorscale', 'showLegend'];
 Streamtubes.meta = {
     hrName: 'streamtubes',
     description: [
-        'The data visualized as scatter point or lines in 3D dimension',
+        'The data visualized as scatter point or streamtubes in 3D dimension',
         'is set in `x`, `y`, `z`.',
         'Text (appearing either on the chart or on hover only) is via `text`.',
-        'Bubble charts are achieved by setting `marker.size` and/or `marker.color`',
         'Projections are achieved via `projection`.'
     ].join(' ')
 };
