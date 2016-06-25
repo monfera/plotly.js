@@ -11,21 +11,17 @@
 
 var createLinePlot = require('gl-line3d');
 var createScatterPlot = require('gl-scatter3d');
-var createErrorBars = require('gl-error3d');
 
 var Lib = require('../../lib');
 var str2RgbaArray = require('../../lib/str2rgbarray');
 var formatColor = require('../../lib/gl_format_color');
 var makeBubbleSizeFn = require('../scatter/make_bubble_size_func');
 
-var calculateError = require('./calc_errors');
-
 function LineWithMarkers(scene, uid) {
     this.scene = scene;
     this.uid = uid;
     this.linePlot = null;
     this.scatterPlot = null;
-    this.errorBars = null;
     this.textMarkers = null;
     this.color = null;
     this.mode = '';
@@ -67,26 +63,6 @@ proto.handlePick = function(selection) {
         return true;
     }
 };
-
-function calculateErrorParams(errors) {
-    var capSize = [0.0, 0.0, 0.0],
-        color = [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
-        lineWidth = [0.0, 0.0, 0.0];
-
-    for(var i = 0; i < 3; i++) {
-        var e = errors[i];
-
-        if(e && e.copy_zstyle !== false) e = errors[2];
-        if(!e) continue;
-
-        capSize[i] = e.width / 2;  // ballpark rescaling
-        color[i] = str2RgbaArray(e.color);
-        lineWidth = e.thickness;
-
-    }
-
-    return {capSize: capSize, color: color, lineWidth: lineWidth};
-}
 
 function calculateTextOffset(tp) {
     //Read out text properties
@@ -196,13 +172,6 @@ function convertPlotlyOptions(scene, data) {
         }
     }
 
-    params.errorBounds = calculateError(data, scaleFactor);
-
-    var errorParams = calculateErrorParams([data.error_x, data.error_y, data.error_z]);
-    params.errorColor = errorParams.color;
-    params.errorLineWidth = errorParams.lineWidth;
-    params.errorCapSize = errorParams.capSize;
-
     return params;
 }
 
@@ -224,7 +193,6 @@ proto.update = function(data) {
     var gl = this.scene.glplot.gl,
         lineOptions,
         scatterOptions,
-        errorOptions,
         textOptions;
 
     //Save data
@@ -323,28 +291,6 @@ proto.update = function(data) {
         this.textMarkers.dispose();
         this.textMarkers = null;
     }
-
-    errorOptions = {
-        gl: gl,
-        position: options.position,
-        color: options.errorColor,
-        error: options.errorBounds,
-        lineWidth: options.errorLineWidth,
-        capSize: options.errorCapSize,
-        opacity: data.opacity
-    };
-    if(this.errorBars) {
-        if(options.errorBounds) {
-            this.errorBars.update(errorOptions);
-        } else {
-            this.scene.glplot.remove(this.errorBars);
-            this.errorBars.dispose();
-            this.errorBars = null;
-        }
-    } else if(options.errorBounds) {
-        this.errorBars = createErrorBars(errorOptions);
-        this.scene.glplot.add(this.errorBars);
-    }
 };
 
 proto.dispose = function() {
@@ -355,10 +301,6 @@ proto.dispose = function() {
     if(this.scatterPlot) {
         this.scene.glplot.remove(this.scatterPlot);
         this.scatterPlot.dispose();
-    }
-    if(this.errorBars) {
-        this.scene.glplot.remove(this.errorBars);
-        this.errorBars.dispose();
     }
     if(this.textMarkers) {
         this.scene.glplot.remove(this.textMarkers);

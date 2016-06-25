@@ -15,7 +15,6 @@ var subTypes = require('../scatter/subtypes');
 var handleMarkerDefaults = require('../scatter/marker_basic_defaults');
 var handleLineDefaults = require('../scatter/basic_line_defaults');
 var handleTextDefaults = require('../scatter/text_defaults');
-var errorBarsSupplyDefaults = require('../../components/errorbars/defaults');
 
 var attributes = require('./attributes');
 
@@ -56,10 +55,6 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
             coerce(projection + '.scale');
         }
     }
-
-    errorBarsSupplyDefaults(traceIn, traceOut, defaultColor, {axis: 'z'});
-    errorBarsSupplyDefaults(traceIn, traceOut, defaultColor, {axis: 'y', inherit: 'z'});
-    errorBarsSupplyDefaults(traceIn, traceOut, defaultColor, {axis: 'x', inherit: 'z'});
 };
 
 function handleXYZDefaults(traceIn, traceOut, coerce) {

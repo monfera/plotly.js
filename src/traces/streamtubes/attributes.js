@@ -116,9 +116,6 @@ module.exports = {
     textposition: extendFlat({}, scatterAttrs.textposition, {dflt: 'top center'}),
     textfont: scatterAttrs.textfont,
     _nestedModules: {
-        'error_x': 'ErrorBars',
-        'error_y': 'ErrorBars',
-        'error_z': 'ErrorBars',
         'marker.colorbar': 'Colorbar'
     }
 };
