@@ -7,35 +7,16 @@
       "mode": "lines+markers",
       "line": {
         "width": 10,
-        "color": [
-          "#67001f",
-          "#b2182b",
-          "#d6604d",
-          "#f4a582",
-          "#fddbc7",
-          "#d1e5f0",
-          "#92c5de",
-          "#4393c3",
-          "#2166ac",
-          "#053061"
-        ]
+        "colorscale": "Viridis",
+        "color": [0,1,2,3,4,5,6,7,8,9]
       },
       "marker": {
         "size": 8,
-        "color": [
-          "#053061",
-          "#2166ac",
-          "#4393c3",
-          "#92c5de",
-          "#d1e5f0",
-          "#fddbc7",
-          "#f4a582",
-          "#d6604d",
-          "#b2182b",
-          "#67001f"
-        ]
+        "colorscale": "Viridis",
+        "color": [0,1,2,3,4,5,6,7,8,9],
+        "showscale": true
       },
-      "type":"streamtubes"
+      "type":"scatter3d"
     }
   ],
   "layout": {

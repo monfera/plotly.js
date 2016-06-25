@@ -20,10 +20,10 @@ module.exports = function calc(trace, vals, containerStr, cLetter) {
 
     if(containerStr) {
         container = Lib.nestedProperty(trace, containerStr).get();
-        inputContainer = Lib.nestedProperty(trace._input, containerStr).get();
+        //inputContainer = Lib.nestedProperty(trace._input, containerStr).get();
     } else {
         container = trace;
-        inputContainer = trace._input;
+        //inputContainer = trace._input;
     }
 
     var auto = container[cLetter + 'auto'],
@@ -47,8 +47,8 @@ module.exports = function calc(trace, vals, containerStr, cLetter) {
     container[cLetter + 'min'] = min;
     container[cLetter + 'max'] = max;
 
-    inputContainer[cLetter + 'min'] = min;
-    inputContainer[cLetter + 'max'] = max;
+    //inputContainer[cLetter + 'min'] = min;
+    //inputContainer[cLetter + 'max'] = max;
 
     if(container.autocolorscale) {
         if(min * max < 0) scl = scales.RdBu;
