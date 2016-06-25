@@ -13,7 +13,7 @@ var Lib = require('../../lib');
 
 var subTypes = require('../scatter/subtypes');
 var handleMarkerDefaults = require('../scatter/marker_defaults');
-var handleLineDefaults = require('../scatter/line_defaults');
+var handleLineDefaults = require('../scatter/basic_line_defaults');
 var handleTextDefaults = require('../scatter/text_defaults');
 var errorBarsSupplyDefaults = require('../../components/errorbars/defaults');
 

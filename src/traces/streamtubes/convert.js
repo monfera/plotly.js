@@ -17,7 +17,6 @@ var Lib = require('../../lib');
 var str2RgbaArray = require('../../lib/str2rgbarray');
 var formatColor = require('../../lib/gl_format_color');
 var makeBubbleSizeFn = require('../scatter/make_bubble_size_func');
-var DASH_PATTERNS = require('../../constants/gl3d_dashes');
 var MARKER_SYMBOLS = require('../../constants/gl_markers');
 
 var calculateError = require('./calc_errors');
@@ -172,7 +171,6 @@ function convertPlotlyOptions(scene, data) {
     if('line' in data) {
         params.lineColor = formatColor(line, 1, len);
         params.lineWidth = line.width;
-        params.lineDashes = line.dash;
     }
 
     if('marker' in data) {
@@ -235,8 +233,7 @@ proto.update = function(data) {
         lineOptions,
         scatterOptions,
         errorOptions,
-        textOptions,
-        dashPattern = DASH_PATTERNS.solid;
+        textOptions;
 
     //Save data
     this.data = data;
@@ -246,11 +243,6 @@ proto.update = function(data) {
 
     if('mode' in options) {
         this.mode = options.mode;
-    }
-    if('lineDashes' in options) {
-        if(options.lineDashes in DASH_PATTERNS) {
-            dashPattern = DASH_PATTERNS[options.lineDashes];
-        }
     }
 
     this.color = arrayToColor(options.scatterColor) ||
@@ -264,8 +256,6 @@ proto.update = function(data) {
         position: options.position,
         color: options.lineColor,
         lineWidth: options.lineWidth || 1,
-        dashes: dashPattern[0],
-        dashScale: dashPattern[1],
         opacity: data.opacity,
         connectGaps: data.connectgaps
     };

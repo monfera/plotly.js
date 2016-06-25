@@ -83,7 +83,6 @@ module.exports = {
     connectgaps: scatterAttrs.connectgaps,
     line: extendFlat({}, {
         width: scatterLineAttrs.width,
-        dash: scatterLineAttrs.dash,
         showscale: {
             valType: 'boolean',
             role: 'info',
