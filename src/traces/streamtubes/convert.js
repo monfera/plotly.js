@@ -179,8 +179,6 @@ function convertPlotlyOptions(scene, data) {
         params.scatterColor = formatColor(marker, 1, len);
         params.scatterSize = formatParam(marker.size, len, calculateSize, 20, sizeFn);
         params.scatterMarker = formatParam(marker.symbol, len, calculateSymbol, '●');
-        params.scatterLineWidth = marker.line.width;  // arrayOk === false
-        params.scatterLineColor = formatColor(marker.line, 1, len);
         params.scatterAngle = 0;
     }
 
@@ -284,8 +282,6 @@ proto.update = function(data) {
         glyph: options.scatterMarker,
         opacity: scatterOpacity,
         orthographic: true,
-        lineWidth: options.scatterLineWidth,
-        lineColor: options.scatterLineColor,
         project: options.project,
         projectScale: options.projectScale,
         projectOpacity: options.projectOpacity

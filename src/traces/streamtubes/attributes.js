@@ -15,8 +15,7 @@ var MARKER_SYMBOLS = require('../../constants/gl_markers');
 var extendFlat = require('../../lib/extend').extendFlat;
 
 var scatterLineAttrs = scatterAttrs.line,
-    scatterMarkerAttrs = scatterAttrs.marker,
-    scatterMarkerLineAttrs = scatterMarkerAttrs.line;
+    scatterMarkerAttrs = scatterAttrs.marker;
 
 function makeProjectionAttr(axLetter) {
     return {
@@ -119,11 +118,7 @@ module.exports = {
                 'to an rgba color and use its alpha channel.'
             ].join(' ')
         }),
-        showscale: scatterMarkerAttrs.showscale,
-        line: extendFlat({},
-            {width: extendFlat({}, scatterMarkerLineAttrs.width, {arrayOk: false})},
-            colorAttributes('marker.line')
-        )
+        showscale: scatterMarkerAttrs.showscale
     },
         colorAttributes('marker')
     ),
