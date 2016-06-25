@@ -13,7 +13,6 @@ var createLinePlot = require('gl-line3d');
 var createScatterPlot = require('gl-scatter3d');
 
 var Lib = require('../../lib');
-var str2RgbaArray = require('../../lib/str2rgbarray');
 var formatColor = require('../../lib/gl_format_color');
 var makeBubbleSizeFn = require('../scatter/make_bubble_size_func');
 
@@ -207,9 +206,6 @@ proto.update = function(data) {
 
     this.color = arrayToColor(options.scatterColor) ||
                  arrayToColor(options.lineColor);
-
-    //Save data points
-    this.dataPoints = options.position;
 
     lineOptions = {
         gl: gl,
