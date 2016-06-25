@@ -23,7 +23,6 @@ module.exports = function markerDefaults(traceIn, traceOut, defaultColor, layout
 
     if(lineColor) defaultColor = lineColor;
 
-    coerce('marker.symbol');
     coerce('marker.opacity', isBubble ? 0.7 : 1);
     coerce('marker.size');
 

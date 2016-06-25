@@ -11,7 +11,6 @@
 var scatterAttrs = require('../scatter/attributes');
 var colorAttributes = require('../../components/colorscale/color_attributes');
 
-var MARKER_SYMBOLS = require('../../constants/gl_markers');
 var extendFlat = require('../../lib/extend').extendFlat;
 
 var scatterLineAttrs = scatterAttrs.line,
@@ -94,15 +93,7 @@ module.exports = {
     },
         colorAttributes('line')
     ),
-    marker: extendFlat({}, {  // Parity with scatter.js?
-        symbol: {
-            valType: 'enumerated',
-            values: Object.keys(MARKER_SYMBOLS),
-            role: 'style',
-            dflt: 'circle',
-            arrayOk: true,
-            description: 'Sets the marker symbol type.'
-        },
+    marker: extendFlat({}, {
         size: extendFlat({}, scatterMarkerAttrs.size, {dflt: 8}),
         sizeref: scatterMarkerAttrs.sizeref,
         sizemin: scatterMarkerAttrs.sizemin,

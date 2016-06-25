@@ -17,7 +17,6 @@ var Lib = require('../../lib');
 var str2RgbaArray = require('../../lib/str2rgbarray');
 var formatColor = require('../../lib/gl_format_color');
 var makeBubbleSizeFn = require('../scatter/make_bubble_size_func');
-var MARKER_SYMBOLS = require('../../constants/gl_markers');
 
 var calculateError = require('./calc_errors');
 
@@ -106,10 +105,6 @@ function calculateSize(sizeIn, sizeFn) {
     return sizeFn(sizeIn * 4);
 }
 
-function calculateSymbol(symbolIn) {
-    return MARKER_SYMBOLS[symbolIn];
-}
-
 function formatParam(paramIn, len, calculate, dflt, extraFn) {
     var paramOut = null;
 
@@ -178,7 +173,6 @@ function convertPlotlyOptions(scene, data) {
 
         params.scatterColor = formatColor(marker, 1, len);
         params.scatterSize = formatParam(marker.size, len, calculateSize, 20, sizeFn);
-        params.scatterMarker = formatParam(marker.symbol, len, calculateSymbol, '●');
         params.scatterAngle = 0;
     }
 

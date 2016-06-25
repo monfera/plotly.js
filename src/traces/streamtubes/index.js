@@ -12,7 +12,6 @@ var Streamtubes = {};
 
 Streamtubes.plot = require('./convert');
 Streamtubes.attributes = require('./attributes');
-Streamtubes.markerSymbols = require('../../constants/gl_markers');
 Streamtubes.supplyDefaults = require('./defaults');
 Streamtubes.colorbar = require('../scatter/colorbar');
 Streamtubes.calc = require('./calc');
@@ -20,7 +19,7 @@ Streamtubes.calc = require('./calc');
 Streamtubes.moduleType = 'trace';
 Streamtubes.name = 'streamtubes';
 Streamtubes.basePlotModule = require('../../plots/gl3d');
-Streamtubes.categories = ['gl3d', 'symbols', 'markerColorscale', 'showLegend'];
+Streamtubes.categories = ['gl3d', 'markerColorscale', 'showLegend'];
 Streamtubes.meta = {
     hrName: 'streamtubes',
     description: [

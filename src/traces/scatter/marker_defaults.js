@@ -20,6 +20,8 @@ module.exports = function markerDefaults(traceIn, traceOut, defaultColor, layout
 
     markerBasicDefaults(traceIn, traceOut, defaultColor, layout, coerce);
 
+    coerce('marker.symbol');
+
     // if there's a line with a different color than the marker, use
     // that line color as the default marker line color
     // mostly this is for transparent markers to behave nicely
