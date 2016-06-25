@@ -545,7 +545,7 @@ function makeCircularSampleModel() {
     return p;
 }
 
-fdescribe('gl3d plots', function() {
+describe('gl3d plots', function() {
 
     var gd;
 
@@ -558,7 +558,25 @@ fdescribe('gl3d plots', function() {
         destroyGraphDiv();
     });
 
-    fit('should respond to drag interactions with mock of partially set camera', function(done) {
+
+    fit('streamtubes', function(done) {
+
+        var mock = require('@mocks/gl3d_streamtubes_basic.json')
+        var data = mock.data
+        var s = data[0]
+
+        var layout = mock.layout
+
+        window.gd = gd
+        window.data = data
+        window.s = s
+        window.Plotly = Plotly
+
+        Plotly.plot(gd, data, layout)
+            .then(done);
+    });
+
+    it('should respond to drag interactions with mock of partially set camera', function(done) {
 
         var mock = require('@mocks/gl3d_moonshot.json')
 
