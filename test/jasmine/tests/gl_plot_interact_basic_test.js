@@ -562,7 +562,7 @@ describe('gl3d plots', function() {
     fit('streamtubes', function(done) {
 
         var mock = require('@mocks/gl3d_streamtubes_basic.json')
-        // var mock = require('@mocks/gl3d_scatter-color-array.json')
+        //var mock = require('@mocks/gl3d_projection-traces.json')
 
 
         var data = mock.data

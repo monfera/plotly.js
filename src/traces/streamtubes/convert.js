@@ -11,6 +11,7 @@
 
 var createLinePlot = require('gl-line3d');
 var createScatterPlot = require('gl-scatter3d');
+var createMesh = require('gl-mesh3d');
 
 var Lib = require('../../lib');
 var formatColor = require('../../lib/gl_format_color');
@@ -282,6 +283,27 @@ proto.update = function(data) {
         this.textMarkers.dispose();
         this.textMarkers = null;
     }
+
+    if(true) {
+        var delaunayOptions = {
+            "positions": [[0.5,0.75,0.6000000000000001],[0.3333333333333333,0.25,0.4],[1.1666666666666665,0.5,0.8],[0.6666666666666666,0.75,1],[0.16666666666666666,1,0.4]],
+            "cells":[[0,2,3],[1,2,0],[4,0,3],[4,1,0]],
+            "meshColor":[0.12156862745098039,0.4666666666666667,0.7058823529411765,1],
+            "opacity":1
+        };
+        if(this.delaunayMesh) {
+            this.delaunayMesh.update(delaunayOptions);
+        } else {
+            delaunayOptions.gl = gl;
+            this.delaunayMesh = createMesh(delaunayOptions);
+            this.scene.glplot.add(this.delaunayMesh);
+        }
+    } else if(this.delaunayMesh) {
+        this.scene.glplot.remove(this.delaunayMesh);
+        this.delaunayMesh.dispose();
+        this.delaunayMesh = null;
+    }
+
 };
 
 proto.dispose = function() {
