@@ -24,11 +24,6 @@ function LineWithMarkers(scene, uid) {
     this.textMarkers = null;
     this.color = null;
     this.mode = '';
-    this.dataPoints = [];
-    this.axesBounds = [
-        [-Infinity, -Infinity, -Infinity],
-        [Infinity, Infinity, Infinity]
-    ];
     this.textLabels = null;
     this.data = null;
 }

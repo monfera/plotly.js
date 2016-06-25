@@ -25,7 +25,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
         return Lib.coerce(traceIn, traceOut, attributes, attr, dflt);
     }
 
-    var len = handleXYZDefaults(traceIn, traceOut, coerce);
+    var len = handleXYZDefaults(traceOut, coerce);
     if(!len) {
         traceOut.visible = false;
         return;
@@ -57,7 +57,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     }
 };
 
-function handleXYZDefaults(traceIn, traceOut, coerce) {
+function handleXYZDefaults(traceOut, coerce) {
     var len = 0,
         x = coerce('x'),
         y = coerce('y'),
