@@ -10,6 +10,7 @@
 'use strict';
 
 var markerBasicDefaults = require('./marker_basic_defaults');
+var Color = require('../../components/color');
 var hasColorscale = require('../../components/colorscale/has_colorscale');
 var colorscaleDefaults = require('../../components/colorscale/defaults');
 
