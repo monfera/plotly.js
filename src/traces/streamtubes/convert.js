@@ -339,7 +339,7 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
         F.push(f);
     }
 
-    function catmullRom(x, y, z, r, f, Tratio) {
+    function catmullRom(x, y, z, r, R, G, B, Tratio) {
 
         var t0 = 0;
         var d, c1, c2;
@@ -358,7 +358,9 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
         var A1y = c1*y[0] + c2*y[1];
         var A1z = c1*z[0] + c2*z[1];
         var A1r = c1*r[0] + c2*r[1];
-        var A1f = c1*f[0] + c2*f[1];
+        var A1R = c1*R[0] + c2*R[1];
+        var A1G = c1*G[0] + c2*G[1];
+        var A1B = c1*B[0] + c2*B[1];
 
         d = t2 - t1;
         c1 = (t2 - T) / d;
@@ -367,7 +369,9 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
         var A2y = c1*y[1] + c2*y[2];
         var A2z = c1*z[1] + c2*z[2];
         var A2r = c1*r[1] + c2*r[2];
-        var A2f = c1*f[1] + c2*f[2];
+        var A2R = c1*R[1] + c2*R[2];
+        var A2G = c1*G[1] + c2*G[2];
+        var A2B = c1*B[1] + c2*B[2];
 
         d = t3 - t2;
         c1 = (t3 - T) / d;
@@ -376,7 +380,9 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
         var A3y = c1*y[2] + c2*y[3];
         var A3z = c1*z[2] + c2*z[3];
         var A3r = c1*r[2] + c2*r[3];
-        var A3f = c1*f[2] + c2*f[3];
+        var A3R = c1*R[2] + c2*R[3];
+        var A3G = c1*G[2] + c2*G[3];
+        var A3B = c1*B[2] + c2*B[3];
 
         d = t2 - t0;
         c1 = (t2 - T) / d;
@@ -385,7 +391,9 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
         var B1y = c1*A1y + c2*A2y;
         var B1z = c1*A1z + c2*A2z;
         var B1r = c1*A1r + c2*A2r;
-        var B1f = c1*A1f + c2*A2f;
+        var B1R = c1*A1R + c2*A2R;
+        var B1G = c1*A1G + c2*A2G;
+        var B1B = c1*A1B + c2*A2B;
 
         d = t3 - t1;
         c1 = (t3 - T) / d;
@@ -394,7 +402,9 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
         var B2y = c1*A2y + c2*A3y;
         var B2z = c1*A2z + c2*A3z;
         var B2r = c1*A2r + c2*A3r;
-        var B2f = c1*A2f + c2*A3f;
+        var B2R = c1*A2R + c2*A3R;
+        var B2G = c1*A2G + c2*A3G;
+        var B2B = c1*A2B + c2*A3B;
 
         d = t2 - t1;
         c1 = (t2 - T) / d;
@@ -403,9 +413,11 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
         var Cy = c1*B1y + c2*B2y;
         var Cz = c1*B1z + c2*B2z;
         var Cr = c1*B1r + c2*B2r;
-        var Cf = c1*B1f + c2*B2f;
+        var CR = c1*B1R + c2*B2R;
+        var CG = c1*B1G + c2*B2G;
+        var CB = c1*B1B + c2*B2B;
 
-        return [Cx, Cy, Cz, Cr, Cf];
+        return [Cx, Cy, Cz, Cr, CR, CG, CB];
     }
 
     var quadCount = 36;
@@ -854,14 +866,16 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
                 [p.y[n], p.y[n + 1], p.y[n + 2], p.y[n + 3]],
                 [p.z[n], p.z[n + 1], p.z[n + 2], p.z[n + 3]],
                 [p.r[n], p.r[n + 1], p.r[n + 2], p.r[n + 3]],
-                [p.c[n], p.c[n + 1], p.c[n + 2], p.c[n + 3]],
+                [p.c[n][0], p.c[n + 1][0], p.c[n + 2][0], p.c[n + 3][0]],
+                [p.c[n][1], p.c[n + 1][1], p.c[n + 2][1], p.c[n + 3][1]],
+                [p.c[n][2], p.c[n + 1][2], p.c[n + 2][2], p.c[n + 3][2]],
                 c1);
 
             rp.x.push(xyzrf[0]);
             rp.y.push(xyzrf[1]);
             rp.z.push(xyzrf[2]);
             rp.r.push(xyzrf[3]);
-            rp.c.push(colorer(xyzrf[4]));
+            rp.c.push([xyzrf[4], xyzrf[5], xyzrf[6], 1]); // fixme transfer opacity too
         }
     }
 
