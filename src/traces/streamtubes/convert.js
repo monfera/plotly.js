@@ -285,7 +285,7 @@ proto.update = function(data) {
     }
 
     if(true) {
-        var delaunayOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.lineColor, this.scene.dataScale);
+        var delaunayOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.lineColor, options.scatterColor, this.scene.dataScale);
         if(this.delaunayMesh) {
             this.delaunayMesh.update(delaunayOptions);
         } else {
@@ -324,7 +324,7 @@ function createLineWithMarkers(scene, data) {
 
 module.exports = createLineWithMarkers;
 
-function calculateMesh(inputX, inputY, inputZ, inputC, scalingFactor) {
+function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
 
     function addVertex(X, Y, Z, x, y, z) {
         X.push(x);
@@ -900,7 +900,7 @@ function calculateMesh(inputX, inputY, inputZ, inputC, scalingFactor) {
     }
 
     for(n = 0; n < p.x.length; n++) {
-        index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], [64/255,64/255,255/255], 0.1, index, X, Y, Z, I, J, K, F);
+        index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], inputMC[n], 0.1, index, X, Y, Z, I, J, K, F);
     }
 
     return {
