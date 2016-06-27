@@ -933,7 +933,11 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
         specular: 0.3,
         roughness: 0.2,
         fresnel: 0,
-        vertexNormalsEpsilon: 0
+        vertexNormalsEpsilon: 0,
+        contourEnable: true, // fixme check what it is; doesn't seem to matter
+        contourCount: 100,// fixme check what it is; doesn't seem to matter
+        contourLineWidth: 10,// fixme check what it is; doesn't seem to matter
+        contourColor: [1,0,0] // fixme check what it is; doesn't seem to matter
     }
 }
 
