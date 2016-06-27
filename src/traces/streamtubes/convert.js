@@ -830,7 +830,7 @@ function calculateMesh(inputX, inputY, inputZ, scalingFactor) {
         x: inputX,
         y: inputY,
         z: inputZ,
-        r: inputX.map(function(d) {return 1}),
+        r: inputX.map(function(d) {return 0.05}),
         c: inputX.map(function(d) {return 1})
     }
 
@@ -901,7 +901,7 @@ function calculateMesh(inputX, inputY, inputZ, scalingFactor) {
     }
 
     for(n = 0; n < p.x.length; n++) {
-        index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 1, index, X, Y, Z, I, J, K, F);
+        index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 0.1, index, X, Y, Z, I, J, K, F);
     }
 
     return {
@@ -919,7 +919,7 @@ function calculateMesh(inputX, inputY, inputZ, scalingFactor) {
         specular: 0.3,
         roughness: 0.1,
         fresnel: 0,
-        vertexNormalsEpsilon: 1e-12
+        vertexNormalsEpsilon: 1e-15
     }
 
     return {
