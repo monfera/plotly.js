@@ -212,7 +212,7 @@ proto.update = function(data) {
         connectGaps: data.connectgaps
     };
 
-    if(this.mode.indexOf('lines') !== -1) {
+    if(false && this.mode.indexOf('lines') !== -1) {
         if(this.linePlot) this.linePlot.update(lineOptions);
         else {
             this.linePlot = createLinePlot(lineOptions);
@@ -241,7 +241,7 @@ proto.update = function(data) {
         projectOpacity: options.projectOpacity
     };
 
-    if(this.mode.indexOf('markers') !== -1) {
+    if(false && this.mode.indexOf('markers') !== -1) {
         if(this.scatterPlot) this.scatterPlot.update(scatterOptions);
         else {
             this.scatterPlot = createScatterPlot(scatterOptions);
@@ -285,7 +285,7 @@ proto.update = function(data) {
     }
 
     if(true) {
-        var delaunayOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.lineColor, options.scatterColor, this.scene.dataScale);
+        var delaunayOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.lineWidth, options.lineColor, options.scatterSize, options.scatterColor, this.scene.dataScale);
         if(this.delaunayMesh) {
             this.delaunayMesh.update(delaunayOptions);
         } else {
@@ -324,7 +324,7 @@ function createLineWithMarkers(scene, data) {
 
 module.exports = createLineWithMarkers;
 
-function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
+function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC, scalingFactor) {
 
     function addVertex(X, Y, Z, x, y, z) {
         X.push(x);
@@ -837,11 +837,13 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
 
     var p = makeCircularSampleModel();
 
+    var scaler =0.01;
+
     p = {
         x: inputX,
         y: inputY,
         z: inputZ,
-        r: inputX.map(function(d) {return 0.05}),
+        r: Array.isArray(inputW) ? inputW * scaler: inputX.map(function() {return inputW * scaler}),
         c: inputC
     }
 
@@ -854,21 +856,27 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
     };
 
     var upsamplingFactor = 100; // convert every original point to as many upsampled points
-    for(n = 0; n < p.x.length - 3; n++) {
+    var n0, n1, n2, n3;
+    for(n = 0; n < p.x.length - 1; n++) {
 
         for(var m = 0; m < upsamplingFactor; m++) {
 
             c1 = m / upsamplingFactor;
             c2 = (upsamplingFactor - m) / upsamplingFactor;
 
+            n0 = (n - 1 + p.x.length) % p.x.length;
+            n1 = n;
+            n2 = (n + 1) % p.x.length;
+            n3 = (n + 2) % p.x.length;
+
             var xyzrf = catmullRom(
-                [p.x[n], p.x[n + 1], p.x[n + 2], p.x[n + 3]],
-                [p.y[n], p.y[n + 1], p.y[n + 2], p.y[n + 3]],
-                [p.z[n], p.z[n + 1], p.z[n + 2], p.z[n + 3]],
-                [p.r[n], p.r[n + 1], p.r[n + 2], p.r[n + 3]],
-                [p.c[n][0], p.c[n + 1][0], p.c[n + 2][0], p.c[n + 3][0]],
-                [p.c[n][1], p.c[n + 1][1], p.c[n + 2][1], p.c[n + 3][1]],
-                [p.c[n][2], p.c[n + 1][2], p.c[n + 2][2], p.c[n + 3][2]],
+                [p.x[n0],    p.x[n1],    p.x[n2],    p.x[n3]],
+                [p.y[n0],    p.y[n1],    p.y[n2],    p.y[n3]],
+                [p.z[n0],    p.z[n1],    p.z[n2],    p.z[n3]],
+                [p.r[n0],    p.r[n1],    p.r[n2],    p.r[n3]],
+                [p.c[n0][0], p.c[n1][0], p.c[n2][0], p.c[n3][0]],
+                [p.c[n0][1], p.c[n1][1], p.c[n2][1], p.c[n3][1]],
+                [p.c[n0][2], p.c[n1][2], p.c[n2][2], p.c[n3][2]],
                 c1);
 
             rp.x.push(xyzrf[0]);
@@ -914,7 +922,7 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
     }
 
     for(n = 0; n < p.x.length; n++) {
-        index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], inputMC[n], 0.1, index, X, Y, Z, I, J, K, F);
+        index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], inputMC[n], scaler / 2 * (Array.isArray(inputMW) ? inputMW[n] : inputMW), index, X, Y, Z, I, J, K, F);
     }
 
     return {
