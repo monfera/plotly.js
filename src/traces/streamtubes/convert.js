@@ -928,10 +928,10 @@ function calculateMesh(inputX, inputY, inputZ, inputC, inputMC, scalingFactor) {
  //       meshColor: [0.12156862745098039,0.4666666666666667,0.9058823529411765,1],
         opacity: 1,
         lightPosition: [1e6 * scalingFactor[0], 1e6 * scalingFactor[1], 1e6 * scalingFactor[2]],
-        ambient: 0,
+        ambient: 0.2,
         diffuse: 1,
         specular: 0.3,
-        roughness: 0.1,
+        roughness: 0.2,
         fresnel: 0,
         vertexNormalsEpsilon: 0
     }
