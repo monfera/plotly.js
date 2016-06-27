@@ -285,7 +285,7 @@ proto.update = function(data) {
     }
 
     if(true) {
-        var delaunayOptions = calculateMesh(this.data.x, this.data.y, this.data.z, this.scene.dataScale);
+        var delaunayOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.lineColor, this.scene.dataScale);
         if(this.delaunayMesh) {
             this.delaunayMesh.update(delaunayOptions);
         } else {
@@ -324,7 +324,7 @@ function createLineWithMarkers(scene, data) {
 
 module.exports = createLineWithMarkers;
 
-function calculateMesh(inputX, inputY, inputZ, scalingFactor) {
+function calculateMesh(inputX, inputY, inputZ, inputC, scalingFactor) {
 
     function addVertex(X, Y, Z, x, y, z) {
         X.push(x);
@@ -788,9 +788,8 @@ function calculateMesh(inputX, inputY, inputZ, scalingFactor) {
     }
 
     function colorer(d) {
-        return d;
-        var colorArray = [Math.round(255 * d), 0, Math.round(255 * (1 - d))];
-        return 'rgb(' + colorArray.join() + ')';
+        var colorArray = [d, 0, 1 - d];
+        return colorArray;
     }
 
     function makeCircularSampleModel() {
@@ -831,7 +830,7 @@ function calculateMesh(inputX, inputY, inputZ, scalingFactor) {
         y: inputY,
         z: inputZ,
         r: inputX.map(function(d) {return 0.05}),
-        c: inputX.map(function(d) {return 1})
+        c: inputC
     }
 
     var rp = {
@@ -901,7 +900,7 @@ function calculateMesh(inputX, inputY, inputZ, scalingFactor) {
     }
 
     for(n = 0; n < p.x.length; n++) {
-        index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], 'rgb(64,64,255)', 0.1, index, X, Y, Z, I, J, K, F);
+        index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], [64/255,64/255,255/255], 0.1, index, X, Y, Z, I, J, K, F);
     }
 
     return {
@@ -911,7 +910,8 @@ function calculateMesh(inputX, inputY, inputZ, scalingFactor) {
             Z[i] * scalingFactor[2]
         ]}),
         cells:I.map(function(d, i) {return [I[i], J[i], K[i]]}),
-        meshColor: [0.12156862745098039,0.4666666666666667,0.9058823529411765,1],
+        cellColors: F,
+ //       meshColor: [0.12156862745098039,0.4666666666666667,0.9058823529411765,1],
         opacity: 1,
         lightPosition: [1e6 * scalingFactor[0], 1e6 * scalingFactor[1], 1e6 * scalingFactor[2]],
         ambient: 0,
