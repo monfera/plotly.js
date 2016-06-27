@@ -285,7 +285,7 @@ proto.update = function(data) {
     }
 
     if(true) {
-        var delaunayOptions = calculateMesh(this.data.x, this.data.y, this.data.z);
+        var delaunayOptions = calculateMesh(this.data.x, this.data.y, this.data.z, this.scene.dataScale);
         if(this.delaunayMesh) {
             this.delaunayMesh.update(delaunayOptions);
         } else {
@@ -324,7 +324,7 @@ function createLineWithMarkers(scene, data) {
 
 module.exports = createLineWithMarkers;
 
-function calculateMesh(inputX, inputY, inputZ) {
+function calculateMesh(inputX, inputY, inputZ, scalingFactor) {
 
     function addVertex(X, Y, Z, x, y, z) {
         X.push(x);
@@ -905,10 +905,21 @@ function calculateMesh(inputX, inputY, inputZ) {
     }
 
     return {
-        "positions": X.map(function(d, i) {return [X[i], Y[i], Z[i]]}),
-        "cells":I.map(function(d, i) {return [I[i], J[i], K[i]]}),
-        "meshColor": [0.12156862745098039,0.4666666666666667,0.9058823529411765,1],
-        "opacity":1
+        positions: X.map(function(d, i) {return [
+            X[i] * scalingFactor[0],
+            Y[i] * scalingFactor[1],
+            Z[i] * scalingFactor[2]
+        ]}),
+        cells:I.map(function(d, i) {return [I[i], J[i], K[i]]}),
+        meshColor: [0.12156862745098039,0.4666666666666667,0.9058823529411765,1],
+        opacity:1,
+        lightPosition: [1e6 * scalingFactor[0], 1e6 * scalingFactor[1], 1e6 * scalingFactor[2]],
+        ambient: 0.4,
+        diffuse: 0.5,
+        specular: 0.3,
+        roughness: 0.1,
+        fresnel: 0,
+        vertexNormalsEpsilon: 1e-12
     }
 
     return {
