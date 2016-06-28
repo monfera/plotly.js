@@ -59,14 +59,14 @@ proto.handlePick = function(selection) {
     }
 };
 
-function calculateTextOffset(tp) {
+function calculateTextOffset(tp, offsetValue) {
     //Read out text properties
     var textOffset = [0, 0];
     if(Array.isArray(tp)) return [0, -1];
-    if(tp.indexOf('bottom') >= 0) textOffset[1] += 1;
-    if(tp.indexOf('top') >= 0) textOffset[1] -= 1;
-    if(tp.indexOf('left') >= 0) textOffset[0] -= 1;
-    if(tp.indexOf('right') >= 0) textOffset[0] += 1;
+    if(tp.indexOf('bottom') >= 0) textOffset[1] += offsetValue;
+    if(tp.indexOf('top') >= 0) textOffset[1] -= offsetValue;
+    if(tp.indexOf('left') >= 0) textOffset[0] -= offsetValue;
+    if(tp.indexOf('right') >= 0) textOffset[0] += offsetValue;
     return textOffset;
 }
 
@@ -149,7 +149,7 @@ function convertPlotlyOptions(scene, data) {
     }
 
     if('textposition' in data) {
-        params.textOffset = calculateTextOffset(data.textposition);  // arrayOk === false
+        params.textOffset = calculateTextOffset(data.textposition, 1.5 * Math.pow(scene.dataScale[0] * scene.dataScale[1] * scene.dataScale[2], 1/2) * Math.max.apply(Math, data.marker.size));  // arrayOk === false
         params.textColor = formatColor(data.textfont, 1, len);
         params.textSize = formatParam(data.textfont.size, len, Lib.identity, 12);
         params.textFont = data.textfont.family;  // arrayOk === false
