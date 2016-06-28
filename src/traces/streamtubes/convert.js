@@ -137,6 +137,7 @@ function convertPlotlyOptions(scene, data) {
     if('line' in data) {
         params.lineColor = formatColor(line, 1, len);
         params.lineWidth = line.width;
+        params.connectionradius = line.connectionradius;
     }
 
     if('marker' in data) {
@@ -284,19 +285,13 @@ proto.update = function(data) {
         this.textMarkers = null;
     }
 
-    if(true) {
-        var delaunayOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.lineWidth, options.lineColor, options.scatterSize, options.scatterColor, this.scene.dataScale);
-        if(this.delaunayMesh) {
-            this.delaunayMesh.update(delaunayOptions);
-        } else {
-            delaunayOptions.gl = gl;
-            this.delaunayMesh = createMesh(delaunayOptions);
-            this.scene.glplot.add(this.delaunayMesh);
-        }
-    } else if(this.delaunayMesh) {
-        this.scene.glplot.remove(this.delaunayMesh);
-        this.delaunayMesh.dispose();
-        this.delaunayMesh = null;
+    var meshOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.connectionradius, options.lineColor, options.scatterSize, options.scatterColor, this.scene.dataScale);
+    if(this.delaunayMesh) {
+        this.delaunayMesh.update(meshOptions);
+    } else {
+        meshOptions.gl = gl;
+        this.delaunayMesh = createMesh(meshOptions);
+        this.scene.glplot.add(this.delaunayMesh);
     }
 
 };
@@ -322,10 +317,8 @@ function createLineWithMarkers(scene, data) {
     return plot;
 }
 
-module.exports = createLineWithMarkers;
-
 function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC, scalingFactor) {
-debugger
+
     function addVertex(X, Y, Z, x, y, z) {
         X.push(x);
         Y.push(y);
@@ -799,51 +792,19 @@ debugger
         return vOffset + mx.length;
     }
 
-    function colorer(d) {
-        var colorArray = [d, 0, 1 - d];
-        return colorArray;
-    }
-
-    function makeCircularSampleModel() {
-
-        var pointCount = 10;
-        var n;
-
-        var p = {
-            x: [],
-            y: [],
-            z: [],
-            r: [],
-            c: []
-        }
-
-        for (n = 0; n < pointCount; n++) {
-
-            p.x.push(Math.cos(10 * n / pointCount) * 100);
-            p.y.push(Math.sin(10 * n / pointCount) * 100);
-            p.z.push(1000 * n / pointCount * 0.2 - 100);
-            p.r.push(5 + 2 * Math.sin(1000 * n / pointCount / 20));
-            p.c.push(0.5 + Math.sin(n * 2) / 2);
-        }
-
-        return p;
-    }
-
     var x, y, z;
 
     var index = 0;
 
     var n, r, r2, c, c1, c2;
 
-    var p = makeCircularSampleModel();
+    var scaler = 0.01; // fixme figure out something for sensibly calculating dimensions
 
-    var scaler =0.01;
-
-    p = {
+    var p = {
         x: inputX,
         y: inputY,
         z: inputZ,
-        r: Array.isArray(inputW) ? inputW * scaler: inputX.map(function() {return inputW * scaler}),
+        r: Array.isArray(inputW) ? inputW : inputX.map(function() {return inputW;}),
         c: inputC
     }
 
@@ -949,3 +910,4 @@ debugger
     }
 }
 
+module.exports = createLineWithMarkers;
