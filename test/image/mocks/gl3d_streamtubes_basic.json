@@ -8,7 +8,7 @@
       "text": ["A","B","C","D","E","F","G","H","I","J","K"],
       "mode": "lines+markers+text",
       "line": {
-        "width": 10,
+        "width": [10,16,12,18,20,28,22,24,14,26,30],
         "colorscale": "Viridis",
         "color": [0,1,2,3,4,5,6,7,8,9,10]
       },

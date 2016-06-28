@@ -325,7 +325,7 @@ function createLineWithMarkers(scene, data) {
 module.exports = createLineWithMarkers;
 
 function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC, scalingFactor) {
-
+debugger
     function addVertex(X, Y, Z, x, y, z) {
         X.push(x);
         Y.push(y);
