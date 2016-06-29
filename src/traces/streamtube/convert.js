@@ -284,14 +284,14 @@ proto.update = function(data) {
         this.textMarkers.dispose();
         this.textMarkers = null;
     }
-
+debugger
     var meshOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.connectionradius, options.lineColor, options.scatterSize, options.scatterColor, this.scene.dataScale);
-    if(this.delaunayMesh) {
-        this.delaunayMesh.update(meshOptions);
+    if(this.streamTubeMesh) {
+        this.streamTubeMesh.update(meshOptions);
     } else {
         meshOptions.gl = gl;
-        this.delaunayMesh = createMesh(meshOptions);
-        this.scene.glplot.add(this.delaunayMesh);
+        this.streamTubeMesh = createMesh(meshOptions);
+        this.scene.glplot.add(this.streamTubeMesh);
     }
 
 };
@@ -318,6 +318,10 @@ function createLineWithMarkers(scene, data) {
 }
 
 function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC, scalingFactor) {
+
+    var sx = scalingFactor[0];
+    var sy = scalingFactor[1];
+    var sz = scalingFactor[2];
 
     function addVertex(X, Y, Z, x, y, z) {
         X.push(x);
@@ -748,9 +752,9 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
         var mk = geom.k;
 
         for(v = 0; v < mx.length; v++) {
-            X.push(x + mx[v] * r);
-            Y.push(y + my[v] * r);
-            Z.push(z + mz[v] * r);
+            X.push(x + mx[v] * r / sx);
+            Y.push(y + my[v] * r / sy);
+            Z.push(z + mz[v] * r / sz);
         }
 
         for(p = 0; p < mi.length; p++) {
@@ -798,7 +802,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
     var n, r, r2, c, c1, c2;
 
-    var scaler = 0.01; // fixme figure out something for sensibly calculating dimensions
+    var scaler = 0.0018; // fixme figure out something for sensibly calculating dimensions
 
     var p = {
         x: inputX,
@@ -879,7 +883,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
     var F = [];
 
     for(n = 0; n < rp.x.length - 1; n++) {
-        index = addLine(cylinderModels[n], index, X, Y, Z, I, J, K, F);
+        //index = addLine(cylinderModels[n], index, X, Y, Z, I, J, K, F);
     }
 
     for(n = 0; n < p.x.length; n++) {
@@ -888,9 +892,9 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
     return {
         positions: X.map(function(d, i) {return [
-            X[i] * scalingFactor[0],
-            Y[i] * scalingFactor[1],
-            Z[i] * scalingFactor[2]
+            X[i] * sx,
+            Y[i] * sy,
+            Z[i] * sz
         ];}),
         cells: I.map(function(d, i) {return [I[i], J[i], K[i]];}),
         cellColors: F,
