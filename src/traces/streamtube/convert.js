@@ -285,7 +285,7 @@ proto.update = function(data) {
         this.textMarkers = null;
     }
 
-    var meshOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.connectionradius, options.lineColor, options.scatterSize, options.scatterColor, this.scene.dataScale);
+    var meshOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.connectionradius, options.lineColor, options.scatterSize, options.scatterColor, this.scene.dataScale, this.scene.glplot.aspect);
     if(this.streamTubeMesh) {
         this.streamTubeMesh.update(meshOptions);
     } else {
@@ -317,11 +317,17 @@ function createLineWithMarkers(scene, data) {
     return plot;
 }
 
-function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC, scalingFactor) {
+function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC, scalingFactor, aspect) {
 
     var sx = scalingFactor[0];
     var sy = scalingFactor[1];
     var sz = scalingFactor[2];
+
+    aspect = [1.5420216697275806, 1.5420216697275806, 0.4205513644711584];
+
+    var ax = aspect[0];
+    var ay = aspect[1];
+    var az = aspect[2];
 
     function addVertex(X, Y, Z, x, y, z) {
         X.push(x);
@@ -890,7 +896,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
     var F = [];
 
     for(n = 0; n < rp.x.length - 1; n++) {
-        index = addLine(cylinderModels[n], index, X, Y, Z, I, J, K, F);
+        // index = addLine(cylinderModels[n], index, X, Y, Z, I, J, K, F);
     }
 
     for(n = 0; n < p.x.length; n++) {
