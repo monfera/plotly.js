@@ -284,7 +284,7 @@ proto.update = function(data) {
         this.textMarkers.dispose();
         this.textMarkers = null;
     }
-debugger
+
     var meshOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.connectionradius, options.lineColor, options.scatterSize, options.scatterColor, this.scene.dataScale);
     if(this.streamTubeMesh) {
         this.streamTubeMesh.update(meshOptions);
@@ -431,6 +431,13 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
     function cylinderMaker(r1, r2, x1, x2, y1, y2, z1, z2, f1, f2, continuable) {
 
+        x1 *= sx;
+        x2 *= sx;
+        y1 *= sy;
+        y2 *= sy;
+        z1 *= sz;
+        z2 *= sz;
+
         var uu = x2 - x1;
         var vv = y2 - y1;
         var ww = z2 - z1;
@@ -510,7 +517,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
                 yy = yyb + yyc * ca + yys * sa;
                 zz = zzb + zzc * ca + zzs * sa;
 
-                av(xx + x1, yy + y1, zz + z1); // with translation
+                av((xx + x1) / sx, (yy + y1) / sy, (zz + z1) / sz); // with translation
             }
 
         length = Math.sqrt(x * x + y * y + z * z) / r2; // renormalize it for the other circle
@@ -539,7 +546,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
             yy = yyb + yyc * ca + yys * sa;
             zz = zzb + zzc * ca + zzs * sa;
 
-            av(xx + uu + x1, yy + vv + y1, zz + ww + z1); // with translation
+            av((xx + uu + x1) / sx, (yy + vv + y1) / sy, (zz + ww + z1) / sz); // with translation
         }
 
         for(q = 0; q < quadCount; q++) {
@@ -883,7 +890,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
     var F = [];
 
     for(n = 0; n < rp.x.length - 1; n++) {
-        //index = addLine(cylinderModels[n], index, X, Y, Z, I, J, K, F);
+        index = addLine(cylinderModels[n], index, X, Y, Z, I, J, K, F);
     }
 
     for(n = 0; n < p.x.length; n++) {
