@@ -245,6 +245,7 @@ proto.update = function(data) {
     };
 
     if(this.mode.indexOf('markers') !== -1) {
+
         if(this.scatterPlot) this.scatterPlot.update(scatterOptions);
         else {
             this.scatterPlot = createScatterPlot(scatterOptions);
