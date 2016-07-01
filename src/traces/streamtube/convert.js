@@ -136,8 +136,7 @@ function convertPlotlyOptions(scene, data) {
 
     if('line' in data) {
         params.lineColor = formatColor(line, 1, len);
-        params.lineWidth = line.width;
-        params.connectionradius = line.connectionradius;
+        params.connectiondiameter = line.connectiondiameter;
     }
 
     if('marker' in data) {
@@ -145,11 +144,14 @@ function convertPlotlyOptions(scene, data) {
 
         params.scatterColor = formatColor(marker, 1, len);
         params.scatterSize = formatParam(marker.size, len, calculateSize, 20, sizeFn);
+        if(!Array.isArray(marker.size)) {
+            params.scatterSize *= 0.5; // for some reason, above formatParam divides by two only if it's an array
+        }
         params.scatterAngle = 0;
     }
 
     if('textposition' in data) {
-        params.textOffset = calculateTextOffset(data.textposition, 1.5 * Math.pow(scene.dataScale[0] * scene.dataScale[1] * scene.dataScale[2], 0.5) * (Array.isArray(data.marker.size) ? Math.max.apply(Math, data.marker.size) : data.marker.size));
+        params.textOffset = calculateTextOffset(data.textposition, 2 * (Array.isArray(data.marker.size) ? Math.max.apply(Math, data.marker.size) : data.marker.size));
         params.textColor = formatColor(data.textfont, 1, len);
         params.textSize = formatParam(data.textfont.size, len, Lib.identity, 12);
         params.textFont = data.textfont.family;  // arrayOk === false
@@ -242,7 +244,7 @@ proto.update = function(data) {
         projectOpacity: options.projectOpacity
     };
 
-    if(this.mode.indexOf('markers-FIXME') !== -1) {
+    if(this.mode.indexOf('markers') !== -1) {
         if(this.scatterPlot) this.scatterPlot.update(scatterOptions);
         else {
             this.scatterPlot = createScatterPlot(scatterOptions);
@@ -284,8 +286,8 @@ proto.update = function(data) {
         this.textMarkers.dispose();
         this.textMarkers = null;
     }
-debugger
-    var meshOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.connectionradius, options.lineColor, options.scatterSize, options.scatterColor, this.data.sizingaxis, this.scene.dataScale, this.scene.glplot.aspect);
+
+    var meshOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.connectiondiameter, options.lineColor, options.scatterSize, options.scatterColor, this.data.sizingaxis, this.scene.dataScale, this.scene.glplot.aspect);
     if(this.streamTubeMesh) {
         this.streamTubeMesh.update(meshOptions);
     } else {
@@ -884,7 +886,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
         r2 = rp.r[point2];
         c2 = rp.c[point2];
 
-        cylinderModels.push(cylinderMaker(r, r2, x, x2, y, y2, z, z2, c, c2, n > 0));
+        cylinderModels.push(cylinderMaker(scaler / 2 * r, scaler / 2 * r2, x, x2, y, y2, z, z2, c, c2, n > 0));
     }
 
     var X = [];
@@ -896,7 +898,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
     var F = [];
 
     for(n = 0; n < rp.x.length - 1; n++) {
-        // index = addLine(cylinderModels[n], index, X, Y, Z, I, J, K, F);
+        index = addLine(cylinderModels[n], index, X, Y, Z, I, J, K, F);
     }
 
     for(n = 0; n < p.x.length; n++) {

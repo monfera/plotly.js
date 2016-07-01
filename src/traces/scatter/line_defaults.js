@@ -16,6 +16,7 @@ var basicLineDefaults = require('./basic_line_defaults');
 module.exports = function lineDefaults(traceIn, traceOut, defaultColor, layout, coerce) {
 
     basicLineDefaults(traceIn, traceOut, defaultColor, layout, coerce);
-
+    
+    coerce('line.width');
     coerce('line.dash');
 };

@@ -91,8 +91,7 @@ module.exports = {
     },
     connectgaps: scatterAttrs.connectgaps,
     line: extendFlat({}, {
-        width: scatterLineAttrs.width,
-        connectionradius: extendFlat({}, scatterMarkerAttrs.size, {
+        connectiondiameter: extendFlat({}, scatterMarkerAttrs.size, {
             dflt: 1,
             description: 'Sets the radius of the line connection. Either a number, or an array with as many elements as the number of points.'
         }),
