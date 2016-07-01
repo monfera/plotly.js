@@ -33,6 +33,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     coerce('text');
     coerce('mode');
+    coerce('sizingaxis');
 
     if(subTypes.hasLines(traceOut)) {
         coerce('connectgaps');

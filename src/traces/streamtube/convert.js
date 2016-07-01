@@ -73,7 +73,7 @@ function calculateTextOffset(tp, offsetValue) {
 
 function calculateSize(sizeIn, sizeFn) {
     // parity with scatter3d markers
-    return sizeFn(sizeIn * 4);
+    return sizeFn(sizeIn);
 }
 
 function formatParam(paramIn, len, calculate, dflt, extraFn) {
@@ -149,7 +149,7 @@ function convertPlotlyOptions(scene, data) {
     }
 
     if('textposition' in data) {
-        params.textOffset = calculateTextOffset(data.textposition, 1.5 * Math.pow(scene.dataScale[0] * scene.dataScale[1] * scene.dataScale[2], 0.5) * Math.max.apply(Math, data.marker.size));  // arrayOk === false
+        params.textOffset = calculateTextOffset(data.textposition, 1.5 * Math.pow(scene.dataScale[0] * scene.dataScale[1] * scene.dataScale[2], 0.5) * (Array.isArray(data.marker.size) ? Math.max.apply(Math, data.marker.size) : data.marker.size));
         params.textColor = formatColor(data.textfont, 1, len);
         params.textSize = formatParam(data.textfont.size, len, Lib.identity, 12);
         params.textFont = data.textfont.family;  // arrayOk === false
@@ -284,8 +284,8 @@ proto.update = function(data) {
         this.textMarkers.dispose();
         this.textMarkers = null;
     }
-
-    var meshOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.connectionradius, options.lineColor, options.scatterSize, options.scatterColor, this.scene.dataScale, this.scene.glplot.aspect);
+debugger
+    var meshOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.connectionradius, options.lineColor, options.scatterSize, options.scatterColor, this.data.sizingaxis, this.scene.dataScale, this.scene.glplot.aspect);
     if(this.streamTubeMesh) {
         this.streamTubeMesh.update(meshOptions);
     } else {
@@ -317,7 +317,7 @@ function createLineWithMarkers(scene, data) {
     return plot;
 }
 
-function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC, scalingFactor, aspect) {
+function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC, sizingaxis, scalingFactor, aspect) {
 
     var sx = scalingFactor[0];
     var sy = scalingFactor[1];
@@ -815,7 +815,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
     var n, r, r2, c, c1, c2;
 
-    var scaler = 0.0018; // fixme figure out something for sensibly calculating dimensions
+    var scaler = [sx, sy, sz][sizingaxis];
 
     var p = {
         x: inputX,
@@ -900,7 +900,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
     }
 
     for(n = 0; n < p.x.length; n++) {
-        index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], inputMC[n], scaler / 2 * (Array.isArray(inputMW) ? inputMW[n] : inputMW), index, X, Y, Z, I, J, K, F);
+        index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], inputMC[n], scaler * (Array.isArray(inputMW) ? inputMW[n] : inputMW), index, X, Y, Z, I, J, K, F);
     }
 
     return {
@@ -911,7 +911,6 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
         ];}),
         cells: I.map(function(d, i) {return [I[i], J[i], K[i]];}),
         cellColors: F,
- //       meshColor: [0.12156862745098039,0.4666666666666667,0.9058823529411765,1],
         opacity: 1,
         lightPosition: [1e6 * scalingFactor[0], 1e6 * scalingFactor[1], 1e6 * scalingFactor[2]],
         ambient: 0.2,
