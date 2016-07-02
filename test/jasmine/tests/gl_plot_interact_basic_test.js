@@ -74,7 +74,8 @@ describe('gl3d plots', function() {
         //var mock = require('@mocks/gl3d_errorbars_sqrt.json')
         //var mock = require('@mocks/gl3d_scatter3d-with-delaunay.json')
         //var mock = require('@mocks/gl3d_streamtubes_basic.json')
-        var mock = require('@mocks/gl3d_streamtubes_closed.json')
+        //var mock = require('@mocks/gl3d_streamtubes_closed.json')
+        var mock = require('@mocks/gl3d_streamtubes_aspectmode_manual.json')
         //var mock = require('@mocks/gl3d_projection-traces.json')
 
 

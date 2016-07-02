@@ -288,7 +288,7 @@ proto.update = function(data) {
         this.textMarkers = null;
     }
 
-    var meshOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.connectiondiameter, options.lineColor, options.scatterSize, options.scatterColor, this.data.sizingaxis, this.scene.dataScale, this.scene.glplot.aspect);
+    var meshOptions = calculateMesh(this.data.x, this.data.y, this.data.z, options.connectiondiameter, options.lineColor, options.scatterSize, options.scatterColor, this.data.sizingaxis, this.scene.dataScale, this.scene.glplotLayout.aspectratio);
     if(this.streamTubeMesh) {
         this.streamTubeMesh.update(meshOptions);
     } else {
@@ -725,9 +725,9 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
         var mk = geom.k;
 
         for(v = 0; v < mx.length; v++) {
-            X.push(x + mx[v] * r / sx);
-            Y.push(y + my[v] * r / sy);
-            Z.push(z + mz[v] * r / sz);
+            X.push(x + mx[v] * r / sx * aspect.x);
+            Y.push(y + my[v] * r / sy * aspect.y);
+            Z.push(z + mz[v] * r / sz * aspect.z);
         }
 
         for(p = 0; p < mi.length; p++) {
@@ -754,9 +754,9 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
         for(v = 0; v < mx.length; v++) {
 
-            X.push(mx[v]);
-            Y.push(my[v]);
-            Z.push(mz[v]);
+            X.push(mx[v] * aspect.x);
+            Y.push(my[v] * aspect.y);
+            Z.push(mz[v] * aspect.z);
         }
 
         for(p = 0; p < mi.length; p++) {
@@ -864,7 +864,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
             index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], inputMC[n], scaler * (Array.isArray(inputMW) ? inputMW[n] : inputMW), index, X, Y, Z, I, J, K, F);
         }
     }
-    
+
     return {
         positions: X.map(function(d, i) {return [
             X[i] * sx,
