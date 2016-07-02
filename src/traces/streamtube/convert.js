@@ -859,10 +859,12 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
         index = addLine(cylinderModels[n], index, X, Y, Z, I, J, K, F);
     }
 
-    for(n = 0; n < p.x.length; n++) {
-        index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], inputMC[n], scaler * (Array.isArray(inputMW) ? inputMW[n] : inputMW), index, X, Y, Z, I, J, K, F);
+    if(inputMC && inputMW) {
+        for (n = 0; n < p.x.length; n++) {
+            index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], inputMC[n], scaler * (Array.isArray(inputMW) ? inputMW[n] : inputMW), index, X, Y, Z, I, J, K, F);
+        }
     }
-
+    
     return {
         positions: X.map(function(d, i) {return [
             X[i] * sx,
