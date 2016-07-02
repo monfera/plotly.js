@@ -320,6 +320,37 @@ function createLineWithMarkers(scene, data) {
     return plot;
 }
 
+function rotate1(xIn, yIn, zIn, rIn, uIn, vIn, wIn, aIn) {
+
+    var length = Math.sqrt(xIn * xIn + yIn * yIn + zIn * zIn) / rIn;
+
+    var x = xIn / length;
+    var y = yIn / length;
+    var z = zIn / length;
+
+    var xxb = uIn * (uIn * x + vIn * y + wIn * z);
+    var yyb = vIn * (uIn * x + vIn * y + wIn * z);
+    var zzb = wIn * (uIn * x + vIn * y + wIn * z);
+
+    var xxc = x * (vIn * vIn + wIn * wIn) - uIn * (vIn * y + wIn * z);
+    var yyc = y * (uIn * uIn + wIn * wIn) - vIn * (uIn * x + wIn * z);
+    var zzc = z * (uIn * uIn + vIn * vIn) - wIn * (uIn * x + vIn * y);
+
+    var xxs = vIn * z - wIn * y;
+    var yys = wIn * x - uIn * z;
+    var zzs = uIn * y - vIn * x;
+
+    var sa = Math.sin(aIn);
+    var ca = Math.cos(aIn);
+
+    var xx = xxb + xxc * ca + xxs * sa;
+    var yy = yyb + yyc * ca + yys * sa;
+    var zz = zzb + zzc * ca + zzs * sa;
+
+    return([xx, yy, zz]);
+}
+
+
 function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC, sizingaxis, scalingFactor, aspect) {
 
     var sx = scalingFactor[0];
@@ -422,15 +453,12 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
     var quadCount = 36;
 
-    var sinVector = [];
-    var cosVector = [];
-    for(var q = 0; q < quadCount; q++) {
-        var a = q * Math.PI * 2 / quadCount;
-        sinVector.push(Math.sin(a));
-        cosVector.push(Math.cos(a));
-    }
+    function rotate(x, y, z, r, u, v, w, vertices) {
 
-    var lastGymbal = null;
+        for (var q = 0; q < quadCount; q++) {
+            vertices.push(rotate1(x, y, z, r, u, v, w, q * Math.PI * 2 / quadCount));
+        }
+    }
 
     function cylinderMaker(r1, r2, x1, x2, y1, y2, z1, z2, f1, f2, continuable) {
 
@@ -477,41 +505,6 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
         var w = ww / length;
 
         x = -1; y = -1; z = (u + v) / w;
-
-        var xxb, yyb, zzb, xxc, yyc, zzc, xxs, yys, zzs;
-
-        function rotate(x, y, z, r1, u, v, w, vertices) {
-
-            length = Math.sqrt(x * x + y * y + z * z) / r1;
-            x /= length;
-            y /= length;
-            z /= length;
-
-            xxb = u * (u * x + v * y + w * z);
-            yyb = v * (u * x + v * y + w * z);
-            zzb = w * (u * x + v * y + w * z);
-
-            xxc = x * (v * v + w * w) - u * (v * y + w * z);
-            yyc = y * (u * u + w * w) - v * (u * x + w * z);
-            zzc = z * (u * u + v * v) - w * (u * x + v * y);
-
-            xxs = v * z - w * y;
-            yys = w * x - u * z;
-            zzs = u * y - v * x;
-
-            for (q = 0; q < quadCount; q++) {
-
-                sa = sinVector[q];
-                ca = cosVector[q];
-
-                xx = xxb + xxc * ca + xxs * sa;
-                yy = yyb + yyc * ca + yys * sa;
-                zz = zzb + zzc * ca + zzs * sa;
-
-                vertices.push([xx, yy, zz]); // with translation
-            }
-
-        }
 
         if(!cont) {
             rotate(x, y, z, r1, u, v, w, vertices1);
