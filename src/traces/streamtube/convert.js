@@ -320,7 +320,7 @@ function createLineWithMarkers(scene, data) {
     return plot;
 }
 
-function rotate1(rIn, uuIn, vvIn, wwIn, aIn) {
+function rotate1(uuIn, vvIn, wwIn, aIn) {
 
     var length = Math.sqrt(uuIn * uuIn + vvIn * vvIn + wwIn * wwIn);
 
@@ -332,7 +332,7 @@ function rotate1(rIn, uuIn, vvIn, wwIn, aIn) {
     var yIn = -1;
     var zIn = (uIn + vIn) / wIn;
 
-    var length2 = Math.sqrt(xIn * xIn + yIn * yIn + zIn * zIn) / rIn;
+    var length2 = Math.sqrt(xIn * xIn + yIn * yIn + zIn * zIn);
 
     var x = xIn / length2;
     var y = yIn / length2;
@@ -466,7 +466,8 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
     function rotate(r, uu, vv, ww, vertices) {
 
         for (var q = 0; q < quadCount; q++) {
-            vertices.push(rotate1(r, uu, vv, ww, q * Math.PI * 2 / quadCount));
+            var v = rotate1(uu, vv, ww, q * Math.PI * 2 / quadCount)
+            vertices.push([r * v[0], r * v[1], r * v[2]]);
         }
     }
 
