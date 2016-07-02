@@ -441,10 +441,6 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
         z1 *= sz;
         z2 *= sz;
 
-        var uu = x2 - x1;
-        var vv = y2 - y1;
-        var ww = z2 - z1;
-
         var X = [];
         var Y = [];
         var Z = [];
@@ -461,33 +457,24 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
         var x, y, z, xx, yy, zz;
 
+
+        /**
+         *         Matrix based rotation
+         */
+
+        var uu = x2 - x1;
+        var vv = y2 - y1;
+        var ww = z2 - z1;
+
         var length = Math.sqrt(uu * uu + vv * vv + ww * ww);
 
         var u = uu / length;
         var v = vv / length;
         var w = ww / length;
 
-        // Gymbaling (switch to quaternion based solution when time permits)
-        var sameGymbal;
-        var epsilon = 1e-9;
-        if(Math.abs(w) > epsilon) {
-            x = -1; y = -1; z = (u + v) / w;
-            sameGymbal = lastGymbal === 1;
-            lastGymbal = 1;
-        } else if(Math.abs(v) > epsilon) {
-            x = -1; y = (u + w) / v; z = -1;
-            sameGymbal = lastGymbal === 2;
-            lastGymbal = 2;
-        } else if(Math.abs(u) > epsilon) {
-            x = (v + w) / u; y = -1; z = -1;
-            sameGymbal = lastGymbal === 3;
-            lastGymbal = 3;
-        } else {
-            x = 1; y = 0; z = 0;
-            sameGymbal = lastGymbal === 3;
-            lastGymbal = 3;
-        }
-        var cont = continuable && sameGymbal;
+        x = -1; y = -1; z = (u + v) / w;
+
+        var cont = continuable;
 
         var xxb, yyb, zzb, xxc, yyc, zzc, xxs, yys, zzs;
 
@@ -551,6 +538,10 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
             av((xx + uu + x1) / sx, (yy + vv + y1) / sy, (zz + ww + z1) / sz); // with translation
         }
+
+        /**
+         * Rotation ends
+         */
 
         for(q = 0; q < quadCount; q++) {
 
