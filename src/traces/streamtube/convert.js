@@ -322,12 +322,11 @@ function createLineWithMarkers(scene, data) {
 
 function rotate1(uuIn, vvIn, wwIn, aIn) {
 
-    var length = Math.sqrt(uuIn * uuIn + vvIn * vvIn + wwIn * wwIn);
+    var uIn = uuIn;
+    var vIn = vvIn;
+    var wIn = wwIn;
 
-    var uIn = uuIn / length;
-    var vIn = vvIn / length;
-    var wIn = wwIn / length;
-
+    // arbitrary normal vector (except in the degenerate case: [-1, -1, Infinity])
     var xIn = -1;
     var yIn = -1;
     var zIn = (uIn + vIn) / wIn;
@@ -465,8 +464,10 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
     function rotate(r, uu, vv, ww, vertices) {
 
+        var len = Math.sqrt(uu * uu + vv * vv + ww * ww);
+
         for (var q = 0; q < quadCount; q++) {
-            var v = rotate1(uu, vv, ww, q * Math.PI * 2 / quadCount)
+            var v = rotate1(uu / len, vv / len, ww / len, q * Math.PI * 2 / quadCount)
             vertices.push([r * v[0], r * v[1], r * v[2]]);
         }
     }
