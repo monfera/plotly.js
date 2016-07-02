@@ -326,12 +326,6 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
     var sy = scalingFactor[1];
     var sz = scalingFactor[2];
 
-    aspect = [1.5420216697275806, 1.5420216697275806, 0.4205513644711584];
-
-    var ax = aspect[0];
-    var ay = aspect[1];
-    var az = aspect[2];
-
     function addVertex(X, Y, Z, x, y, z) {
         X.push(x);
         Y.push(y);
