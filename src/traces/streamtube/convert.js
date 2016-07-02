@@ -450,9 +450,9 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
         var K = [];
         var F = [];
 
-        var vertices = [];
+        var vertices1 = [];
+        var vertices2 = [];
 
-        var av = addVertex.bind(null, X, Y, Z);
         var af = addFace.bind(null, I, J, K, F);
 
         var q, vert, sa, ca;
@@ -479,8 +479,8 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
         x = -1; y = -1; z = (u + v) / w;
 
         var xxb, yyb, zzb, xxc, yyc, zzc, xxs, yys, zzs;
-        
-        if(!cont) {
+
+        function rotate(x, y, z, r1, u, v, w, vertices) {
 
             length = Math.sqrt(x * x + y * y + z * z) / r1;
             x /= length;
@@ -513,41 +513,24 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
         }
 
-        length = Math.sqrt(x * x + y * y + z * z) / r2; // renormalize it for the other circle
-        x /= length;
-        y /= length;
-        z /= length;
-
-        xxb = u * (u * x + v * y + w * z);
-        yyb = v * (u * x + v * y + w * z);
-        zzb = w * (u * x + v * y + w * z);
-
-        xxc = x * (v * v + w * w) - u * (v * y + w * z);
-        yyc = y * (u * u + w * w) - v * (u * x + w * z);
-        zzc = z * (u * u + v * v) - w * (u * x + v * y);
-
-        xxs = v * z - w * y;
-        yys = w * x - u * z;
-        zzs = u * y - v * x;
-
-        for(q = 0; q < quadCount; q++) {
-
-            sa = sinVector[q];
-            ca = cosVector[q];
-
-            xx = xxb + xxc * ca + xxs * sa;
-            yy = yyb + yyc * ca + yys * sa;
-            zz = zzb + zzc * ca + zzs * sa;
-
-            vertices.push([xx + uu, yy + vv, zz + ww]); // with translation
+        if(!cont) {
+            rotate(x, y, z, r1, u, v, w, vertices1);
         }
+
+        rotate(x, y, z, r2, u, v, w, vertices2);
+
 
         /**
          * Rotation ends
          */
 
-        for(q = 0; q < vertices.length; q++) {
-            addVertex(X, Y, Z, (vertices[q][0] + x1) / sx, (vertices[q][1] + y1) / sy, (vertices[q][2] + z1) / sz);
+
+        for(q = 0; q < vertices1.length; q++) {
+            addVertex(X, Y, Z, (vertices1[q][0] + x1) / sx, (vertices1[q][1] + y1) / sy, (vertices1[q][2] + z1) / sz);
+        }
+
+        for(q = 0; q < vertices2.length; q++) {
+            addVertex(X, Y, Z, (vertices2[q][0] + x1 + uu) / sx, (vertices2[q][1] + y1 + vv) / sy, (vertices2[q][2] + z1 + ww) / sz);
         }
 
         var o = cont ? -quadCount : 0; // offset for possible welding (cont == true)
