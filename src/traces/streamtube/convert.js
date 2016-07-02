@@ -450,12 +450,16 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
         var K = [];
         var F = [];
 
+        var vertices = [];
+
         var av = addVertex.bind(null, X, Y, Z);
         var af = addFace.bind(null, I, J, K, F);
 
         var q, vert, sa, ca;
 
         var x, y, z, xx, yy, zz;
+
+        var cont = continuable;
 
 
         /**
@@ -474,31 +478,28 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
         x = -1; y = -1; z = (u + v) / w;
 
-        var cont = continuable;
-
         var xxb, yyb, zzb, xxc, yyc, zzc, xxs, yys, zzs;
+        
+        if(!cont) {
 
-        length = Math.sqrt(x * x + y * y + z * z) / r1;
-        x /= length;
-        y /= length;
-        z /= length;
+            length = Math.sqrt(x * x + y * y + z * z) / r1;
+            x /= length;
+            y /= length;
+            z /= length;
 
-        xxb = u * (u * x + v * y + w * z);
-        yyb = v * (u * x + v * y + w * z);
-        zzb = w * (u * x + v * y + w * z);
+            xxb = u * (u * x + v * y + w * z);
+            yyb = v * (u * x + v * y + w * z);
+            zzb = w * (u * x + v * y + w * z);
 
-        xxc = x * (v * v + w * w) - u * (v * y + w * z);
-        yyc = y * (u * u + w * w) - v * (u * x + w * z);
-        zzc = z * (u * u + v * v) - w * (u * x + v * y);
+            xxc = x * (v * v + w * w) - u * (v * y + w * z);
+            yyc = y * (u * u + w * w) - v * (u * x + w * z);
+            zzc = z * (u * u + v * v) - w * (u * x + v * y);
 
-        xxs = v * z - w * y;
-        yys = w * x - u * z;
-        zzs = u * y - v * x;
+            xxs = v * z - w * y;
+            yys = w * x - u * z;
+            zzs = u * y - v * x;
 
-        var o = cont ? -quadCount : 0; // offset for possible welding (cont == true)
-
-        if(!cont)
-            for(q = 0; q < quadCount; q++) {
+            for (q = 0; q < quadCount; q++) {
 
                 sa = sinVector[q];
                 ca = cosVector[q];
@@ -507,8 +508,10 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
                 yy = yyb + yyc * ca + yys * sa;
                 zz = zzb + zzc * ca + zzs * sa;
 
-                av((xx + x1) / sx, (yy + y1) / sy, (zz + z1) / sz); // with translation
+                vertices.push([xx, yy, zz]); // with translation
             }
+
+        }
 
         length = Math.sqrt(x * x + y * y + z * z) / r2; // renormalize it for the other circle
         x /= length;
@@ -536,12 +539,18 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
             yy = yyb + yyc * ca + yys * sa;
             zz = zzb + zzc * ca + zzs * sa;
 
-            av((xx + uu + x1) / sx, (yy + vv + y1) / sy, (zz + ww + z1) / sz); // with translation
+            vertices.push([xx + uu, yy + vv, zz + ww]); // with translation
         }
 
         /**
          * Rotation ends
          */
+
+        for(q = 0; q < vertices.length; q++) {
+            addVertex(X, Y, Z, (vertices[q][0] + x1) / sx, (vertices[q][1] + y1) / sy, (vertices[q][2] + z1) / sz);
+        }
+
+        var o = cont ? -quadCount : 0; // offset for possible welding (cont == true)
 
         for(q = 0; q < quadCount; q++) {
 
