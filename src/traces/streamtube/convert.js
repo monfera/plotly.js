@@ -467,27 +467,9 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
         var v = vv / length;
         var w = ww / length;
 
-        // Gymbaling (switch to quaternion based solution when time permits)
-        var sameGymbal;
-        var epsilon = 1e-9;
-        if(Math.abs(w) > epsilon) {
-            x = -1; y = -1; z = (u + v) / w;
-            sameGymbal = lastGymbal === 1;
-            lastGymbal = 1;
-        } else if(Math.abs(v) > epsilon) {
-            x = -1; y = (u + w) / v; z = -1;
-            sameGymbal = lastGymbal === 2;
-            lastGymbal = 2;
-        } else if(Math.abs(u) > epsilon) {
-            x = (v + w) / u; y = -1; z = -1;
-            sameGymbal = lastGymbal === 3;
-            lastGymbal = 3;
-        } else {
-            x = 1; y = 0; z = 0;
-            sameGymbal = lastGymbal === 3;
-            lastGymbal = 3;
-        }
-        var cont = continuable && sameGymbal;
+        x = - w; y = - w; z = u + v;
+
+        var cont = continuable;
 
         var xxb, yyb, zzb, xxc, yyc, zzc, xxs, yys, zzs;
 
