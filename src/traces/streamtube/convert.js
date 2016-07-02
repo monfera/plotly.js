@@ -473,27 +473,26 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
         var xxb, yyb, zzb, xxc, yyc, zzc, xxs, yys, zzs;
 
-        length = Math.sqrt(x * x + y * y + z * z) / r1;
-        x /= length;
-        y /= length;
-        z /= length;
+        if(!cont) {
 
-        xxb = u * (u * x + v * y + w * z);
-        yyb = v * (u * x + v * y + w * z);
-        zzb = w * (u * x + v * y + w * z);
+            length = Math.sqrt(x * x + y * y + z * z) / r1;
+            x /= length;
+            y /= length;
+            z /= length;
 
-        xxc = x * (v * v + w * w) - u * (v * y + w * z);
-        yyc = y * (u * u + w * w) - v * (u * x + w * z);
-        zzc = z * (u * u + v * v) - w * (u * x + v * y);
+            xxb = u * (u * x + v * y + w * z);
+            yyb = v * (u * x + v * y + w * z);
+            zzb = w * (u * x + v * y + w * z);
 
-        xxs = v * z - w * y;
-        yys = w * x - u * z;
-        zzs = u * y - v * x;
+            xxc = x * (v * v + w * w) - u * (v * y + w * z);
+            yyc = y * (u * u + w * w) - v * (u * x + w * z);
+            zzc = z * (u * u + v * v) - w * (u * x + v * y);
 
-        var o = cont ? -quadCount : 0; // offset for possible welding (cont == true)
+            xxs = v * z - w * y;
+            yys = w * x - u * z;
+            zzs = u * y - v * x;
 
-        if(!cont)
-            for(q = 0; q < quadCount; q++) {
+            for (q = 0; q < quadCount; q++) {
 
                 sa = sinVector[q];
                 ca = cosVector[q];
@@ -504,6 +503,8 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
                 av((xx + x1) / sx, (yy + y1) / sy, (zz + z1) / sz); // with translation
             }
+
+        }
 
         length = Math.sqrt(x * x + y * y + z * z) / r2; // renormalize it for the other circle
         x /= length;
@@ -533,6 +534,8 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
             av((xx + uu + x1) / sx, (yy + vv + y1) / sy, (zz + ww + z1) / sz); // with translation
         }
+
+        var o = cont ? -quadCount : 0; // offset for possible welding (cont == true)
 
         for(q = 0; q < quadCount; q++) {
 
