@@ -327,33 +327,18 @@ function rotate1(u, v, w, a) {
     var yIn = -1;
     var zIn = (u + v) / w;
 
-    var length = Math.sqrt(xIn * xIn + yIn * yIn + zIn * zIn);
-
     // turn the normal vector to a unit normal vector
+    var length = Math.sqrt(xIn * xIn + yIn * yIn + zIn * zIn);
     var x = xIn / length;
     var y = yIn / length;
     var z = zIn / length;
 
-    var xxb = u * (u * x + v * y + w * z);
-    var yyb = v * (u * x + v * y + w * z);
-    var zzb = w * (u * x + v * y + w * z);
-
-    var xxc = x * (v * v + w * w) - u * (v * y + w * z);
-    var yyc = y * (u * u + w * w) - v * (u * x + w * z);
-    var zzc = z * (u * u + v * v) - w * (u * x + v * y);
-
-    var xxs = v * z - w * y;
-    var yys = w * x - u * z;
-    var zzs = u * y - v * x;
-
-    var sa = Math.sin(a);
-    var ca = Math.cos(a);
-
-    var xx = xxb + xxc * ca + xxs * sa;
-    var yy = yyb + yyc * ca + yys * sa;
-    var zz = zzb + zzc * ca + zzs * sa;
-
-    return([xx, yy, zz]);
+    // magic happens here  (matrix based)
+    return([
+        u * (u * x + v * y + w * z) + (x * (v * v + w * w) - u * (v * y + w * z)) * Math.cos(a) + (v * z - w * y) * Math.sin(a),
+        v * (u * x + v * y + w * z) + (y * (u * u + w * w) - v * (u * x + w * z)) * Math.cos(a) + (w * x - u * z) * Math.sin(a),
+        w * (u * x + v * y + w * z) + (z * (u * u + v * v) - w * (u * x + v * y)) * Math.cos(a) + (u * y - v * x) * Math.sin(a)
+    ]);
 }
 
 
@@ -462,10 +447,13 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
     function rotate(r, uu, vv, ww, vertices) {
 
         var len = Math.sqrt(uu * uu + vv * vv + ww * ww);
+        var u = uu / len;
+        var v = vv / len;
+        var w = ww / len;
 
         for (var q = 0; q < quadCount; q++) {
-            var v = rotate1(uu / len, vv / len, ww / len, q * Math.PI * 2 / quadCount)
-            vertices.push([r * v[0], r * v[1], r * v[2]]);
+            var vert = rotate1(u, v, w, q * Math.PI * 2 / quadCount)
+            vertices.push([r * vert[0], r * vert[1], r * vert[2]]);
         }
     }
 
@@ -492,9 +480,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
         var af = addFace.bind(null, I, J, K, F);
 
-        var q, vert, sa, ca;
-
-        var x, y, z, xx, yy, zz;
+        var q, vert;
 
         var cont = continuable;
 
