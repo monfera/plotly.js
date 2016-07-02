@@ -469,11 +469,12 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
         x = - w; y = - w; z = u + v;
 
-        var cont = continuable;
-
         var xxb, yyb, zzb, xxc, yyc, zzc, xxs, yys, zzs;
 
-        if(!cont) {
+        // While we could easily avoid variable capture and turn this into a pure function,
+        // it would involve the creation of intermediary data (lots of small array allocations)
+        // so this function, which pushes things in a large array, is kept this way.
+        function ncompute(r1, uu, vv, ww) {
 
             length = Math.sqrt(x * x + y * y + z * z) / r1;
             x /= length;
@@ -501,41 +502,18 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
                 yy = yyb + yyc * ca + yys * sa;
                 zz = zzb + zzc * ca + zzs * sa;
 
-                av((xx + x1) / sx, (yy + y1) / sy, (zz + z1) / sz); // with translation
+                av((xx + uu + x1) / sx, (yy + vv + y1) / sy, (zz + ww + z1) / sz); // with translation
             }
 
         }
 
-        length = Math.sqrt(x * x + y * y + z * z) / r2; // renormalize it for the other circle
-        x /= length;
-        y /= length;
-        z /= length;
-
-        xxb = u * (u * x + v * y + w * z);
-        yyb = v * (u * x + v * y + w * z);
-        zzb = w * (u * x + v * y + w * z);
-
-        xxc = x * (v * v + w * w) - u * (v * y + w * z);
-        yyc = y * (u * u + w * w) - v * (u * x + w * z);
-        zzc = z * (u * u + v * v) - w * (u * x + v * y);
-
-        xxs = v * z - w * y;
-        yys = w * x - u * z;
-        zzs = u * y - v * x;
-
-        for(q = 0; q < quadCount; q++) {
-
-            sa = sinVector[q];
-            ca = cosVector[q];
-
-            xx = xxb + xxc * ca + xxs * sa;
-            yy = yyb + yyc * ca + yys * sa;
-            zz = zzb + zzc * ca + zzs * sa;
-
-            av((xx + uu + x1) / sx, (yy + vv + y1) / sy, (zz + ww + z1) / sz); // with translation
+        if(!continuable) {
+            ncompute(r1, 0, 0, 0);
         }
 
-        var o = cont ? -quadCount : 0; // offset for possible welding (cont == true)
+        ncompute(r2, uu, vv, ww);
+
+        var o = continuable ? -quadCount : 0; // offset for possible welding (continue == true)
 
         for(q = 0; q < quadCount; q++) {
 
