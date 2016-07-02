@@ -320,37 +320,34 @@ function createLineWithMarkers(scene, data) {
     return plot;
 }
 
-function rotate1(uuIn, vvIn, wwIn, aIn) {
-
-    var uIn = uuIn;
-    var vIn = vvIn;
-    var wIn = wwIn;
+function rotate1(u, v, w, a) {
 
     // arbitrary normal vector (except in the degenerate case: [-1, -1, Infinity])
     var xIn = -1;
     var yIn = -1;
-    var zIn = (uIn + vIn) / wIn;
+    var zIn = (u + v) / w;
 
-    var length2 = Math.sqrt(xIn * xIn + yIn * yIn + zIn * zIn);
+    var length = Math.sqrt(xIn * xIn + yIn * yIn + zIn * zIn);
 
-    var x = xIn / length2;
-    var y = yIn / length2;
-    var z = zIn / length2;
+    // turn the normal vector to a unit normal vector
+    var x = xIn / length;
+    var y = yIn / length;
+    var z = zIn / length;
 
-    var xxb = uIn * (uIn * x + vIn * y + wIn * z);
-    var yyb = vIn * (uIn * x + vIn * y + wIn * z);
-    var zzb = wIn * (uIn * x + vIn * y + wIn * z);
+    var xxb = u * (u * x + v * y + w * z);
+    var yyb = v * (u * x + v * y + w * z);
+    var zzb = w * (u * x + v * y + w * z);
 
-    var xxc = x * (vIn * vIn + wIn * wIn) - uIn * (vIn * y + wIn * z);
-    var yyc = y * (uIn * uIn + wIn * wIn) - vIn * (uIn * x + wIn * z);
-    var zzc = z * (uIn * uIn + vIn * vIn) - wIn * (uIn * x + vIn * y);
+    var xxc = x * (v * v + w * w) - u * (v * y + w * z);
+    var yyc = y * (u * u + w * w) - v * (u * x + w * z);
+    var zzc = z * (u * u + v * v) - w * (u * x + v * y);
 
-    var xxs = vIn * z - wIn * y;
-    var yys = wIn * x - uIn * z;
-    var zzs = uIn * y - vIn * x;
+    var xxs = v * z - w * y;
+    var yys = w * x - u * z;
+    var zzs = u * y - v * x;
 
-    var sa = Math.sin(aIn);
-    var ca = Math.cos(aIn);
+    var sa = Math.sin(a);
+    var ca = Math.cos(a);
 
     var xx = xxb + xxc * ca + xxs * sa;
     var yy = yyb + yyc * ca + yys * sa;
