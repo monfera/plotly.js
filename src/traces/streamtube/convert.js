@@ -777,12 +777,18 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
     var scaler = [sx, sy, sz][sizingaxis];
 
+    var rArr = Array.isArray(inputW);
+    var cArr = Array.isArray(inputC[0]);
+
+    var mrArr = Array.isArray(inputMW);
+    var mcArr = Array.isArray(inputMC[0]);
+
     var p = {
         x: inputX,
         y: inputY,
         z: inputZ,
-        r: Array.isArray(inputW) ? inputW : inputX.map(function() {return inputW;}),
-        c: inputC
+        r: rArr ? inputW : null,
+        c: cArr ? inputC : null
     };
 
     var rp = {
@@ -811,10 +817,10 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
                 [p.x[n0], p.x[n1], p.x[n2], p.x[n3]],
                 [p.y[n0], p.y[n1], p.y[n2], p.y[n3]],
                 [p.z[n0], p.z[n1], p.z[n2], p.z[n3]],
-                [p.r[n0], p.r[n1], p.r[n2], p.r[n3]],
-                [p.c[n0][0], p.c[n1][0], p.c[n2][0], p.c[n3][0]],
-                [p.c[n0][1], p.c[n1][1], p.c[n2][1], p.c[n3][1]],
-                [p.c[n0][2], p.c[n1][2], p.c[n2][2], p.c[n3][2]],
+                rArr ? [p.r[n0], p.r[n1], p.r[n2], p.r[n3]] : [inputW, inputW, inputW, inputW],
+                cArr ? [p.c[n0][0], p.c[n1][0], p.c[n2][0], p.c[n3][0]] : [inputC[0], inputC[0], inputC[0], inputC[0]],
+                cArr ? [p.c[n0][1], p.c[n1][1], p.c[n2][1], p.c[n3][1]] : [inputC[1], inputC[1], inputC[1], inputC[1]],
+                cArr ? [p.c[n0][2], p.c[n1][2], p.c[n2][2], p.c[n3][2]] : [inputC[2], inputC[2], inputC[2], inputC[2]],
                 c1);
 
             rp.x.push(xyzrf[0]);
@@ -861,7 +867,7 @@ function calculateMesh(inputX, inputY, inputZ, inputW, inputC, inputMW, inputMC,
 
     if(inputMC && inputMW) {
         for (n = 0; n < p.x.length; n++) {
-            index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], inputMC[n], scaler * (Array.isArray(inputMW) ? inputMW[n] : inputMW), index, X, Y, Z, I, J, K, F);
+            index = addPointMarker(unitSphere, p.x[n], p.y[n], p.z[n], mcArr ? inputMC[n] : inputMC, scaler * (mrArr ? inputMW[n] : inputMW), index, X, Y, Z, I, J, K, F);
         }
     }
 
