@@ -12,7 +12,6 @@
 var Lib = require('../../lib');
 
 var handleXYDefaults = require('../scatter/xy_defaults');
-var handleMarkerDefaults = require('../scatter/marker_defaults');
 
 var attributes = require('./attributes');
 
@@ -28,6 +27,10 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     }
 
     coerce('text');
-
-    handleMarkerDefaults(traceIn, traceOut, defaultColor, layout, coerce);
+    coerce('marker.color', defaultColor);
+    coerce('marker.opacity'/*, isBubble ? 0.7 : 1*/);
+    coerce('marker.sizemin');
+    coerce('marker.sizemax');
+    coerce('marker.border.color', defaultColor);
+    coerce('marker.border.arearatio');
 };
