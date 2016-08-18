@@ -35,7 +35,7 @@ function Pointcloud(scene, uid) {
 
     this.pointcloudOptions = {
         positions: new Float32Array(0),
-        size: 12,
+        sizemin: 0.5,
         color: [0, 0, 0, 1],
         borderSize: 1,
         borderColor: [0, 0, 0, 1]
@@ -60,9 +60,7 @@ proto.handlePick = function(pickResult) {
         textLabel: Array.isArray(this.textLabels) ?
             this.textLabels[index] :
             this.textLabels,
-        color: Array.isArray(this.color) ?
-            this.color[index] :
-            this.color,
+        color: this.color,
         name: this.name,
         hoverinfo: this.hoverinfo
     };
@@ -121,7 +119,7 @@ proto.updateFast = function(options) {
     this.pointcloudOptions.positions = positions;
 
     var markerColor = str2RGBArray(options.marker.color),
-        borderColor = str2RGBArray(options.marker.line.color),
+        borderColor = str2RGBArray(options.marker.border.color),
         opacity = options.opacity * options.marker.opacity;
 
     markerColor[3] *= opacity;
@@ -130,9 +128,9 @@ proto.updateFast = function(options) {
     borderColor[3] *= opacity;
     this.pointcloudOptions.borderColor = borderColor;
 
-    markerSize = options.marker.size;
+    markerSize = options.marker.sizemin;
     this.pointcloudOptions.size = markerSize;
-    this.pointcloudOptions.borderSize = options.marker.line.width;
+    this.pointcloudOptions.borderSize = options.marker.border.arearatio;
 
     this.pointcloud.update(this.pointcloudOptions);
 
