@@ -13,11 +13,9 @@
  * (e.g. node-webkit) that do not implement Float32Array.prototype.slice
  */
 module.exports = function truncate(float32ArrayIn, len) {
-    if(Float32Array.slice === undefined) {
-        var float32ArrayOut = new Float32Array(len);
-        for(var i = 0; i < len; i++) float32ArrayOut[i] = float32ArrayIn[i];
-        return float32ArrayOut;
-    }
-
-    return float32ArrayIn.slice(0, len);
+    // for some reason, ES2015 Float32Array.prototype.slice takes 2x as long...
+    // therefore we aren't checking for its existence
+    var float32ArrayOut = new Float32Array(len);
+    for(var i = 0; i < len; i++) float32ArrayOut[i] = float32ArrayIn[i];
+    return float32ArrayOut;
 };
