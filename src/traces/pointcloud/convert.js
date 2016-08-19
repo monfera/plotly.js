@@ -9,10 +9,8 @@
 'use strict';
 
 var createpointcloud = require('gl-pointcloud2d');
-var isNumeric = require('fast-isnumeric');
 
 var str2RGBArray = require('../../lib/str2rgbarray');
-var truncate = require('../../lib/float32_truncate');
 var getTraceColor = require('../scatter/get_trace_color');
 
 var AXES = ['xaxis', 'yaxis'];
