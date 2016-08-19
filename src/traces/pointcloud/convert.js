@@ -30,11 +30,12 @@ function Pointcloud(scene, uid) {
     this.name = '';
     this.hoverinfo = 'all';
 
-    this.idToIndex = [];
+    this.idToIndex = new Int32Array(0);
     this.bounds = [0, 0, 0, 0];
 
     this.pointcloudOptions = {
         positions: new Float32Array(0),
+        idToIndex: this.idToIndex,
         sizemin: 0.5,
         color: [0, 0, 0, 1],
         borderSize: 1,
@@ -83,11 +84,9 @@ proto.updateFast = function(options) {
     var y = this.yData = this.pickYData = options.y;
 
     var len = x.length,
-        idToIndex = new Array(len),
+        idToIndex = new Int32Array(len),
         positions = new Float32Array(2 * len),
-        bounds = this.bounds,
-        pId = 0,
-        ptr = 0;
+        bounds = this.bounds;
 
     var xx, yy;
 
@@ -98,12 +97,12 @@ proto.updateFast = function(options) {
         yy = y[i];
 
         // check for isNaN is faster but doesn't skip over nulls
-        if(!isNumeric(xx) || !isNumeric(yy)) continue;
+        //if(!isNumeric(xx) || !isNumeric(yy)) continue;
 
-        idToIndex[pId++] = i;
+        idToIndex[i] = i;
 
-        positions[ptr++] = xx;
-        positions[ptr++] = yy;
+        positions[i * 2] = xx;
+        positions[i * 2 + 1] = yy;
 
         bounds[0] = Math.min(bounds[0], xx);
         bounds[1] = Math.min(bounds[1], yy);
@@ -111,8 +110,9 @@ proto.updateFast = function(options) {
         bounds[3] = Math.max(bounds[3], yy);
     }
 
-    positions = truncate(positions, ptr);
+    //positions = truncate(positions, ptr);
     this.idToIndex = idToIndex;
+    this.pointcloudOptions.idToIndex = idToIndex;
 
     var markerSize;
 
