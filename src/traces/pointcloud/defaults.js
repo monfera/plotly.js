@@ -20,11 +20,25 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
         return Lib.coerce(traceIn, traceOut, attributes, attr, dflt);
     }
 
-    var len = handleXYDefaults(traceIn, traceOut, coerce);
-    if(!len) {
-        traceOut.visible = false;
-        return;
+    coerce('x');
+    coerce('y');
+    coerce('bounds');
+
+    if(traceIn.xy && traceIn.xy instanceof Float32Array) {
+        traceOut.xy = traceIn.xy;
     }
+
+    if(traceIn.indexid && traceIn.indexid instanceof Int32Array) {
+        traceOut.indexid = traceIn.indexid;
+    }
+
+    /*
+        var len = handleXYDefaults(traceIn, traceOut, coerce);
+        if(!len) {
+            traceOut.visible = false;
+            return;
+        }
+    */
 
     coerce('text');
     coerce('marker.color', defaultColor);

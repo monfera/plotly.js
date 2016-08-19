@@ -81,31 +81,79 @@ proto.updateFast = function(options) {
     var x = this.xData = this.pickXData = options.x;
     var y = this.yData = this.pickYData = options.y;
 
+    var xy = options.xy;
+    var userBounds = options.bounds;
+    var index = options.indexid;
+
     var len = x.length,
-        idToIndex = new Int32Array(len),
-        positions = new Float32Array(2 * len),
+        idToIndex,
+        positions,
         bounds = this.bounds;
 
-    var xx, yy;
+    var xx, yy, i;
 
-    // TODO add 'very fast' mode that bypasses this loop
-    // TODO bypass this on modebar +/- zoom
-    for(var i = 0; i < len; ++i) {
-        xx = x[i];
-        yy = y[i];
+    if(xy) {
 
-        // check for isNaN is faster but doesn't skip over nulls
-        //if(!isNumeric(xx) || !isNumeric(yy)) continue;
+        positions = xy;
 
-        idToIndex[i] = i;
+        if(userBounds) {
 
-        positions[i * 2] = xx;
-        positions[i * 2 + 1] = yy;
+            bounds[0] = userBounds[0];
+            bounds[1] = userBounds[1];
+            bounds[2] = userBounds[2];
+            bounds[3] = userBounds[3];
 
-        bounds[0] = Math.min(bounds[0], xx);
-        bounds[1] = Math.min(bounds[1], yy);
-        bounds[2] = Math.max(bounds[2], xx);
-        bounds[3] = Math.max(bounds[3], yy);
+        } else {
+
+            for (i = 0; i < len; i++) {
+
+                xx = positions[i * 2];
+                yy = positions[i * 2 + 1];
+
+                if(xx < bounds[0]) bounds[0] = xx;
+                if(xx > bounds[2]) bounds[2] = xx;
+                if(yy < bounds[1]) bounds[1] = yy;
+                if(yy > bounds[3]) bounds[3] = yy;
+            }
+
+        }
+
+        if(index) {
+
+            idToIndex = index;
+
+        } else {
+
+            idToIndex = new Int32Array(len);
+
+            for(i = 0; i < len; i++) {
+
+                idToIndex[i] = i;
+
+            }
+
+        }
+
+    } else {
+
+        positions = new Float32Array(2 * len);
+        idToIndex = new Int32Array(len);
+
+        for (i = 0; i < len; ++i) {
+            xx = x[i];
+            yy = y[i];
+
+            idToIndex[i] = i;
+
+            positions[i * 2] = xx;
+            positions[i * 2 + 1] = yy;
+
+            if(xx < bounds[0]) bounds[0] = xx;
+            if(xx > bounds[2]) bounds[2] = xx;
+            if(yy < bounds[1]) bounds[1] = yy;
+            if(yy > bounds[3]) bounds[3] = yy;
+        }
+
     }
 
     //positions = truncate(positions, ptr);

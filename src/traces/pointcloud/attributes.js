@@ -13,6 +13,27 @@ var scatterglAttrs = require('../scattergl/attributes');
 module.exports = {
     x: scatterglAttrs.x,
     y: scatterglAttrs.y,
+    xy: {
+        valType: 'data_array',
+        description: [
+            'Faster alternative to specifying `x` and `y` separately.',
+            'If supplied, it must be a typed `Float32Array` array that',
+            'represents points such that `xy[i * 2] = x[i]` and `xy[i * 2 + 1] = y[i]`'
+        ].join(' ')
+    },
+    indexid: {
+        valType: 'data_array',
+        description: [
+            'A sequential value, 0..n, supply it to avoid creating this array inside plotting.'
+        ].join(' ')
+    },
+    bounds: {
+        valType: 'data_array',
+        description: [
+            "Specify `bounds` in the shape of `[xMin, yMin, xMax, yMax] to avoid looping through",
+            "the `xy` typed array."
+        ].join(' ')
+    },
     text: scatterglAttrs.text,
     marker: {
         color: {
