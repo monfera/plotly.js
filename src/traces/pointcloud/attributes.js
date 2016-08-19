@@ -12,11 +12,7 @@ var scatterglAttrs = require('../scattergl/attributes');
 
 module.exports = {
     x: scatterglAttrs.x,
-    x0: scatterglAttrs.x0,
-    dx: scatterglAttrs.dx,
     y: scatterglAttrs.y,
-    y0: scatterglAttrs.y0,
-    dy: scatterglAttrs.dy,
     text: scatterglAttrs.text,
     marker: {
         color: {
