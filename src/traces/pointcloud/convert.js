@@ -36,7 +36,7 @@ function Pointcloud(scene, uid) {
         idToIndex: this.idToIndex,
         sizemin: 0.5,
         color: [0, 0, 0, 1],
-        borderSize: 1,
+        areaRatio: 1,
         borderColor: [0, 0, 0, 1]
     };
     this.pointcloud = createpointcloud(scene.glplot, this.pointcloudOptions);
@@ -160,7 +160,7 @@ proto.updateFast = function(options) {
     this.idToIndex = idToIndex;
     this.pointcloudOptions.idToIndex = idToIndex;
 
-    var markerSize;
+    var markerSizeMin;
 
     this.pointcloudOptions.positions = positions;
 
@@ -174,18 +174,18 @@ proto.updateFast = function(options) {
     borderColor[3] *= opacity;
     this.pointcloudOptions.borderColor = borderColor;
 
-    markerSize = options.marker.sizemin;
-    this.pointcloudOptions.size = markerSize;
-    this.pointcloudOptions.borderSize = options.marker.border.arearatio;
+    markerSizeMin = options.marker.sizemin;
+    this.pointcloudOptions.sizeMin = markerSizeMin;
+    this.pointcloudOptions.areaRatio = options.marker.border.arearatio;
 
     this.pointcloud.update(this.pointcloudOptions);
 
     // add item for autorange routine
-    this.expandAxesFast(bounds, markerSize);
+    this.expandAxesFast(bounds, markerSizeMin);
 };
 
-proto.expandAxesFast = function(bounds, markerSize) {
-    var pad = markerSize || 10;
+proto.expandAxesFast = function(bounds, markerSizeMin) {
+    var pad = markerSizeMin || 0.5;
     var ax, min, max;
 
     for(var i = 0; i < 2; i++) {
