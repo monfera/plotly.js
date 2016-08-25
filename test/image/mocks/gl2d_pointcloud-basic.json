@@ -4,8 +4,8 @@
             "type": "pointcloud",
             "mode": "markers",
             "marker": {
-                "sizemin": 10,
-                "sizemax": 30,
+                "sizemin": 0.5,
+                "sizemax": 13000,
                 "size": 10,
                 "arearatio": 0
             },

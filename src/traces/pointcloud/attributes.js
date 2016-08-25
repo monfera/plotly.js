@@ -77,7 +77,7 @@ module.exports = {
         sizemax: {
             valType: 'number',
             min: 0.1,
-            dflt: 0.5,
+            dflt: 20,
             role: 'style',
             description: [
                 'Sets the maximum size (in px) of the rendered marker points.',

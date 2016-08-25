@@ -35,6 +35,7 @@ function Pointcloud(scene, uid) {
         positions: new Float32Array(0),
         idToIndex: this.idToIndex,
         sizemin: 0.5,
+        sizemax: 12,
         color: [0, 0, 0, 1],
         areaRatio: 1,
         borderColor: [0, 0, 0, 1]
@@ -160,7 +161,7 @@ proto.updateFast = function(options) {
     this.idToIndex = idToIndex;
     this.pointcloudOptions.idToIndex = idToIndex;
 
-    var markerSizeMin;
+    var markerSizeMin, markerSizeMax;
 
     this.pointcloudOptions.positions = positions;
 
@@ -175,13 +176,15 @@ proto.updateFast = function(options) {
     this.pointcloudOptions.borderColor = borderColor;
 
     markerSizeMin = options.marker.sizemin;
+    markerSizeMax = Math.max(options.marker.sizemax, options.marker.sizemin);
     this.pointcloudOptions.sizeMin = markerSizeMin;
+    this.pointcloudOptions.sizeMax = markerSizeMax;
     this.pointcloudOptions.areaRatio = options.marker.border.arearatio;
 
     this.pointcloud.update(this.pointcloudOptions);
 
     // add item for autorange routine
-    this.expandAxesFast(bounds, markerSizeMin);
+    this.expandAxesFast(bounds, markerSizeMax / 2); // avoid axis reexpand just because of the adaptive point size
 };
 
 proto.expandAxesFast = function(bounds, markerSizeMin) {
