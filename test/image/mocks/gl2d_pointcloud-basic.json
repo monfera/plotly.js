@@ -1,0 +1,61 @@
+{
+    "data": [
+        {
+            "type": "pointcloud",
+            "mode": "markers",
+            "marker": {
+                "sizemin": 10,
+                "sizemax": 30,
+                "size": 10,
+                "arearatio": 0
+            },
+            "x": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+            ],
+            "y": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+            ]
+        }
+    ],
+    "layout": {
+        "title": "Point Cloud - basic",
+        "xaxis": {
+            "type": "linear",
+            "range": [
+                -2.501411175139456,
+                43.340777299865266
+            ],
+            "autorange": true
+        },
+        "yaxis": {
+            "type": "linear",
+            "range": [
+                4,
+                6
+            ],
+            "autorange": true
+        },
+        "height": 598,
+        "width": 1080,
+        "autosize": true,
+        "showlegend": false
+    }
+}
