@@ -11,8 +11,6 @@
 
 var Lib = require('../../lib');
 
-var handleXYDefaults = require('../scatter/xy_defaults');
-
 var attributes = require('./attributes');
 
 module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout) {
@@ -32,17 +30,10 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
         traceOut.indexid = traceIn.indexid;
     }
 
-    /*
-        var len = handleXYDefaults(traceIn, traceOut, coerce);
-        if(!len) {
-            traceOut.visible = false;
-            return;
-        }
-    */
-
     coerce('text');
     coerce('marker.color', defaultColor);
-    coerce('marker.opacity'/*, isBubble ? 0.7 : 1*/);
+    coerce('marker.opacity');
+    coerce('marker.blend');
     coerce('marker.sizemin');
     coerce('marker.sizemax');
     coerce('marker.border.color', defaultColor);

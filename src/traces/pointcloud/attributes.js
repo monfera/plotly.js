@@ -60,8 +60,22 @@ module.exports = {
             description: [
                 'Sets the marker opacity. The default value is `1` (fully opaque).',
                 'If the markers are not fully opaque and there are hundreds of thousands',
-                'of points, it may cause slower zooming and panning.'
+                'of points, it may cause slower zooming and panning.',
+                'Opacity fades the color even if `blend` is left on `false` even if there',
+                'is no translucency effect in that case.'
                 ].join(' ')
+        },
+        blend: {
+            valType: 'boolean',
+            dflt: false,
+            arrayOk: false,
+            role: 'style',
+            description: [
+                'Determines if colors are blended together for a translucency effect',
+                'in case `opacity` is specified as a value less then `1`.',
+                'Setting `blend` to `true` reduces zoom/pan',
+                'speed if used with large numbers of points.'
+            ].join(' ')
         },
         sizemin: {
             valType: 'number',

@@ -168,6 +168,7 @@ proto.updateFast = function(options) {
 
     markerColor[3] *= opacity;
     this.pointcloudOptions.color = markerColor;
+    this.pointcloudOptions.blend = options.marker.blend;
 
     borderColor[3] *= opacity;
     this.pointcloudOptions.borderColor = borderColor;
