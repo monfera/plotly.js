@@ -12,7 +12,7 @@ function makePlot(gd, mock) {
     return Plotly.plot(gd, mock.data, mock.layout);
 }
 
-fdescribe('pointcloud plots', function() {
+describe('pointcloud plots', function() {
 
     var gd;
 
@@ -20,12 +20,12 @@ fdescribe('pointcloud plots', function() {
         gd = createGraphDiv();
     });
 
-    afterEach(function() {return
+    afterEach(function() {
         Plotly.purge(gd);
         destroyGraphDiv();
     });
 
-    it('should just plot something', function(done) {
+    it('should make pointcloud plot without raising an error', function(done) {
         makePlot(gd, require('@mocks/gl2d_pointcloud-basic.json'))
             .then(null, failTest) // current linter balks on .catch with 'dot-notation'; fixme a linter
             .then(done);
