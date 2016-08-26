@@ -157,11 +157,8 @@ proto.updateFast = function(options) {
 
     }
 
-    //positions = truncate(positions, ptr);
     this.idToIndex = idToIndex;
     this.pointcloudOptions.idToIndex = idToIndex;
-
-    var markerSizeMin, markerSizeMax;
 
     this.pointcloudOptions.positions = positions;
 
@@ -175,8 +172,8 @@ proto.updateFast = function(options) {
     borderColor[3] *= opacity;
     this.pointcloudOptions.borderColor = borderColor;
 
-    markerSizeMin = options.marker.sizemin;
-    markerSizeMax = Math.max(options.marker.sizemax, options.marker.sizemin);
+    var markerSizeMin = options.marker.sizemin;
+    var markerSizeMax = Math.max(options.marker.sizemax, options.marker.sizemin);
     this.pointcloudOptions.sizeMin = markerSizeMin;
     this.pointcloudOptions.sizeMax = markerSizeMax;
     this.pointcloudOptions.areaRatio = options.marker.border.arearatio;
