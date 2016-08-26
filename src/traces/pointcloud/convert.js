@@ -106,7 +106,7 @@ proto.updateFast = function(options) {
 
         } else {
 
-            for (i = 0; i < len; i++) {
+            for(i = 0; i < len; i++) {
 
                 xx = positions[i * 2];
                 yy = positions[i * 2 + 1];
@@ -140,7 +140,7 @@ proto.updateFast = function(options) {
         positions = new Float32Array(2 * len);
         idToIndex = new Int32Array(len);
 
-        for (i = 0; i < len; ++i) {
+        for(i = 0; i < len; i++) {
             xx = x[i];
             yy = y[i];
 

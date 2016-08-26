@@ -34,8 +34,8 @@ module.exports = {
     bounds: {
         valType: 'data_array',
         description: [
-            "Specify `bounds` in the shape of `[xMin, yMin, xMax, yMax] to avoid looping through",
-            "the `xy` typed array."
+            'Specify `bounds` in the shape of `[xMin, yMin, xMax, yMax] to avoid looping through',
+            'the `xy` typed array.'
         ].join(' ')
     },
     text: scatterglAttrs.text,
@@ -63,7 +63,7 @@ module.exports = {
                 'of points, it may cause slower zooming and panning.',
                 'Opacity fades the color even if `blend` is left on `false` even if there',
                 'is no translucency effect in that case.'
-                ].join(' ')
+            ].join(' ')
         },
         blend: {
             valType: 'boolean',
@@ -116,8 +116,8 @@ module.exports = {
                 dflt: 0,
                 role: 'style',
                 description: [
-                    "Specifies what fraction of the marker area is covered with the",
-                    "border."
+                    'Specifies what fraction of the marker area is covered with the',
+                    'border.'
                 ].join(' ')
             }
         }

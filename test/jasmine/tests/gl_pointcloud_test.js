@@ -1,7 +1,6 @@
 'use strict';
 
 var Plotly = require('@lib/index');
-var mouseEvent = require('../assets/mouse_event');
 
 // Test utilities
 var createGraphDiv = require('../assets/create_graph_div');
