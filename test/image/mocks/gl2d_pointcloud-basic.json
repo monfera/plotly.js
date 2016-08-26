@@ -5,10 +5,12 @@
             "mode": "markers",
             "marker": {
                 "sizemin": 0.5,
-                "sizemax": 13000,
-                "size": 10,
-                "arearatio": 0
+                "sizemax": 100,
+                "arearatio": 0,
+                "color": "rgba(0, 0, 255, 0.9)",
+                "opacity": 0.8
             },
+            "opacity": 0.7,
             "x": [
                 0,
                 1,
