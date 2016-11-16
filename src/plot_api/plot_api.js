@@ -2808,6 +2808,9 @@ function makePlotFramework(gd) {
     // single pie layer for the whole plot
     fullLayout._pielayer = fullLayout._paper.append('g').classed('pielayer', true);
 
+    // single pie layer for the whole plot
+    fullLayout._parcoordslayer = fullLayout._paper.append('g').classed('parcoordslayer', true);
+
     // fill in image server scrape-svg
     fullLayout._glimages = fullLayout._paper.append('g').classed('glimages', true);
     fullLayout._geoimages = fullLayout._paper.append('g').classed('geoimages', true);
