@@ -1,5 +1,5 @@
 /**
-* Copyright 2012-2017, Plotly, Inc.
+* Copyright 2012-2016, Plotly, Inc.
 * All rights reserved.
 *
 * This source code is licensed under the MIT license found in the
@@ -8,64 +8,38 @@
 
 'use strict';
 
-var d3 = require('d3');
-var Plots = require('../../plots/plots');
 var Registry = require('../../registry');
-var xmlnsNamespaces = require('../../constants/xmlns_namespaces');
 
-exports.name = 'parcoords';
 
-exports.attr = 'parcoords';
-
-exports.idRoot = 'parcoords';
-
-exports.idRegex = /^parcoords([2-9]|[1-9][0-9]+)?$/;
-
-exports.attrRegex = /^parcoords([2-9]|[1-9][0-9]+)?$/;
+exports.name = 'paroords';
 
 exports.plot = function(gd) {
     var Parcoords = Registry.getModule('parcoords');
-    var calcData = Plots.getSubplotCalcData(gd.calcdata, 'parcoords', void(0));
+    var cdParcoords = getCdModule(gd.calcdata, Parcoords);
 
-    if(calcData.length) Parcoords.plot(gd, calcData);
+    if(cdParcoords.length) Parcoords.plot(gd, cdParcoords);
 };
 
 exports.clean = function(newFullData, newFullLayout, oldFullData, oldFullLayout) {
-    oldFullLayout._paperdiv.selectAll('.parcoords-line-layers').remove();
-    oldFullLayout._paperdiv.selectAll('.parcoords-line-layers').remove();
-    oldFullLayout._paperdiv.selectAll('.parcoords').remove();
-    oldFullLayout._paperdiv.selectAll('.parcoords').remove();
-    oldFullLayout._glimages.selectAll('*').remove();
+    var hadParcoords = (oldFullLayout._has && oldFullLayout._has('parcoords'));
+    var hasParcoords = (newFullLayout._has && newFullLayout._has('parcoords'));
+
+    if(hadParcoords && !hasParcoords) {
+        oldFullLayout._parcoordslayer.selectAll('g.trace').remove();
+    }
 };
 
-exports.toSVG = function(gd) {
+function getCdModule(calcdata, _module) {
+    var cdModule = [];
 
-    var bodyStyle = window.getComputedStyle(document.body, null);
-    var imageRoot = gd._fullLayout._glimages;
-    var root = d3.selectAll('.svg-container');
-    var canvases = root.filter(function(d, i) {return i === 0;})
-        .selectAll('.parcoords-lines.context, .parcoords-lines.focus');
-    var snapshot = root[0].length > 1;
+    for(var i = 0; i < calcdata.length; i++) {
+        var cd = calcdata[i];
+        var trace = cd[0].trace;
 
-    function canvasToImage() {
-        var canvas = this;
-        var rect = canvas.getBoundingClientRect();
-        var canvasStyle = window.getComputedStyle(canvas, null);
-        var canvasContentOriginX = parseFloat(canvasStyle.getPropertyValue('padding-left')) + rect.left;
-        var canvasContentOriginY = parseFloat(canvasStyle.getPropertyValue('padding-top')) + rect.top;
-        var imageData = canvas.toDataURL('image/png');
-        var image = imageRoot.append('svg:image');
-
-        image.attr({
-            xmlns: xmlnsNamespaces.svg,
-            'xlink:href': imageData,
-            x: canvasContentOriginX - (snapshot ? 0 : parseFloat(bodyStyle.getPropertyValue('margin-left'))),
-            y: canvasContentOriginY - (snapshot ? 0 : parseFloat(bodyStyle.getPropertyValue('margin-top'))),
-            width: parseFloat(canvasStyle.getPropertyValue('width')),
-            height: parseFloat(canvasStyle.getPropertyValue('height')),
-            preserveAspectRatio: 'none'
-        });
+        if((trace._module === _module) && (trace.visible === true)) {
+            cdModule.push(cd);
+        }
     }
 
-    canvases.each(canvasToImage);
-};
+    return cdModule;
+}

@@ -1,5 +1,5 @@
 /**
-* Copyright 2012-2017, Plotly, Inc.
+* Copyright 2012-2016, Plotly, Inc.
 * All rights reserved.
 *
 * This source code is licensed under the MIT license found in the
@@ -9,43 +9,12 @@
 'use strict';
 
 var parcoords = require('./parcoords');
-var Lib = require('../../lib');
 
 module.exports = function plot(gd, cdparcoords) {
 
     var fullLayout = gd._fullLayout;
-    var svg = fullLayout._paper;
-    var root = fullLayout._paperdiv;
-    var data = cdparcoords.map(function(d, i) {
-        var item = Lib.extendDeep(d[0]);
-        item._gdDataItem = gd.data[i];
-        return item;
-    });
+    var root = fullLayout._glcontainer.node();
+    var data = cdparcoords[0][0];
 
-    var filterChanged = function() {
-        gd.emit('plotly_restyle');
-    };
-
-    var hover = function(eventData) {
-        gd.emit('plotly_hover', eventData);
-    };
-
-    var unhover = function(eventData) {
-        gd.emit('plotly_unhover', eventData);
-    };
-
-    parcoords(
-        gd,
-        root,
-        svg,
-        data,
-        {
-            width: fullLayout.width,
-            height: fullLayout.height
-        },
-        {
-            filterChanged: filterChanged,
-            hover: hover,
-            unhover: unhover
-        });
+    parcoords(root, data, {width: fullLayout.width, height: fullLayout.height});
 };

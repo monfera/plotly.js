@@ -1,5 +1,5 @@
 /**
-* Copyright 2012-2017, Plotly, Inc.
+* Copyright 2012-2016, Plotly, Inc.
 * All rights reserved.
 *
 * This source code is licensed under the MIT license found in the
@@ -9,218 +9,92 @@
 'use strict';
 
 var lineLayerMaker = require('./lines');
-var c = require('./constants');
-var Lib = require('../../lib');
+var utils = require('./utils');
 var d3 = require('d3');
 
-
-function keyFun(d) {return d.key;}
-
-function repeat(d) {return [d];}
-
-function visible(dimension) {return !('visible' in dimension) || dimension.visible;}
-
-function dimensionExtent(dimension) {
-
-    var lo = dimension.range ? dimension.range[0] : d3.min(dimension.values);
-    var hi = dimension.range ? dimension.range[1] : d3.max(dimension.values);
-
-    if(isNaN(lo) || !isFinite(lo)) {
-        lo = 0;
-    }
-
-    if(isNaN(hi) || !isFinite(hi)) {
-        hi = 0;
-    }
-
-    // avoid a degenerate (zero-width) domain
-    if(lo === hi) {
-        if(lo === void(0)) {
-            lo = 0;
-            hi = 1;
-        } else if(lo === 0) {
-            // no use to multiplying zero, so add/subtract in this case
-            lo -= 1;
-            hi += 1;
-        } else {
-            // this keeps the range in the order of magnitude of the data
-            lo *= 0.9;
-            hi *= 1.1;
-        }
-    }
-
-    return [lo, hi];
+function keyFun(d) {
+    return d.key;
 }
 
-function ordinalScaleSnap(scale, v) {
-    var i, a, prevDiff, prevValue, diff;
-    for(i = 0, a = scale.range(), prevDiff = Infinity, prevValue = a[0], diff; i < a.length; i++) {
-        if((diff = Math.abs(a[i] - v)) > prevDiff) {
-            return prevValue;
-        }
-        prevDiff = diff;
-        prevValue = a[i];
-    }
-    return a[a.length - 1];
+function repeat(d) {
+    return [d];
 }
 
-function domainScale(height, padding, dimension) {
-    var extent = dimensionExtent(dimension);
-    return dimension.tickvals ?
+function makeDomainScale(height, padding, integerPadding, dimension) {
+    var lo = d3.min(dimension.values);
+    var hi = d3.max(dimension.values);
+    // convert a zero-domain to a proper domain
+    if(!dimension.integer && lo === hi) {
+        lo *= 0.9;
+        hi *= 1.1;
+    }
+    return dimension.integer ?
         d3.scale.ordinal()
-            .domain(dimension.tickvals)
-            .range(dimension.tickvals
-                .map(function(d) {return (d - extent[0]) / (extent[1] - extent[0]);})
-                .map(function(d) {return (height - padding + d * (padding - (height - padding)));})) :
+        .domain(d3.range(Math.round(lo), Math.round(hi + 1)))
+        .rangePoints([height - padding, padding], integerPadding) :
         d3.scale.linear()
-            .domain(extent)
-            .range([height - padding, padding]);
+        .domain([lo, hi])
+        .range([height - padding, padding]);
 }
 
-function unitScale(height, padding) {return d3.scale.linear().range([height - padding, padding]);}
-function domainToUnitScale(dimension) {return d3.scale.linear().domain(dimensionExtent(dimension));}
-
-function ordinalScale(dimension) {
-    var extent = dimensionExtent(dimension);
-    return dimension.tickvals && d3.scale.ordinal()
-            .domain(dimension.tickvals)
-            .range(dimension.tickvals.map(function(d) {return (d - extent[0]) / (extent[1] - extent[0]);}));
+function makeUnitScale(height, padding) {
+    return d3.scale.linear()
+        .range([height - padding, padding]);
 }
 
-function unitToColorScale(cscale, cmin, cmax, coloringArray) {
-
-    var colorStops = cscale.map(function(d) {return d[0];});
-    var colorStrings = cscale.map(function(d) {return d[1];});
-    var colorTuples = colorStrings.map(function(c) {return d3.rgb(c);});
-    var prop = function(n) {return function(o) {return o[n];};};
-
-    // We can't use d3 color interpolation as we may have non-uniform color palette raster
-    // (various color stop distances).
-    var polylinearUnitScales = 'rgb'.split('').map(function(key) {
-        return d3.scale.linear()
-            .clamp(true)
-            .domain(colorStops)
-            .range(colorTuples.map(prop(key)));
-    });
-
-    var colorToUnitScale = d3.scale.linear()
-        .domain(d3.extent(coloringArray));
-
-    var unitMin = colorToUnitScale(cmin);
-    var unitMax = colorToUnitScale(cmax);
-
-    var cScale = d3.scale.linear()
-        .clamp(true)
-        .domain([unitMin, unitMax]);
-
-    return function(d) {
-        return polylinearUnitScales.map(function(s) {
-            return s(cScale(d));
-        });
-    };
+function makeIntegerScale(integerPadding, dimension) {
+    return dimension.integer && d3.scale.ordinal()
+            .domain(
+                d3.range(0, Math.round(d3.max(dimension.values) + 1) - Math.round(d3.min(dimension.values)))
+                    .map(function(d, _, a) {return d / (a.length - 1);})
+            )
+            .rangePoints([0, 1], integerPadding);
 }
 
-function model(layout, d, i, a) {
-
-    var lines = Lib.extendDeep({}, d.line, {
-        color: d.line.color.map(domainToUnitScale({values: d.line.color})),
-        blockLineCount: c.blockLineCount,
-        canvasOverdrag: c.overdrag * c.canvasPixelRatio
-    });
-
-    var groupCount = a.length;
-    var groupWidth = layout.width * (d.domain.x[1] - d.domain.x[0]);
-    var groupHeight = layout.height * (d.domain.y[1] - d.domain.y[0]) / groupCount;
-
-    var pad = d.pad || {l: 80, r: 80, t: 80, b: 80};
-    var rowPad = pad; // for now, row padding is identical with (group) padding
-    var rowContentWidth = groupWidth - pad.l - pad.r - (d.line.showscale ? c.legendWidth : 0); // leavig room for the colorbar
-    var rowHeight = groupHeight - rowPad.t - rowPad.b;
-
-    return {
-        key: i,
-        colCount: d.dimensions.filter(visible).length,
-        _gdDimensions: d._gdDataItem.dimensions,
-        _gdDimensionsOriginalOrder: d._gdDataItem.dimensions.slice(),
-        dimensions: d.dimensions,
-        tickDistance: c.tickDistance,
-        unitToColor: unitToColorScale(d.line.colorscale, d.line.cmin, d.line.cmax, d.line.color),
-        lines: lines,
-        translateX: (d.domain.x[0] || 0) * layout.width,
-        translateY: (d.domain.y[0] || 0) * layout.height,
-        pad: pad,
-        canvasWidth: rowContentWidth * c.canvasPixelRatio + 2 * lines.canvasOverdrag,
-        canvasHeight: rowHeight * c.canvasPixelRatio,
-        width: rowContentWidth,
-        height: rowHeight,
-        canvasPixelRatio: c.canvasPixelRatio
-    };
+function makeDomainToUnitScale(values) {
+    var extent = d3.extent(values);
+    if(extent[0] === extent[1]) {
+        extent[0]--;
+        extent[1]++;
+    }
+    var a = 1 / (extent[1] - extent[0]);
+    var b = -a * extent[0];
+    return function(x) {return a * x + b;};
 }
 
-function viewModel(model) {
+function viewModel(lines, width, height, model) {
 
-    var width = model.width;
-    var height = model.height;
-    var dimensions = model.dimensions;
-    var canvasPixelRatio = model.canvasPixelRatio;
-
-    var xScale = function(d) {return width * d / Math.max(1, model.colCount - 1);};
-
-    var unitPad = c.verticalPadding / (height * canvasPixelRatio);
-    var unitPadScale = (1 - 2 * unitPad);
-    var paddedUnitScale = function(d) {return unitPad + unitPadScale * d;};
+    var xScale = d3.scale.ordinal().domain(d3.range(model.dimensions.length)).rangePoints([0, width], 0);
 
     var viewModel = {
         key: model.key,
-        xScale: xScale,
-        model: model
+        xScale: xScale
     };
 
-    var uniqueKeys = {};
-
-    viewModel.dimensions = dimensions.filter(visible).map(function(dimension, i) {
-        var domainToUnit = domainToUnitScale(dimension);
-        var foundKey = uniqueKeys[dimension.label];
-        uniqueKeys[dimension.label] = (foundKey ? 0 : foundKey) + 1;
-        var key = dimension.label + (foundKey ? '__' + foundKey : '');
+    viewModel.panels = model.dimensions.map(function(dimension, i) {
         return {
-            key: key,
+            key: dimension.id || (dimension.label + ' ' + Math.floor(1e6 * Math.random())),
             label: dimension.label,
-            tickvals: dimension.tickvals || false,
-            ticktext: dimension.ticktext || false,
-            ordinal: !!dimension.tickvals,
-            scatter: c.scatter || dimension.scatter,
+            integer: dimension.integer,
+            scatter: dimension.scatter,
             xIndex: i,
-            crossfilterDimensionIndex: i,
+            originalXIndex: i,
             height: height,
             values: dimension.values,
-            paddedUnitValues: dimension.values.map(domainToUnit).map(paddedUnitScale),
             xScale: xScale,
             x: xScale(i),
-            canvasX: xScale(i) * canvasPixelRatio,
-            unitScale: unitScale(height, c.verticalPadding),
-            domainScale: domainScale(height, c.verticalPadding, dimension),
-            ordinalScale: ordinalScale(dimension),
-            domainToUnitScale: domainToUnit,
-            filter: dimension.constraintrange ? dimension.constraintrange.map(domainToUnit) : [0, 1],
-            parent: viewModel,
-            model: model
+            unitScale: makeUnitScale(height, lines.verticalpadding),
+            domainScale: makeDomainScale(height, lines.verticalpadding, lines.integerpadding, dimension),
+            integerScale: makeIntegerScale(lines.integerpadding, dimension),
+            domainToUnitScale: makeDomainToUnitScale(dimension.values),
+            pieChartCheat: dimension.pieChartCheat,
+            filter: [0, 1], // dimension.filter || (dimension.filter = [0, 1]),
+            // one more problem: context lines get stuck
+            parent: viewModel
         };
     });
 
-    return viewModel;
-}
-
-function lineLayerModel(vm) {
-    return c.layers.map(function(key) {
-        return {
-            key: key,
-            context: key === 'contextLineLayer',
-            pick: key === 'pickLineLayer',
-            viewModel: vm,
-            model: vm.model
-        };
-    });
+    return [viewModel];
 }
 
 function styleExtentTexts(selection) {
@@ -229,15 +103,41 @@ function styleExtentTexts(selection) {
         .attr('text-anchor', 'middle')
         .style('font-family', 'monospace')
         .style('font-weight', 100)
-        .style('font-size', '10px')
+        .style('font-size', 'x-small')
         .style('cursor', 'default')
         .style('user-select', 'none');
 }
 
-module.exports = function(gd, root, svg, styledData, layout, callbacks) {
+module.exports = function(root, styledData, layout) {
 
-    var domainBrushing = false;
-    var linePickActive = true;
+    var unitToColor = styledData.unitToColor;
+
+    var data = styledData.dimensions;
+    var tickDistance = styledData.tickdistance;
+    var coloringDomainToUnitScale = makeDomainToUnitScale(styledData.line.color);
+    var overdrag = 40;
+    var lines = utils.extend(styledData.lines, {
+        color: styledData.line.color.map(coloringDomainToUnitScale),
+        overdrag: overdrag
+    });
+
+    var layoutWidth = layout.width * (styledData.domain.x[1] - styledData.domain.x[0]);
+    var layoutHeight = layout.height * (styledData.domain.y[1] - styledData.domain.y[0]);
+
+    var legendWidth = 80;
+    var padding = styledData.padding || 80;
+    var translateX = (styledData.domain.x[0] || 0) * layout.width;
+    var translateY = (styledData.domain.y[0] || 0) * layout.height;
+    var width = layoutWidth - 2 * padding - legendWidth; // leavig room for the colorbar
+    var height = layoutHeight - 2 * padding;
+
+    var canvasPixelRatio = lines.pixelratio;
+    var canvasWidth = (width + 2 * overdrag) * canvasPixelRatio;
+    var canvasHeight = height * canvasPixelRatio;
+
+    var resizeHeight = styledData.filterbar.handleheight;
+    var brushVisibleWidth = styledData.filterbar.width;
+    var brushCaptureWidth = styledData.filterbar.capturewidth || Math.min(32, brushVisibleWidth + 16);
 
     function enterSvgDefs(root) {
         var defs = root.selectAll('defs')
@@ -252,291 +152,153 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         filterBarPattern.enter()
             .append('pattern')
             .attr('id', 'filterBarPattern')
+            .attr('width', brushCaptureWidth)
+            .attr('height', height)
+            .attr('x', -brushVisibleWidth)
             .attr('patternUnits', 'userSpaceOnUse');
-
-        filterBarPattern
-            .attr('x', -c.bar.width)
-            .attr('width', c.bar.capturewidth)
-            .attr('height', function(d) {return d.model.height;});
 
         var filterBarPatternGlyph = filterBarPattern.selectAll('rect')
             .data(repeat, keyFun);
 
         filterBarPatternGlyph.enter()
             .append('rect')
-            .attr('shape-rendering', 'crispEdges');
-
-        filterBarPatternGlyph
-            .attr('height', function(d) {return d.model.height;})
-            .attr('width', c.bar.width)
-            .attr('x', c.bar.width / 2)
-            .attr('fill', c.bar.fillcolor)
-            .attr('fill-opacity', c.bar.fillopacity)
-            .attr('stroke', c.bar.strokecolor)
-            .attr('stroke-opacity', c.bar.strokeopacity)
-            .attr('stroke-width', c.bar.strokewidth);
+            .attr('shape-rendering', 'crispEdges')
+            .attr('width', brushVisibleWidth)
+            .attr('height', height)
+            .attr('x', brushVisibleWidth / 2)
+            .attr('fill', styledData.filterbar.fillcolor)
+            .attr('fill-opacity', styledData.filterbar.fillopacity)
+            .attr('stroke', styledData.filterbar.strokecolor)
+            .attr('stroke-opacity', styledData.filterbar.strokeopacity)
+            .attr('stroke-width', styledData.filterbar.strokewidth);
     }
 
-    var vm = styledData
-        .filter(function(d) {return !!d.dimensions && d.dimensions.length > 0;})
-        .map(model.bind(0, layout))
-        .map(viewModel);
+    var lastApproached = null;
 
-    var parcoordsLineLayers = root.selectAll('.parcoords-line-layers')
-        .data(vm, keyFun);
+    var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
+        .data([{key: 0, dimensions: data}], keyFun);
 
-    parcoordsLineLayers.enter()
-        .insert('div', '.' + svg.attr('class').split(' ').join(' .')) // not hardcoding .main-svg
-        .classed('parcoords-line-layers', true)
-        .style('box-sizing', 'content-box');
+    parcoordsModel.enter()
+        .append('div')
+        .classed('parcoordsModel', true);
 
-    parcoordsLineLayers
-        .style('transform', function(d, i) {
-            var translateY = i * (d.model.height + d.model.pad.t + d.model.pad.b);
-            return 'translate(' + d.model.translateX + 'px,' + (d.model.translateY + translateY) + 'px)';
-        });
+    var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
+        .data(viewModel.bind(0, lines, width, height), keyFun);
 
-    var parcoordsLineLayer = parcoordsLineLayers.selectAll('.parcoords-lines')
-        .data(lineLayerModel, keyFun);
+    parcoordsViewModel.enter()
+        .append('div')
+        .classed('parcoordsViewModel', true)
+        .style('transform', 'translate(' + translateX + 'px,' + translateY + 'px)');
 
-    var tweakables = {renderers: [], dimensions: []};
-
-    var lastHovered = null;
+    var parcoordsLineLayer = parcoordsViewModel.selectAll('.parcoordsLineLayer')
+        .data(function(vm) {
+            return [true, false].map(function(context) {
+                return {
+                    key: context ? 'contextLineLayer' : 'focusLineLayer',
+                    context: context,
+                    viewModel: vm
+                };
+            });
+        }, keyFun);
 
     parcoordsLineLayer.enter()
         .append('canvas')
-        .attr('class', function(d) {return 'parcoords-lines ' + (d.context ? 'context' : d.pick ? 'pick' : 'focus');})
-        .style('box-sizing', 'content-box')
-        .style('transform', 'translate(' + (-c.overdrag) + 'px, 0)')
-        .style('float', 'left')
-        .style('clear', 'both')
-        .style('left', 0)
+        .classed('parcoordsLineLayer', true)
+        .style('transform', 'translate(' + (-overdrag) + 'px, 0)')
+        .style('position', 'absolute')
+        .style('padding', padding + 'px')
         .style('overflow', 'visible')
-        .style('position', function(d, i) {return i > 0 ? 'absolute' : 'absolute';})
-        .filter(function(d) {return d.pick;})
-        .on('mousemove', function(d) {
-            if(linePickActive && d.lineLayer && callbacks && callbacks.hover) {
-                var event = d3.event;
-                var cw = this.width;
-                var ch = this.height;
-                var translateY = d.model.key * (d.model.height + d.model.pad.t + d.model.pad.b);
-                var x = event.layerX - d.model.pad.l + c.overdrag;
-                var y = event.layerY - d.model.pad.t - translateY;
-                if(x < 0 || y < 0 || x >= cw || y >= ch) {
-                    return;
-                }
-                var pixel = d.lineLayer.readPixel(x, ch - 1 - y);
-                var found = pixel[3] !== 0;
-                var curveNumber = found ? pixel[2] + 256 * (pixel[1] + 256 * pixel[0]) : null;
-                var eventData = {
-                    x: x,
-                    y: y,
-                    dataIndex: d.model.key,
-                    curveNumber: curveNumber
-                };
-                if(curveNumber !== lastHovered) { // don't unnecessarily repeat the same hit (or miss)
-                    if(found) {
-                        callbacks.hover(eventData);
-                    } else if(callbacks.unhover) {
-                        callbacks.unhover(eventData);
-                    }
-                    lastHovered = curveNumber;
-                }
-            }
-        });
+        .attr('width', canvasWidth)
+        .attr('height', canvasHeight)
+        .style('width', (width + 2 * overdrag) + 'px')
+        .style('height', height + 'px');
+
+    var tweakables = {renderers: [], dimensions: []};
 
     parcoordsLineLayer
-        .style('padding', function(d) {
-            var p = d.viewModel.model.pad;
-            return p.t + 'px ' + p.r + 'px ' + p.b + 'px ' + p.l + 'px';
-        })
-        .attr('width', function(d) {return d.viewModel.model.canvasWidth;})
-        .attr('height', function(d) {return d.viewModel.model.canvasHeight;})
-        .style('width', function(d) {return (d.viewModel.model.width + 2 * c.overdrag) + 'px';})
-        .style('height', function(d) {return d.viewModel.model.height + 'px';})
-        .style('opacity', function(d) {return d.pick ? 0.01 : 1;});
+        .each(function(d) {
+            var lineLayer = lineLayerMaker(this, lines, canvasWidth, canvasHeight, d.viewModel.panels, unitToColor, d.context);
+            d.viewModel[d.key] = lineLayer;
+            tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true);});
+            lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
+        });
 
-    svg.style('background', 'rgba(255, 255, 255, 0)');
-    var parcoordsControlOverlay = svg.selectAll('.parcoords')
-        .data(vm, keyFun);
+    var parcoordsControlOverlay = parcoordsViewModel.selectAll('.parcoordsControlOverlay')
+        .data(repeat, keyFun);
 
     parcoordsControlOverlay.enter()
-        .append('g')
-        .classed('parcoords', true)
+        .append('svg')
+        .classed('parcoordsControlOverlay', true)
         .attr('overflow', 'visible')
-        .style('box-sizing', 'content-box')
+        .attr('width', width + 2 * padding)
+        .attr('height', height + 2 * padding)
         .style('position', 'absolute')
-        .style('left', 0)
         .style('overflow', 'visible')
         .style('shape-rendering', 'crispEdges')
-        .style('pointer-events', 'none')
         .call(enterSvgDefs);
-
-    parcoordsControlOverlay
-        .attr('width', function(d) {return d.model.width + d.model.pad.l + d.model.pad.r;})
-        .attr('height', function(d) {return d.model.height + d.model.pad.t + d.model.pad.b;})
-        .attr('transform', function(d, i) {
-            var translateY = i * (d.model.height + d.model.pad.t + d.model.pad.b);
-            return 'translate(0,' + translateY + ')';
-        });
 
     var parcoordsControlView = parcoordsControlOverlay.selectAll('.parcoordsControlView')
         .data(repeat, keyFun);
 
     parcoordsControlView.enter()
         .append('g')
-        .classed('parcoordsControlView', true)
-        .style('box-sizing', 'content-box');
+        .attr('transform', 'translate(' + padding + ',' + padding + ')')
+        .classed('parcoordsControlView', true);
 
-    parcoordsControlView
-        .attr('transform', function(d) {return 'translate(' + d.model.pad.l + ',' + d.model.pad.t + ')';});
+    var panel = parcoordsControlView.selectAll('.panel')
+        .data(function(vm) {return vm.panels;}, keyFun);
 
-    var yAxis = parcoordsControlView.selectAll('.yAxis')
-        .data(function(vm) {return vm.dimensions;}, keyFun);
+    var domainBrushing = false;
 
     function someFiltersActive(view) {
-        return view.dimensions.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
+        return view.panels.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
     }
 
-    function updatePanelLayoutParcoords(yAxis, vm) {
-        var panels = vm.panels || (vm.panels = []);
-        var yAxes = yAxis.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
-        var panelCount = yAxes.length - 1;
-        var rowCount = 1;
-        for(var row = 0; row < rowCount; row++) {
-            for(var p = 0; p < panelCount; p++) {
-                var panel = panels[p + row * panelCount] || (panels[p + row * panelCount] = {});
-                var dim1 = yAxes[p];
-                var dim2 = yAxes[p + 1];
-                panel.dim1 = dim1;
-                panel.dim2 = dim2;
-                panel.canvasX = dim1.canvasX;
-                panel.panelSizeX = dim2.canvasX - dim1.canvasX;
-                panel.panelSizeY = vm.model.canvasHeight / rowCount;
-                panel.y = row * panel.panelSizeY;
-                panel.canvasY = vm.model.canvasHeight - panel.y - panel.panelSizeY;
-            }
-        }
-    }
-
-    function updatePanelLayoutScatter(yAxis, vm) {
-        var panels = vm.panels || (vm.panels = []);
-        var yAxes = yAxis.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
-        var panelCount = yAxes.length - 1;
-        var rowCount = panelCount;
-        for(var row = 0; row < panelCount; row++) {
-            for(var p = 0; p < panelCount; p++) {
-                var panel = panels[p + row * panelCount] || (panels[p + row * panelCount] = {});
-                var dim1 = yAxes[p];
-                var dim2 = yAxes[p + 1];
-                panel.dim1 = yAxes[row + 1];
-                panel.dim2 = dim2;
-                panel.canvasX = dim1.canvasX;
-                panel.panelSizeX = dim2.canvasX - dim1.canvasX;
-                panel.panelSizeY = vm.model.canvasHeight / rowCount;
-                panel.y = row * panel.panelSizeY;
-                panel.canvasY = vm.model.canvasHeight - panel.y - panel.panelSizeY;
-            }
-        }
-    }
-
-    function updatePanelLayout(yAxis, vm) {
-        return (c.scatter ? updatePanelLayoutScatter : updatePanelLayoutParcoords)(yAxis, vm);
-    }
-
-    yAxis.enter()
+    panel.enter()
         .append('g')
-        .classed('yAxis', true)
+        .classed('panel', true)
         .each(function(d) {tweakables.dimensions.push(d);});
 
-    parcoordsControlView.each(function(vm) {
-        updatePanelLayout(yAxis, vm);
-    });
-
-    parcoordsLineLayer
-        .each(function(d) {
-            d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.dimensions, d.viewModel.panels, d.model.unitToColor, d.context, d.pick, c.scatter);
-            d.viewModel[d.key] = d.lineLayer;
-            tweakables.renderers.push(function() {d.lineLayer.render(d.viewModel.panels, true);});
-            d.lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
-        });
-
-    yAxis
+    panel
         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
 
-    yAxis
+    panel
         .call(d3.behavior.drag()
             .origin(function(d) {return d;})
             .on('drag', function(d) {
-                var p = d.parent;
-                linePickActive = false;
                 if(domainBrushing) {
                     return;
                 }
-                d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag, d3.event.x));
-                d.canvasX = d.x * d.model.canvasPixelRatio;
-                yAxis
+                d.x = Math.max(-overdrag, Math.min(width + overdrag, d3.event.x));
+                panel
                     .sort(function(a, b) {return a.x - b.x;})
                     .each(function(dd, i) {
                         dd.xIndex = i;
                         dd.x = d === dd ? dd.x : dd.xScale(dd.xIndex);
-                        dd.canvasX = dd.x * dd.model.canvasPixelRatio;
                     });
-
-                updatePanelLayout(yAxis, p);
-
-                yAxis.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
+                panel.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                 d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
-                yAxis.each(function(dd, i, ii) {if(ii === d.parent.key) p.dimensions[i] = dd;});
-                p.contextLineLayer && p.contextLineLayer.render(p.panels, false, !someFiltersActive(p));
-                p.focusLineLayer.render && p.focusLineLayer.render(p.panels);
+                panel.each(function(d, i) {d.parent.panels[i] = d;});
+                d.parent.contextLineLayer.render(d.parent.panels, false, !someFiltersActive(d.parent));
+                d.parent.focusLineLayer.render(d.parent.panels);
             })
             .on('dragend', function(d) {
-                var p = d.parent;
                 if(domainBrushing) {
-                    if(domainBrushing === 'ending') {
-                        domainBrushing = false;
-                    }
                     return;
                 }
                 d.x = d.xScale(d.xIndex);
-                d.canvasX = d.x * d.model.canvasPixelRatio;
-                updatePanelLayout(yAxis, p);
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                p.contextLineLayer && p.contextLineLayer.render(p.panels, false, !someFiltersActive(p));
-                p.focusLineLayer && p.focusLineLayer.render(p.panels);
-                p.pickLineLayer && p.pickLineLayer.render(p.panels, true);
-                linePickActive = true;
-
-                // Have updated order data on `gd.data` and raise `Plotly.restyle` event
-                // without having to incur heavy UI blocking due to an actual `Plotly.restyle` call
-
-                var orig = p.model._gdDimensionsOriginalOrder
-                    .filter(function(d) {return d.visible === void(0) || d.visible;});
-                function newIdx(dim) {
-                    var origIndex = orig.indexOf(dim);
-                    var currentIndex = p.dimensions.map(function(dd) {return dd.crossfilterDimensionIndex;}).indexOf(origIndex);
-                    if(currentIndex === -1) {
-                        // invisible dimensions go to the end, retaining their original order
-                        currentIndex += orig.length;
-                    }
-                    return currentIndex;
-                }
-                d.model._gdDimensions.sort(function(d1, d2) {
-                    var i1 = newIdx(d1);
-                    var i2 = newIdx(d2);
-                    return i1 - i2;
-                });
-                gd.emit('plotly_restyle');
+                d.parent.contextLineLayer.render(d.parent.panels, false, !someFiltersActive(d.parent));
+                d.parent.focusLineLayer.render(d.parent.panels);
             })
         );
 
-    yAxis.exit()
+    panel.exit()
         .remove();
 
-    var axisOverlays = yAxis.selectAll('.axisOverlays')
+    var axisOverlays = panel.selectAll('.axisOverlays')
         .data(repeat, keyFun);
 
     axisOverlays.enter()
@@ -548,23 +310,19 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
 
     var axisEnter = axis.enter()
         .append('g')
-        .classed('axis', true);
-
-    axis
+        .classed('axis', true)
         .each(function(d) {
-            var wantedTickCount = d.model.height / d.model.tickDistance;
+            var wantedTickCount = height / tickDistance;
             var scale = d.domainScale;
-            var sdom = scale.domain();
-            var texts = d.ticktext;
+            var dom = scale.domain();
             d3.select(this)
                 .call(d3.svg.axis()
                     .orient('left')
                     .tickSize(4)
                     .outerTickSize(2)
                     .ticks(wantedTickCount, '3s') // works for continuous scales only...
-                    .tickValues(d.ordinal ? // and this works for ordinal scales
-                        sdom.filter(function(d, i) {return !(i % Math.round((sdom.length / wantedTickCount)));})
-                            .map(function(d, i) {return texts && texts[i] || d;}) :
+                    .tickValues(d.integer ? // and this works for ordinal scales
+                        dom.filter(function(d, i) {return !(i % Math.round((dom.length / wantedTickCount)));}) :
                         null)
                     .scale(scale));
         });
@@ -580,7 +338,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         .selectAll('text')
         .style('font-family', 'monospace')
         .style('font-weight', 100)
-        .style('font-size', '10px')
+        .style('font-size', 'x-small')
         .style('fill', 'black')
         .style('fill-opacity', 1)
         .style('stroke', 'none')
@@ -601,16 +359,13 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
     axisTitle.enter()
         .append('text')
         .classed('axisTitle', true)
+        .attr('transform', 'translate(0,' + -(styledData.filterbar.handleheight + 20) + ')')
+        .text(function(d) {return d.label;})
         .attr('text-anchor', 'middle')
         .style('font-family', 'sans-serif')
-        .style('font-size', '10px')
+        .style('font-size', 'xx-small')
         .style('cursor', 'default')
-        .style('user-select', 'none')
-        .style('pointer-events', 'auto');
-
-    axisTitle
-        .attr('transform', 'translate(0,' + -(c.bar.handleheight + 20) + ')')
-        .text(function(d) {return d.label;});
+        .style('user-select', 'none');
 
     var axisExtent = axisOverlays.selectAll('.axisExtent')
         .data(repeat, keyFun);
@@ -624,36 +379,30 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
 
     axisExtentTop.enter()
         .append('g')
-        .classed('axisExtentTop', true);
-
-    axisExtentTop
-        .attr('transform', 'translate(' + 0 + ',' + -(c.bar.handleheight - 2) + ')');
+        .classed('axisExtentTop', true)
+        .attr('transform', 'translate(' + 0 + ',' + -(styledData.filterbar.handleheight - 2) + ')');
 
     var axisExtentTopText = axisExtentTop.selectAll('.axisExtentTopText')
         .data(repeat, keyFun);
 
     function formatExtreme(d) {
-        return d.ordinal ? d3.format('.0s') : d3.format('.3s');
+        return d.integer ? d3.format('.0s') : d3.format('.3s');
     }
 
     axisExtentTopText.enter()
         .append('text')
         .classed('axisExtentTopText', true)
+        .text(function(d) {return formatExtreme(d)(d.domainScale.domain().slice(-1)[0]);})
         .attr('alignment-baseline', 'after-edge')
         .call(styleExtentTexts);
-
-    axisExtentTopText
-        .text(function(d) {return formatExtreme(d)(d.domainScale.domain().slice(-1)[0]);});
 
     var axisExtentBottom = axisExtent.selectAll('.axisExtentBottom')
         .data(repeat, keyFun);
 
     axisExtentBottom.enter()
         .append('g')
-        .classed('axisExtentBottom', true);
-
-    axisExtentBottom
-        .attr('transform', function(d) {return 'translate(' + 0 + ',' + (d.model.height + c.bar.handleheight - 2) + ')';});
+        .classed('axisExtentBottom', true)
+        .attr('transform', 'translate(' + 0 + ',' + (height + styledData.filterbar.handleheight - 2) + ')');
 
     var axisExtentBottomText = axisExtentBottom.selectAll('.axisExtentBottomText')
         .data(repeat, keyFun);
@@ -661,18 +410,22 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
     axisExtentBottomText.enter()
         .append('text')
         .classed('axisExtentBottomText', true)
+        .text(function(d) {return formatExtreme(d)(d.domainScale.domain()[0]);})
         .attr('alignment-baseline', 'before-edge')
         .call(styleExtentTexts);
-
-    axisExtentBottomText
-        .text(function(d) {return formatExtreme(d)(d.domainScale.domain()[0]);});
 
     var axisBrush = axisOverlays.selectAll('.axisBrush')
         .data(repeat, keyFun);
 
     var axisBrushEnter = axisBrush.enter()
         .append('g')
-        .classed('axisBrush', true);
+        .classed('axisBrush', true)
+        .on('mouseenter', function approach(dimension) {
+            if(dimension !== lastApproached) {
+                dimension.parent.focusLineLayer.approach(dimension);
+                lastApproached = dimension;
+            }
+        });
 
     axisBrush
         .each(function(d) {
@@ -682,37 +435,33 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                     .on('brushstart', axisBrushStarted)
                     .on('brush', axisBrushMoved)
                     .on('brushend', axisBrushEnded);
-                if(d.filter[0] !== 0 || d.filter[1] !== 1) {
-                    d.brush.extent(d.filter);
-                }
                 d3.select(this).call(d.brush);
             }
         });
 
     axisBrushEnter
         .selectAll('rect')
-        .attr('x', -c.bar.capturewidth / 2)
-        .attr('width', c.bar.capturewidth);
+        .attr('x', -brushCaptureWidth / 2)
+        .attr('width', brushCaptureWidth);
 
     axisBrushEnter
         .selectAll('rect.extent')
         .attr('fill', 'url(#filterBarPattern)')
-        .filter(function(d) {return d.filter[0] === 0 && d.filter[1] === 1;})
         .attr('y', -100); //  // zero-size rectangle pointer issue workaround
 
     axisBrushEnter
         .selectAll('.resize rect')
-        .attr('height', c.bar.handleheight)
+        .attr('height', resizeHeight)
         .attr('opacity', 0)
         .style('visibility', 'visible');
 
     axisBrushEnter
         .selectAll('.resize.n rect')
-        .attr('y', c.bar.handleoverlap - c.bar.handleheight);
+        .attr('y', -resizeHeight + styledData.filterbar.handleoverlap);
 
     axisBrushEnter
         .selectAll('.resize.s rect')
-        .attr('y', c.bar.handleoverlap);
+        .attr('y', -styledData.filterbar.handleoverlap);
 
     var justStarted = false;
     var contextShown = false;
@@ -723,11 +472,9 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
     }
 
     function axisBrushMoved(dimension) {
-        linePickActive = false;
-        var p = dimension.parent;
         var extent = dimension.brush.extent();
-        var dimensions = p.dimensions;
-        var filter = dimensions[dimension.xIndex].filter;
+        var panels = dimension.parent.panels;
+        var filter = panels[dimension.xIndex].filter;
         var reset = justStarted && (extent[0] === extent[1]);
         if(reset) {
             dimension.brush.clear();
@@ -735,14 +482,19 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         }
         var newExtent = reset ? [0, 1] : extent.slice();
         if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
-            dimensions[dimension.xIndex].filter = newExtent;
-            p.focusLineLayer && p.focusLineLayer.render(p.panels, true);
-            var filtersActive = someFiltersActive(p);
+/*          // the 1st dimension is special: brushing on it changes the color projection
+            if(dimension.originalXIndex === 0) {
+                dimension.parent['focusLineLayer'].setColorDomain(newExtent);
+            }
+*/
+            panels[dimension.xIndex].filter = newExtent;
+            dimension.parent.focusLineLayer.render(panels, true);
+            var filtersActive = someFiltersActive(dimension.parent);
             if(!contextShown && filtersActive) {
-                p.contextLineLayer && p.contextLineLayer.render(p.panels, true);
+                dimension.parent.contextLineLayer.render(panels, true);
                 contextShown = true;
             } else if(contextShown && !filtersActive) {
-                p.contextLineLayer && p.contextLineLayer.render(p.panels, true, true);
+                dimension.parent.contextLineLayer.render(panels, true, true);
                 contextShown = false;
             }
         }
@@ -750,37 +502,21 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
     }
 
     function axisBrushEnded(dimension) {
-        var p = dimension.parent;
         var extent = dimension.brush.extent();
         var empty = extent[0] === extent[1];
-        var dimensions = p.dimensions;
-        var f = dimensions[dimension.xIndex].filter;
-        if(!empty && dimension.ordinal) {
-            f[0] = ordinalScaleSnap(dimension.ordinalScale, f[0]);
-            f[1] = ordinalScaleSnap(dimension.ordinalScale, f[1]);
+        if(!empty && dimension.integer) {
+            var panels = dimension.parent.panels;
+            var f = panels[dimension.xIndex].filter;
+            f[0] = utils.d3OrdinalScaleSnap(dimension.integerScale, f[0]);
+            f[1] = utils.d3OrdinalScaleSnap(dimension.integerScale, f[1]);
             if(f[0] === f[1]) {
                 f[0] = Math.max(0, f[0] - 0.05);
                 f[1] = Math.min(1, f[1] + 0.05);
             }
             d3.select(this).transition().duration(150).call(dimension.brush.extent(f));
-            p.focusLineLayer.render(p.panels, true);
+            dimension.parentfocusLineLayer.render(panels, true);
         }
-        p.pickLineLayer && p.pickLineLayer.render(p.panels, true);
-        linePickActive = true;
-        domainBrushing = 'ending';
-        if(callbacks && callbacks.filterChanged) {
-            var invScale = dimension.domainToUnitScale.invert;
-
-            // update gd.data as if a Plotly.restyle were fired
-            var gdDimension = p.model._gdDimensionsOriginalOrder[dimension.crossfilterDimensionIndex];
-            var gdConstraintRange = gdDimension.constraintrange;
-            if(!gdConstraintRange || gdConstraintRange.length !== 2) {
-                gdConstraintRange = gdDimension.constraintrange = [];
-            }
-            gdConstraintRange[0] = invScale(f[0]);
-            gdConstraintRange[1] = invScale(f[1]);
-            callbacks.filterChanged();
-        }
+        domainBrushing = false;
     }
 
     return tweakables;

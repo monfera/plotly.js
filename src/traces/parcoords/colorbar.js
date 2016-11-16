@@ -1,5 +1,5 @@
 /**
-* Copyright 2012-2017, Plotly, Inc.
+* Copyright 2012-2016, Plotly, Inc.
 * All rights reserved.
 *
 * This source code is licensed under the MIT license found in the
@@ -23,6 +23,9 @@ module.exports = function colorbar(gd, cd) {
         cbId = 'cb' + trace.uid;
 
     gd._fullLayout._infolayer.selectAll('.' + cbId).remove();
+
+    // TODO unify parcoords, scatter and heatmap colorbar
+    // TODO make Colorbar.draw support multiple colorbar per trace
 
     if((line === undefined) || !line.showscale) {
         Plots.autoMargin(gd, cbId);
