@@ -22,12 +22,12 @@ Parcoords.styleOne = require('./style_one');
 Parcoords.moduleType = 'trace';
 Parcoords.name = 'parcoords';
 Parcoords.basePlotModule = require('./base_plot');
-Parcoords.categories = ['pie', 'showLegend'];
+Parcoords.categories = ['parcoords', 'showLegend'];
 Parcoords.meta = {
     description: [
-        'A data visualized by the sectors of the pie is set in `values`.',
-        'The sector labels are set in `labels`.',
-        'The sector colors are set in `marker.colors`'
+        'Parallel coordinates for multidimensional exploratory data analysis.',
+        'The samples are in `data`.',
+        'The colors are set in `colors`.'
     ].join(' ')
 };
 
