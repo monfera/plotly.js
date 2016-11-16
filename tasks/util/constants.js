@@ -13,7 +13,7 @@ var pathToTopojsonSrc = path.join(
 );
 
 var partialBundleNames = [
-    'basic', 'cartesian', 'geo', 'gl3d', 'gl2d', 'mapbox', 'finance'
+    'basic', 'cartesian', 'geo', 'gl3d', 'gl2d', 'mapbox', 'finance', 'parcoords'
 ];
 
 var partialBundlePaths = partialBundleNames.map(function(name) {
