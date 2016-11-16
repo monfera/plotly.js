@@ -18,7 +18,7 @@ var extendFlat = require('../../lib/extend').extendFlat;
 module.exports = {
     labels: {
         valType: 'data_array',
-        description: 'Sets the sector labels.'
+        description: 'Sets the dimension labels.'
     },
     // equivalent of x0 and dx, if label is missing
     label0: {
@@ -41,14 +41,14 @@ module.exports = {
 
     values: {
         valType: 'data_array',
-        description: 'Sets the values of the sectors of this pie chart.'
+        description: 'Sets the samples of this parallel coordinates chart.'
     },
 
     marker: {
         colors: {
             valType: 'data_array',  // TODO 'color_array' ?
             description: [
-                'Sets the color of each sector of this pie chart.',
+                'Sets the color of each sector of this parallel coordinates chart.',
                 'If not specified, the default trace color set is used',
                 'to pick the sector colors.'
             ].join(' ')
@@ -79,13 +79,9 @@ module.exports = {
 
     text: {
         valType: 'data_array',
-        description: 'Sets text elements associated with each sector.'
+        description: 'Sets text elements associated with each dimension.'
     },
 
-// 'see eg:'
-// 'https://www.e-education.psu.edu/natureofgeoinfo/sites/www.e-education.psu.edu.natureofgeoinfo/files/image/hisp_pies.gif',
-// '(this example involves a map too - may someday be a whole trace type',
-// 'of its own. but the point is the size of the whole pie is important.)'
     scalegroup: {
         valType: 'string',
         role: 'info',
@@ -178,7 +174,7 @@ module.exports = {
         role: 'style',
         dflt: true,
         description: [
-            'Determines whether or not the sectors of reordered',
+            'Determines whether or not the samples are reordered',
             'from largest to smallest.'
         ].join(' ')
     },
@@ -195,7 +191,7 @@ module.exports = {
         role: 'style',
         dflt: 'counterclockwise',
         description: [
-            'Specifies the direction at which succeeding sectors follow',
+            'Specifies the direction at which succeeding sample lines follow',
             'one another.'
         ].join(' ')
     },
