@@ -14,18 +14,18 @@ var Registry = require('../../registry');
 exports.name = 'paroords';
 
 exports.plot = function(gd) {
-    var Pie = Registry.getModule('parcoords');
-    var cdPie = getCdModule(gd.calcdata, Pie);
+    var Parcoords = Registry.getModule('parcoords');
+    var cdParcoords = getCdModule(gd.calcdata, Parcoords);
 
-    if(cdPie.length) Pie.plot(gd, cdPie);
+    if(cdParcoords.length) Parcoords.plot(gd, cdParcoords);
 };
 
 exports.clean = function(newFullData, newFullLayout, oldFullData, oldFullLayout) {
-    var hadPie = (oldFullLayout._has && oldFullLayout._has('pie'));
-    var hasPie = (newFullLayout._has && newFullLayout._has('pie'));
+    var hadParcoords = (oldFullLayout._has && oldFullLayout._has('parcoords'));
+    var hasParcoords = (newFullLayout._has && newFullLayout._has('parcoords'));
 
-    if(hadPie && !hasPie) {
-        oldFullLayout._pielayer.selectAll('g.trace').remove();
+    if(hadParcoords && !hasParcoords) {
+        oldFullLayout._parcoordslayer.selectAll('g.trace').remove();
     }
 };
 
