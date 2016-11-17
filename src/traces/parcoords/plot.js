@@ -22,18 +22,41 @@ var vertexShaderSource = require('./shaderVertex');
 var fragmentShaderSource = require('./shaderFragment');
 var utils = require('./utils');
 var regl = require('regl');
+var unitToColor = require('./colors');
+var lineLayerMaker = require('./lineLayer');
 
 var helpers = require('./helpers');
 
 module.exports = function plot(gd, cdpie) {
     var fullLayout = gd._fullLayout;
 
+    var root = fullLayout._glcontainer.node() // fullLayout._parcoordslayer
+
+    var canvasGL = document.createElement('canvas');
+    canvasGL.setAttribute('style', 'position: absolute; margin: 32px;overflow: visible;');
+    root.appendChild(canvasGL);
+
+    var svgRoot = d3.select(root).append('svg')
+        .style('position', 'absolute')
+        .style('margin', '32px')
+        .style('overflow', 'visible')
+        .node();
+
+    var ol = overlay(svgRoot)
+
+    var lineLayer = lineLayerMaker(regl, utils, canvasGL, vertexShaderSource, fragmentShaderSource, config, model, ol, unitToColor);
+
+    lineLayer.render(false);
+
+    return;
+
+
     scalePies(cdpie, fullLayout._size);
 
     var pieGroups = fullLayout._pielayer.selectAll('g.trace').data(cdpie);
-    var dd = model;
 
-    debugger
+
+
 
     pieGroups.enter().append('g')
         .attr({
