@@ -15,6 +15,14 @@ var Color = require('../../components/color');
 var Drawing = require('../../components/drawing');
 var svgTextUtils = require('../../lib/svg_text_utils');
 
+var config = require('./config');
+var model = require('./model');
+var overlay = require('./overlay');
+var vertexShaderSource = require('./shaderVertex');
+var fragmentShaderSource = require('./shaderFragment');
+var utils = require('./utils');
+var regl = require('regl');
+
 var helpers = require('./helpers');
 
 module.exports = function plot(gd, cdpie) {
@@ -23,6 +31,9 @@ module.exports = function plot(gd, cdpie) {
     scalePies(cdpie, fullLayout._size);
 
     var pieGroups = fullLayout._pielayer.selectAll('g.trace').data(cdpie);
+    var dd = model;
+
+    debugger
 
     pieGroups.enter().append('g')
         .attr({
