@@ -15,15 +15,7 @@ var Color = require('../../components/color');
 var Drawing = require('../../components/drawing');
 var svgTextUtils = require('../../lib/svg_text_utils');
 
-var config = require('./config');
-var model = require('./model');
-var overlay = require('./overlay');
-var vertexShaderSource = require('./shaderVertex');
-var fragmentShaderSource = require('./shaderFragment');
-var utils = require('./utils');
-var regl = require('regl');
-var unitToColor = require('./colors');
-var lineLayerMaker = require('./lineLayer');
+var parcoords = require('./parcoords');
 
 var helpers = require('./helpers');
 
@@ -32,21 +24,7 @@ module.exports = function plot(gd, cdpie) {
 
     var root = fullLayout._glcontainer.node() // fullLayout._parcoordslayer
 
-    var canvasGL = document.createElement('canvas');
-    canvasGL.setAttribute('style', 'position: absolute; margin: 32px;overflow: visible;');
-    root.appendChild(canvasGL);
-
-    var svgRoot = d3.select(root).append('svg')
-        .style('position', 'absolute')
-        .style('margin', '32px')
-        .style('overflow', 'visible')
-        .node();
-
-    var ol = overlay(svgRoot)
-
-    var lineLayer = lineLayerMaker(regl, utils, canvasGL, vertexShaderSource, fragmentShaderSource, config, model, ol, unitToColor);
-
-    lineLayer.render(false);
+    parcoords(root);
 
     return;
 
