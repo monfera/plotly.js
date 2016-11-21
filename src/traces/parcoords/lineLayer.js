@@ -1,4 +1,7 @@
-module.exports = function(createREGL, utils, canvasGL, vertexShaderSource, fragmentShaderSource, config, model, overlay, unitToColor) {
+var utils = require('./utils');
+var createREGL = require('regl');
+
+module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, overlay, unitToColor) {
 
     var data = model.data
     var variableCount = model.variableCount
