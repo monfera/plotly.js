@@ -10,8 +10,8 @@
 
 var d3 = require('d3');
 
-var config = require('./config');
-var model = require('./model');
+var configMaker = require('./config');
+var modelMaker = require('./model');
 var overlay = require('./overlay');
 var vertexShaderSource = require('./shaderVertex');
 var fragmentShaderSource = require('./shaderFragment');
@@ -20,7 +20,7 @@ var regl = require('regl');
 var unitToColor = require('./colors');
 var lineLayerMaker = require('./lineLayer');
 
-module.exports = function plot(root) {
+module.exports = function plot(root, data) {
 
     var canvasGL = document.createElement('canvas');
     canvasGL.setAttribute('style', 'position: absolute; margin: 32px;overflow: visible;');
@@ -32,7 +32,9 @@ module.exports = function plot(root) {
         .style('overflow', 'visible')
         .node();
 
-    var ol = overlay(svgRoot)
+    var model = modelMaker(data);
+    var config = configMaker(model);
+    var ol = overlay(svgRoot, config);
 
     var lineLayer = lineLayerMaker(regl, utils, canvasGL, vertexShaderSource, fragmentShaderSource, config, model, ol, unitToColor);
 

@@ -1,7 +1,6 @@
-var data = require('./dataAdapter');
 var utils = require('./utils');
 
-module.exports = (function(utils, data) {
+module.exports = function(data) {
 
     var variableCount = data.shape[0]
     var sampleCount = data.shape[1]
@@ -20,4 +19,4 @@ module.exports = (function(utils, data) {
         domainToUnitScales: domainToUnitScales,
         filters: filters
     }
-})(utils, data);
+};
