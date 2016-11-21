@@ -1,6 +1,4 @@
-var model = require('./model');
-
-module.exports = (function(variableCount) {
+module.exports = function(model) {
 
     var width = 1600
     var height = 275
@@ -12,7 +10,7 @@ module.exports = (function(variableCount) {
     return {
         width: width,
         height: height,
-        panelSizeX: width / variableCount,
+        panelSizeX: width / model.variableCount,
         panelSizeY: height,
 
         colorScale: colorScale,
@@ -24,4 +22,4 @@ module.exports = (function(variableCount) {
         rafTimeRatio: 4, // a multiple of the 16.6ms rAF budget, use 0.5..5
         blockLineCount: 5000 // smallest number of lines drawn in one increment
     }
-})(model.variableCount);
+};

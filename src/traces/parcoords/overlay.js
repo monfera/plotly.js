@@ -1,8 +1,7 @@
-var config = require('./config');
 var controlConfig = require('./overlayConfig');
 var utils = require('./utils');
 
-module.exports = function (svgRoot) {
+module.exports = function (svgRoot, config) {
 
     var width = config.width
     var height = config.height
