@@ -228,9 +228,10 @@ module.exports = function (svgRoot, config) {
         }}
     }
 
-    function enterOverlayPanel(update, overlay, translateX, filter, render) {
+    function enterOverlayPanel(overlay, translateX, filter, render) {
 
-        var changedDataDomain = function() {
+        var changedDataDomain = function(filter) {
+            overlay.filterControls.setExtent(filter[0], filter[1])
             render(true)
         }
 
@@ -250,7 +251,7 @@ module.exports = function (svgRoot, config) {
             if(Math.abs(filter[0] - f0) >= 1 / panelSizeY) {
                 filter[0] = f0
                 filter[1] = f1
-                changedDataDomain()
+                changedDataDomain(filter)
             }
         }
 
@@ -264,7 +265,7 @@ module.exports = function (svgRoot, config) {
             var f0 = Math.max(0, Math.min(f1, originalFilter[0] - y / panelSizeY))
             if(Math.abs(filter[0] - f0) >= 1 / panelSizeY) {
                 filter[0] = f0
-                changedDataDomain()
+                changedDataDomain(filter)
             }
         }
 
@@ -277,7 +278,7 @@ module.exports = function (svgRoot, config) {
             var f1 = Math.min(1, Math.max(f0, originalFilter[1] - y / panelSizeY))
             if(Math.abs(filter[1] - f1) >= 1 / panelSizeY) {
                 filter[1] = f1
-                changedDataDomain()
+                changedDataDomain(filter)
             }
         }
 
@@ -285,18 +286,14 @@ module.exports = function (svgRoot, config) {
             originalFilter[1] = filter[1]
         }
 
-        if(update && overlay.filterControls) {
-            overlay.filterControls.setExtent(filter[0], filter[1])
-        } else {
-            overlay.filterControls = makeOverlayPanel(translateX, filter, {
-                barMove: barMove,
-                barRelease: barRelease,
-                loMove: loMove,
-                loRelease: loRelease,
-                hiMove: hiMove,
-                hiRelease: hiRelease,
-            })
-        }
+        overlay.filterControls = makeOverlayPanel(translateX, filter, {
+            barMove: barMove,
+            barRelease: barRelease,
+            loMove: loMove,
+            loRelease: loRelease,
+            hiMove: hiMove,
+            hiRelease: hiRelease
+        })
     }
 
     function destroy() {

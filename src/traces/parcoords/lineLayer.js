@@ -200,11 +200,15 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 return i < shownVariableCount && i + offset < filters.length
             }
 
-            for(var i = 0, ii = 1; i < shownVariableCount; i++, ii = (i + 1) % shownVariableCount) {
-                if(!update)
+            var i, ii;
+
+            if(!update)
+                for(i = 0; i < shownVariableCount; i++) {
                     overlayPanels[i] = {filterControls: null}
-                var overlayPanel = overlayPanels[i]
-                overlay.enterOverlayPanel(update, overlayPanel,  i * panelSizeX, filters[i], render)
+                    overlay.enterOverlayPanel(overlayPanels[i],  i * panelSizeX, filters[i], render)
+                }
+
+            for(i = 0, ii = 1; i < shownVariableCount; i++, ii = (i + 1) % shownVariableCount) {
                 items.push({
                     resolution: [width, height],
                     viewBoxPosition: [i * panelSizeX, rowNum * panelSizeY],
