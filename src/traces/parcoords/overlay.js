@@ -21,7 +21,7 @@ module.exports = function (root, typedArrayModel, config) {
     var panelSizeX = config.panelSizeX
     var panelSizeY = config.panelSizeY
 
-    var resizeHeight = controlConfig.filterSize;
+    var resizeHeight = controlConfig.handleGlyphHeight;
     var brushVisibleWidth = controlConfig.filterSize;
     var brushCaptureWidth = 3 * controlConfig.filterSize;
 
@@ -192,10 +192,31 @@ module.exports = function (root, typedArrayModel, config) {
             .selectAll('text')
             .style('font-family', 'monospace')
             .style('font-weight', 100)
-            .style('font-size', 'small')
+            .style('font-size', 'x-small')
             .style('fill', 'black')
             .style('fill-opacity', 1)
             .style('text-shadow', '2px 2px 2px #fff, -2px -2px 2px #fff, 2px -2px 2px #fff, -2px 2px 2px #fff')
+            .style('cursor', 'default')
+            .style('user-select', 'none');
+
+        var axisHeading = axisOverlays.selectAll('.axisHeading')
+            .data(repeat, keyFun);
+
+        axisHeading.enter()
+            .append('g')
+            .classed('axisHeading', true)
+
+        var axisTitle = axisHeading.selectAll('.axisTitle')
+            .data(repeat, keyFun);
+
+        axisTitle.enter()
+            .append('text')
+            .classed('axisTitle', true)
+            .text(function(d) {return d.name;})
+            .attr('y', -controlConfig.handleGlyphHeight - 10)
+            .attr('text-anchor', 'middle')
+            .style('font-family', 'sans-serif')
+            .style('font-size', 'xx-small')
             .style('cursor', 'default')
             .style('user-select', 'none');
 
