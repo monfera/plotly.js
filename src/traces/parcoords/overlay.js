@@ -39,7 +39,7 @@ module.exports = function (root, typedArrayModel, config) {
 
     function makeScale(column) {
         return d3.scale.linear()
-            .domain(d3.extent(column.values))
+            //.domain(d3.extent(column.values))
             .range([height, 0]);
     }
 
@@ -204,7 +204,11 @@ module.exports = function (root, typedArrayModel, config) {
         function moved(brush, startMoveEndIndex) {
             var operation = ['start', 'move', 'end'][startMoveEndIndex];
             return function(variable) {
-                console.log('changed due to ', operation, variable.xIndex, variable.name, brush.extent())
+                var filter = filters[variable.xIndex];
+                var extent = brush.extent();
+                filter[0] = extent[0];
+                filter[1] = extent[1];
+                render(true); // fixme unthrottled rn!
             }
         }
     }
