@@ -221,7 +221,19 @@ module.exports = function (root, typedArrayModel, config) {
             .style('font-family', 'sans-serif')
             .style('font-size', 'xx-small')
             .style('cursor', 'default')
-            .style('user-select', 'none');
+            .style('user-select', 'none')
+            .call(d3.behavior.drag()
+                .origin(function(d) {return {x: d.x};})
+                .on('dragstart', function(d) {
+                    console.log('Drag started on dimension', d.name)
+                })
+                .on('drag', function(d) {
+                    console.log('Dragging', d3.event.x)
+                })
+                .on('dragend', function(d) {
+                    console.log('Drag ended')
+                })
+            );
 
         var axisBrush = axisOverlays.selectAll('.axisBrush')
             .data(repeat, keyFun);
