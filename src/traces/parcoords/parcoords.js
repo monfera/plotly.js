@@ -18,12 +18,13 @@ var lineLayerMaker = require('./lineLayer');
 
 module.exports = function plot(root, data) {
 
-    var canvasGL = document.createElement('canvas');
-    canvasGL.setAttribute('style', 'position: absolute; margin: 32px;overflow: visible;');
-    root.appendChild(canvasGL);
-
     var model = modelMaker(data);
     var config = configMaker(model);
+
+    var canvasGL = document.createElement('canvas');
+    canvasGL.setAttribute('style', 'position: absolute; padding: ' + config.padding + 'px;overflow: visible;');
+    root.appendChild(canvasGL);
+
     var ol = overlay(root, model, config);
 
     var lineLayer = lineLayerMaker(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, ol, unitToColor);

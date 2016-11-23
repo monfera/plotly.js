@@ -9,6 +9,7 @@ module.exports = {
     panelOpacity: debug ? 0.2 : 0,
 
     filterColor: 'black',
+    handleGlyphHeight: 16,
     handleGlyphOpacity: 0.0,
     handleGlyphOverlap: 3, // effect can be seen with debug = true
     filterBarOpacity: 0.05,
