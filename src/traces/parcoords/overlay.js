@@ -51,7 +51,7 @@ module.exports = function (root, typedArrayModel, config) {
         return [{
             key: model.key,
             columns: model.columns,
-            scales: makeScales(model.columns)
+            unitScales: makeScales(model.columns)
         }];
     }
 
@@ -66,7 +66,7 @@ module.exports = function (root, typedArrayModel, config) {
                 width: panelWidth,
                 height: height,
                 values: viewModel.columns[i].values,
-                scale: viewModel.scales[i]
+                scale: viewModel.unitScales[i]
             };
         });
     }
