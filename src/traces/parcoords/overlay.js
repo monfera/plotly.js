@@ -32,7 +32,7 @@ module.exports = function (root, typedArrayModel, config) {
             values.push(typedArrayModel.data.get(i, j));
         }
         columns.push({
-            name: 'Gensym-' + i,
+            name: typedArrayModel.variableNames[i],
             values: values
         });
     }

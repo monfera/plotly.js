@@ -1,7 +1,8 @@
 var utils = require('./utils');
 
-module.exports = function(data) {
+module.exports = function(tuple) {
 
+    var data = tuple.raw
     var variableCount = data.shape[0]
     var sampleCount = data.shape[1]
     var variableIds = utils.range(variableCount);
@@ -17,6 +18,7 @@ module.exports = function(data) {
         variableCount: variableCount,
         sampleCount: sampleCount,
         domainToUnitScales: domainToUnitScales,
-        filters: filters
+        filters: filters,
+        variableNames: tuple.variableNames
     }
 };
