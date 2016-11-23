@@ -8,8 +8,6 @@
 
 'use strict';
 
-var d3 = require('d3');
-
 var modelMaker = require('./model');
 var configMaker = require('./config');
 var overlay = require('./overlay');
@@ -24,15 +22,9 @@ module.exports = function plot(root, data) {
     canvasGL.setAttribute('style', 'position: absolute; margin: 32px;overflow: visible;');
     root.appendChild(canvasGL);
 
-    var svgRoot = d3.select(root).append('svg')
-        .style('position', 'absolute')
-        .style('margin', '32px')
-        .style('overflow', 'visible')
-        .node();
-
     var model = modelMaker(data);
     var config = configMaker(model);
-    var ol = overlay(svgRoot, config);
+    var ol = overlay(root, model, config);
 
     var lineLayer = lineLayerMaker(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, ol, unitToColor);
 
