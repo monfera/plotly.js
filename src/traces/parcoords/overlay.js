@@ -223,17 +223,12 @@ module.exports = function (svgRoot, config) {
         // top handle (with capture zone)
         setExtents.push(enterGlyphMaker(filter, false, hiMove, hiRelease, domain))
 
-        return {setExtent: function(lo, hi) {
+        return function(lo, hi) {
             setExtents.forEach(function(set) {set(lo, hi)})
-        }}
+        }
     }
 
     function enterOverlayPanel(overlay, translateX, filter, render) {
-
-        var changedDataDomain = function(filter) {
-            overlay.filterControls.setExtent(filter[0], filter[1])
-            render(true)
-        }
 
         var originalFilter = filter.slice()
 
@@ -284,6 +279,11 @@ module.exports = function (svgRoot, config) {
 
         function hiRelease() {
             originalFilter[1] = filter[1]
+        }
+
+        function changedDataDomain(filter) {
+            overlay.filterControls(filter[0], filter[1])
+            render(true)
         }
 
         overlay.filterControls = makeOverlayPanel(translateX, filter, {

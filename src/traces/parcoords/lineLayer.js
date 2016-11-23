@@ -190,6 +190,12 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
         var scheduled = null
 
+        function enterOverlayPanels(overlayPanels, filters, panelSizeX, render) {
+            for(var i = 0; i < filters.length; i++) {
+                overlay.enterOverlayPanel({filterControls: null},  i * panelSizeX, filters[i], render)
+            }
+        }
+
         return function(rowNum, update) {
 
             window.clearTimeout(scheduled)
@@ -203,10 +209,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             var i, ii;
 
             if(!update)
-                for(i = 0; i < shownVariableCount; i++) {
-                    overlayPanels[i] = {filterControls: null}
-                    overlay.enterOverlayPanel(overlayPanels[i],  i * panelSizeX, filters[i], render)
-                }
+                enterOverlayPanels(overlayPanels, filters, panelSizeX, render)
 
             for(i = 0, ii = 1; i < shownVariableCount; i++, ii = (i + 1) % shownVariableCount) {
                 items.push({
