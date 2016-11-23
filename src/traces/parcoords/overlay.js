@@ -169,9 +169,7 @@ module.exports = function (root, typedArrayModel, config) {
                 var brush = d3.svg.brush()
                     .y(d.scale);
                 brush
-                    .on('brushstart', moved(brush, 0))
-                    .on('brush', moved(brush, 1))
-                    .on('brushend', moved(brush, 2));
+                    .on('brush', moved(brush));
                 d3.select(this).call(brush);
             });
 
@@ -184,7 +182,8 @@ module.exports = function (root, typedArrayModel, config) {
         axisBrushEnter
             .selectAll('rect.extent')
             .attr('fill-opacity', controlConfig.filterBarOpacity)
-            .attr('fill', 'url(#filterBarPattern)');
+            .attr('fill', 'url(#filterBarPattern)')
+            .attr('y', -100); // small D3 bug workaround
 
         axisBrushEnter
             .selectAll('.resize rect')
@@ -200,13 +199,18 @@ module.exports = function (root, typedArrayModel, config) {
             .selectAll('.resize.s rect')
             .attr('y', -controlConfig.handleGlyphOverlap);
 
-        function moved(brush, startMoveEndIndex) {
-            var operation = ['start', 'move', 'end'][startMoveEndIndex];
+        function moved(brush) {
             return function(variable) {
+                console.log('moved haha')
                 var filter = filters[variable.xIndex];
                 var extent = brush.extent();
-                filter[0] = extent[0];
-                filter[1] = extent[1];
+                var reset = extent[0] == extent[1]
+                if(reset) {
+                    brush.clear();
+                    d3.select(this).select('rect.extent').attr('y', -100); // small D3 bug workaround
+                }
+                filter[0] = reset ? 0 : extent[0];
+                filter[1] = reset ? 1 : extent[1];
                 render(true); // fixme unthrottled rn!
             }
         }
