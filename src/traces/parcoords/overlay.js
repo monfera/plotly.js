@@ -302,8 +302,14 @@ module.exports = function (svgRoot, config) {
         range.deleteContents()
     }
 
+    function enterOverlayPanels(filters, panelSizeX, render) {
+        for(var i = 0; i < filters.length; i++) {
+            enterOverlayPanel(i * panelSizeX, filters[i], render)
+        }
+    }
+
     return {
-        enterOverlayPanel: enterOverlayPanel,
+        enterOverlayPanels: enterOverlayPanels,
         destroy: destroy
     }
 
