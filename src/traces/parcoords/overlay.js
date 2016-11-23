@@ -147,10 +147,26 @@ module.exports = function (root, typedArrayModel, config) {
         var panel = parcoordsView.selectAll('.panel')
             .data(panelViewModel, keyFun)
 
+        var lastX = null;
+
         panel.enter()
             .append('g')
             .classed('panel', true)
-            .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
+            .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';})
+            .call(d3.behavior.drag()
+                .origin(function(d) {return {x: d.x};})
+                .on('dragstart', function(d) {
+                    console.log('Drag started on dimension', d.name)
+                })
+                .on('drag', function(d) {
+                    d3.select(this).attr('transform', 'translate(' + d3.event.x + ', 0)');
+                    lastX = d3.event.x;
+                })
+                .on('dragend', function(d) {
+                    console.log('Drag ended')
+                    d.x = lastX;
+                })
+            );
 
         var panelBackground = panel.selectAll('.panelBackground')
             .data(repeat, keyFun);
@@ -222,19 +238,7 @@ module.exports = function (root, typedArrayModel, config) {
             .style('font-family', 'sans-serif')
             .style('font-size', 'xx-small')
             .style('cursor', 'default')
-            .style('user-select', 'none')
-            .call(d3.behavior.drag()
-                .origin(function(d) {return d;})
-                .on('dragstart', function(d) {
-                    console.log('Drag started on dimension', d.name)
-                })
-                .on('drag', function(d) {
-                    d3.select(this).attr('transform', function(dd) {return 'translate(' + (dd == d ? d3.event.x - d.x: 0) + ', 0)';});
-                })
-                .on('dragend', function(d) {
-                    console.log('Drag ended')
-                })
-            );
+            .style('user-select', 'none');
 
         var axisBrush = axisOverlays.selectAll('.axisBrush')
             .data(repeat, keyFun);
