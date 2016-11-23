@@ -207,7 +207,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             var i, ii;
 
             if(!update)
-                enterOverlayPanels(filters, panelSizeX, render)
+                overlay.enterOverlayPanels(filters, panelSizeX, render)
 
             for(i = 0, ii = 1; i < shownVariableCount; i++, ii = (i + 1) % shownVariableCount) {
                 items.push({
