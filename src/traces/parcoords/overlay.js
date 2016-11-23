@@ -2,322 +2,221 @@ var controlConfig = require('./overlayConfig');
 var utils = require('./utils');
 var d3 = require('d3');
 
-module.exports = function (root, model, config) {
+function keyFun(d) {
+    return d && d.key;
+}
 
-    var svgRoot = d3.select(root).append('svg')
-        .style('position', 'absolute')
-        .style('margin', '32px')
-        .style('overflow', 'visible')
-        .node();
+function repeat(d) {
+    return [d];
+}
+
+function descend(d) {
+    return d;
+}
+
+module.exports = function (root, typedArrayModel, config) {
 
     var width = config.width
     var height = config.height
     var panelSizeX = config.panelSizeX
     var panelSizeY = config.panelSizeY
 
-    var filterSize = controlConfig.filterSize
+    var resizeHeight = controlConfig.filterSize;
+    var brushVisibleWidth = controlConfig.filterSize;
+    var brushCaptureWidth = 3 * controlConfig.filterSize;
 
-    var capturePaddingX = Math.max(panelSizeX / 2 - filterSize, 0)
-    var svg = svgRoot.namespaceURI
-
-    svgRoot.setAttribute('width', width)
-    svgRoot.setAttribute('height', height)
-
-    function attachEventHandler(root, redraw, padding, move, release) {
-
-        var captureZonePerimeterX = width
-        var captureZonePerimeterY = height
-        var mouseDowned = false
-        var mouseDownX = NaN
-        var mouseDownY = NaN
-
-        function mouseDown(e) {
-            e.preventDefault() // prevents the Firefox 'drag&drop' reflex on 2nd use
-            svgRoot.style['pointer-events'] = 'none'
-            root.style['pointer-events'] = 'all'
-            mouseDownX = e.pageX
-            mouseDownY = e.pageY
-            padding[0] = captureZonePerimeterX
-            padding[1] = captureZonePerimeterY
-            mouseDowned = true
+    var columns = [];
+    for(var i = 0; i < typedArrayModel.variableCount; i++) {
+        var values = [];
+        for(var j = 0; j < typedArrayModel.sampleCount; j++) {
+            values.push(typedArrayModel.data.get(i, j));
         }
-
-        function mouseUp() {
-            padding[0] = capturePaddingX
-            padding[1] = 0
-            mouseDowned = false
-            release()
-            redraw()
-            svgRoot.style['pointer-events'] = ''
-            root.style['pointer-events'] = ''
-        }
-
-        function mousemove(e) {
-            if(e.buttons === 0 && mouseDowned)
-                mouseUp()
-            if(mouseDowned)
-                move(e.pageY - mouseDownY)
-        }
-
-        root.addEventListener('mousedown', mouseDown)
-        root.addEventListener('mouseup', mouseUp)
-        root.addEventListener('mousemove', utils.throttle(mousemove,
-            controlConfig.mousemoveThrottle), { passive: true })
+        columns.push({
+            name: 'Gensym-' + i,
+            values: values
+        });
     }
 
-    function barBoxToDomain(rect, padding, loHi) {
-        var lo = loHi[0]
-        var hi = loHi[1]
-        rect.setAttribute('y', panelSizeY * (1 - hi) - padding[1])
-        rect.setAttribute('height', panelSizeY * (hi - lo) + 2 * padding[1])
-        rect.setAttribute('x', - padding[0])
-        rect.setAttribute('width', filterSize + 2 * padding[0])
+    function makeScale(column) {
+        return d3.scale.linear()
+            .domain(d3.extent(column.values))
+            .range([height, 0]);
     }
 
-    function handleToDomain(handle, position) {
-        var y = (1 - position) * panelSizeY
-        handle.setAttribute('transform', 'translate(0,' + y + ')')
+    function makeScales(columns) {
+        return columns.map(makeScale);
     }
 
-    function handleBoxToDomain(bottom) {
-        return function(rect, padding) {
-            rect.setAttribute('y', (bottom ? 0 : -filterSize) - padding[1])
-            rect.setAttribute('height', filterSize + 2 * padding[1])
-            rect.setAttribute('x', - padding[0])
-            rect.setAttribute('width', filterSize + 2 * padding[0])
-        }
+    function viewModel(model) {
+        return [{
+            key: model.key,
+            columns: model.columns,
+            scales: makeScales(model.columns)
+        }];
     }
 
-    function setHandleExtent(index, handle, zone, domain, zonePadding,
-                             handleToDomain, handleBoxToDomain) {
-        return function(lo, hi) {
-            var value = index ? hi : lo
-            domain[index] = value
-            handleToDomain(handle, value)
-            handleBoxToDomain(zone, zonePadding, !!index)
-        }
+    function panelViewModel(viewModel) {
+        return columns.map(function(column, i) {
+            var panelWidth = width / viewModel.columns.length;
+            return {
+                key: viewModel.columns[i].name,
+                name: viewModel.columns[i].name,
+                xIndex: i,
+                x: panelWidth * i,
+                width: panelWidth,
+                height: height,
+                values: viewModel.columns[i].values,
+                scale: viewModel.scales[i]
+            };
+        });
     }
 
-    function enterFilterBarRect(root, domain) {
 
-        var rect = document.createElementNS(svg, 'rect')
-        rect.style['stroke-width'] = 0.0
-        rect.style.fill = controlConfig.filterColor
-        rect.style['fill-opacity'] = controlConfig.filterBarOpacity
-        rect.style.stroke = controlConfig.filterColor
-        rect.setAttribute('class', 'filterBarRect')
-        rect.setAttribute('width', filterSize)
-        barBoxToDomain(rect, [0, 0], domain)
-        root.appendChild(rect)
-
-        return function() {barBoxToDomain(rect, [0, 0], domain)}
+    var model = {
+        key: 0,
+        columns: columns
     }
 
-    function enterCaptureZone(padding, boxToDomain, move, release, domain) {
-        var zone = document.createElementNS(svg, 'rect')
-        attachEventHandler(
-            zone,
-            function() {return boxToDomain(zone, padding, domain)},
-            padding,
-            move,
-            release
-        )
-        zone.style.fill = controlConfig.captureZoneFillColor
-        zone.style.stroke = controlConfig.captureZoneBorderColor
-        zone.setAttribute('class', 'captureZone')
-        zone.setAttribute('width', filterSize)
-        return zone
-    }
+    function enterOverlayPanels(filters, panelSizeX, render) {
 
-    function enterBarCaptureZone(root, boxToDomain, move, release, domain) {
-        var activeCaptureZonePadding = [capturePaddingX, 0]
-        var filterBarCaptureZone = enterCaptureZone(
-            activeCaptureZonePadding, boxToDomain, move, release, domain)
-        boxToDomain(filterBarCaptureZone, activeCaptureZonePadding, domain)
-        filterBarCaptureZone.style.cursor = 'pointer'
-        root.appendChild(filterBarCaptureZone)
-        return function() {
-            boxToDomain(filterBarCaptureZone, activeCaptureZonePadding, domain)
-        }
-    }
+        var c = config
+        var cc = controlConfig
+        //debugger
 
-    function enterGlyphMaker(root, bottom, move, release, domain) {
 
-        var position = domain[bottom ? 0 : 1]
-        var s = filterSize
-        var dir = bottom ? 1 : -1
+        var svg = d3.select(root).selectAll('.parcoordsSVG')
+            .data([model], keyFun)
 
-        var handle = document.createElementNS(svg, 'g')
-        handle.setAttribute('class', 'handle')
-        handleToDomain(handle, position)
-        root.appendChild(handle)
+        svg.enter()
+            .append('svg')
+            .classed('parcoordsSVG', true)
+            .attr('overflow', 'visible')
+            .attr('width', width)
+            .attr('height', height)
+            .style('position', 'absolute')
+            .style('padding', '32px')
+/*
+            .style('padding-top', resizeHeight)
+            .style('padding-bottom', resizeHeight)
+            .style('padding-left', brushCaptureWidth / 2)
+            .style('padding-right', brushCaptureWidth / 2)
+*/
+            .style('overflow', 'visible');
 
-        var handleGlyph = document.createElementNS(svg, 'path')
-        handleGlyph.style.fill = controlConfig.filterColor
-        handleGlyph.style['fill-opacity'] = controlConfig.handleGlyphOpacity
-        handleGlyph.style['stroke-width'] = 0
-        handleGlyph.style.stroke = controlConfig.filterColor
-        handleGlyph.setAttribute('stroke-width', 1)
-        handleGlyph.setAttribute('d', 'M0,' + dir * s + ' l' + s / 2 +','
-            + dir * -s + ' l' + s/2 + ',' + dir * s + 'Z')
-        handle.appendChild(handleGlyph)
+        var defs = svg.selectAll('defs')
+            .data(repeat, keyFun);
 
-        var zonePadding = [capturePaddingX, 0]
-        var handleBox = handleBoxToDomain(bottom)
-        var zone = enterCaptureZone(zonePadding, handleBox, move, release, domain)
-        handleBoxToDomain(bottom)(zone, zonePadding)
-        zone.style.cursor = 'row-resize'
-        handle.appendChild(zone)
+        defs.enter()
+            .append('defs');
 
-        return setHandleExtent(bottom ? 0 : 1, handle, zone, domain, zonePadding,
-            handleToDomain, handleBox)
-    }
+        var filterBarPattern = defs.selectAll('#filterBarPattern')
+            .data(repeat, keyFun);
 
-    function makeOverlayPanel(translateX, loHi, callbacks) {
+        filterBarPattern.enter()
+            .append('pattern')
+            .attr('id', 'filterBarPattern')
+            .attr('width', brushCaptureWidth)
+            .attr('height', height)
+            .attr('x', -brushVisibleWidth / 2)
+            .attr('patternUnits', 'userSpaceOnUse');
 
-        var lo = loHi[0]
-        var hi = loHi[1]
+        var filterBarPatternGlyph = filterBarPattern.selectAll('rect')
+            .data(repeat, keyFun);
 
-        var barMove = callbacks.barMove || function() {}
-        var barRelease = callbacks.barRelease || function() {}
-        var loMove = callbacks.loMove || function() {}
-        var loRelease = callbacks.loRelease || function() {}
-        var hiMove = callbacks.hiMove || function() {}
-        var hiRelease = callbacks.hiRelease || function() {}
+        filterBarPatternGlyph.enter()
+            .append('rect')
+            .attr('width', brushVisibleWidth)
+            .attr('height', height);
 
-        var domain = [lo, hi]
-        var setExtents = []
+        var parcoordsModel = svg.selectAll('.parcoordsModel')
+            .data(repeat, keyFun)
 
-        setExtents.push(function(lo, hi) {
-            domain[0] = lo
-            domain[1] = hi
-        })
+        parcoordsModel.enter()
+            .append('g')
+            .classed('parcoordsModel', true);
 
-        // panel
-        var panel = document.createElementNS(svg, 'g')
-        panel.setAttribute('class', 'panel')
-        panel.setAttribute('transform', 'translate(' + translateX + ', 0)')
-        svgRoot.appendChild(panel)
+        var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
+            .data(viewModel, keyFun)
 
-        // border
-        var border = document.createElementNS(svg, 'rect')
-        border.setAttribute('class', 'border')
-        border.setAttribute('width', panelSizeX)
-        border.setAttribute('height', panelSizeY)
-        border.setAttribute('stroke-width', '1px')
-        border.style.fill = 'none'
-        border.style.stroke = controlConfig.panelBorderColor
-        border.style['stroke-opacity'] = controlConfig.panelBorderOpacity
-        panel.appendChild(border)
+        parcoordsViewModel.enter()
+            .append('g')
+            .classed('parcoordsViewModel', true);
 
-        // vertical filter
-        var filter = document.createElementNS(svg, 'g')
-        var x = 0.5 - filterSize / 2
-        filter.setAttribute('class', 'filter')
-        filter.setAttribute('transform', 'translate(' + x + ', 0)')
-        panel.appendChild(filter)
+        var parcoordsView = parcoordsViewModel.selectAll('.parcoordsView')
+            .data(repeat, keyFun);
 
-        // vertical filter rectangle
-        setExtents.push(enterFilterBarRect(filter, domain))
+        parcoordsView.enter()
+            .append('g')
+            .classed('parcoordsView', true)
 
-        // vertical filter rectangle - capture zone
-        setExtents.push(enterBarCaptureZone(filter, barBoxToDomain,
-            barMove, barRelease, domain))
+        var panel = parcoordsView.selectAll('.panel')
+            .data(panelViewModel, keyFun)
 
-        // bottom handle (with capture zone)
-        setExtents.push(enterGlyphMaker(filter, true, loMove, loRelease, domain))
+        panel.enter()
+            .append('g')
+            .classed('panel', true)
+            .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
 
-        // top handle (with capture zone)
-        setExtents.push(enterGlyphMaker(filter, false, hiMove, hiRelease, domain))
+        var panelBackground = panel.selectAll('.panelBackground')
+            .data(repeat, keyFun);
 
-        return function(lo, hi) {
-            setExtents.forEach(function(set) {set(lo, hi)})
-        }
-    }
+        panelBackground.enter()
+            .append('rect')
+            .classed('panelBackground', true)
+            .attr('width', function(d) {return d.width})
+            .attr('height', function(d) {return d.height})
+            .attr('fill', function() {return 'rgba(0,255,0,' + 0.2 * Math.random() + ')';});
 
-    function enterOverlayPanel(translateX, filter, render) {
+        var axisBrush = panel.selectAll('.axisBrush')
+            .data(repeat, keyFun);
 
-        var originalFilter = filter.slice()
+        var axisBrushEnter = axisBrush.enter()
+            .append('g')
+            .classed('axisBrush', true)
+            .each(function(d) {
+                var brush = d3.svg.brush()
+                    .y(d.scale);
+                brush
+                    .on('brushstart', moved(brush, 0))
+                    .on('brush', moved(brush, 1))
+                    .on('brushend', moved(brush, 2));
+                d3.select(this).call(brush);
+            });
 
-        function barMove(y) {
-            var f0 = originalFilter[0] - y / panelSizeY
-            var f1 = originalFilter[1] - y / panelSizeY
-            if(f0 < 0) {
-                f1 += 0 - f0
-                f0 = 0
-            }
-            if(f1 > 1) {
-                f0 -= f1 - 1
-                f1 = 1
-            }
-            if(Math.abs(filter[0] - f0) >= 1 / panelSizeY) {
-                filter[0] = f0
-                filter[1] = f1
-                changedDataDomain(filter)
+        axisBrushEnter
+            .selectAll('rect')
+            .attr('x', -brushCaptureWidth / 2)
+            .attr('width', brushCaptureWidth)
+
+        axisBrushEnter
+            .selectAll('rect.extent')
+            .attr('fill-opacity', 0.15)
+            .attr('fill', 'url(#filterBarPattern)');
+
+        axisBrushEnter
+            .selectAll('.resize rect')
+            .attr('height', resizeHeight);
+
+        axisBrushEnter
+            .selectAll('.resize.n rect')
+            .attr('y', -resizeHeight);
+
+        function moved(brush, startMoveEndIndex) {
+            var operation = ['start', 'move', 'end'][startMoveEndIndex];
+            return function(variable) {
+                console.log('changed due to ', operation, variable.xIndex, variable.name, brush.extent())
             }
         }
-
-        function barRelease() {
-            originalFilter[0] = filter[0]
-            originalFilter[1] = filter[1]
-        }
-
-        function loMove(y) {
-            var f1 = originalFilter[1]
-            var f0 = Math.max(0, Math.min(f1, originalFilter[0] - y / panelSizeY))
-            if(Math.abs(filter[0] - f0) >= 1 / panelSizeY) {
-                filter[0] = f0
-                changedDataDomain(filter)
-            }
-        }
-
-        function loRelease() {
-            originalFilter[0] = filter[0]
-        }
-
-        function hiMove(y) {
-            var f0 = originalFilter[0]
-            var f1 = Math.min(1, Math.max(f0, originalFilter[1] - y / panelSizeY))
-            if(Math.abs(filter[1] - f1) >= 1 / panelSizeY) {
-                filter[1] = f1
-                changedDataDomain(filter)
-            }
-        }
-
-        function hiRelease() {
-            originalFilter[1] = filter[1]
-        }
-
-        function changedDataDomain(filter) {
-            filterControls(filter[0], filter[1])
-            render(true)
-        }
-
-        var filterControls = makeOverlayPanel(translateX, filter, {
-            barMove: barMove,
-            barRelease: barRelease,
-            loMove: loMove,
-            loRelease: loRelease,
-            hiMove: hiMove,
-            hiRelease: hiRelease
-        })
     }
 
     function destroy() {
         var range = document.createRange()
-        range.selectNodeContents(svgRoot)
+        range.selectNodeContents(svg)
         range.deleteContents()
-    }
-
-    function enterOverlayPanels(filters, panelSizeX, render) {
-        for(var i = 0; i < filters.length; i++) {
-            enterOverlayPanel(i * panelSizeX, filters[i], render)
-        }
     }
 
     return {
         enterOverlayPanels: enterOverlayPanels,
         destroy: destroy
     }
-
 }
