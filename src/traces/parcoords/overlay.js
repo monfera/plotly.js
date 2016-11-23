@@ -37,21 +37,23 @@ module.exports = function (root, typedArrayModel, config) {
         });
     }
 
-    function makeScale(column) {
+    function makeDomainScale(column) {
         return d3.scale.linear()
-            //.domain(d3.extent(column.values))
+            .domain(d3.extent(column.values))
             .range([height, 0]);
     }
 
-    function makeScales(columns) {
-        return columns.map(makeScale);
+    function makeUnitScale(column) {
+        return d3.scale.linear()
+            .range([height, 0]);
     }
 
     function viewModel(model) {
         return [{
             key: model.key,
             columns: model.columns,
-            unitScales: makeScales(model.columns)
+            unitScales: columns.map(makeUnitScale),
+            domainScales: columns.map(makeDomainScale)
         }];
     }
 
@@ -66,7 +68,7 @@ module.exports = function (root, typedArrayModel, config) {
                 width: panelWidth,
                 height: height,
                 values: viewModel.columns[i].values,
-                scale: viewModel.unitScales[i]
+                unitScale: viewModel.unitScales[i]
             };
         });
     }
@@ -178,7 +180,7 @@ module.exports = function (root, typedArrayModel, config) {
                     .call(d3.svg.axis()
                     .orient('left')
                         .ticks(height / 40)
-                        .scale(d.scale));
+                        .scale(d.unitScale));
             });
 
         axisEnter
@@ -228,7 +230,7 @@ module.exports = function (root, typedArrayModel, config) {
             .classed('axisBrush', true)
             .each(function(d) {
                 d.brush = d3.svg.brush()
-                    .y(d.scale)
+                    .y(d.unitScale)
                     .on('brushstart', started)
                     .on('brush', moved);
                 d3.select(this).call(d.brush);
