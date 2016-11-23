@@ -228,7 +228,7 @@ module.exports = function (svgRoot, config) {
         }
     }
 
-    function enterOverlayPanel(overlay, translateX, filter, render) {
+    function enterOverlayPanel(translateX, filter, render) {
 
         var originalFilter = filter.slice()
 
@@ -282,11 +282,11 @@ module.exports = function (svgRoot, config) {
         }
 
         function changedDataDomain(filter) {
-            overlay.filterControls(filter[0], filter[1])
+            filterControls(filter[0], filter[1])
             render(true)
         }
 
-        overlay.filterControls = makeOverlayPanel(translateX, filter, {
+        var filterControls = makeOverlayPanel(translateX, filter, {
             barMove: barMove,
             barRelease: barRelease,
             loMove: loMove,
