@@ -169,6 +169,7 @@ module.exports = function (root, typedArrayModel, config) {
                 var brush = d3.svg.brush()
                     .y(d.scale);
                 brush
+                    .on('brushstart', started)
                     .on('brush', moved(brush));
                 d3.select(this).call(brush);
             });
@@ -199,19 +200,25 @@ module.exports = function (root, typedArrayModel, config) {
             .selectAll('.resize.s rect')
             .attr('y', -controlConfig.handleGlyphOverlap);
 
+        var justStarted = false;
+
+        function started() {
+            justStarted = true;
+        }
+
         function moved(brush) {
             return function(variable) {
-                console.log('moved haha')
                 var filter = filters[variable.xIndex];
                 var extent = brush.extent();
-                var reset = extent[0] == extent[1]
+                var reset = justStarted && (extent[0] == extent[1])
                 if(reset) {
                     brush.clear();
                     d3.select(this).select('rect.extent').attr('y', -100); // small D3 bug workaround
                 }
                 filter[0] = reset ? 0 : extent[0];
                 filter[1] = reset ? 1 : extent[1];
-                render(true); // fixme unthrottled rn!
+                justStarted = false;
+                render(true);
             }
         }
     }
