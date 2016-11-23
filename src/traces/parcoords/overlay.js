@@ -208,15 +208,13 @@ module.exports = function (root, typedArrayModel, config) {
 
         function moved(brush) {
             return function(variable) {
-                var filter = filters[variable.xIndex];
                 var extent = brush.extent();
-                var reset = justStarted && (extent[0] == extent[1])
+                var reset = justStarted && (extent[0] == extent[1]);
                 if(reset) {
                     brush.clear();
                     d3.select(this).select('rect.extent').attr('y', -100); // small D3 bug workaround
                 }
-                filter[0] = reset ? 0 : extent[0];
-                filter[1] = reset ? 1 : extent[1];
+                filters[variable.xIndex] = reset ? [0, 1] : extent.slice();
                 justStarted = false;
                 render(true);
             }
