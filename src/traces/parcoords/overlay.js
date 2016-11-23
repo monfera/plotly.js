@@ -159,7 +159,43 @@ module.exports = function (root, typedArrayModel, config) {
             .attr('stroke-opacity', controlConfig.panelBorderOpacity)
             .attr('fill', function() {return 'rgba(0,255,0,' + controlConfig.panelOpacity * Math.random() + ')';});
 
-        var axisBrush = panel.selectAll('.axisBrush')
+        var axisOverlays = panel.selectAll('.axisOverlays')
+            .data(repeat, keyFun);
+
+        axisOverlays.enter()
+            .append('g')
+            .classed('axisOverlays', true);
+
+        var axis = axisOverlays.selectAll('.axis')
+            .data(repeat, keyFun);
+
+        var axisEnter = axis.enter()
+            .append('g')
+            .classed('axis', true)
+            .each(function(d) {
+                d3.select(this)
+                    .call(d3.svg.axis()
+                    .orient('left')
+                        .ticks(height / 40)
+                        .scale(d.scale));
+            });
+
+        axisEnter
+            .selectAll('.domain')
+            .attr('fill', 'none')
+            .attr('stroke', 'black')
+            .attr('stroke-opacity', 0.5)
+            .attr('stroke-width', '0.5px');
+
+        axisEnter
+            .selectAll('text')
+            .style('font-family', 'monospace')
+            .style('font-weight', 100)
+            .style('font-size', 'small')
+            .style('fill-opacity', 0.5)
+            .style('user-select', 'none');
+
+        var axisBrush = axisOverlays.selectAll('.axisBrush')
             .data(repeat, keyFun);
 
         var axisBrushEnter = axisBrush.enter()
