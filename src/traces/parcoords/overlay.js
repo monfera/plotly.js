@@ -166,12 +166,11 @@ module.exports = function (root, typedArrayModel, config) {
             .append('g')
             .classed('axisBrush', true)
             .each(function(d) {
-                var brush = d3.svg.brush()
-                    .y(d.scale);
-                brush
+                d.brush = d3.svg.brush()
+                    .y(d.scale)
                     .on('brushstart', started)
-                    .on('brush', moved(brush));
-                d3.select(this).call(brush);
+                    .on('brush', moved);
+                d3.select(this).call(d.brush);
             });
 
         axisBrushEnter
@@ -184,7 +183,7 @@ module.exports = function (root, typedArrayModel, config) {
             .selectAll('rect.extent')
             .attr('fill-opacity', controlConfig.filterBarOpacity)
             .attr('fill', 'url(#filterBarPattern)')
-            .attr('y', -100); // small D3 bug workaround
+            .attr('y', -100); //  // zero-size rectangle pointer issue workaround
 
         axisBrushEnter
             .selectAll('.resize rect')
@@ -206,18 +205,16 @@ module.exports = function (root, typedArrayModel, config) {
             justStarted = true;
         }
 
-        function moved(brush) {
-            return function(variable) {
-                var extent = brush.extent();
-                var reset = justStarted && (extent[0] == extent[1]);
-                if(reset) {
-                    brush.clear();
-                    d3.select(this).select('rect.extent').attr('y', -100); // small D3 bug workaround
-                }
-                filters[variable.xIndex] = reset ? [0, 1] : extent.slice();
-                justStarted = false;
-                render(true);
+        function moved(variable) {
+            var extent = variable.brush.extent();
+            var reset = justStarted && (extent[0] == extent[1]);
+            if(reset) {
+                variable.brush.clear();
+                d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
             }
+            filters[variable.xIndex] = reset ? [0, 1] : extent.slice();
+            justStarted = false;
+            render(true);
         }
     }
 
