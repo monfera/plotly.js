@@ -69,7 +69,8 @@ module.exports = function (root, typedArrayModel, config) {
                 height: height,
                 values: viewModel.columns[i].values,
                 unitScale: viewModel.unitScales[i],
-                domainScale: viewModel.domainScales[i]
+                domainScale: viewModel.domainScales[i],
+                columns: columns
             };
         });
     }
@@ -223,12 +224,12 @@ module.exports = function (root, typedArrayModel, config) {
             .style('cursor', 'default')
             .style('user-select', 'none')
             .call(d3.behavior.drag()
-                .origin(function(d) {return {x: d.x};})
+                .origin(function(d) {return d;})
                 .on('dragstart', function(d) {
                     console.log('Drag started on dimension', d.name)
                 })
                 .on('drag', function(d) {
-                    console.log('Dragging', d3.event.x)
+                    d3.select(this).attr('transform', function(dd) {return 'translate(' + (dd == d ? d3.event.x - d.x: 0) + ', 0)';});
                 })
                 .on('dragend', function(d) {
                     console.log('Drag ended')
