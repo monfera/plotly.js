@@ -5,7 +5,8 @@ module.exports = {
     mousemoveThrottle: 1000 / 30,
 
     panelBorderColor: 'black',
-    panelBorderOpacity: 0.05,
+    panelBorderOpacity: debug ? 1 : 0.05,
+    panelOpacity: debug ? 0.2 : 0,
 
     filterColor: 'black',
     handleGlyphOpacity: 0.0,

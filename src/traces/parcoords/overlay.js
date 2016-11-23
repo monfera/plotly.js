@@ -157,7 +157,7 @@ module.exports = function (root, typedArrayModel, config) {
             .attr('height', function(d) {return d.height})
             .attr('stroke', controlConfig.panelBorderColor)
             .attr('stroke-opacity', controlConfig.panelBorderOpacity)
-            .attr('fill', function() {return 'rgba(0,255,0,' + 0.2 * Math.random() + ')';});
+            .attr('fill', function() {return 'rgba(0,255,0,' + controlConfig.panelOpacity * Math.random() + ')';});
 
         var axisBrush = panel.selectAll('.axisBrush')
             .data(repeat, keyFun);
