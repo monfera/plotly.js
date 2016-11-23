@@ -77,7 +77,7 @@ module.exports = function (root, typedArrayModel, config) {
         columns: columns
     }
 
-    function enterOverlayPanels(filters, panelSizeX, render) {
+    function enterOverlayPanels(filters, render) {
 
         var svg = d3.select(root).selectAll('.parcoordsSVG')
             .data([model], keyFun)
