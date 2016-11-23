@@ -90,7 +90,8 @@ module.exports = function (root, typedArrayModel, config) {
             .attr('height', height)
             .style('position', 'absolute')
             .style('padding', config.padding + 'px')
-            .style('overflow', 'visible');
+            .style('overflow', 'visible')
+            .style('shape-rendering', 'crispEdges');
 
         var defs = svg.selectAll('defs')
             .data(repeat, keyFun);
@@ -181,7 +182,7 @@ module.exports = function (root, typedArrayModel, config) {
             });
 
         axisEnter
-            .selectAll('.domain')
+            .selectAll('.domain, .tick')
             .attr('fill', 'none')
             .attr('stroke', 'black')
             .attr('stroke-opacity', 0.5)
@@ -192,7 +193,10 @@ module.exports = function (root, typedArrayModel, config) {
             .style('font-family', 'monospace')
             .style('font-weight', 100)
             .style('font-size', 'small')
-            .style('fill-opacity', 0.5)
+            .style('fill', 'black')
+            .style('fill-opacity', 1)
+            .style('text-shadow', '2px 2px 2px #fff, -2px -2px 2px #fff, 2px -2px 2px #fff, -2px 2px 2px #fff')
+            .style('cursor', 'default')
             .style('user-select', 'none');
 
         var axisBrush = axisOverlays.selectAll('.axisBrush')
