@@ -6,7 +6,7 @@ module.exports = function (root, model, config) {
 
     var svgRoot = d3.select(root).append('svg')
         .style('position', 'absolute')
-        .style('margin', '32px')
+        .style('margin', config.padding + 'px')
         .style('overflow', 'visible')
         .node();
 

@@ -79,11 +79,6 @@ module.exports = function (root, typedArrayModel, config) {
 
     function enterOverlayPanels(filters, panelSizeX, render) {
 
-        var c = config
-        var cc = controlConfig
-        //debugger
-
-
         var svg = d3.select(root).selectAll('.parcoordsSVG')
             .data([model], keyFun)
 
@@ -94,13 +89,7 @@ module.exports = function (root, typedArrayModel, config) {
             .attr('width', width)
             .attr('height', height)
             .style('position', 'absolute')
-            .style('padding', '32px')
-/*
-            .style('padding-top', resizeHeight)
-            .style('padding-bottom', resizeHeight)
-            .style('padding-left', brushCaptureWidth / 2)
-            .style('padding-right', brushCaptureWidth / 2)
-*/
+            .style('padding', config.padding + 'px')
             .style('overflow', 'visible');
 
         var defs = svg.selectAll('defs')
@@ -126,7 +115,8 @@ module.exports = function (root, typedArrayModel, config) {
         filterBarPatternGlyph.enter()
             .append('rect')
             .attr('width', brushVisibleWidth)
-            .attr('height', height);
+            .attr('height', height)
+            .attr('fill', controlConfig.filterColor);
 
         var parcoordsModel = svg.selectAll('.parcoordsModel')
             .data(repeat, keyFun)
@@ -165,6 +155,8 @@ module.exports = function (root, typedArrayModel, config) {
             .classed('panelBackground', true)
             .attr('width', function(d) {return d.width})
             .attr('height', function(d) {return d.height})
+            .attr('stroke', controlConfig.panelBorderColor)
+            .attr('stroke-opacity', controlConfig.panelBorderOpacity)
             .attr('fill', function() {return 'rgba(0,255,0,' + 0.2 * Math.random() + ')';});
 
         var axisBrush = panel.selectAll('.axisBrush')
@@ -187,19 +179,26 @@ module.exports = function (root, typedArrayModel, config) {
             .selectAll('rect')
             .attr('x', -brushCaptureWidth / 2)
             .attr('width', brushCaptureWidth)
+            .attr('stroke', controlConfig.captureZoneBorderColor);
 
         axisBrushEnter
             .selectAll('rect.extent')
-            .attr('fill-opacity', 0.15)
+            .attr('fill-opacity', controlConfig.filterBarOpacity)
             .attr('fill', 'url(#filterBarPattern)');
 
         axisBrushEnter
             .selectAll('.resize rect')
-            .attr('height', resizeHeight);
+            .attr('height', resizeHeight)
+            .attr('fill-opacity', controlConfig.handleGlyphOpacity)
+            .style('visibility', 'visible');
 
         axisBrushEnter
             .selectAll('.resize.n rect')
-            .attr('y', -resizeHeight);
+            .attr('y', -resizeHeight + controlConfig.handleGlyphOverlap);
+
+        axisBrushEnter
+            .selectAll('.resize.s rect')
+            .attr('y', -controlConfig.handleGlyphOverlap);
 
         function moved(brush, startMoveEndIndex) {
             var operation = ['start', 'move', 'end'][startMoveEndIndex];

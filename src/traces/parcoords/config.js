@@ -12,6 +12,7 @@ module.exports = function(model) {
         height: height,
         panelSizeX: width / model.variableCount,
         panelSizeY: height,
+        padding: 32, // useful to make room for brush capture zones when resize handle is on top or bottom
 
         colorScale: colorScale,
         coloringVariable: 0,
