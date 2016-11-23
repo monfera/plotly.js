@@ -68,7 +68,8 @@ module.exports = function (root, typedArrayModel, config) {
                 width: panelWidth,
                 height: height,
                 values: viewModel.columns[i].values,
-                unitScale: viewModel.unitScales[i]
+                unitScale: viewModel.unitScales[i],
+                domainScale: viewModel.domainScales[i]
             };
         });
     }
@@ -179,8 +180,8 @@ module.exports = function (root, typedArrayModel, config) {
                 d3.select(this)
                     .call(d3.svg.axis()
                     .orient('left')
-                        .ticks(height / 40)
-                        .scale(d.unitScale));
+                        .ticks(height / 50)
+                        .scale(d.domainScale));
             });
 
         axisEnter
