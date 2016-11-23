@@ -179,8 +179,8 @@ module.exports = function (root, typedArrayModel, config) {
             .each(function(d) {
                 d3.select(this)
                     .call(d3.svg.axis()
-                    .orient('left')
-                        .ticks(height / 50)
+                        .orient('left')
+                        .ticks(height / 50, '3s')
                         .scale(d.domainScale));
             });
 
