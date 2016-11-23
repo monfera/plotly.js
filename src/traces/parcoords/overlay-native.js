@@ -309,7 +309,7 @@ module.exports = function (root, model, config) {
         range.deleteContents()
     }
 
-    function enterOverlayPanels(filters, panelSizeX, render) {
+    function enterOverlayPanels(filters, render, panelSizeX) {
         for(var i = 0; i < filters.length; i++) {
             enterOverlayPanel(i * panelSizeX, filters[i], render)
         }
