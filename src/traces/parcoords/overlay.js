@@ -316,26 +316,29 @@ module.exports = function (root, typedArrayModel, config) {
             render(true);
         }
 
+        function closestValue(a, v) {
+            for(var i = 0, prevDiff = Infinity, prevValue = a[0], diff; i < a.length; i++) {
+                if((diff = Math.abs(a[i] - v)) > prevDiff) {
+                    return prevValue;
+                }
+                prevDiff = diff;
+                prevValue = a[i];
+            }
+            return a[a.length - 1];
+        }
+
         function ended(variable) {
             brushing = false;
             var extent = variable.brush.extent();
             var empty = extent[0] == extent[1];
             if(!empty && variable.integer) {
                 var f = filters[variable.xIndex];
-                var s = variable.integerScale;
-                var points = s.range();
-                var i, lo, hi
-                for(i = 0; i < points.length; i++) {
-                    if(f[0] < points[i]) {lo = points[i]; break};
-                }
-                for(i = points.length - 1; i >= 0; i--) {
-                    if(f[1] > points[i]) {hi = points[i]; break};
-                }
-                f[0] = 1/3 * Math.round(f[0] * 3);
-                f[1] = 1/3 * Math.round(f[1] * 3);
-                if(true || f[0] === f[1]) {
-                    f[0] = Math.max(0, f[0] - 1/3  / 8)
-                    f[1] = Math.min(1, f[1] + 1/3  / 8)
+                var points = variable.integerScale.range();
+                f[0] = closestValue(points, f[0]);
+                f[1] = closestValue(points.reverse(), f[1]);
+                if(f[0] === f[1]) {
+                    f[0] = Math.max(0, f[0] - 0.05);
+                    f[1] = Math.min(1, f[1] + 0.05);
                 }
                 d3.select(this).transition().call(variable.brush.extent(f));
                 render(true);
