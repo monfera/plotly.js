@@ -207,6 +207,11 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
             var I;
 
+            function orig(i) {
+                var index = variableViews.map(function(v) {return v.originalXIndex;}).indexOf(i);
+                return variableViews[index];
+            }
+
             for(I = 0; I < shownVariableCount; I++) {
                 var variableView = variableViews[I];
                 var i = variableView.originalXIndex;
@@ -223,12 +228,12 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0}),
                     var1C: utils.range(16).map(function(d) {return d + 32 === i  ? 1 : 0}),
                     var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0}),
-                    hiA: utils.range(16).map(function(i) {return valid(i, 0)  ? 1 - variableViews[i].filter[0] : 1}),
-                    loA: utils.range(16).map(function(i) {return valid(i, 0)  ? 1 - variableViews[i].filter[1] : 0}),
-                    hiB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - variableViews[i + 16].filter[0] : 1}),
-                    loB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - variableViews[i + 16].filter[1] : 0}),
-                    hiC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - variableViews[i + 32].filter[0] : 1}),
-                    loC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - variableViews[i + 32].filter[1] : 0}),
+                    hiA: utils.range(16).map(function(i) {return valid(i, 0)  ? 1 - orig(i).filter[0] : 1}),
+                    loA: utils.range(16).map(function(i) {return valid(i, 0)  ? 1 - orig(i).filter[1] : 0}),
+                    hiB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - orig(i + 16).filter[0] : 1}),
+                    loB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - orig(i + 16).filter[1] : 0}),
+                    hiC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - orig(i + 32).filter[0] : 1}),
+                    loC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - orig(i + 32).filter[1] : 0}),
                     scissorX: I * canvasPanelSizeX
                 })
             }
