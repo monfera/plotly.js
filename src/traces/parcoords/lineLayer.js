@@ -7,7 +7,6 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var variableCount = model.variableCount
     var sampleCount = model.sampleCount
     var domainToUnitScales = model.domainToUnitScales
-    var outdatedFilters = model.filters
 
     var width = config.width
     var height = config.height
@@ -77,11 +76,9 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var shownVariableCount = variableCount
 
     var variableViews;
-    var filters;
 
     function render(update, newFilters) {
         variableViews = newFilters;
-        filters = variableViews.map(function(d) {return d.filter;});
         renderGLParcoords(update);
     }
 
@@ -152,7 +149,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             },
 
             scissor: {
-                enable: true,
+                enable: false,
                 box: {
                     x: regl.prop('scissorX'),
                     y: 0,
@@ -205,7 +202,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             var items = []
 
             function valid(i, offset) {
-                return i < shownVariableCount && i + offset < filters.length
+                return i < shownVariableCount && i + offset < variableViews.length
             }
 
             var I;
@@ -226,12 +223,12 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0}),
                     var1C: utils.range(16).map(function(d) {return d + 32 === i  ? 1 : 0}),
                     var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0}),
-                    hiA: utils.range(16).map(function(i) {return valid(i, 0) ? 1 - filters[i][0] : 1}),
-                    loA: utils.range(16).map(function(i) {return valid(i, 0) ? 1 - filters[i][1] : 0}),
-                    hiB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - filters[i + 16][0] : 1}),
-                    loB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - filters[i + 16][1] : 0}),
-                    hiC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - filters[i + 32][0] : 1}),
-                    loC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - filters[i + 32][1] : 0}),
+                    hiA: utils.range(16).map(function(i) {return valid(i, 0)  ? 1 - variableViews[i].filter[0] : 1}),
+                    loA: utils.range(16).map(function(i) {return valid(i, 0)  ? 1 - variableViews[i].filter[1] : 0}),
+                    hiB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - variableViews[i + 16].filter[0] : 1}),
+                    loB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - variableViews[i + 16].filter[1] : 0}),
+                    hiC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - variableViews[i + 32].filter[0] : 1}),
+                    loC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - variableViews[i + 32].filter[1] : 0}),
                     scissorX: I * canvasPanelSizeX
                 })
             }
