@@ -82,6 +82,7 @@ module.exports = function (root, typedArrayModel, config) {
                 height: height,
                 values: viewModel.columns[i].values,
                 xScale: viewModel.xScale,
+                x: viewModel.xScale(i),
                 unitScale: viewModel.unitScales[i],
                 domainScale: viewModel.domainScales[i],
                 integerScale: viewModel.integerScales[i],
@@ -173,11 +174,33 @@ module.exports = function (root, typedArrayModel, config) {
             .classed('panel', true)
             .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';})
             .call(d3.behavior.drag()
-                .origin(function(d) {return {x: d.xScale(d.xIndex)};})
+                .origin(function(d) {return d;})
                 .on('drag', function(d) {
                     if(brushing)
                         return;
-                    d3.select(this).attr('transform', 'translate(' + d3.event.x + ', 0)');
+                    d.x = d3.event.x;
+                    panel
+                        .sort(function(a, b) {return a.x - b.x;})
+                        .each(function(dd, i) {
+                            dd.xIndex = i;
+                            dd.x = d == dd ? dd.x : dd.xScale(dd.xIndex);
+                        });
+                    panel.filter(function(dd) {return dd !== d;})
+                        .transition()
+                        .delay(function(dd) {return (Math.abs(d.xIndex - dd.xIndex) - 1) * 25000;})
+                        .duration(controlConfig.axisSnapDuration)
+                        .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
+                    d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
+                })
+                .on('dragend', function(d) {
+                    panel
+                        .sort(function(a, b) {return a.x - b.x;})
+                        .each(function(d, i) {
+                            d.xIndex = i;
+                            d.x = d.xScale(d.xIndex);
+                        });
+                    panel.transition().duration(controlConfig.axisSnapDuration)
+                        .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                 })
             );
 
