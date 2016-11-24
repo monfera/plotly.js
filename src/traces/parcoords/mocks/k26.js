@@ -25768,4 +25768,5 @@ module.exports = {raw: ndarray(new Float64Array([-0.004094021,3.2,26.863,0,0,0.0
 -0.036719116,6.63,59.21,2,0,0.041543844680023,0.49286038185107,0.00958466838773447,52.58,0.709,49.3889986775374,1.47352077554433,
 -0.009793972,3.75,43.85,2,0,0.0188426244260351,0.246182007345882,0.00210039254247057,40.1,-0.635000000000001,34.0289986775374,0.574239352683443,
 -0.023594951,5.37,51.69,2,0,0.0303850737388868,0.376349683444934,0.00524036059084271,46.32,0.201,41.8689986775374,1.01176435304269].map(function(d) {return d + 0 * 3 * (Math.random() - 0.5)})), [12, 25768], [1, 12]),
-variableNames: ["Preference","Block height","Block width","Cylinder material","Block material","Total weight","Assembly total cost","Assembly penalty weight","Height st width","Min height width","Min width diameter","RF block"]}
+variableNames: ["Preference","Block height","Block width","Cylinder material","Block material","Total weight","Assembly total cost","Assembly penalty weight","Height st width","Min height width","Min width diameter","RF block"],
+integer: [false, false, false, true, true, false, false, false, false, false, false, false]}

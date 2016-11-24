@@ -19,6 +19,7 @@ module.exports = function(tuple) {
         sampleCount: sampleCount,
         domainToUnitScales: domainToUnitScales,
         filters: filters,
-        variableNames: tuple.variableNames
+        variableNames: tuple.variableNames,
+        integer: tuple.integer
     }
 };

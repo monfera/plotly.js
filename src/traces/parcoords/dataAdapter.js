@@ -12,5 +12,5 @@ module.exports = (function() {
 
     //unsortedData = utils.widen(unsortedData, 48)
 
-    return {raw: utils.ndarrayOrder(data.raw), variableNames: data.variableNames}
+    return {raw: utils.ndarrayOrder(data.raw), variableNames: data.variableNames, integer: data.integer}
 })()
