@@ -104,7 +104,18 @@ module.exports = (function() {
             return domains
         },
 
-        range: range
+        range: range,
+
+        closestValue: function closestValue(a, v) {
+            for(var i = 0, prevDiff = Infinity, prevValue = a[0], diff; i < a.length; i++) {
+                if((diff = Math.abs(a[i] - v)) > prevDiff) {
+                    return prevValue;
+                }
+                prevDiff = diff;
+                prevValue = a[i];
+            }
+            return a[a.length - 1];
+        }
     }
 
 })();
