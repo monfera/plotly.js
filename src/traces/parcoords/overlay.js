@@ -111,7 +111,7 @@ module.exports = function (root, typedArrayModel, config) {
             .attr('id', 'filterBarPattern')
             .attr('width', brushCaptureWidth)
             .attr('height', height)
-            .attr('x', -brushVisibleWidth / 2)
+            .attr('x', -brushVisibleWidth)
             .attr('patternUnits', 'userSpaceOnUse');
 
         var filterBarPatternGlyph = filterBarPattern.selectAll('rect')
@@ -119,9 +119,14 @@ module.exports = function (root, typedArrayModel, config) {
 
         filterBarPatternGlyph.enter()
             .append('rect')
+            .attr('shape-rendering', 'geometricPrecision')
             .attr('width', brushVisibleWidth)
             .attr('height', height)
-            .attr('fill', controlConfig.filterColor);
+            .attr('x', brushVisibleWidth / 2)
+            .attr('fill', controlConfig.filterColor)
+            .attr('fill-opacity', controlConfig.filterBarOpacity)
+            .attr('stroke', controlConfig.filterBarStroke)
+            .attr('stroke-width', controlConfig.filterBarStrokeWidth);
 
         var parcoordsModel = svg.selectAll('.parcoordsModel')
             .data(repeat, keyFun)
@@ -259,7 +264,6 @@ module.exports = function (root, typedArrayModel, config) {
 
         axisBrushEnter
             .selectAll('rect.extent')
-            .attr('fill-opacity', controlConfig.filterBarOpacity)
             .attr('fill', 'url(#filterBarPattern)')
             .attr('y', -100); //  // zero-size rectangle pointer issue workaround
 

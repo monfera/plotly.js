@@ -12,7 +12,9 @@ module.exports = {
     handleGlyphHeight: 16,
     handleGlyphOpacity: 0.0,
     handleGlyphOverlap: 3, // effect can be seen with debug = true
-    filterBarOpacity: 0.05,
+    filterBarOpacity: 0.075,
+    filterBarStroke: 'white',
+    filterBarStrokeWidth: 0.3,
 
     // for debugging:
     captureZoneBorderColor: debug ? 'red' : "",
