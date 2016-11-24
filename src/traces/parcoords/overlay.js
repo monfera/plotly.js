@@ -324,7 +324,7 @@ module.exports = function (root, typedArrayModel, config) {
                 var f = filters[variable.xIndex];
                 var points = variable.integerScale.range();
                 f[0] = utils.closestValue(points, f[0]);
-                f[1] = utils.closestValue(points.reverse(), f[1]);
+                f[1] = utils.closestValue(points, f[1]);
                 if(f[0] === f[1]) {
                     f[0] = Math.max(0, f[0] - 0.05);
                     f[1] = Math.min(1, f[1] + 0.05);
