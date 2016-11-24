@@ -11,7 +11,7 @@ module.exports = {
     filterColor: 'black',
     handleGlyphHeight: 16,
     handleGlyphOpacity: 0.0,
-    handleGlyphOverlap: 3, // effect can be seen with debug = true
+    handleGlyphOverlap: 0, // effect can be seen with debug = true
     filterBarOpacity: 0.075,
     filterBarStroke: 'white',
     filterBarStrokeWidth: 0.3,
