@@ -266,9 +266,9 @@ module.exports = function (root, typedArrayModel, config) {
             .each(function(d) {
                 d.brush = d3.svg.brush()
                     .y(d.unitScale)
-                    .on('brushstart', started)
-                    .on('brush', moved)
-                    .on('brushend', ended);
+                    .on('brushstart', axisBrushStarted)
+                    .on('brush', axisBrushMoved)
+                    .on('brushend', axisBrushEnded);
                 d3.select(this).call(d.brush);
             });
 
@@ -299,12 +299,12 @@ module.exports = function (root, typedArrayModel, config) {
 
         var justStarted = false;
 
-        function started() {
+        function axisBrushStarted() {
             justStarted = true;
             brushing = true;
         }
 
-        function moved(variable) {
+        function axisBrushMoved(variable) {
             var extent = variable.brush.extent();
             var reset = justStarted && (extent[0] == extent[1]);
             if(reset) {
@@ -316,26 +316,15 @@ module.exports = function (root, typedArrayModel, config) {
             render(true);
         }
 
-        function closestValue(a, v) {
-            for(var i = 0, prevDiff = Infinity, prevValue = a[0], diff; i < a.length; i++) {
-                if((diff = Math.abs(a[i] - v)) > prevDiff) {
-                    return prevValue;
-                }
-                prevDiff = diff;
-                prevValue = a[i];
-            }
-            return a[a.length - 1];
-        }
-
-        function ended(variable) {
+        function axisBrushEnded(variable) {
             brushing = false;
             var extent = variable.brush.extent();
             var empty = extent[0] == extent[1];
             if(!empty && variable.integer) {
                 var f = filters[variable.xIndex];
                 var points = variable.integerScale.range();
-                f[0] = closestValue(points, f[0]);
-                f[1] = closestValue(points.reverse(), f[1]);
+                f[0] = utils.closestValue(points, f[0]);
+                f[1] = utils.closestValue(points.reverse(), f[1]);
                 if(f[0] === f[1]) {
                     f[0] = Math.max(0, f[0] - 0.05);
                     f[1] = Math.min(1, f[1] + 0.05);
