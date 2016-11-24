@@ -78,7 +78,6 @@ module.exports = function (root, typedArrayModel, config) {
                 name: viewModel.columns[i].name,
                 integer: viewModel.columns[i].integer,
                 xIndex: i,
-                x: panelWidth * i,
                 width: panelWidth,
                 height: height,
                 values: viewModel.columns[i].values,
@@ -90,7 +89,6 @@ module.exports = function (root, typedArrayModel, config) {
             };
         });
     }
-
 
     var model = {
         key: 0,
@@ -175,12 +173,11 @@ module.exports = function (root, typedArrayModel, config) {
             .classed('panel', true)
             .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';})
             .call(d3.behavior.drag()
-                .origin(function(d) {return d;})
+                .origin(function(d) {return {x: d.xScale(d.xIndex)};})
                 .on('drag', function(d) {
                     if(brushing)
                         return;
-                    d.x = d3.event.x;
-                    d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
+                    d3.select(this).attr('transform', 'translate(' + d3.event.x + ', 0)');
                 })
             );
 
