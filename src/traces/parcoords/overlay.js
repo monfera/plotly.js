@@ -33,12 +33,17 @@ module.exports = function (root, typedArrayModel, config) {
         }
         columns.push({
             name: typedArrayModel.variableNames[i],
+            integer: typedArrayModel.integer[i],
             values: values
         });
     }
 
     function makeDomainScale(column) {
-        return d3.scale.linear()
+        return column.integer
+            ? d3.scale.ordinal()
+            .domain(d3.range(Math.round(d3.min(column.values)), Math.round(d3.max(column.values) + 1)))
+            .rangePoints([height, 0])
+            : d3.scale.linear()
             .domain(d3.extent(column.values))
             .range([height, 0]);
     }
@@ -63,6 +68,7 @@ module.exports = function (root, typedArrayModel, config) {
             return {
                 key: viewModel.columns[i].name,
                 name: viewModel.columns[i].name,
+                integer: viewModel.columns[i].integer,
                 xIndex: i,
                 x: panelWidth * i,
                 width: panelWidth,
