@@ -63,6 +63,7 @@ module.exports = function (root, typedArrayModel, config) {
         return [{
             key: model.key,
             columns: model.columns,
+            xScale: d3.scale.ordinal().domain(d3.range(columns.length + 1)).rangePoints([0, width], 0),
             unitScales: columns.map(makeUnitScale),
             domainScales: columns.map(makeDomainScale),
             integerScales: columns.map(makeIntegerScale)
@@ -81,6 +82,7 @@ module.exports = function (root, typedArrayModel, config) {
                 width: panelWidth,
                 height: height,
                 values: viewModel.columns[i].values,
+                xScale: viewModel.xScale,
                 unitScale: viewModel.unitScales[i],
                 domainScale: viewModel.domainScales[i],
                 integerScale: viewModel.integerScales[i],
@@ -171,7 +173,7 @@ module.exports = function (root, typedArrayModel, config) {
         panel.enter()
             .append('g')
             .classed('panel', true)
-            .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';})
+            .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';})
             .call(d3.behavior.drag()
                 .origin(function(d) {return d;})
                 .on('drag', function(d) {
