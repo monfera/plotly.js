@@ -106,8 +106,8 @@ module.exports = (function() {
 
         range: range,
 
-        closestValue: function closestValue(a, v) {
-            for(var i = 0, prevDiff = Infinity, prevValue = a[0], diff; i < a.length; i++) {
+        d3OrdinalScaleSnap: function closestValue(scale, v) {
+            for(var i = 0, a = scale.range(), prevDiff = Infinity, prevValue = a[0], diff; i < a.length; i++) {
                 if((diff = Math.abs(a[i] - v)) > prevDiff) {
                     return prevValue;
                 }

@@ -322,9 +322,8 @@ module.exports = function (root, typedArrayModel, config) {
             var empty = extent[0] == extent[1];
             if(!empty && variable.integer) {
                 var f = filters[variable.xIndex];
-                var points = variable.integerScale.range();
-                f[0] = utils.closestValue(points, f[0]);
-                f[1] = utils.closestValue(points, f[1]);
+                f[0] = utils.d3OrdinalScaleSnap(variable.integerScale, f[0]);
+                f[1] = utils.d3OrdinalScaleSnap(variable.integerScale, f[1]);
                 if(f[0] === f[1]) {
                     f[0] = Math.max(0, f[0] - 0.05);
                     f[1] = Math.min(1, f[1] + 0.05);
