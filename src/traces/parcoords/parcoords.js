@@ -29,5 +29,5 @@ module.exports = function plot(root, data) {
 
     var lineLayer = lineLayerMaker(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, ol, unitToColor);
 
-    lineLayer.render(false);
+    lineLayer.render(false, []);
 };

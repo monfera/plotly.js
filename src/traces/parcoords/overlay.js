@@ -66,7 +66,8 @@ module.exports = function (root, typedArrayModel, config) {
             xScale: d3.scale.ordinal().domain(d3.range(columns.length + 1)).rangePoints([0, width], 0),
             unitScales: columns.map(makeUnitScale),
             domainScales: columns.map(makeDomainScale),
-            integerScales: columns.map(makeIntegerScale)
+            integerScales: columns.map(makeIntegerScale),
+            filters: columns.map(function() {return [0, 1];})
         }];
     }
 
@@ -86,6 +87,7 @@ module.exports = function (root, typedArrayModel, config) {
                 unitScale: viewModel.unitScales[i],
                 domainScale: viewModel.domainScales[i],
                 integerScale: viewModel.integerScales[i],
+                filter: viewModel.filters[i],
                 columns: columns
             };
         });
@@ -96,7 +98,9 @@ module.exports = function (root, typedArrayModel, config) {
         columns: columns
     }
 
-    function enterOverlayPanels(filters, render) {
+    function enterOverlayPanels(render) {
+
+        var filters = [];
 
         var svg = d3.select(root).selectAll('.parcoordsSVG')
             .data([model], keyFun)
@@ -163,6 +167,9 @@ module.exports = function (root, typedArrayModel, config) {
         parcoordsView.enter()
             .append('g')
             .classed('parcoordsView', true)
+            .each(function(d) {
+                filters = d.filters.slice();
+            });
 
         var panel = parcoordsView.selectAll('.panel')
             .data(panelViewModel, keyFun)
@@ -189,6 +196,9 @@ module.exports = function (root, typedArrayModel, config) {
                         .transition().duration(controlConfig.axisSnapDuration)
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
+                    filters = [];
+                    panel.each(function(d) {filters.push(d.filter)});
+                    render(true, filters);
                 })
                 .on('dragend', function(d) {
                     d3.select(this).transition().duration(controlConfig.axisSnapDuration)
@@ -327,7 +337,7 @@ module.exports = function (root, typedArrayModel, config) {
             }
             filters[variable.xIndex] = reset ? [0, 1] : extent.slice();
             justStarted = false;
-            render(true);
+            render(true, filters);
         }
 
         function axisBrushEnded(variable) {
@@ -343,9 +353,11 @@ module.exports = function (root, typedArrayModel, config) {
                     f[1] = Math.min(1, f[1] + 0.05);
                 }
                 d3.select(this).transition().call(variable.brush.extent(f));
-                render(true);
+                render(true, filters);
             }
         }
+
+        return filters;
     }
 
     function destroy() {

@@ -7,7 +7,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var variableCount = model.variableCount
     var sampleCount = model.sampleCount
     var domainToUnitScales = model.domainToUnitScales
-    var filters = model.filters
+    var outdatedFilters = model.filters
 
     var width = config.width
     var height = config.height
@@ -76,7 +76,10 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var shownVariableCount = variableCount
 
-    function render(update) {
+    var filters;
+
+    function render(update, newFilters) {
+        filters = newFilters.slice()
         renderGLParcoords(0, update)
     }
 
@@ -192,6 +195,9 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
             window.clearTimeout(scheduled)
 
+            if(!update)
+                filters = overlay.enterOverlayPanels(render, panelSizeX)
+
             var items = []
 
             function valid(i, offset) {
@@ -199,9 +205,6 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             }
 
             var i, ii;
-
-            if(!update)
-                overlay.enterOverlayPanels(filters, render, panelSizeX)
 
             for(i = 0, ii = 1; i < shownVariableCount; i++, ii = (i + 1) % shownVariableCount) {
                 items.push({
