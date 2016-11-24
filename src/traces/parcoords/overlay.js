@@ -185,22 +185,14 @@ module.exports = function (root, typedArrayModel, config) {
                             dd.xIndex = i;
                             dd.x = d == dd ? dd.x : dd.xScale(dd.xIndex);
                         });
-                    panel.filter(function(dd) {return dd !== d;})
-                        .transition()
-                        .delay(function(dd) {return (Math.abs(d.xIndex - dd.xIndex) - 1) * 25000;})
-                        .duration(controlConfig.axisSnapDuration)
+                    panel.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) === 1;})
+                        .transition().duration(controlConfig.axisSnapDuration)
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                 })
                 .on('dragend', function(d) {
-                    panel
-                        .sort(function(a, b) {return a.x - b.x;})
-                        .each(function(d, i) {
-                            d.xIndex = i;
-                            d.x = d.xScale(d.xIndex);
-                        });
-                    panel.transition().duration(controlConfig.axisSnapDuration)
-                        .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
+                    d3.select(this).transition().duration(controlConfig.axisSnapDuration)
+                        .attr('transform', 'translate(' + d.xScale(d.xIndex) + ', 0)');
                 })
             );
 
