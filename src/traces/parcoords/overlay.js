@@ -42,7 +42,7 @@ module.exports = function (root, typedArrayModel, config) {
         return column.integer
             ? d3.scale.ordinal()
             .domain(d3.range(Math.round(d3.min(column.values)), Math.round(d3.max(column.values) + 1)))
-            .rangePoints([height, 0])
+            .rangePoints([height, 0], controlConfig.integerPadding)
             : d3.scale.linear()
             .domain(d3.extent(column.values))
             .range([height, 0]);
@@ -204,7 +204,9 @@ module.exports = function (root, typedArrayModel, config) {
                 d3.select(this)
                     .call(d3.svg.axis()
                         .orient('left')
-                        .ticks(height / 50, '3s')
+                        .tickSize(4)
+                        .outerTickSize(2)
+                        .ticks(height / controlConfig.averageTickDistance, '3s')
                         .scale(d.domainScale));
             });
 
