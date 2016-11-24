@@ -147,6 +147,8 @@ module.exports = function (root, typedArrayModel, config) {
         var panel = parcoordsView.selectAll('.panel')
             .data(panelViewModel, keyFun)
 
+        var brushing = false
+
         panel.enter()
             .append('g')
             .classed('panel', true)
@@ -154,6 +156,8 @@ module.exports = function (root, typedArrayModel, config) {
             .call(d3.behavior.drag()
                 .origin(function(d) {return d;})
                 .on('drag', function(d) {
+                    if(brushing)
+                        return;
                     d.x = d3.event.x;
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                 })
@@ -165,6 +169,7 @@ module.exports = function (root, typedArrayModel, config) {
         panelBackground.enter()
             .append('rect')
             .classed('panelBackground', true)
+            .style('pointer-events', 'none')
             .attr('width', function(d) {return d.width})
             .attr('height', function(d) {return d.height})
             .attr('stroke', controlConfig.panelBorderColor)
@@ -241,7 +246,8 @@ module.exports = function (root, typedArrayModel, config) {
                 d.brush = d3.svg.brush()
                     .y(d.unitScale)
                     .on('brushstart', started)
-                    .on('brush', moved);
+                    .on('brush', moved)
+                    .on('brushend', ended);
                 d3.select(this).call(d.brush);
             });
 
@@ -275,6 +281,7 @@ module.exports = function (root, typedArrayModel, config) {
 
         function started() {
             justStarted = true;
+            brushing = true;
         }
 
         function moved(variable) {
@@ -287,6 +294,10 @@ module.exports = function (root, typedArrayModel, config) {
             filters[variable.xIndex] = reset ? [0, 1] : extent.slice();
             justStarted = false;
             render(true);
+        }
+
+        function ended() {
+            brushing = false;
         }
     }
 
