@@ -100,7 +100,7 @@ module.exports = function (root, typedArrayModel, config) {
 
     function enterOverlayPanels(render) {
 
-        var filters = [];
+        var variableViews = [];
 
         var svg = d3.select(root).selectAll('.parcoordsSVG')
             .data([model], keyFun)
@@ -166,10 +166,7 @@ module.exports = function (root, typedArrayModel, config) {
 
         parcoordsView.enter()
             .append('g')
-            .classed('parcoordsView', true)
-            .each(function(d) {
-                filters = d.filters.slice();
-            });
+            .classed('parcoordsView', true);
 
         var panel = parcoordsView.selectAll('.panel')
             .data(panelViewModel, keyFun)
@@ -180,6 +177,7 @@ module.exports = function (root, typedArrayModel, config) {
             .append('g')
             .classed('panel', true)
             .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';})
+            .each(function(d) {variableViews.push(d);})
             .call(d3.behavior.drag()
                 .origin(function(d) {return d;})
                 .on('drag', function(d) {
@@ -196,9 +194,9 @@ module.exports = function (root, typedArrayModel, config) {
                         .transition().duration(controlConfig.axisSnapDuration)
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
-                    filters = [];
-                    panel.each(function(d) {filters.push(d.filter)});
-                    render(true, filters);
+                    variableViews = [];
+                    panel.each(function(d) {variableViews.push(d)});
+                    render(true, variableViews);
                 })
                 .on('dragend', function(d) {
                     d3.select(this).transition().duration(controlConfig.axisSnapDuration)
@@ -335,9 +333,9 @@ module.exports = function (root, typedArrayModel, config) {
                 variable.brush.clear();
                 d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
             }
-            filters[variable.xIndex] = reset ? [0, 1] : extent.slice();
+            variableViews[variable.xIndex].filter = reset ? [0, 1] : extent.slice();
             justStarted = false;
-            render(true, filters);
+            render(true, variableViews);
         }
 
         function axisBrushEnded(variable) {
@@ -345,7 +343,7 @@ module.exports = function (root, typedArrayModel, config) {
             var extent = variable.brush.extent();
             var empty = extent[0] == extent[1];
             if(!empty && variable.integer) {
-                var f = filters[variable.xIndex];
+                var f = variableViews[variable.xIndex].filter;
                 f[0] = utils.d3OrdinalScaleSnap(variable.integerScale, f[0]);
                 f[1] = utils.d3OrdinalScaleSnap(variable.integerScale, f[1]);
                 if(f[0] === f[1]) {
@@ -353,11 +351,11 @@ module.exports = function (root, typedArrayModel, config) {
                     f[1] = Math.min(1, f[1] + 0.05);
                 }
                 d3.select(this).transition().call(variable.brush.extent(f));
-                render(true, filters);
+                render(true, variableViews);
             }
         }
 
-        return filters;
+        return variableViews;
     }
 
     function destroy() {
