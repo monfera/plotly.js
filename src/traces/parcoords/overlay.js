@@ -79,6 +79,7 @@ module.exports = function (root, typedArrayModel, config) {
                 name: viewModel.columns[i].name,
                 integer: viewModel.columns[i].integer,
                 xIndex: i,
+                originalXIndex: i,
                 width: panelWidth,
                 height: height,
                 values: viewModel.columns[i].values,
@@ -194,8 +195,7 @@ module.exports = function (root, typedArrayModel, config) {
                         .transition().duration(controlConfig.axisSnapDuration)
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
-                    variableViews = [];
-                    panel.each(function(d) {variableViews.push(d)});
+                    panel.each(function(d, i) {variableViews[i] = d;});
                     render(true, variableViews);
                 })
                 .on('dragend', function(d) {
