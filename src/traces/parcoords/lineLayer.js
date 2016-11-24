@@ -76,11 +76,13 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var shownVariableCount = variableCount
 
+    var variableViews;
     var filters;
 
     function render(update, newFilters) {
-        filters = newFilters.slice()
-        renderGLParcoords(0, update)
+        variableViews = newFilters;
+        filters = variableViews.map(function(d) {return d.filter;});
+        renderGLParcoords(0, update);
     }
 
     var regl = createREGL({
@@ -195,8 +197,10 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
             window.clearTimeout(scheduled)
 
-            if(!update)
-                filters = overlay.enterOverlayPanels(render, panelSizeX)
+            if(!update) {
+                variableViews = overlay.enterOverlayPanels(render, panelSizeX);
+                filters = variableViews.map(function(d) {return d.filter;});
+            }
 
             var items = []
 
