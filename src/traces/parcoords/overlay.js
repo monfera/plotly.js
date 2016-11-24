@@ -53,12 +53,19 @@ module.exports = function (root, typedArrayModel, config) {
             .range([height, 0]);
     }
 
+    function makeIntegerScale(column) {
+        return column.integer && d3.scale.ordinal()
+            .domain(d3.range(0, Math.round(d3.max(column.values) + 1) - Math.round(d3.min(column.values))).map(function(d, _, a) {return d / (a.length - 1)}))
+            .rangePoints([0, 1], controlConfig.integerPadding)
+    }
+
     function viewModel(model) {
         return [{
             key: model.key,
             columns: model.columns,
             unitScales: columns.map(makeUnitScale),
-            domainScales: columns.map(makeDomainScale)
+            domainScales: columns.map(makeDomainScale),
+            integerScales: columns.map(makeIntegerScale)
         }];
     }
 
@@ -76,6 +83,7 @@ module.exports = function (root, typedArrayModel, config) {
                 values: viewModel.columns[i].values,
                 unitScale: viewModel.unitScales[i],
                 domainScale: viewModel.domainScales[i],
+                integerScale: viewModel.integerScales[i],
                 columns: columns
             };
         });
@@ -314,10 +322,18 @@ module.exports = function (root, typedArrayModel, config) {
             var empty = extent[0] == extent[1];
             if(!empty && variable.integer) {
                 var f = filters[variable.xIndex];
-                var s = variable.domainScale;
+                var s = variable.integerScale;
+                var points = s.range();
+                var i, lo, hi
+                for(i = 0; i < points.length; i++) {
+                    if(f[0] < points[i]) {lo = points[i]; break};
+                }
+                for(i = points.length - 1; i >= 0; i--) {
+                    if(f[1] > points[i]) {hi = points[i]; break};
+                }
                 f[0] = 1/3 * Math.round(f[0] * 3);
                 f[1] = 1/3 * Math.round(f[1] * 3);
-                if(f[0] === f[1]) {
+                if(true || f[0] === f[1]) {
                     f[0] = Math.max(0, f[0] - 1/3  / 8)
                     f[1] = Math.min(1, f[1] + 1/3  / 8)
                 }
