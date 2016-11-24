@@ -147,24 +147,15 @@ module.exports = function (root, typedArrayModel, config) {
         var panel = parcoordsView.selectAll('.panel')
             .data(panelViewModel, keyFun)
 
-        var lastX = null;
-
         panel.enter()
             .append('g')
             .classed('panel', true)
             .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';})
             .call(d3.behavior.drag()
-                .origin(function(d) {return {x: d.x};})
-                .on('dragstart', function(d) {
-                    console.log('Drag started on dimension', d.name)
-                })
+                .origin(function(d) {return d;})
                 .on('drag', function(d) {
-                    d3.select(this).attr('transform', 'translate(' + d3.event.x + ', 0)');
-                    lastX = d3.event.x;
-                })
-                .on('dragend', function(d) {
-                    console.log('Drag ended')
-                    d.x = lastX;
+                    d.x = d3.event.x;
+                    d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                 })
             );
 
