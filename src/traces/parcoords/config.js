@@ -20,7 +20,7 @@ module.exports = function(model) {
 
         // technical config
         canvasPixelRatio: 1, // using 2 or devicePixelRatio sharpens lines, slower
-        rafTimeRatio: 4, // a multiple of the 16.6ms rAF budget, use 0.5..5
-        blockLineCount: 5000 // smallest number of lines drawn in one increment
+        rafTimeRatio: 2, // a multiple of the 16.6ms rAF budget, use 0.5..5
+        blockLineCount: 2000 // number of lines drawn in one increment
     }
 };
