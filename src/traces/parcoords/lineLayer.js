@@ -82,7 +82,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     function render(update, newFilters) {
         variableViews = newFilters;
         filters = variableViews.map(function(d) {return d.filter;});
-        renderGLParcoords(0, update);
+        renderGLParcoords(update);
     }
 
     var regl = createREGL({
@@ -193,7 +193,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
         var scheduled = null
 
-        return function(rowNum, update) {
+        return function(update) {
 
             window.clearTimeout(scheduled)
 
@@ -208,12 +208,17 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 return i < shownVariableCount && i + offset < filters.length
             }
 
-            var i, ii;
+            var I;
 
-            for(i = 0, ii = 1; i < shownVariableCount; i++, ii = (i + 1) % shownVariableCount) {
+            for(I = 0; I < shownVariableCount; I++) {
+                var variableView = variableViews[I];
+                var i = variableView.originalXIndex;
+                var x = variableView.x;
+                var nextVar = variableViews[(I + 1) % shownVariableCount];
+                var ii = nextVar.originalXIndex;
                 items.push({
                     resolution: [width, height],
-                    viewBoxPosition: [i * panelSizeX, rowNum * panelSizeY],
+                    viewBoxPosition: [x, 0],
                     viewBoxSize: [panelSizeX, panelSizeY],
                     var1A: utils.range(16).map(function(d) {return d === i  ? 1 : 0}),
                     var2A: utils.range(16).map(function(d) {return d === ii ? 1 : 0}),
@@ -227,7 +232,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     loB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - filters[i + 16][1] : 0}),
                     hiC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - filters[i + 32][0] : 1}),
                     loC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - filters[i + 32][1] : 0}),
-                    scissorX: i * canvasPanelSizeX
+                    scissorX: I * canvasPanelSizeX
                 })
             }
 
