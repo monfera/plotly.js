@@ -35,6 +35,18 @@ function makeIntegerScale(column) {
             .rangePoints([0, 1], controlConfig.integerPadding)
 }
 
+function viewModel(width, height, model) {
+    return [{
+        key: model.key,
+        columns: model.columns,
+        xScale: d3.scale.ordinal().domain(d3.range(model.columns.length + 1)).rangePoints([0, width], 0),
+        unitScales: model.columns.map(makeUnitScale.bind(0, height)),
+        domainScales: model.columns.map(makeDomainScale.bind(0, height)),
+        integerScales: model.columns.map(makeIntegerScale),
+        filters: model.columns.map(function() {return [0, 1];})
+    }];
+}
+
 module.exports = function (root, typedArrayModel, config) {
 
     var width = config.width
@@ -57,18 +69,6 @@ module.exports = function (root, typedArrayModel, config) {
             integer: typedArrayModel.integer[i],
             values: values
         });
-    }
-
-    function viewModel(model) {
-        return [{
-            key: model.key,
-            columns: model.columns,
-            xScale: d3.scale.ordinal().domain(d3.range(columns.length + 1)).rangePoints([0, width], 0),
-            unitScales: columns.map(makeUnitScale.bind(0, height)),
-            domainScales: columns.map(makeDomainScale.bind(0, height)),
-            integerScales: columns.map(makeIntegerScale),
-            filters: columns.map(function() {return [0, 1];})
-        }];
     }
 
     function panelViewModel(viewModel) {
@@ -156,7 +156,7 @@ module.exports = function (root, typedArrayModel, config) {
             .classed('parcoordsModel', true);
 
         var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
-            .data(viewModel, keyFun)
+            .data(viewModel.bind(0, width, height), keyFun)
 
         parcoordsViewModel.enter()
             .append('g')
