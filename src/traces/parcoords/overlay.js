@@ -191,7 +191,7 @@ module.exports = function (root, typedArrayModel, config) {
                             dd.xIndex = i;
                             dd.x = d == dd ? dd.x : dd.xScale(dd.xIndex);
                         });
-                    panel.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) === 1;})
+                    panel.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                         .transition().duration(controlConfig.axisSnapDuration)
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
@@ -199,8 +199,18 @@ module.exports = function (root, typedArrayModel, config) {
                     render(true, variableViews);
                 })
                 .on('dragend', function(d) {
-                    d3.select(this).transition().duration(controlConfig.axisSnapDuration)
-                        .attr('transform', 'translate(' + d.xScale(d.xIndex) + ', 0)');
+                    panel
+                        .sort(function(a, b) {return a.x - b.x;})
+                        .each(function(d, i) {
+                            d.xIndex = i;
+                            d.x = d.xScale(d.xIndex);
+                        });
+                    panel.transition().duration(controlConfig.axisSnapDuration)
+                        .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
+                    render(true, variableViews);
+                    if(0)
+                        d3.select(this).transition().duration(controlConfig.axisSnapDuration)
+                            .attr('transform', 'translate(' + d.xScale(d.xIndex) + ', 0)');
                 })
             );
 
