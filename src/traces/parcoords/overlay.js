@@ -14,6 +14,27 @@ function descend(d) {
     return d;
 }
 
+function makeDomainScale(height, column) {
+    return column.integer
+        ? d3.scale.ordinal()
+        .domain(d3.range(Math.round(d3.min(column.values)), Math.round(d3.max(column.values) + 1)))
+        .rangePoints([height, 0], controlConfig.integerPadding)
+        : d3.scale.linear()
+        .domain(d3.extent(column.values))
+        .range([height, 0]);
+}
+
+function makeUnitScale(height, _) {
+    return d3.scale.linear()
+        .range([height, 0]);
+}
+
+function makeIntegerScale(column) {
+    return column.integer && d3.scale.ordinal()
+            .domain(d3.range(0, Math.round(d3.max(column.values) + 1) - Math.round(d3.min(column.values))).map(function(d, _, a) {return d / (a.length - 1)}))
+            .rangePoints([0, 1], controlConfig.integerPadding)
+}
+
 module.exports = function (root, typedArrayModel, config) {
 
     var width = config.width
@@ -38,34 +59,13 @@ module.exports = function (root, typedArrayModel, config) {
         });
     }
 
-    function makeDomainScale(column) {
-        return column.integer
-            ? d3.scale.ordinal()
-            .domain(d3.range(Math.round(d3.min(column.values)), Math.round(d3.max(column.values) + 1)))
-            .rangePoints([height, 0], controlConfig.integerPadding)
-            : d3.scale.linear()
-            .domain(d3.extent(column.values))
-            .range([height, 0]);
-    }
-
-    function makeUnitScale(column) {
-        return d3.scale.linear()
-            .range([height, 0]);
-    }
-
-    function makeIntegerScale(column) {
-        return column.integer && d3.scale.ordinal()
-            .domain(d3.range(0, Math.round(d3.max(column.values) + 1) - Math.round(d3.min(column.values))).map(function(d, _, a) {return d / (a.length - 1)}))
-            .rangePoints([0, 1], controlConfig.integerPadding)
-    }
-
     function viewModel(model) {
         return [{
             key: model.key,
             columns: model.columns,
             xScale: d3.scale.ordinal().domain(d3.range(columns.length + 1)).rangePoints([0, width], 0),
-            unitScales: columns.map(makeUnitScale),
-            domainScales: columns.map(makeDomainScale),
+            unitScales: columns.map(makeUnitScale.bind(0, height)),
+            domainScales: columns.map(makeDomainScale.bind(0, height)),
             integerScales: columns.map(makeIntegerScale),
             filters: columns.map(function() {return [0, 1];})
         }];
