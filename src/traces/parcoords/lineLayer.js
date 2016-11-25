@@ -265,7 +265,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
             var offset = blockNumber * blockLineCount
             var count = Math.min(blockLineCount, sampleCount - blockNumber * blockLineCount)
-            for (var i = 0; i < shownPanelCount; i++) {
+            for (var i = 0; i < items.length; i++) {
                 var item = items[i]
                 item.offset = 2 * offset
                 item.count = 2 * count
