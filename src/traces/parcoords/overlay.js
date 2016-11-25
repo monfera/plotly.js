@@ -199,13 +199,10 @@ module.exports = function (root, typedArrayModel, config) {
                     render(true, variableViews);
                 })
                 .on('dragend', function(d) {
-                    panel
-                        .each(function(dd, i) {
-                            dd.xIndex = i;
-                            dd.x = dd.xScale(dd.xIndex);
-                        });
-                    panel.transition().duration(controlConfig.axisSnapDuration)
-                        .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
+                    d.x = d.xScale(d.xIndex);
+                    d3.select(this)
+                        .transition().duration(controlConfig.axisSnapDuration)
+                        .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                     render(true, variableViews);
                 })
             );
