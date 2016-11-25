@@ -73,7 +73,8 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var positionStride = gpuVariableCount * 4
 
-    var shownVariableCount = variableCount
+    var shownVariableCount = variableCount;
+    var shownPanelCount = shownVariableCount - 1;
 
     var variableViews;
 
@@ -212,12 +213,13 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 return variableViews[index];
             }
 
-            for(I = 0; I < shownVariableCount; I++) {
+            for(I = 0; I < shownPanelCount; I++) {
                 var variableView = variableViews[I];
                 var i = variableView.originalXIndex;
                 var x = variableView.x;
                 var nextVar = variableViews[(I + 1) % shownVariableCount];
                 var ii = nextVar.originalXIndex;
+                var panelSizeX = nextVar.x - variableView.x;
                 items.push({
                     resolution: [width, height],
                     viewBoxPosition: [x, 0],
@@ -263,7 +265,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
             var offset = blockNumber * blockLineCount
             var count = Math.min(blockLineCount, sampleCount - blockNumber * blockLineCount)
-            for (var i = 0; i < shownVariableCount; i++) {
+            for (var i = 0; i < shownPanelCount; i++) {
                 var item = items[i]
                 item.offset = 2 * offset
                 item.count = 2 * count
