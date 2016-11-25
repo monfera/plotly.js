@@ -200,17 +200,13 @@ module.exports = function (root, typedArrayModel, config) {
                 })
                 .on('dragend', function(d) {
                     panel
-                        .sort(function(a, b) {return a.x - b.x;})
-                        .each(function(d, i) {
-                            d.xIndex = i;
-                            d.x = d.xScale(d.xIndex);
+                        .each(function(dd, i) {
+                            dd.xIndex = i;
+                            dd.x = dd.xScale(dd.xIndex);
                         });
                     panel.transition().duration(controlConfig.axisSnapDuration)
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     render(true, variableViews);
-                    if(0)
-                        d3.select(this).transition().duration(controlConfig.axisSnapDuration)
-                            .attr('transform', 'translate(' + d.xScale(d.xIndex) + ', 0)');
                 })
             );
 
