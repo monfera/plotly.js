@@ -47,6 +47,29 @@ function viewModel(width, height, model) {
     }];
 }
 
+function panelViewModel(width, height, viewModel) {
+    return viewModel.columns.map(function(column, i) {
+        var panelWidth = width / viewModel.columns.length;
+        return {
+            key: viewModel.columns[i].name,
+            name: viewModel.columns[i].name,
+            integer: viewModel.columns[i].integer,
+            xIndex: i,
+            originalXIndex: i,
+            width: panelWidth,
+            height: height,
+            values: viewModel.columns[i].values,
+            xScale: viewModel.xScale,
+            x: viewModel.xScale(i),
+            unitScale: viewModel.unitScales[i],
+            domainScale: viewModel.domainScales[i],
+            integerScale: viewModel.integerScales[i],
+            filter: viewModel.filters[i],
+            columns: viewModel.columns
+        };
+    });
+}
+
 module.exports = function (root, typedArrayModel, config) {
 
     var width = config.width
@@ -68,29 +91,6 @@ module.exports = function (root, typedArrayModel, config) {
             name: typedArrayModel.variableNames[i],
             integer: typedArrayModel.integer[i],
             values: values
-        });
-    }
-
-    function panelViewModel(viewModel) {
-        return columns.map(function(column, i) {
-            var panelWidth = width / viewModel.columns.length;
-            return {
-                key: viewModel.columns[i].name,
-                name: viewModel.columns[i].name,
-                integer: viewModel.columns[i].integer,
-                xIndex: i,
-                originalXIndex: i,
-                width: panelWidth,
-                height: height,
-                values: viewModel.columns[i].values,
-                xScale: viewModel.xScale,
-                x: viewModel.xScale(i),
-                unitScale: viewModel.unitScales[i],
-                domainScale: viewModel.domainScales[i],
-                integerScale: viewModel.integerScales[i],
-                filter: viewModel.filters[i],
-                columns: columns
-            };
         });
     }
 
@@ -170,7 +170,7 @@ module.exports = function (root, typedArrayModel, config) {
             .classed('parcoordsView', true);
 
         var panel = parcoordsView.selectAll('.panel')
-            .data(panelViewModel, keyFun)
+            .data(panelViewModel.bind(0, width, height), keyFun)
 
         var brushing = false
 
