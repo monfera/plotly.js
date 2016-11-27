@@ -173,6 +173,7 @@ module.exports = function (root, typedArrayModel, config) {
             .data(panelViewModel.bind(0, width, height), keyFun)
 
         var brushing = false
+        var dragging = false
 
         panel.enter()
             .append('g')
@@ -184,6 +185,7 @@ module.exports = function (root, typedArrayModel, config) {
                 .on('drag', function(d) {
                     if(brushing)
                         return;
+                    dragging = true;
                     d.x = d3.event.x;
                     panel
                         .sort(function(a, b) {return a.x - b.x;})
@@ -199,6 +201,10 @@ module.exports = function (root, typedArrayModel, config) {
                     render(true, variableViews);
                 })
                 .on('dragend', function(d) {
+                    if(brushing || !dragging) {
+                        dragging = false;
+                        return;
+                    }
                     d.x = d.xScale(d.xIndex);
                     d3.select(this)
                         .transition().duration(controlConfig.axisSnapDuration)
@@ -342,7 +348,6 @@ module.exports = function (root, typedArrayModel, config) {
         }
 
         function axisBrushEnded(variable) {
-            brushing = false;
             var extent = variable.brush.extent();
             var empty = extent[0] == extent[1];
             if(!empty && variable.integer) {
@@ -356,6 +361,7 @@ module.exports = function (root, typedArrayModel, config) {
                 d3.select(this).transition().call(variable.brush.extent(f));
                 render(true, variableViews);
             }
+            brushing = false;
         }
 
         return variableViews;
