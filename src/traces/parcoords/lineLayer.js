@@ -10,7 +10,6 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var width = config.width
     var height = config.height
-    var panelSizeX = config.panelSizeX
     var panelSizeY = config.panelSizeY
     var coloringVariable = config.coloringVariable
     var colorScale = config.colorScale
@@ -21,7 +20,6 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var canvasWidth = width * canvasPixelRatio
     var canvasHeight = height * canvasPixelRatio
-    var canvasPanelSizeX = panelSizeX * canvasPixelRatio
     var canvasPanelSizeY = panelSizeY * canvasPixelRatio
 
     canvasGL.setAttribute('width', canvasWidth)
@@ -78,9 +76,9 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var variableViews;
 
-    function render(update, newFilters) {
-        variableViews = newFilters;
-        renderGLParcoords(update);
+    function render(update, newVariableViews, setChanged) {
+        variableViews = newVariableViews;
+        renderGLParcoords(update, setChanged);
     }
 
     var regl = createREGL({
@@ -89,6 +87,8 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             preserveDrawingBuffer: true
         }
     })
+
+    var gl = regl._gl;
 
     var renderGLParcoords = (function() {
 
@@ -185,8 +185,8 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 loC: regl.prop('loC'),
                 hiC: regl.prop('hiC')
             },
-            count: regl.prop('count'),
-            offset: regl.prop('offset')
+            offset: regl.prop('offset'),
+            count: regl.prop('count')
         })
 
         var scheduled = null
@@ -198,7 +198,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
         var previousAxisOrder = [];
 
-        return function(update) {
+        return function(update, setChanged) {
 
             window.clearTimeout(scheduled)
 
@@ -219,6 +219,14 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 return variableViews[index];
             }
 
+            var rightmostIndex, highestX = -Infinity;
+            for(I = 0; I < shownPanelCount; I++) {
+                if(variableViews[I].x > highestX) {
+                    highestX = variableViews[I].x;
+                    rightmostIndex = I;
+                }
+            }
+
             for(I = 0; I < shownPanelCount; I++) {
                 var variableView = variableViews[I];
                 var i = variableView.originalXIndex;
@@ -226,7 +234,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 var nextVar = variableViews[(I + 1) % shownVariableCount];
                 var ii = nextVar.originalXIndex;
                 var panelSizeX = nextVar.x - variableView.x;
-                if(!previousAxisOrder[I] || previousAxisOrder[I][0] !== x || previousAxisOrder[I][1] !== panelSizeX) {
+                if(setChanged || !previousAxisOrder[I] || previousAxisOrder[I][0] !== x || previousAxisOrder[I][1] !== panelSizeX) {
                     previousAxisOrder[I] = [x, panelSizeX];
                     items.push({
                         resolution: [width, height],
@@ -245,13 +253,13 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                         hiC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - orig(i + 32).filter[0] : 1}),
                         loC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - orig(i + 32).filter[1] : 0}),
                         scissorX: x,
-                        scissorWidth: panelSizeX
+                        scissorWidth: panelSizeX,
+                        rightmost: I === rightmostIndex
                     });
                 }
             }
 
             window.cancelAnimationFrame(currentRaf)
-            regl.clear({ color: [1, 1, 1, 1], depth: 1 })
             renderBlock(glAes, items, 0, performance.now())
         }
     })()
@@ -279,6 +287,12 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 var item = items[i]
                 item.offset = 2 * offset
                 item.count = 2 * count
+                if(blockNumber === 0) {
+                    gl.enable(gl.SCISSOR_TEST);
+                    gl.scissor(item.scissorX, 0, item.rightmost ? width : item.scissorWidth, panelSizeY);
+                    regl.clear({ color: [1, 1, 1, 1], depth: 1 }); // clearing is done in scissored panel only
+                    // todo figure out how to idiomatically use scissored clear with regl; doesn't appear to work
+                }
             }
             glAes(items)
             blockNumber++

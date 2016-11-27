@@ -353,7 +353,7 @@ module.exports = function (root, typedArrayModel, config) {
             }
             variableViews[variable.xIndex].filter = reset ? [0, 1] : extent.slice();
             justStarted = false;
-            lineRender(true, variableViews);
+            lineRender(true, variableViews, true);
         }
 
         function axisBrushEnded(variable) {
@@ -368,7 +368,7 @@ module.exports = function (root, typedArrayModel, config) {
                     f[1] = Math.min(1, f[1] + 0.05);
                 }
                 d3.select(this).transition().call(variable.brush.extent(f));
-                lineRender(true, variableViews);
+                lineRender(true, variableViews, true);
             }
             domainBrushing = false;
         }
