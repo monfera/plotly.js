@@ -150,11 +150,11 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             },
 
             scissor: {
-                enable: false,
+                enable: true,
                 box: {
                     x: regl.prop('scissorX'),
                     y: 0,
-                    width: canvasPanelSizeX,
+                    width: regl.prop('scissorWidth'),
                     height: canvasPanelSizeY
                 }
             },
@@ -196,6 +196,8 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             console.log('Approached ', JSON.stringify(column.name));
         }
 
+        var previousAxisOrder = [];
+
         return function(update) {
 
             window.clearTimeout(scheduled)
@@ -224,24 +226,28 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 var nextVar = variableViews[(I + 1) % shownVariableCount];
                 var ii = nextVar.originalXIndex;
                 var panelSizeX = nextVar.x - variableView.x;
-                items.push({
-                    resolution: [width, height],
-                    viewBoxPosition: [x, 0],
-                    viewBoxSize: [panelSizeX, panelSizeY],
-                    var1A: utils.range(16).map(function(d) {return d === i  ? 1 : 0}),
-                    var2A: utils.range(16).map(function(d) {return d === ii ? 1 : 0}),
-                    var1B: utils.range(16).map(function(d) {return d + 16 === i  ? 1 : 0}),
-                    var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0}),
-                    var1C: utils.range(16).map(function(d) {return d + 32 === i  ? 1 : 0}),
-                    var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0}),
-                    hiA: utils.range(16).map(function(i) {return valid(i, 0)  ? 1 - orig(i).filter[0] : 1}),
-                    loA: utils.range(16).map(function(i) {return valid(i, 0)  ? 1 - orig(i).filter[1] : 0}),
-                    hiB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - orig(i + 16).filter[0] : 1}),
-                    loB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - orig(i + 16).filter[1] : 0}),
-                    hiC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - orig(i + 32).filter[0] : 1}),
-                    loC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - orig(i + 32).filter[1] : 0}),
-                    scissorX: I * canvasPanelSizeX
-                })
+                if(!previousAxisOrder[I] || previousAxisOrder[I][0] !== x || previousAxisOrder[I][1] !== panelSizeX) {
+                    previousAxisOrder[I] = [x, panelSizeX];
+                    items.push({
+                        resolution: [width, height],
+                        viewBoxPosition: [x, 0],
+                        viewBoxSize: [panelSizeX, panelSizeY],
+                        var1A: utils.range(16).map(function(d) {return d === i  ? 1 : 0}),
+                        var2A: utils.range(16).map(function(d) {return d === ii ? 1 : 0}),
+                        var1B: utils.range(16).map(function(d) {return d + 16 === i  ? 1 : 0}),
+                        var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0}),
+                        var1C: utils.range(16).map(function(d) {return d + 32 === i  ? 1 : 0}),
+                        var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0}),
+                        hiA: utils.range(16).map(function(i) {return valid(i, 0)  ? 1 - orig(i).filter[0] : 1}),
+                        loA: utils.range(16).map(function(i) {return valid(i, 0)  ? 1 - orig(i).filter[1] : 0}),
+                        hiB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - orig(i + 16).filter[0] : 1}),
+                        loB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - orig(i + 16).filter[1] : 0}),
+                        hiC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - orig(i + 32).filter[0] : 1}),
+                        loC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - orig(i + 32).filter[1] : 0}),
+                        scissorX: x,
+                        scissorWidth: panelSizeX
+                    });
+                }
             }
 
             window.cancelAnimationFrame(currentRaf)
