@@ -1,6 +1,8 @@
 var utils = require('./utils');
 var createREGL = require('regl');
 
+var depthLimitEpsilon = 1e-6; // don't change; otherwise near/far plane lines are lost
+
 module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, overlay, unitToColor) {
 
     var data = model.data
@@ -54,7 +56,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var leftOrRight = utils.range(sampleCount * 2).map(function(d) {return d % 2})
     var depth = utils.range(sampleCount * 2).map(function(d){
-        return depthUnitScale(data.get(depthVariable, (d - d % 2) / 2))
+        return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon, depthUnitScale(data.get(depthVariable, Math.round((d - d % 2) / 2)))))
     })
 
     var color = new Float32Array(sampleCount * 2 * 4)
@@ -191,7 +193,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
         function approach(column) {
             //utils.ndarrayOrder(, column.index)
-            console.log('Approached ', JSON.stringify(column.name));
+            //console.log('Approached ', JSON.stringify(column.name));
         }
 
         var previousAxisOrder = [];

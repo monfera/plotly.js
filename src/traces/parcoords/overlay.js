@@ -15,12 +15,18 @@ function descend(d) {
 }
 
 function makeDomainScale(height, column) {
+    var lo = d3.min(column.values);
+    var hi = d3.max(column.values);
+    if(!column.integer && lo === hi) {
+        lo *= 0.9;
+        hi *= 1.1;
+    }
     return column.integer
         ? d3.scale.ordinal()
-        .domain(d3.range(Math.round(d3.min(column.values)), Math.round(d3.max(column.values) + 1)))
+        .domain(d3.range(Math.round(lo), Math.round(hi + 1)))
         .rangePoints([height, 0], controlConfig.integerPadding)
         : d3.scale.linear()
-        .domain(d3.extent(column.values))
+        .domain([lo, hi])
         .range([height, 0]);
 }
 
