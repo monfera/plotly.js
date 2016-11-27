@@ -373,7 +373,7 @@ module.exports = function (root, typedArrayModel, config) {
                     f[0] = Math.max(0, f[0] - 0.05);
                     f[1] = Math.min(1, f[1] + 0.05);
                 }
-                d3.select(this).transition().call(variable.brush.extent(f));
+                d3.select(this).transition().duration(150).call(variable.brush.extent(f));
                 lineRender(true, variableViews, true);
             }
             domainBrushing = false;
