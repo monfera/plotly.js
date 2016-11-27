@@ -15,6 +15,8 @@ module.exports = function(model) {
         padding: 64, // useful to make room for brush capture zones when resize handle is on top or bottom
 
         colorScale: colorScale,
+
+        // coloring and depth variable should be the same unless for development testing
         coloringVariable: 0,
         depthVariable: 0,
 
