@@ -59,15 +59,15 @@ module.exports = (function() {
             return r
         },
 
-        ndarrayOrder: function ndarrayOrder(unsortedData) {
+        ndarrayOrder: function ndarrayOrder(unsortedData, orderByColumn) {
 
             var columnCount = unsortedData.shape[0]
             var rowCount = unsortedData.shape[1]
             var orderByVector = []
             var i, j
             for(j = 0; j < rowCount; j++) {
-                //orderByVector.push(unsortedData.get(0, j))
-                orderByVector.push(Math.random())
+                orderByVector.push(unsortedData.get(orderByColumn, j))
+                //orderByVector.push(Math.random())
             }
 
             var sortedSampleIndices = range(rowCount)
