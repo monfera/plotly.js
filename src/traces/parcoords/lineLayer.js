@@ -4,6 +4,58 @@ var createREGL = require('regl');
 var depthLimitEpsilon = 1e-6; // don't change; otherwise near/far plane lines are lost
 var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on domain boundaries
 
+var pixel = new Uint8Array(4)
+function ensureDraw(regl) {
+    regl.read({
+        x: 0,
+        y: 0,
+        width: 1,
+        height: 1,
+        data: pixel
+    })
+}
+
+var currentRaf = null
+function renderBlock(regl, gl, glAes, config, sampleCount, items, blockNumber, t) {
+
+    do {
+
+        var rafWorkTime = config.rafTimeRatio * 1000 / 60
+        var canvasWidth = config.width * config.canvasPixelRatio
+        var canvasPanelSizeY = config.panelSizeY * config.canvasPixelRatio
+        var blockLineCount = config.blockLineCount
+        var offset = blockNumber * blockLineCount
+        var count = Math.min(blockLineCount, sampleCount - blockNumber * blockLineCount)
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i]
+            item.offset = 2 * offset
+            item.count = 2 * count
+            if(blockNumber === 0) {
+                gl.enable(gl.SCISSOR_TEST);
+                gl.scissor(
+                    item.scissorX,
+                    0,
+                    item.rightmost ? canvasWidth : item.scissorWidth + 1,
+                    canvasPanelSizeY
+                );
+                // the + 1 is important to not leave minor vertical residue on axis
+                regl.clear({ color: [1, 1, 1, 1], depth: 1 }); // clearing is done in scissored panel only
+                // todo figure out how to idiomatically use scissored clear with regl; doesn't appear to work
+            }
+        }
+        glAes(items)
+        blockNumber++
+        ensureDraw(regl)
+    } while(performance.now() - t < rafWorkTime && (blockNumber - 1) * blockLineCount + count < sampleCount)
+
+    if(blockNumber * blockLineCount + count < sampleCount) {
+        window.cancelAnimationFrame(currentRaf)
+        currentRaf = window.requestAnimationFrame(function(t) {
+            renderBlock(regl, gl, glAes, config, sampleCount, items, blockNumber, t)
+        })
+    }
+}
+
 module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, overlay, unitToColor) {
 
     var data = model.data
@@ -18,8 +70,6 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var colorScale = config.colorScale
     var depthVariable = config.depthVariable
     var canvasPixelRatio = config.canvasPixelRatio
-    var rafWorkTime = config.rafTimeRatio * 1000 / 60
-    var blockLineCount = config.blockLineCount
 
     var canvasWidth = width * canvasPixelRatio
     var canvasHeight = height * canvasPixelRatio
@@ -259,58 +309,9 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 }
             }
 
-            renderBlock(glAes, items, 0, performance.now())
+            renderBlock(regl, gl, glAes, config, sampleCount, items, 0, performance.now())
         }
     })()
-
-    var currentRaf = null
-
-    var pixel = new Uint8Array(4)
-    function ensureDraw(regl) {
-        regl.read({
-            x: 0,
-            y: 0,
-            width: 1,
-            height: 1,
-            data: pixel
-        })
-    }
-
-    function renderBlock(glAes, items, blockNumber, t) {
-
-        do {
-
-            var offset = blockNumber * blockLineCount
-            var count = Math.min(blockLineCount, sampleCount - blockNumber * blockLineCount)
-            for (var i = 0; i < items.length; i++) {
-                var item = items[i]
-                item.offset = 2 * offset
-                item.count = 2 * count
-                if(blockNumber === 0) {
-                    gl.enable(gl.SCISSOR_TEST);
-                    gl.scissor(
-                        item.scissorX,
-                        0,
-                        item.rightmost ? width : item.scissorWidth + 1,
-                        config.canvasPixelRatio * panelSizeY
-                    );
-                    // the + 1 is important to not leave minor vertical residue on axis
-                    regl.clear({ color: [1, 1, 1, 1], depth: 1 }); // clearing is done in scissored panel only
-                    // todo figure out how to idiomatically use scissored clear with regl; doesn't appear to work
-                }
-            }
-            glAes(items)
-            blockNumber++
-            ensureDraw(regl)
-        } while(performance.now() - t < rafWorkTime && (blockNumber - 1) * blockLineCount + count < sampleCount)
-
-        if(blockNumber * blockLineCount + count < sampleCount) {
-            window.cancelAnimationFrame(currentRaf)
-            currentRaf = window.requestAnimationFrame(function(t) {
-                renderBlock(glAes, items, blockNumber, t)
-            })
-        }
-    }
 
     function destroy() {
         overlay.destroy()
