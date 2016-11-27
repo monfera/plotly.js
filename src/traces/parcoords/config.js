@@ -21,7 +21,7 @@ module.exports = function(model) {
         depthVariable: 0,
 
         // technical config
-        canvasPixelRatio: 1, // using 2 or devicePixelRatio sharpens lines, slower
+        canvasPixelRatio: window.devicePixelRatio, // using 2 or devicePixelRatio sharpens lines, slower
         rafTimeRatio: 2, // a multiple of the 16.6ms rAF budget, use 0.5..5
         blockLineCount: 2000 // number of lines drawn in one increment
     }
