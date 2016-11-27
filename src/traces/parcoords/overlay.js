@@ -218,7 +218,7 @@ module.exports = function (root, typedArrayModel, config) {
                     d3.select(this)
                         .transition().duration(controlConfig.axisSnapDuration)
                         .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                    lineRender(true, variableViews, true);
+                    lineRender(true, variableViews);
                 })
             );
 
