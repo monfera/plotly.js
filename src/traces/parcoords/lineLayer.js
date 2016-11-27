@@ -98,7 +98,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             color: {
                 stride: 16,
                 offset: 0,
-                buffer: color,
+                buffer: color
             },
             x: {
                 size: 1,
@@ -191,13 +191,17 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
         var scheduled = null
 
+        function approach(column) {
+            //utils.ndarrayOrder(, column.index)
+            console.log('Approached ', JSON.stringify(column.name));
+        }
+
         return function(update) {
 
             window.clearTimeout(scheduled)
 
             if(!update) {
-                variableViews = overlay.enterOverlayPanels(render, panelSizeX);
-                filters = variableViews.map(function(d) {return d.filter;});
+                variableViews = overlay.enterOverlayPanels(approach, render);
             }
 
             var items = []

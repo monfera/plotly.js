@@ -99,7 +99,9 @@ module.exports = function (root, typedArrayModel, config) {
         columns: columns
     }
 
-    function enterOverlayPanels(render) {
+    function enterOverlayPanels(lineRenderApproach, lineRender) {
+
+        var lastApproached = null
 
         var variableViews = [];
 
@@ -172,8 +174,8 @@ module.exports = function (root, typedArrayModel, config) {
         var panel = parcoordsView.selectAll('.panel')
             .data(panelViewModel.bind(0, width, height), keyFun)
 
-        var brushing = false
-        var dragging = false
+        var domainBrushing = false
+        var axisDragging = false
 
         panel.enter()
             .append('g')
@@ -183,9 +185,9 @@ module.exports = function (root, typedArrayModel, config) {
             .call(d3.behavior.drag()
                 .origin(function(d) {return d;})
                 .on('drag', function(d) {
-                    if(brushing)
+                    if(domainBrushing)
                         return;
-                    dragging = true;
+                    axisDragging = true;
                     d.x = d3.event.x;
                     panel
                         .sort(function(a, b) {return a.x - b.x;})
@@ -198,18 +200,19 @@ module.exports = function (root, typedArrayModel, config) {
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                     panel.each(function(d, i) {variableViews[i] = d;});
-                    render(true, variableViews);
+                    lineRender(true, variableViews);
                 })
                 .on('dragend', function(d) {
-                    if(brushing || !dragging) {
-                        dragging = false;
+                    if(domainBrushing || !axisDragging) {
+                        axisDragging = false;
                         return;
                     }
+                    axisDragging = false;
                     d.x = d.xScale(d.xIndex);
                     d3.select(this)
                         .transition().duration(controlConfig.axisSnapDuration)
                         .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                    render(true, variableViews);
+                    lineRender(true, variableViews);
                 })
             );
 
@@ -294,6 +297,12 @@ module.exports = function (root, typedArrayModel, config) {
         var axisBrushEnter = axisBrush.enter()
             .append('g')
             .classed('axisBrush', true)
+            .on('mouseenter', function approach(column) {
+                if(column !== lastApproached && !axisDragging) {
+                    lineRenderApproach(column);
+                    lastApproached = column;
+                }
+            })
             .each(function(d) {
                 d.brush = d3.svg.brush()
                     .y(d.unitScale)
@@ -332,7 +341,7 @@ module.exports = function (root, typedArrayModel, config) {
 
         function axisBrushStarted() {
             justStarted = true;
-            brushing = true;
+            domainBrushing = true;
         }
 
         function axisBrushMoved(variable) {
@@ -344,7 +353,7 @@ module.exports = function (root, typedArrayModel, config) {
             }
             variableViews[variable.xIndex].filter = reset ? [0, 1] : extent.slice();
             justStarted = false;
-            render(true, variableViews);
+            lineRender(true, variableViews);
         }
 
         function axisBrushEnded(variable) {
@@ -359,9 +368,9 @@ module.exports = function (root, typedArrayModel, config) {
                     f[1] = Math.min(1, f[1] + 0.05);
                 }
                 d3.select(this).transition().call(variable.brush.extent(f));
-                render(true, variableViews);
+                lineRender(true, variableViews);
             }
-            brushing = false;
+            domainBrushing = false;
         }
 
         return variableViews;
