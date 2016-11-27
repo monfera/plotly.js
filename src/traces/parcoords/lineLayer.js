@@ -232,16 +232,16 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             for(I = 0; I < shownPanelCount; I++) {
                 var variableView = variableViews[I];
                 var i = variableView.originalXIndex;
-                var x = variableView.x;
+                var x = variableView.x * config.canvasPixelRatio;
                 var nextVar = variableViews[(I + 1) % shownVariableCount];
                 var ii = nextVar.originalXIndex;
-                var panelSizeX = nextVar.x - x;
+                var panelSizeX = nextVar.x * config.canvasPixelRatio - x;
                 if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextVar.x) {
                     previousAxisOrder[i] = [x, nextVar.x];
                     items.push({
-                        resolution: [width, height],
+                        resolution: [canvasWidth, canvasHeight],
                         viewBoxPosition: [x, 0],
-                        viewBoxSize: [panelSizeX, panelSizeY],
+                        viewBoxSize: [panelSizeX, canvasPanelSizeY],
                         var1A: utils.range(16).map(function(d) {return d === i  ? 1 : 0}),
                         var2A: utils.range(16).map(function(d) {return d === ii ? 1 : 0}),
                         var1B: utils.range(16).map(function(d) {return d + 16 === i  ? 1 : 0}),
@@ -290,7 +290,12 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 item.count = 2 * count
                 if(blockNumber === 0) {
                     gl.enable(gl.SCISSOR_TEST);
-                    gl.scissor(item.scissorX, 0, item.rightmost ? width : item.scissorWidth + 1, panelSizeY);
+                    gl.scissor(
+                        item.scissorX,
+                        0,
+                        item.rightmost ? width : item.scissorWidth + 1,
+                        config.canvasPixelRatio * panelSizeY
+                    );
                     // the + 1 is important to not leave minor vertical residue on axis
                     regl.clear({ color: [1, 1, 1, 1], depth: 1 }); // clearing is done in scissored panel only
                     // todo figure out how to idiomatically use scissored clear with regl; doesn't appear to work
