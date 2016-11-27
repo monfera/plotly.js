@@ -10,10 +10,6 @@ function repeat(d) {
     return [d];
 }
 
-function descend(d) {
-    return d;
-}
-
 function makeDomainScale(height, column) {
     var lo = d3.min(column.values);
     var hi = d3.max(column.values);
@@ -30,7 +26,7 @@ function makeDomainScale(height, column) {
         .range([height, 0]);
 }
 
-function makeUnitScale(height, _) {
+function makeUnitScale(height) {
     return d3.scale.linear()
         .range([height, 0]);
 }
@@ -80,8 +76,6 @@ module.exports = function (root, typedArrayModel, config) {
 
     var width = config.width
     var height = config.height
-    var panelSizeX = config.panelSizeX
-    var panelSizeY = config.panelSizeY
 
     var resizeHeight = controlConfig.handleGlyphHeight;
     var brushVisibleWidth = controlConfig.filterSize;
