@@ -2,6 +2,7 @@ var utils = require('./utils');
 var createREGL = require('regl');
 
 var depthLimitEpsilon = 1e-6; // don't change; otherwise near/far plane lines are lost
+var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on domain boundaries
 
 module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, overlay, unitToColor) {
 
@@ -41,7 +42,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var points = []
     for(var j = 0; j < sampleCount; j++)
         for(var i = 0; i < gpuVariableCount; i++)
-            points.push(i < variableCount ? domainToUnitScales[i](data.get(i, j)) : 0)
+            points.push(i < variableCount ? domainToUnitScales[i](data.get(i, j)) : 0.5)
 
     var pointPairs = []
 
@@ -91,6 +92,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     })
 
     var gl = regl._gl;
+    window.gl = gl;
 
     var renderGLParcoords = (function() {
 
@@ -246,12 +248,12 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                         var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0}),
                         var1C: utils.range(16).map(function(d) {return d + 32 === i  ? 1 : 0}),
                         var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0}),
-                        hiA: utils.range(16).map(function(i) {return valid(i, 0)  ? 1 - orig(i).filter[0] : 1}),
-                        loA: utils.range(16).map(function(i) {return valid(i, 0)  ? 1 - orig(i).filter[1] : 0}),
-                        hiB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - orig(i + 16).filter[0] : 1}),
-                        loB: utils.range(16).map(function(i) {return valid(i, 16) ? 1 - orig(i + 16).filter[1] : 0}),
-                        hiC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - orig(i + 32).filter[0] : 1}),
-                        loC: utils.range(16).map(function(i) {return valid(i, 32) ? 1 - orig(i + 32).filter[1] : 0}),
+                        loA: utils.range(16).map(function(i) {return 1 - (valid(i, 0)  ? orig(i     ).filter[1] : 1) - filterEpsilon}),
+                        hiA: utils.range(16).map(function(i) {return 1 - (valid(i, 0)  ? orig(i     ).filter[0] : 0) + filterEpsilon}),
+                        loB: utils.range(16).map(function(i) {return 1 - (valid(i, 16) ? orig(i + 16).filter[1] : 1) - filterEpsilon}),
+                        hiB: utils.range(16).map(function(i) {return 1 - (valid(i, 16) ? orig(i + 16).filter[0] : 0) + filterEpsilon}),
+                        loC: utils.range(16).map(function(i) {return 1 - (valid(i, 32) ? orig(i + 32).filter[1] : 1) - filterEpsilon}),
+                        hiC: utils.range(16).map(function(i) {return 1 - (valid(i, 32) ? orig(i + 32).filter[0] : 0) + filterEpsilon}),
                         scissorX: x,
                         scissorWidth: panelSizeX,
                         rightmost: I === rightmostIndex
