@@ -290,7 +290,8 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 item.count = 2 * count
                 if(blockNumber === 0) {
                     gl.enable(gl.SCISSOR_TEST);
-                    gl.scissor(item.scissorX, 0, item.rightmost ? width : item.scissorWidth, panelSizeY);
+                    gl.scissor(item.scissorX, 0, item.rightmost ? width : item.scissorWidth + 1, panelSizeY);
+                    // the + 1 is important to not leave minor vertical residue on axis
                     regl.clear({ color: [1, 1, 1, 1], depth: 1 }); // clearing is done in scissored panel only
                     // todo figure out how to idiomatically use scissored clear with regl; doesn't appear to work
                 }
