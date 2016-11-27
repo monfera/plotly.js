@@ -144,174 +144,171 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var gl = regl._gl;
     window.gl = gl;
 
-    var renderGLParcoords = (function() {
+    var positionBuffer = regl.buffer(new Float32Array(pointPairs))
 
-        var positionBuffer = regl.buffer(new Float32Array(pointPairs))
+    var attributes = {
+        color: {
+            stride: 16,
+            offset: 0,
+            buffer: color
+        },
+        x: {
+            size: 1,
+            buffer: regl.buffer(leftOrRight)
+        },
+        depth: {
+            size: 1,
+            buffer: regl.buffer(depth)
+        }};
 
-        var attributes = {
-            color: {
-                stride: 16,
-                offset: 0,
-                buffer: color
+    for(var i = 0; i < 12; i++) {
+        attributes['p' + i.toString(16)] = {
+            offset: i * 16,
+            stride: positionStride,
+            buffer: positionBuffer
+        };
+    }
+
+    var glAes = regl({
+
+        profile: false,
+
+        blend: {
+            enable: false,
+            func: {
+                srcRGB: 'src alpha',
+                dstRGB: 'one minus src alpha',
+                srcAlpha: 1,
+                dstAlpha: 1 // 'one minus src alpha'
             },
-            x: {
-                size: 1,
-                buffer: regl.buffer(leftOrRight)
+            equation: {
+                rgb: 'add',
+                alpha: 'add'
             },
-            depth: {
-                size: 1,
-                buffer: regl.buffer(depth)
-            }};
+            color: [0, 0, 0, 0]
+        },
 
-        for(var i = 0; i < 12; i++) {
-            attributes['p' + i.toString(16)] = {
-                offset: i * 16,
-                stride: positionStride,
-                buffer: positionBuffer
-            };
+        depth: {
+            enable: true,
+            mask: true,
+            func: 'less',
+            range: [0, 1]
+        },
+
+        // for polygons
+        cull: {
+            enable: true,
+            face: 'back'
+        },
+
+        scissor: {
+            enable: true,
+            box: {
+                x: regl.prop('scissorX'),
+                y: 0,
+                width: regl.prop('scissorWidth'),
+                height: canvasPanelSizeY
+            }
+        },
+
+        dither: false,
+
+        vert: vertexShaderSource,
+
+        frag: fragmentShaderSource,
+
+        primitive: 'lines',
+        lineWidth: 1,
+        attributes: attributes,
+        uniforms: {
+            resolution: regl.prop('resolution'),
+            viewBoxPosition: regl.prop('viewBoxPosition'),
+            viewBoxSize: regl.prop('viewBoxSize'),
+            var1A: regl.prop('var1A'),
+            var2A: regl.prop('var2A'),
+            var1B: regl.prop('var1B'),
+            var2B: regl.prop('var2B'),
+            var1C: regl.prop('var1C'),
+            var2C: regl.prop('var2C'),
+            loA: regl.prop('loA'),
+            hiA: regl.prop('hiA'),
+            loB: regl.prop('loB'),
+            hiB: regl.prop('hiB'),
+            loC: regl.prop('loC'),
+            hiC: regl.prop('hiC')
+        },
+        offset: regl.prop('offset'),
+        count: regl.prop('count')
+    })
+
+    function approach(column) {
+        //utils.ndarrayOrder(, column.index)
+        //console.log('Approached ', JSON.stringify(column.name));
+    }
+
+    var previousAxisOrder = [];
+
+    function valid(i, offset) {
+        return i < shownVariableCount && i + offset < variableViews.length
+    }
+
+    function renderGLParcoords(update, setChanged) {
+
+        if(!update) {
+            variableViews = overlay.enterOverlayPanels(approach, render);
         }
 
-        var glAes = regl({
+        var items = []
 
-            profile: false,
+        var I;
 
-            blend: {
-                enable: false,
-                func: {
-                    srcRGB: 'src alpha',
-                    dstRGB: 'one minus src alpha',
-                    srcAlpha: 1,
-                    dstAlpha: 1 // 'one minus src alpha'
-                },
-                equation: {
-                    rgb: 'add',
-                    alpha: 'add'
-                },
-                color: [0, 0, 0, 0]
-            },
-
-            depth: {
-                enable: true,
-                mask: true,
-                func: 'less',
-                range: [0, 1]
-            },
-
-            // for polygons
-            cull: {
-                enable: true,
-                face: 'back'
-            },
-
-            scissor: {
-                enable: true,
-                box: {
-                    x: regl.prop('scissorX'),
-                    y: 0,
-                    width: regl.prop('scissorWidth'),
-                    height: canvasPanelSizeY
-                }
-            },
-
-            dither: false,
-
-            vert: vertexShaderSource,
-
-            frag: fragmentShaderSource,
-
-            primitive: 'lines',
-            lineWidth: 1,
-            attributes: attributes,
-            uniforms: {
-                resolution: regl.prop('resolution'),
-                viewBoxPosition: regl.prop('viewBoxPosition'),
-                viewBoxSize: regl.prop('viewBoxSize'),
-                var1A: regl.prop('var1A'),
-                var2A: regl.prop('var2A'),
-                var1B: regl.prop('var1B'),
-                var2B: regl.prop('var2B'),
-                var1C: regl.prop('var1C'),
-                var2C: regl.prop('var2C'),
-                loA: regl.prop('loA'),
-                hiA: regl.prop('hiA'),
-                loB: regl.prop('loB'),
-                hiB: regl.prop('hiB'),
-                loC: regl.prop('loC'),
-                hiC: regl.prop('hiC')
-            },
-            offset: regl.prop('offset'),
-            count: regl.prop('count')
-        })
-
-        function approach(column) {
-            //utils.ndarrayOrder(, column.index)
-            //console.log('Approached ', JSON.stringify(column.name));
+        function orig(i) {
+            var index = variableViews.map(function(v) {return v.originalXIndex;}).indexOf(i);
+            return variableViews[index];
         }
 
-        var previousAxisOrder = [];
-
-        return function(update, setChanged) {
-
-            if(!update) {
-                variableViews = overlay.enterOverlayPanels(approach, render);
+        var rightmostIndex, highestX = -Infinity;
+        for(I = 0; I < shownPanelCount; I++) {
+            if(variableViews[I].x > highestX) {
+                highestX = variableViews[I].x;
+                rightmostIndex = I;
             }
-
-            var items = []
-
-            function valid(i, offset) {
-                return i < shownVariableCount && i + offset < variableViews.length
-            }
-
-            var I;
-
-            function orig(i) {
-                var index = variableViews.map(function(v) {return v.originalXIndex;}).indexOf(i);
-                return variableViews[index];
-            }
-
-            var rightmostIndex, highestX = -Infinity;
-            for(I = 0; I < shownPanelCount; I++) {
-                if(variableViews[I].x > highestX) {
-                    highestX = variableViews[I].x;
-                    rightmostIndex = I;
-                }
-            }
-
-            for(I = 0; I < shownPanelCount; I++) {
-                var variableView = variableViews[I];
-                var i = variableView.originalXIndex;
-                var x = variableView.x * config.canvasPixelRatio;
-                var nextVar = variableViews[(I + 1) % shownVariableCount];
-                var ii = nextVar.originalXIndex;
-                var panelSizeX = nextVar.x * config.canvasPixelRatio - x;
-                if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextVar.x) {
-                    previousAxisOrder[i] = [x, nextVar.x];
-                    items.push({
-                        resolution: [canvasWidth, canvasHeight],
-                        viewBoxPosition: [x, 0],
-                        viewBoxSize: [panelSizeX, canvasPanelSizeY],
-                        var1A: utils.range(16).map(function(d) {return d === i  ? 1 : 0}),
-                        var2A: utils.range(16).map(function(d) {return d === ii ? 1 : 0}),
-                        var1B: utils.range(16).map(function(d) {return d + 16 === i  ? 1 : 0}),
-                        var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0}),
-                        var1C: utils.range(16).map(function(d) {return d + 32 === i  ? 1 : 0}),
-                        var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0}),
-                        loA: utils.range(16).map(function(i) {return 1 - (valid(i, 0)  ? orig(i     ).filter[1] : 1) - filterEpsilon}),
-                        hiA: utils.range(16).map(function(i) {return 1 - (valid(i, 0)  ? orig(i     ).filter[0] : 0) + filterEpsilon}),
-                        loB: utils.range(16).map(function(i) {return 1 - (valid(i, 16) ? orig(i + 16).filter[1] : 1) - filterEpsilon}),
-                        hiB: utils.range(16).map(function(i) {return 1 - (valid(i, 16) ? orig(i + 16).filter[0] : 0) + filterEpsilon}),
-                        loC: utils.range(16).map(function(i) {return 1 - (valid(i, 32) ? orig(i + 32).filter[1] : 1) - filterEpsilon}),
-                        hiC: utils.range(16).map(function(i) {return 1 - (valid(i, 32) ? orig(i + 32).filter[0] : 0) + filterEpsilon}),
-                        scissorX: x,
-                        scissorWidth: panelSizeX,
-                        rightmost: I === rightmostIndex
-                    });
-                }
-            }
-
-            renderBlock(regl, gl, glAes, config, sampleCount, items, 0, performance.now())
         }
-    })()
+
+        for(I = 0; I < shownPanelCount; I++) {
+            var variableView = variableViews[I];
+            var i = variableView.originalXIndex;
+            var x = variableView.x * config.canvasPixelRatio;
+            var nextVar = variableViews[(I + 1) % shownVariableCount];
+            var ii = nextVar.originalXIndex;
+            var panelSizeX = nextVar.x * config.canvasPixelRatio - x;
+            if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextVar.x) {
+                previousAxisOrder[i] = [x, nextVar.x];
+                items.push({
+                    resolution: [canvasWidth, canvasHeight],
+                    viewBoxPosition: [x, 0],
+                    viewBoxSize: [panelSizeX, canvasPanelSizeY],
+                    var1A: utils.range(16).map(function(d) {return d === i  ? 1 : 0}),
+                    var2A: utils.range(16).map(function(d) {return d === ii ? 1 : 0}),
+                    var1B: utils.range(16).map(function(d) {return d + 16 === i  ? 1 : 0}),
+                    var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0}),
+                    var1C: utils.range(16).map(function(d) {return d + 32 === i  ? 1 : 0}),
+                    var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0}),
+                    loA: utils.range(16).map(function(i) {return 1 - (valid(i, 0)  ? orig(i     ).filter[1] : 1) - filterEpsilon}),
+                    hiA: utils.range(16).map(function(i) {return 1 - (valid(i, 0)  ? orig(i     ).filter[0] : 0) + filterEpsilon}),
+                    loB: utils.range(16).map(function(i) {return 1 - (valid(i, 16) ? orig(i + 16).filter[1] : 1) - filterEpsilon}),
+                    hiB: utils.range(16).map(function(i) {return 1 - (valid(i, 16) ? orig(i + 16).filter[0] : 0) + filterEpsilon}),
+                    loC: utils.range(16).map(function(i) {return 1 - (valid(i, 32) ? orig(i + 32).filter[1] : 1) - filterEpsilon}),
+                    hiC: utils.range(16).map(function(i) {return 1 - (valid(i, 32) ? orig(i + 32).filter[0] : 0) + filterEpsilon}),
+                    scissorX: x,
+                    scissorWidth: panelSizeX,
+                    rightmost: I === rightmostIndex
+                });
+            }
+        }
+
+        renderBlock(regl, gl, glAes, config, sampleCount, items, 0, performance.now())
+    }
 
     function destroy() {
         overlay.destroy()
