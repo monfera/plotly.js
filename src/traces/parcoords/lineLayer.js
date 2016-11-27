@@ -233,9 +233,9 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 var x = variableView.x;
                 var nextVar = variableViews[(I + 1) % shownVariableCount];
                 var ii = nextVar.originalXIndex;
-                var panelSizeX = nextVar.x - variableView.x;
-                if(setChanged || !previousAxisOrder[I] || previousAxisOrder[I][0] !== x || previousAxisOrder[I][1] !== panelSizeX) {
-                    previousAxisOrder[I] = [x, panelSizeX];
+                var panelSizeX = nextVar.x - x;
+                if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextVar.x) {
+                    previousAxisOrder[i] = [x, nextVar.x];
                     items.push({
                         resolution: [width, height],
                         viewBoxPosition: [x, 0],
