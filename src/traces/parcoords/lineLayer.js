@@ -202,8 +202,6 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
         return function(update, setChanged) {
 
-            window.cancelAnimationFrame(currentRaf)
-
             if(!update) {
                 variableViews = overlay.enterOverlayPanels(approach, render);
             }
@@ -307,6 +305,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         } while(performance.now() - t < rafWorkTime && (blockNumber - 1) * blockLineCount + count < sampleCount)
 
         if(blockNumber * blockLineCount + count < sampleCount) {
+            window.cancelAnimationFrame(currentRaf)
             currentRaf = window.requestAnimationFrame(function(t) {
                 renderBlock(glAes, items, blockNumber, t)
             })
