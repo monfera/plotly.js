@@ -189,8 +189,6 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             count: regl.prop('count')
         })
 
-        var scheduled = null
-
         function approach(column) {
             //utils.ndarrayOrder(, column.index)
             console.log('Approached ', JSON.stringify(column.name));
@@ -200,7 +198,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
         return function(update, setChanged) {
 
-            window.clearTimeout(scheduled)
+            window.cancelAnimationFrame(currentRaf)
 
             if(!update) {
                 variableViews = overlay.enterOverlayPanels(approach, render);
@@ -259,7 +257,6 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                 }
             }
 
-            window.cancelAnimationFrame(currentRaf)
             renderBlock(glAes, items, 0, performance.now())
         }
     })()
