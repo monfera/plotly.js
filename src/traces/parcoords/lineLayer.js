@@ -25,11 +25,12 @@ function clear(regl, x, y, width, height) {
 var currentRafs = {};
 var drawCompleted = true;
 
-function renderBlock(regl, glAes, config, sampleCount, item, blockNumber, t) {
+function renderBlock(regl, glAes, config, sampleCount, item, incremental) {
 
+    var blockNumber = 0;
     var width = config.width * config.canvasPixelRatio;
     var canvasPanelSizeY = config.panelSizeY * config.canvasPixelRatio;
-    var blockLineCount = config.blockLineCount;
+    var blockLineCount = incremental ? config.blockLineCount : sampleCount;
     var rafKey = item.I;
 
     if(!drawCompleted) {
@@ -62,7 +63,7 @@ function renderBlock(regl, glAes, config, sampleCount, item, blockNumber, t) {
         drawCompleted = false;
     }
 
-    render(blockNumber, t);
+    render(blockNumber);
 }
 
 module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, overlay, unitToColor) {
@@ -317,7 +318,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     ii: ii,
                     I: I
                 };
-                renderBlock(regl, glAes, config, sampleCount, item, 0);
+                renderBlock(regl, glAes, config, sampleCount, item, setChanged);
             }
         }
     }
