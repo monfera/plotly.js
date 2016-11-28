@@ -4,10 +4,6 @@ module.exports = {
     filterSize: 16,
     mousemoveThrottle: 1000 / 30,
 
-    panelBorderColor: 'black',
-    panelBorderOpacity: debug ? 1 : 0,
-    panelOpacity: debug ? 0.2 : 0,
-
     filterColor: 'black',
     handleGlyphHeight: 16,
     handleGlyphOpacity: 0,

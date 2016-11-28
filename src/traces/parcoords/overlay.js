@@ -41,7 +41,7 @@ function viewModel(width, height, model) {
     return [{
         key: model.key,
         columns: model.columns,
-        xScale: d3.scale.ordinal().domain(d3.range(model.columns.length + 1)).rangePoints([0, width], 0),
+        xScale: d3.scale.ordinal().domain(d3.range(model.columns.length)).rangePoints([0, width], 0),
         unitScales: model.columns.map(makeUnitScale.bind(0, height)),
         domainScales: model.columns.map(makeDomainScale.bind(0, height)),
         integerScales: model.columns.map(makeIntegerScale),
@@ -51,14 +51,12 @@ function viewModel(width, height, model) {
 
 function panelViewModel(width, height, viewModel) {
     return viewModel.columns.map(function(column, i) {
-        var panelWidth = width / viewModel.columns.length;
         return {
             key: viewModel.columns[i].name,
             name: viewModel.columns[i].name,
             integer: viewModel.columns[i].integer,
             xIndex: i,
             originalXIndex: i,
-            width: panelWidth,
             height: height,
             values: viewModel.columns[i].values,
             xScale: viewModel.xScale,
@@ -215,19 +213,6 @@ module.exports = function (root, typedArrayModel, config) {
                     lineRender(true, variableViews);
                 })
             );
-
-        var panelBackground = panel.selectAll('.panelBackground')
-            .data(repeat, keyFun);
-
-        panelBackground.enter()
-            .append('rect')
-            .classed('panelBackground', true)
-            .style('pointer-events', 'none')
-            .attr('width', function(d) {return d.width})
-            .attr('height', function(d) {return d.height})
-            .attr('stroke', controlConfig.panelBorderColor)
-            .attr('stroke-opacity', controlConfig.panelBorderOpacity)
-            .attr('fill', function() {return 'rgba(0,255,0,' + controlConfig.panelOpacity * Math.random() + ')';});
 
         var axisOverlays = panel.selectAll('.axisOverlays')
             .data(repeat, keyFun);
