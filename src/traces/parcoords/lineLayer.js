@@ -1,3 +1,4 @@
+var controlConfig = require('./controlConfig');
 var utils = require('./utils');
 var createREGL = require('regl');
 
@@ -96,10 +97,15 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var gpuVariableCount = 48 // don't change this
 
+    function paddedUnit(d) {
+        var unitPad = controlConfig.verticalPadding / panelSizeY;
+        return unitPad + d * (1 - 2 * unitPad);
+    }
+
     var points = []
     for(var j = 0; j < sampleCount; j++)
         for(var i = 0; i < gpuVariableCount; i++)
-            points.push(i < variableCount ? domainToUnitScales[i](data.get(i, j)) : 0.5);
+            points.push(i < variableCount ? paddedUnit(domainToUnitScales[i](data.get(i, j))) : 0.5);
 
     var pointPairs = [];
 
@@ -301,12 +307,12 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0}),
                     var1C: utils.range(16).map(function(d) {return d + 32 === i  ? 1 : 0}),
                     var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0}),
-                    loA: utils.range(16).map(function(i) {return 1 - (valid(i, 0)  ? orig(i     ).filter[1] : 1) - filterEpsilon}),
-                    hiA: utils.range(16).map(function(i) {return 1 - (valid(i, 0)  ? orig(i     ).filter[0] : 0) + filterEpsilon}),
-                    loB: utils.range(16).map(function(i) {return 1 - (valid(i, 16) ? orig(i + 16).filter[1] : 1) - filterEpsilon}),
-                    hiB: utils.range(16).map(function(i) {return 1 - (valid(i, 16) ? orig(i + 16).filter[0] : 0) + filterEpsilon}),
-                    loC: utils.range(16).map(function(i) {return 1 - (valid(i, 32) ? orig(i + 32).filter[1] : 1) - filterEpsilon}),
-                    hiC: utils.range(16).map(function(i) {return 1 - (valid(i, 32) ? orig(i + 32).filter[0] : 0) + filterEpsilon}),
+                    loA: utils.range(16).map(function(i) {return paddedUnit(1 - (valid(i, 0)  ? orig(i     ).filter[1] : 1)) - filterEpsilon}),
+                    hiA: utils.range(16).map(function(i) {return paddedUnit(1 - (valid(i, 0)  ? orig(i     ).filter[0] : 0)) + filterEpsilon}),
+                    loB: utils.range(16).map(function(i) {return paddedUnit(1 - (valid(i, 16) ? orig(i + 16).filter[1] : 1)) - filterEpsilon}),
+                    hiB: utils.range(16).map(function(i) {return paddedUnit(1 - (valid(i, 16) ? orig(i + 16).filter[0] : 0)) + filterEpsilon}),
+                    loC: utils.range(16).map(function(i) {return paddedUnit(1 - (valid(i, 32) ? orig(i + 32).filter[1] : 1)) - filterEpsilon}),
+                    hiC: utils.range(16).map(function(i) {return paddedUnit(1 - (valid(i, 32) ? orig(i + 32).filter[0] : 0)) + filterEpsilon}),
                     scissorX: x,
                     scissorWidth: panelSizeX,
                     leftmost: I === leftmostIndex,

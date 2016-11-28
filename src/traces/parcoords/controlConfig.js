@@ -12,7 +12,8 @@ module.exports = {
     filterBarStroke: 'white',
     filterBarStrokeWidth: 0.3,
     integerPadding: 0, // use 1 to offset integer extreme values by half pitch
-    averageTickDistance: 50, // in pixels
+    averageTickDistance: 50, // in pixels,
+    verticalPadding: 2,
 
     // for debugging:
     captureZoneBorderColor: debug ? 'red' : "",
