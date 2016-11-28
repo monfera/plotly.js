@@ -66,8 +66,8 @@ module.exports = (function() {
             var orderByVector = []
             var i, j
             for(j = 0; j < rowCount; j++) {
-                orderByVector.push(unsortedData.get(orderByColumn, j))
-                //orderByVector.push(Math.random())
+                //orderByVector.push(-unsortedData.get(orderByColumn, j))
+                orderByVector.push(Math.random())
             }
 
             var sortedSampleIndices = range(rowCount)

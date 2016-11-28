@@ -21,7 +21,7 @@ module.exports = function(model) {
         depthVariable: 0,
 
         // technical config
-        canvasPixelRatio: window.devicePixelRatio, // using 2 or devicePixelRatio sharpens lines, slower
+        canvasPixelRatio: 1, //window.devicePixelRatio, // using 2 or devicePixelRatio sharpens lines, slower
         blockLineCount: 2000 // number of lines drawn in one increment
     }
 };
