@@ -188,7 +188,7 @@ module.exports = function (root, typedArrayModel, config) {
                     if(domainBrushing)
                         return;
                     axisDragging = true;
-                    d.x = d3.event.x;
+                    d.x = Math.max(-10, Math.min(width + 10, d3.event.x));
                     panel
                         .sort(function(a, b) {return a.x - b.x;})
                         .each(function(dd, i) {
