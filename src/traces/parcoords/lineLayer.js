@@ -47,7 +47,7 @@ function renderBlock(regl, glAes, config, sampleCount, item, blockNumber, t) {
         item.count = 2 * count;
         if(blockNumber === 0) { // the +1 avoids the minor vertical residue on axes
             window.cancelAnimationFrame(currentRafs[rafKey]); // stop drawing possibly stale glyphs before clearing
-            clear(regl, item.scissorX, 0, item.rightmost ? width : item.scissorWidth + 1, canvasPanelSizeY);
+            clear(regl, item.leftmost ? 0 : item.scissorX, 0, item.rightmost ? width : item.scissorWidth + 1 + (item.leftmost ? item.scissorX : 0), canvasPanelSizeY);
         }
 
         glAes(item);
@@ -272,11 +272,15 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             return variableViews[index];
         }
 
-        var rightmostIndex, highestX = -Infinity;
+        var leftmostIndex, rightmostIndex, lowestX = Infinity, highestX = -Infinity;
         for(I = 0; I < shownPanelCount; I++) {
             if(variableViews[I].x > highestX) {
                 highestX = variableViews[I].x;
                 rightmostIndex = I;
+            }
+            if(variableViews[I].x < lowestX) {
+                lowestX = variableViews[I].x;
+                leftmostIndex = I;
             }
         }
 
@@ -307,6 +311,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     hiC: utils.range(16).map(function(i) {return 1 - (valid(i, 32) ? orig(i + 32).filter[0] : 0) + filterEpsilon}),
                     scissorX: x,
                     scissorWidth: panelSizeX,
+                    leftmost: I === leftmostIndex,
                     rightmost: I === rightmostIndex,
                     i: i,
                     ii: ii,
