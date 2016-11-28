@@ -194,7 +194,6 @@ module.exports = function (root, typedArrayModel, config) {
                             dd.x = d == dd ? dd.x : dd.xScale(dd.xIndex);
                         });
                     panel.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
-                        .transition().duration(controlConfig.axisSnapDuration)
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                     panel.each(function(d, i) {variableViews[i] = d;});
@@ -208,7 +207,6 @@ module.exports = function (root, typedArrayModel, config) {
                     axisDragging = false;
                     d.x = d.xScale(d.xIndex);
                     d3.select(this)
-                        .transition().duration(controlConfig.axisSnapDuration)
                         .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                     lineRender(true, variableViews);
                 })
