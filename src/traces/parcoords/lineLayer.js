@@ -22,42 +22,36 @@ function clear(regl, x, y, width, height) {
     regl.clear({ color: [1, 1, 1, 1], depth: 1 }); // clearing is done in scissored panel only
 }
 
-var currentRaf = null
+var currentRafs = {}
 
-function renderBlock(regl, glAes, config, sampleCount, items, blockNumber, t) {
+function renderBlock(regl, glAes, config, sampleCount, item, blockNumber, t) {
 
-    var rafWorkTime = config.rafTimeRatio * 1000 / 60
     var width = config.width * config.canvasPixelRatio
     var canvasPanelSizeY = config.panelSizeY * config.canvasPixelRatio
     var blockLineCount = config.blockLineCount
+    var rafKey = item.I
 
-    function render(blockNumber, t) {
+    function render(blockNumber) {
 
-        var count, i, item;
+        var count;
 
-        do {
+        count = Math.min(blockLineCount, sampleCount - blockNumber * blockLineCount);
 
-            count = Math.min(blockLineCount, sampleCount - blockNumber * blockLineCount);
+        item.offset = 2 * blockNumber * blockLineCount;
+        item.count = 2 * count;
+        if(blockNumber === 0) { // the +1 avoids the minor vertical residue on axes
+            window.cancelAnimationFrame(currentRafs[rafKey]); // stop drawing possibly stale glyphs before clearing
+            clear(regl, item.scissorX, 0, item.rightmost ? width : item.scissorWidth + 1, canvasPanelSizeY);
+        }
 
-            for (i = 0; i < items.length; i++) {
-                item = items[i];
-                item.offset = 2 * blockNumber * blockLineCount;
-                item.count = 2 * count;
-                if(blockNumber === 0) { // the +1 avoids the minor vertical residue on axes
-                    clear(regl, item.scissorX, 0, item.rightmost ? width : item.scissorWidth + 1, canvasPanelSizeY);
-                }
-            }
+        glAes(item);
+        blockNumber++;
 
-            glAes(items);
-            blockNumber++;
-            ensureDraw(regl);
-
-        } while(performance.now() - t < rafWorkTime && (blockNumber - 1) * blockLineCount + count < sampleCount);
+        ensureDraw(regl)
 
         if(blockNumber * blockLineCount + count < sampleCount) {
-            window.cancelAnimationFrame(currentRaf);
-            currentRaf = window.requestAnimationFrame(function(t) {
-                render(blockNumber, t);
+            currentRafs[rafKey] = window.requestAnimationFrame(function() {
+                render(blockNumber);
             });
         }
     }
@@ -266,8 +260,6 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             variableViews = overlay.enterOverlayPanels(approach, render);
         }
 
-        var items = []
-
         var I;
 
         function orig(i) {
@@ -292,7 +284,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             var panelSizeX = nextVar.x * config.canvasPixelRatio - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextVar.x) {
                 previousAxisOrder[i] = [x, nextVar.x];
-                items.push({
+                var item = {
                     resolution: [canvasWidth, canvasHeight],
                     viewBoxPosition: [x, 0],
                     viewBoxSize: [panelSizeX, canvasPanelSizeY],
@@ -310,12 +302,14 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     hiC: utils.range(16).map(function(i) {return 1 - (valid(i, 32) ? orig(i + 32).filter[0] : 0) + filterEpsilon}),
                     scissorX: x,
                     scissorWidth: panelSizeX,
-                    rightmost: I === rightmostIndex
-                });
+                    rightmost: I === rightmostIndex,
+                    i: i,
+                    ii: ii,
+                    I: I
+                };
+                renderBlock(regl, glAes, config, sampleCount, item, 0)
             }
         }
-
-        renderBlock(regl, glAes, config, sampleCount, items, 0, performance.now())
     }
 
     function destroy() {
