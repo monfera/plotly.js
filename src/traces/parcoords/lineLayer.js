@@ -4,34 +4,33 @@ var createREGL = require('regl');
 var depthLimitEpsilon = 1e-6; // don't change; otherwise near/far plane lines are lost
 var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on domain boundaries
 
-var pixel = new Uint8Array(4)
+var dummyPixel = new Uint8Array(4)
 function ensureDraw(regl) {
     regl.read({
         x: 0,
         y: 0,
         width: 1,
         height: 1,
-        data: pixel
-    })
+        data: dummyPixel
+    });
 }
 
 function clear(regl, x, y, width, height) {
     var gl = regl._gl;
     gl.enable(gl.SCISSOR_TEST);
     gl.scissor(x, y, width, height);
-    //regl.clear({ color: [0.85 + 0.15 * Math.random(), 0.85 + 0.15 * Math.random(), 0.85 + 0.15 * Math.random(), 1], depth: 1 }); // clearing is done in scissored panel only
     regl.clear({ color: [1,1,1, 1], depth: 1 }); // clearing is done in scissored panel only
 }
 
-var currentRafs = {}
-var drawCompleted = true
+var currentRafs = {};
+var drawCompleted = true;
 
 function renderBlock(regl, glAes, config, sampleCount, item, blockNumber, t) {
 
-    var width = config.width * config.canvasPixelRatio
-    var canvasPanelSizeY = config.panelSizeY * config.canvasPixelRatio
-    var blockLineCount = config.blockLineCount
-    var rafKey = item.I
+    var width = config.width * config.canvasPixelRatio;
+    var canvasPanelSizeY = config.panelSizeY * config.canvasPixelRatio;
+    var blockLineCount = config.blockLineCount;
+    var rafKey = item.I;
 
     if(!drawCompleted) {
         ensureDraw(regl);
@@ -68,33 +67,33 @@ function renderBlock(regl, glAes, config, sampleCount, item, blockNumber, t) {
 
 module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, overlay, unitToColor) {
 
-    var data = model.data
-    var variableCount = model.variableCount
-    var sampleCount = model.sampleCount
-    var domainToUnitScales = model.domainToUnitScales
+    var data = model.data;
+    var variableCount = model.variableCount;
+    var sampleCount = model.sampleCount;
+    var domainToUnitScales = model.domainToUnitScales;
 
-    var width = config.width
-    var height = config.height
-    var panelSizeY = config.panelSizeY
-    var coloringVariable = config.coloringVariable
-    var colorScale = config.colorScale
-    var depthVariable = config.depthVariable
-    var canvasPixelRatio = config.canvasPixelRatio
+    var width = config.width;
+    var height = config.height;
+    var panelSizeY = config.panelSizeY;
+    var coloringVariable = config.coloringVariable;
+    var colorScale = config.colorScale;
+    var depthVariable = config.depthVariable;
+    var canvasPixelRatio = config.canvasPixelRatio;
 
-    var canvasWidth = width * canvasPixelRatio
-    var canvasHeight = height * canvasPixelRatio
-    var canvasPanelSizeY = panelSizeY * canvasPixelRatio
+    var canvasWidth = width * canvasPixelRatio;
+    var canvasHeight = height * canvasPixelRatio;
+    var canvasPanelSizeY = panelSizeY * canvasPixelRatio;
 
-    canvasGL.setAttribute('width', canvasWidth)
-    canvasGL.setAttribute('height', canvasHeight)
-    canvasGL.style.width = width + 'px'
-    canvasGL.style.height = height + 'px'
+    canvasGL.setAttribute('width', canvasWidth);
+    canvasGL.setAttribute('height', canvasHeight);
+    canvasGL.style.width = width + 'px';
+    canvasGL.style.height = height + 'px';
 
-    var coloringVariableUnitScale = domainToUnitScales[coloringVariable]
-    var depthUnitScale = domainToUnitScales[depthVariable]
+    var coloringVariableUnitScale = domainToUnitScales[coloringVariable];
+    var depthUnitScale = domainToUnitScales[depthVariable];
 
-    var colorProjection = function(j) {
-        return colorScale(coloringVariableUnitScale(data.get(coloringVariable, j)))
+    function colorProjection(j) {
+        return colorScale(coloringVariableUnitScale(data.get(coloringVariable, j)));
     }
 
     var gpuVariableCount = 48 // don't change this
@@ -102,33 +101,34 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var points = []
     for(var j = 0; j < sampleCount; j++)
         for(var i = 0; i < gpuVariableCount; i++)
-            points.push(i < variableCount ? domainToUnitScales[i](data.get(i, j)) : 0.5)
+            points.push(i < variableCount ? domainToUnitScales[i](data.get(i, j)) : 0.5);
 
-    var pointPairs = []
+    var pointPairs = [];
 
     for (j = 0; j < sampleCount; j++) {
         for (i = 0; i < gpuVariableCount; i++) {
-            pointPairs.push(points[j * gpuVariableCount + i])
+            pointPairs.push(points[j * gpuVariableCount + i]);
         }
         for (i = 0; i < gpuVariableCount; i++) {
-            pointPairs.push(points[j * gpuVariableCount + i])
+            pointPairs.push(points[j * gpuVariableCount + i]);
         }
     }
 
-    var leftOrRight = utils.range(sampleCount * 2).map(function(d) {return d % 2})
-    var depth = utils.range(sampleCount * 2).map(function(d){
-        return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon, depthUnitScale(data.get(depthVariable, Math.round((d - d % 2) / 2)))))
+    var leftOrRight = utils.range(sampleCount * 2).map(function(d) {return d % 2});
+    var depth = utils.range(sampleCount * 2).map(function(d) {
+        return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon,
+            depthUnitScale(data.get(depthVariable, Math.round((d - d % 2) / 2)))));
     })
 
-    var color = new Float32Array(sampleCount * 2 * 4)
+    var color = new Float32Array(sampleCount * 2 * 4);
     for(j = 0; j < sampleCount; j++) {
-        var prominence = colorProjection(j)
+        var prominence = colorProjection(j);
         for(var k = 0; k < 2; k++) {
-            var c = unitToColor(1 - prominence)
-            color[j * 2 * 4 + k * 4]     = c[0] / 255
-            color[j * 2 * 4 + k * 4 + 1] = c[1] / 255
-            color[j * 2 * 4 + k * 4 + 2] = c[2] / 255
-            color[j * 2 * 4 + k * 4 + 3] = 1
+            var c = unitToColor(1 - prominence);
+            color[j * 2 * 4 + k * 4]     = c[0] / 255;
+            color[j * 2 * 4 + k * 4 + 1] = c[1] / 255;
+            color[j * 2 * 4 + k * 4 + 2] = c[2] / 255;
+            color[j * 2 * 4 + k * 4 + 3] = 1;
         }
     }
 
@@ -149,11 +149,9 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         attributes: {
             preserveDrawingBuffer: true
         }
-    })
+    });
 
-    // var gl = regl._gl; window.gl = gl; // debug
-
-    var positionBuffer = regl.buffer(new Float32Array(pointPairs))
+    var positionBuffer = regl.buffer(new Float32Array(pointPairs));
 
     var attributes = {
         color: {
@@ -248,17 +246,17 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         },
         offset: regl.prop('offset'),
         count: regl.prop('count')
-    })
+    });
 
     function approach(column) {
-        //utils.ndarrayOrder(, column.index)
+        //utils.ndarrayOrder(, column.index);
         //console.log('Approached ', JSON.stringify(column.name));
     }
 
     var previousAxisOrder = [];
 
     function valid(i, offset) {
-        return i < shownVariableCount && i + offset < variableViews.length
+        return i < shownVariableCount && i + offset < variableViews.length;
     }
 
     function renderGLParcoords(update, setChanged) {
@@ -314,18 +312,18 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     ii: ii,
                     I: I
                 };
-                renderBlock(regl, glAes, config, sampleCount, item, 0)
+                renderBlock(regl, glAes, config, sampleCount, item, 0);
             }
         }
     }
 
     function destroy() {
-        overlay.destroy()
-        regl.destroy()
+        overlay.destroy();
+        regl.destroy();
     }
 
     return {
         render: render,
         destroy: destroy
-    }
+    };
 }
