@@ -1,4 +1,4 @@
-var controlConfig = require('./overlayConfig');
+var controlConfig = require('./controlConfig');
 var utils = require('./utils');
 var d3 = require('d3');
 
@@ -20,15 +20,15 @@ function makeDomainScale(height, column) {
     return column.integer
         ? d3.scale.ordinal()
         .domain(d3.range(Math.round(lo), Math.round(hi + 1)))
-        .rangePoints([height, 0], controlConfig.integerPadding)
+        .rangePoints([height - controlConfig.verticalPadding, controlConfig.verticalPadding], controlConfig.integerPadding)
         : d3.scale.linear()
         .domain([lo, hi])
-        .range([height, 0]);
+        .range([height - controlConfig.verticalPadding, controlConfig.verticalPadding]);
 }
 
 function makeUnitScale(height) {
     return d3.scale.linear()
-        .range([height, 0]);
+        .range([height - controlConfig.verticalPadding, controlConfig.verticalPadding]);
 }
 
 function makeIntegerScale(column) {
