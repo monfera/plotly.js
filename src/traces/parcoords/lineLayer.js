@@ -19,10 +19,12 @@ function clear(regl, x, y, width, height) {
     var gl = regl._gl;
     gl.enable(gl.SCISSOR_TEST);
     gl.scissor(x, y, width, height);
-    regl.clear({ color: [1, 1, 1, 1], depth: 1 }); // clearing is done in scissored panel only
+    //regl.clear({ color: [0.85 + 0.15 * Math.random(), 0.85 + 0.15 * Math.random(), 0.85 + 0.15 * Math.random(), 1], depth: 1 }); // clearing is done in scissored panel only
+    regl.clear({ color: [1,1,1, 1], depth: 1 }); // clearing is done in scissored panel only
 }
 
 var currentRafs = {}
+var drawCompleted = true
 
 function renderBlock(regl, glAes, config, sampleCount, item, blockNumber, t) {
 
@@ -30,6 +32,11 @@ function renderBlock(regl, glAes, config, sampleCount, item, blockNumber, t) {
     var canvasPanelSizeY = config.panelSizeY * config.canvasPixelRatio
     var blockLineCount = config.blockLineCount
     var rafKey = item.I
+
+    if(!drawCompleted) {
+        ensureDraw(regl);
+        drawCompleted = true;
+    }
 
     function render(blockNumber) {
 
@@ -47,13 +54,13 @@ function renderBlock(regl, glAes, config, sampleCount, item, blockNumber, t) {
         glAes(item);
         blockNumber++;
 
-        ensureDraw(regl)
-
         if(blockNumber * blockLineCount + count < sampleCount) {
             currentRafs[rafKey] = window.requestAnimationFrame(function() {
                 render(blockNumber);
             });
         }
+
+        drawCompleted = false;
     }
 
     render(blockNumber, t);
