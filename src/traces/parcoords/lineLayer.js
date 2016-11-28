@@ -25,12 +25,9 @@ function clear(regl, x, y, width, height) {
 var currentRafs = {};
 var drawCompleted = true;
 
-function renderBlock(regl, glAes, config, sampleCount, item, incremental) {
+function renderBlock(regl, glAes, width, canvasPanelSizeY, blockLineCount, sampleCount, item) {
 
     var blockNumber = 0;
-    var width = config.width * config.canvasPixelRatio;
-    var canvasPanelSizeY = config.panelSizeY * config.canvasPixelRatio;
-    var blockLineCount = incremental ? config.blockLineCount : sampleCount;
     var rafKey = item.I;
 
     if(!drawCompleted) {
@@ -318,7 +315,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     ii: ii,
                     I: I
                 };
-                renderBlock(regl, glAes, config, sampleCount, item, setChanged);
+                renderBlock(regl, glAes, canvasWidth, canvasPanelSizeY, setChanged ? config.blockLineCount : sampleCount, sampleCount, item);
             }
         }
     }
