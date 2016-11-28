@@ -15,47 +15,50 @@ function ensureDraw(regl) {
     })
 }
 
+function clear(regl, x, y, width, height) {
+    var gl = regl._gl;
+    gl.enable(gl.SCISSOR_TEST);
+    gl.scissor(x, y, width, height);
+    regl.clear({ color: [1, 1, 1, 1], depth: 1 }); // clearing is done in scissored panel only
+}
+
 var currentRaf = null
 
-function renderBlock(regl, gl, glAes, config, sampleCount, items, blockNumber, t) {
+function renderBlock(regl, glAes, config, sampleCount, items, blockNumber, t) {
+
+    var rafWorkTime = config.rafTimeRatio * 1000 / 60
+    var width = config.width * config.canvasPixelRatio
+    var canvasPanelSizeY = config.panelSizeY * config.canvasPixelRatio
+    var blockLineCount = config.blockLineCount
 
     function render(blockNumber, t) {
 
+        var count, i, item;
+
         do {
 
-            var rafWorkTime = config.rafTimeRatio * 1000 / 60
-            var canvasWidth = config.width * config.canvasPixelRatio
-            var canvasPanelSizeY = config.panelSizeY * config.canvasPixelRatio
-            var blockLineCount = config.blockLineCount
-            var offset = blockNumber * blockLineCount
-            var count = Math.min(blockLineCount, sampleCount - blockNumber * blockLineCount)
-            for (var i = 0; i < items.length; i++) {
-                var item = items[i]
-                item.offset = 2 * offset
-                item.count = 2 * count
-                if(blockNumber === 0) {
-                    gl.enable(gl.SCISSOR_TEST);
-                    gl.scissor(
-                        item.scissorX,
-                        0,
-                        item.rightmost ? canvasWidth : item.scissorWidth + 1,
-                        canvasPanelSizeY
-                    );
-                    // the + 1 is important to not leave minor vertical residue on axis
-                    regl.clear({ color: [1, 1, 1, 1], depth: 1 }); // clearing is done in scissored panel only
-                    // todo figure out how to idiomatically use scissored clear with regl; doesn't appear to work
+            count = Math.min(blockLineCount, sampleCount - blockNumber * blockLineCount);
+
+            for (i = 0; i < items.length; i++) {
+                item = items[i];
+                item.offset = 2 * blockNumber * blockLineCount;
+                item.count = 2 * count;
+                if(blockNumber === 0) { // the +1 avoids the minor vertical residue on axes
+                    clear(regl, item.scissorX, 0, item.rightmost ? width : item.scissorWidth + 1, canvasPanelSizeY);
                 }
             }
-            glAes(items)
-            blockNumber++
-            ensureDraw(regl)
-        } while(performance.now() - t < rafWorkTime && (blockNumber - 1) * blockLineCount + count < sampleCount)
+
+            glAes(items);
+            blockNumber++;
+            ensureDraw(regl);
+
+        } while(performance.now() - t < rafWorkTime && (blockNumber - 1) * blockLineCount + count < sampleCount);
 
         if(blockNumber * blockLineCount + count < sampleCount) {
-            window.cancelAnimationFrame(currentRaf)
+            window.cancelAnimationFrame(currentRaf);
             currentRaf = window.requestAnimationFrame(function(t) {
                 render(blockNumber, t);
-            })
+            });
         }
     }
 
@@ -128,7 +131,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         }
     }
 
-    var positionStride = gpuVariableCount * 4
+    var positionStride = gpuVariableCount * 4;
 
     var shownVariableCount = variableCount;
     var shownPanelCount = shownVariableCount - 1;
@@ -147,8 +150,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         }
     })
 
-    var gl = regl._gl;
-    window.gl = gl;
+    // var gl = regl._gl; window.gl = gl; // debug
 
     var positionBuffer = regl.buffer(new Float32Array(pointPairs))
 
@@ -313,7 +315,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             }
         }
 
-        renderBlock(regl, gl, glAes, config, sampleCount, items, 0, performance.now())
+        renderBlock(regl, glAes, config, sampleCount, items, 0, performance.now())
     }
 
     function destroy() {
