@@ -228,13 +228,19 @@ module.exports = function (root, typedArrayModel, config) {
             .append('g')
             .classed('axis', true)
             .each(function(d) {
+                var wantedTickCount = height / controlConfig.averageTickDistance;
+                var scale = d.domainScale;
+                var dom = scale.domain();
                 d3.select(this)
                     .call(d3.svg.axis()
                         .orient('left')
                         .tickSize(4)
                         .outerTickSize(2)
-                        .ticks(height / controlConfig.averageTickDistance, '3s')
-                        .scale(d.domainScale));
+                        .ticks(wantedTickCount, '3s') // works for continuous scales only...
+                        .tickValues(d.integer // and this works for ordinal scales
+                            ? dom.filter(function(d, i) {return !(i % Math.round((dom.length / wantedTickCount)));})
+                            : null)
+                        .scale(scale));
             });
 
         axisEnter
