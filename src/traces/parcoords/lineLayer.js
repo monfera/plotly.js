@@ -311,8 +311,6 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     scissorWidth: panelSizeX,
                     leftmost: I === leftmostIndex,
                     rightmost: I === rightmostIndex,
-                    i: i,
-                    ii: ii,
                     I: I
                 };
                 renderBlock(regl, glAes, canvasWidth, canvasPanelSizeY, setChanged ? config.blockLineCount : sampleCount, sampleCount, item);
