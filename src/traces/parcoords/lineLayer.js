@@ -64,7 +64,7 @@ function renderBlock(regl, glAes, width, canvasPanelSizeY, blockLineCount, sampl
     render(blockNumber);
 }
 
-module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, overlay, unitToColor) {
+module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor) {
 
     var data = model.data;
     var variableCount = model.variableCount;
@@ -143,9 +143,9 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var variableViews;
 
-    function render(update, newVariableViews, setChanged) {
+    function render(newVariableViews, setChanged) {
         variableViews = newVariableViews;
-        renderGLParcoords(update, setChanged);
+        renderGLParcoords(setChanged, variableViews);
     }
 
     var regl = createREGL({
@@ -263,11 +263,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         return i < shownVariableCount && i + offset < variableViews.length;
     }
 
-    function renderGLParcoords(update, setChanged) {
-
-        if(!update) {
-            variableViews = overlay.enterOverlayPanels(approach, render);
-        }
+    function renderGLParcoords(setChanged, variableViews) {
 
         var I;
 
@@ -325,11 +321,11 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     }
 
     function destroy() {
-        overlay.destroy();
         regl.destroy();
     }
 
     return {
+        approach: approach,
         render: render,
         destroy: destroy
     };
