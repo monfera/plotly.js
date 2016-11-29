@@ -336,14 +336,18 @@ module.exports = function (root, typedArrayModel, config) {
 
         function axisBrushMoved(variable) {
             var extent = variable.brush.extent();
+            var filter = variableViews[variable.xIndex].filter;
             var reset = justStarted && (extent[0] == extent[1]);
             if(reset) {
                 variable.brush.clear();
                 d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
             }
-            variableViews[variable.xIndex].filter = reset ? [0, 1] : extent.slice();
+            var newExtent = reset ? [0, 1] : extent.slice();
+            if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
+                variableViews[variable.xIndex].filter = newExtent;
+                lineRender(variableViews, true);
+            }
             justStarted = false;
-            lineRender(variableViews, true);
         }
 
         function axisBrushEnded(variable) {
