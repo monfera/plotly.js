@@ -245,8 +245,8 @@ module.exports = function (root, typedArrayModel, config) {
             .selectAll('.domain, .tick')
             .attr('fill', 'none')
             .attr('stroke', 'black')
-            .attr('stroke-opacity', 0.5)
-            .attr('stroke-width', '0.5px');
+            .attr('stroke-opacity', 0.25)
+            .attr('stroke-width', '1px');
 
         axisEnter
             .selectAll('text')
@@ -255,7 +255,8 @@ module.exports = function (root, typedArrayModel, config) {
             .style('font-size', 'x-small')
             .style('fill', 'black')
             .style('fill-opacity', 1)
-            .style('text-shadow', '2px 2px 2px #fff, -2px -2px 2px #fff, 2px -2px 2px #fff, -2px 2px 2px #fff')
+            .style('stroke', 'none')
+            .style('text-shadow', '1px 1px 1px #fff, -1px -1px 1px #fff, 1px -1px 1px #fff, -1px 1px 1px #fff')
             .style('cursor', 'default')
             .style('user-select', 'none');
 

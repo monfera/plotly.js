@@ -15,6 +15,8 @@ module.exports = {
     averageTickDistance: 50, // in pixels,
     verticalPadding: 2,
 
+    alphaBlending: false,
+
     // for debugging:
     captureZoneBorderColor: debug ? 'red' : "",
     captureZoneFillColor: debug ? 'rgba(255, 0, 0, 0.05)' : 'rgba(0, 0, 0, 0)'

@@ -129,10 +129,10 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         var prominence = colorProjection(j);
         for(var k = 0; k < 2; k++) {
             var c = unitToColor(1 - prominence);
-            color[j * 2 * 4 + k * 4]     = c[0] / 255;
-            color[j * 2 * 4 + k * 4 + 1] = c[1] / 255;
-            color[j * 2 * 4 + k * 4 + 2] = c[2] / 255;
-            color[j * 2 * 4 + k * 4 + 3] = 1;
+            color[j * 2 * 4 + k * 4]     = controlConfig.alphaBlending ? 0 : c[0] / 255;
+            color[j * 2 * 4 + k * 4 + 1] = controlConfig.alphaBlending ? 0 : c[1] / 255;
+            color[j * 2 * 4 + k * 4 + 2] = controlConfig.alphaBlending ? 0 : c[2] / 255;
+            color[j * 2 * 4 + k * 4 + 3] = controlConfig.alphaBlending ? .02 : 1;
         }
     }
 
@@ -185,7 +185,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         profile: false,
 
         blend: {
-            enable: false,
+            enable: controlConfig.alphaBlending,
             func: {
                 srcRGB: 'src alpha',
                 dstRGB: 'one minus src alpha',
@@ -200,7 +200,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         },
 
         depth: {
-            enable: true,
+            enable: !controlConfig.alphaBlending,
             mask: true,
             func: 'less',
             range: [0, 1]
