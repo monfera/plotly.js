@@ -70,6 +70,17 @@ function panelViewModel(width, height, viewModel) {
     });
 }
 
+function styleExtentTexts(selection) {
+    selection
+        .classed('axisExtentText', true)
+        .attr('text-anchor', 'middle')
+        .style('font-family', 'monospace')
+        .style('font-weight', 100)
+        .style('font-size', 'x-small')
+        .style('cursor', 'default')
+        .style('user-select', 'none');
+}
+
 module.exports = function (root, typedArrayModel, config) {
 
     var width = config.width
@@ -276,13 +287,60 @@ module.exports = function (root, typedArrayModel, config) {
         axisTitle.enter()
             .append('text')
             .classed('axisTitle', true)
+            .attr('transform', 'translate(0,' + -(controlConfig.handleGlyphHeight + 20) + ')')
             .text(function(d) {return d.name;})
-            .attr('y', -controlConfig.handleGlyphHeight - 10)
             .attr('text-anchor', 'middle')
             .style('font-family', 'sans-serif')
             .style('font-size', 'xx-small')
             .style('cursor', 'default')
             .style('user-select', 'none');
+
+        var axisExtent = axisOverlays.selectAll('.axisExtent')
+            .data(repeat, keyFun);
+
+        axisExtent.enter()
+            .append('g')
+            .classed('axisExtent', true);
+
+        var axisExtentTop = axisExtent.selectAll('.axisExtentTop')
+            .data(repeat, keyFun);
+
+        axisExtentTop.enter()
+            .append('g')
+            .classed('axisExtentTop', true)
+            .attr('transform', 'translate(' + 0 + ',' + -(controlConfig.handleGlyphHeight - 2) + ')')
+
+        var axisExtentTopText = axisExtentTop.selectAll('.axisExtentTopText')
+            .data(repeat, keyFun);
+
+        function formatExtreme(d) {
+            return d.integer ? d3.format('.0s') : d3.format('.3s');
+        }
+
+        axisExtentTopText.enter()
+            .append('text')
+            .classed('axisExtentTopText', true)
+            .text(function(d) {return formatExtreme(d)(d.domainScale.domain().slice(-1)[0]);})
+            .attr('alignment-baseline', 'after-edge')
+            .call(styleExtentTexts);
+
+        var axisExtentBottom = axisExtent.selectAll('.axisExtentBottom')
+            .data(repeat, keyFun);
+
+        axisExtentBottom.enter()
+            .append('g')
+            .classed('axisExtentBottom', true)
+            .attr('transform', 'translate(' + 0 + ',' + (height + controlConfig.handleGlyphHeight - 2) + ')')
+
+        var axisExtentBottomText = axisExtentBottom.selectAll('.axisExtentBottomText')
+            .data(repeat, keyFun);
+
+        axisExtentBottomText.enter()
+            .append('text')
+            .classed('axisExtentBottomText', true)
+            .text(function(d) {return formatExtreme(d)(d.domainScale.domain()[0]);})
+            .attr('alignment-baseline', 'before-edge')
+            .call(styleExtentTexts);
 
         var axisBrush = axisOverlays.selectAll('.axisBrush')
             .data(repeat, keyFun);
