@@ -20,7 +20,7 @@ function clear(regl, x, y, width, height) {
     var gl = regl._gl;
     gl.enable(gl.SCISSOR_TEST);
     gl.scissor(x, y, width, height);
-    regl.clear({color: [1, 1, 1, 1], depth: 1}); // clearing is done in scissored panel only
+    regl.clear({color: [0, 0, 0, 0], depth: 1}); // clearing is done in scissored panel only
 }
 
 var currentRafs = {};
@@ -64,12 +64,14 @@ function renderBlock(regl, glAes, blockLineCount, sampleCount, item) {
     render(blockNumber);
 }
 
-module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor) {
+module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor, context) {
 
     var data = model.data;
     var variableCount = model.variableCount;
     var sampleCount = model.sampleCount;
     var domainToUnitScales = model.domainToUnitScales;
+
+    var alphaBlending = context; // controlConfig.alphaBlending;
 
     var width = config.width;
     var height = config.height;
@@ -129,10 +131,10 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         var prominence = colorProjection(j);
         for(var k = 0; k < 2; k++) {
             var c = unitToColor(1 - prominence);
-            color[j * 2 * 4 + k * 4]     = controlConfig.alphaBlending ? 0 : c[0] / 255;
-            color[j * 2 * 4 + k * 4 + 1] = controlConfig.alphaBlending ? 0 : c[1] / 255;
-            color[j * 2 * 4 + k * 4 + 2] = controlConfig.alphaBlending ? 0 : c[2] / 255;
-            color[j * 2 * 4 + k * 4 + 3] = controlConfig.alphaBlending ? .02 : 1;
+            color[j * 2 * 4 + k * 4]     = alphaBlending ? 0 : c[0] / 255;
+            color[j * 2 * 4 + k * 4 + 1] = alphaBlending ? 0 : c[1] / 255;
+            color[j * 2 * 4 + k * 4 + 2] = alphaBlending ? 0 : c[2] / 255;
+            color[j * 2 * 4 + k * 4 + 3] = alphaBlending ? .01 : 1;
         }
     }
 
@@ -185,7 +187,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         profile: false,
 
         blend: {
-            enable: controlConfig.alphaBlending,
+            enable: alphaBlending,
             func: {
                 srcRGB: 'src alpha',
                 dstRGB: 'one minus src alpha',
@@ -200,7 +202,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         },
 
         depth: {
-            enable: !controlConfig.alphaBlending,
+            enable: !alphaBlending,
             mask: true,
             func: 'less',
             range: [0, 1]
