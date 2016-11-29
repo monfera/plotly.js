@@ -197,6 +197,7 @@ module.exports = function (root, typedArrayModel, config) {
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                     panel.each(function(d, i) {variableViews[i] = d;});
+                    contextLineRender(variableViews);
                     lineRender(variableViews);
                 })
                 .on('dragend', function(d) {
@@ -208,6 +209,7 @@ module.exports = function (root, typedArrayModel, config) {
                     d.x = d.xScale(d.xIndex);
                     d3.select(this)
                         .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
+                    contextLineRender(variableViews);
                     lineRender(variableViews);
                 })
             );
@@ -367,8 +369,8 @@ module.exports = function (root, typedArrayModel, config) {
             domainBrushing = false;
         }
 
-        lineRender(variableViews, true);
         contextLineRender(variableViews, true);
+        lineRender(variableViews, true);
 
         return variableViews;
     }
