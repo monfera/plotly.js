@@ -23,17 +23,14 @@ function clear(regl, x, y, width, height) {
     regl.clear({color: [0, 0, 0, 0], depth: 1}); // clearing is done in scissored panel only
 }
 
-var currentRafs = {};
-var drawCompleted = true;
-
-function renderBlock(regl, glAes, blockLineCount, sampleCount, item) {
+function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item) {
 
     var blockNumber = 0;
     var rafKey = item.key;
 
-    if(!drawCompleted) {
+    if(!renderState.drawCompleted) {
         ensureDraw(regl);
-        drawCompleted = true;
+        renderState.drawCompleted = true;
     }
 
     function render(blockNumber) {
@@ -45,7 +42,7 @@ function renderBlock(regl, glAes, blockLineCount, sampleCount, item) {
         item.offset = 2 * blockNumber * blockLineCount;
         item.count = 2 * count;
         if(blockNumber === 0) { // the +1 avoids the minor vertical residue on axes
-            window.cancelAnimationFrame(currentRafs[rafKey]); // stop drawing possibly stale glyphs before clearing
+            window.cancelAnimationFrame(renderState.currentRafs[rafKey]); // stop drawing possibly stale glyphs before clearing
             clear(regl, item.scissorX, 0, item.scissorWidth + 1, item.viewBoxSize[1]);
         }
 
@@ -53,18 +50,23 @@ function renderBlock(regl, glAes, blockLineCount, sampleCount, item) {
         blockNumber++;
 
         if(blockNumber * blockLineCount + count < sampleCount) {
-            currentRafs[rafKey] = window.requestAnimationFrame(function() {
+            renderState.currentRafs[rafKey] = window.requestAnimationFrame(function() {
                 render(blockNumber);
             });
         }
 
-        drawCompleted = false;
+        renderState.drawCompleted = false;
     }
 
     render(blockNumber);
 }
 
 module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor, context) {
+
+    var renderState = {
+        currentRafs: {},
+        drawCompleted: true
+    };
 
     var data = model.data;
     var variableCount = model.variableCount;
@@ -315,7 +317,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     scissorX: I === leftmostIndex ? 0 : x,
                     scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
                 };
-                renderBlock(regl, glAes, setChanged ? config.blockLineCount : sampleCount, sampleCount, item);
+                renderBlock(regl, glAes, renderState, setChanged ? config.blockLineCount : sampleCount, sampleCount, item);
             }
         }
     }
