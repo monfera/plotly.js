@@ -76,8 +76,8 @@ module.exports = function (root, typedArrayModel, config) {
     var height = config.height
 
     var resizeHeight = controlConfig.handleGlyphHeight;
-    var brushVisibleWidth = controlConfig.filterSize;
-    var brushCaptureWidth = 3 * controlConfig.filterSize;
+    var brushVisibleWidth = controlConfig.filterVisibleWidth;
+    var brushCaptureWidth = controlConfig.filterCaptureWidth;
 
     var columns = [];
     for(var i = 0; i < typedArrayModel.variableCount; i++) {
@@ -139,13 +139,14 @@ module.exports = function (root, typedArrayModel, config) {
 
         filterBarPatternGlyph.enter()
             .append('rect')
-            .attr('shape-rendering', 'geometricPrecision')
+            .attr('shape-rendering', 'crispEdges')
             .attr('width', brushVisibleWidth)
             .attr('height', height)
             .attr('x', brushVisibleWidth / 2)
-            .attr('fill', controlConfig.filterColor)
-            .attr('fill-opacity', controlConfig.filterBarOpacity)
+            .attr('fill', controlConfig.filterBarFill)
+            .attr('fill-opacity', controlConfig.filterBarFillOpacity)
             .attr('stroke', controlConfig.filterBarStroke)
+            .attr('stroke-opacity', controlConfig.filterBarStrokeOpacity)
             .attr('stroke-width', controlConfig.filterBarStrokeWidth);
 
         var parcoordsModel = svg.selectAll('.parcoordsModel')
