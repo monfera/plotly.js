@@ -25,10 +25,7 @@ module.exports = function plot(root, data) {
     canvasGL.setAttribute('style', 'position: absolute; padding: ' + config.padding + 'px;overflow: visible;');
     root.appendChild(canvasGL);
 
-    var lineLayer = lineLayerMaker(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor);
+    var focusLineLayer = lineLayerMaker(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor);
     var ol = overlay(root, model, config);
-    var variableViews = ol.enterOverlayPanels(lineLayer.approach, lineLayer.render);
-
-
-    //lineLayer.render(false, []);
+    var variableViews = ol.enterOverlayPanels(focusLineLayer.approach, focusLineLayer.render);
 };

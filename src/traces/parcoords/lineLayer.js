@@ -20,16 +20,16 @@ function clear(regl, x, y, width, height) {
     var gl = regl._gl;
     gl.enable(gl.SCISSOR_TEST);
     gl.scissor(x, y, width, height);
-    regl.clear({ color: [1,1,1, 1], depth: 1 }); // clearing is done in scissored panel only
+    regl.clear({color: [1, 1, 1, 1], depth: 1}); // clearing is done in scissored panel only
 }
 
 var currentRafs = {};
 var drawCompleted = true;
 
-function renderBlock(regl, glAes, width, canvasPanelSizeY, blockLineCount, sampleCount, item) {
+function renderBlock(regl, glAes, blockLineCount, sampleCount, item) {
 
     var blockNumber = 0;
-    var rafKey = item.I;
+    var rafKey = item.key;
 
     if(!drawCompleted) {
         ensureDraw(regl);
@@ -46,7 +46,7 @@ function renderBlock(regl, glAes, width, canvasPanelSizeY, blockLineCount, sampl
         item.count = 2 * count;
         if(blockNumber === 0) { // the +1 avoids the minor vertical residue on axes
             window.cancelAnimationFrame(currentRafs[rafKey]); // stop drawing possibly stale glyphs before clearing
-            clear(regl, item.scissorX, 0, item.scissorWidth + 1, canvasPanelSizeY);
+            clear(regl, item.scissorX, 0, item.scissorWidth + 1, item.viewBoxSize[1]);
         }
 
         glAes(item);
@@ -294,6 +294,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextVar.x) {
                 previousAxisOrder[i] = [x, nextVar.x];
                 var item = {
+                    key: variableView.originalXIndex,
                     resolution: [canvasWidth, canvasHeight],
                     viewBoxPosition: [x, 0],
                     viewBoxSize: [panelSizeX, canvasPanelSizeY],
@@ -310,10 +311,9 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     loC: utils.range(16).map(function(i) {return paddedUnit(1 - (valid(i, 32) ? orig(i + 32).filter[1] : 1)) - filterEpsilon}),
                     hiC: utils.range(16).map(function(i) {return paddedUnit(1 - (valid(i, 32) ? orig(i + 32).filter[0] : 0)) + filterEpsilon}),
                     scissorX: I === leftmostIndex ? 0 : x,
-                    scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0),
-                    I: I
+                    scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
                 };
-                renderBlock(regl, glAes, canvasWidth, canvasPanelSizeY, setChanged ? config.blockLineCount : sampleCount, sampleCount, item);
+                renderBlock(regl, glAes, setChanged ? config.blockLineCount : sampleCount, sampleCount, item);
             }
         }
     }
