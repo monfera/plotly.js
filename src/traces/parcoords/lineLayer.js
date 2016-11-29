@@ -41,9 +41,9 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
 
         item.offset = 2 * blockNumber * blockLineCount;
         item.count = 2 * count;
-        if(blockNumber === 0) { // the +1 avoids the minor vertical residue on axes
+        if(blockNumber === 0) {
             window.cancelAnimationFrame(renderState.currentRafs[rafKey]); // stop drawing possibly stale glyphs before clearing
-            clear(regl, item.scissorX, 0, item.scissorWidth + 1, item.viewBoxSize[1]);
+            clear(regl, item.scissorX, 0, item.scissorWidth, item.viewBoxSize[1]);
         }
 
         glAes(item);
