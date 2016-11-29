@@ -197,7 +197,7 @@ module.exports = function (root, typedArrayModel, config) {
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                     panel.each(function(d, i) {variableViews[i] = d;});
-                    lineRender(true, variableViews);
+                    lineRender(variableViews);
                 })
                 .on('dragend', function(d) {
                     if(domainBrushing || !axisDragging) {
@@ -208,7 +208,7 @@ module.exports = function (root, typedArrayModel, config) {
                     d.x = d.xScale(d.xIndex);
                     d3.select(this)
                         .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                    lineRender(true, variableViews);
+                    lineRender(variableViews);
                 })
             );
 
@@ -343,7 +343,7 @@ module.exports = function (root, typedArrayModel, config) {
             }
             variableViews[variable.xIndex].filter = reset ? [0, 1] : extent.slice();
             justStarted = false;
-            lineRender(true, variableViews, true);
+            lineRender(variableViews, true);
         }
 
         function axisBrushEnded(variable) {
@@ -358,10 +358,12 @@ module.exports = function (root, typedArrayModel, config) {
                     f[1] = Math.min(1, f[1] + 0.05);
                 }
                 d3.select(this).transition().duration(150).call(variable.brush.extent(f));
-                lineRender(true, variableViews, true);
+                lineRender(variableViews, true);
             }
             domainBrushing = false;
         }
+
+        lineRender(variableViews, true);
 
         return variableViews;
     }
