@@ -97,7 +97,7 @@ module.exports = function (root, typedArrayModel, config) {
         columns: columns
     }
 
-    function enterOverlayPanels(lineRenderApproach, lineRender) {
+    function enterOverlayPanels(lineRenderApproach, lineRender, contextLineRender) {
 
         var lastApproached = null
 
@@ -368,6 +368,7 @@ module.exports = function (root, typedArrayModel, config) {
         }
 
         lineRender(variableViews, true);
+        contextLineRender(variableViews, true);
 
         return variableViews;
     }

@@ -21,11 +21,16 @@ module.exports = function plot(root, data) {
     var model = modelMaker(data);
     var config = configMaker(model);
 
-    var canvasGL = document.createElement('canvas');
-    canvasGL.setAttribute('style', 'position: absolute; padding: ' + config.padding + 'px;overflow: visible;');
-    root.appendChild(canvasGL);
+    var contextCanvasGL = document.createElement('canvas');
+    contextCanvasGL.setAttribute('style', 'position: absolute; padding: ' + config.padding + 'px;overflow: visible;');
+    root.appendChild(contextCanvasGL);
 
-    var focusLineLayer = lineLayerMaker(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor);
+    var focusCanvasGL = document.createElement('canvas');
+    focusCanvasGL.setAttribute('style', 'position: absolute; padding: ' + config.padding + 'px;overflow: visible;');
+    root.appendChild(focusCanvasGL);
+
+    var contextLineLayer = lineLayerMaker(contextCanvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor, true);
+    var focusLineLayer = lineLayerMaker(focusCanvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor, false);
     var ol = overlay(root, model, config);
-    var variableViews = ol.enterOverlayPanels(focusLineLayer.approach, focusLineLayer.render);
+    var variableViews = ol.enterOverlayPanels(focusLineLayer.approach, focusLineLayer.render, contextLineLayer.render);
 };
