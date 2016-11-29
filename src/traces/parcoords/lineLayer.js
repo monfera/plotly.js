@@ -46,7 +46,7 @@ function renderBlock(regl, glAes, width, canvasPanelSizeY, blockLineCount, sampl
         item.count = 2 * count;
         if(blockNumber === 0) { // the +1 avoids the minor vertical residue on axes
             window.cancelAnimationFrame(currentRafs[rafKey]); // stop drawing possibly stale glyphs before clearing
-            clear(regl, item.leftmost ? 0 : item.scissorX, 0, item.rightmost ? width : item.scissorWidth + 1 + (item.leftmost ? item.scissorX : 0), canvasPanelSizeY);
+            clear(regl, item.scissorX, 0, item.scissorWidth + 1, canvasPanelSizeY);
         }
 
         glAes(item);
@@ -309,10 +309,8 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     hiB: utils.range(16).map(function(i) {return paddedUnit(1 - (valid(i, 16) ? orig(i + 16).filter[0] : 0)) + filterEpsilon}),
                     loC: utils.range(16).map(function(i) {return paddedUnit(1 - (valid(i, 32) ? orig(i + 32).filter[1] : 1)) - filterEpsilon}),
                     hiC: utils.range(16).map(function(i) {return paddedUnit(1 - (valid(i, 32) ? orig(i + 32).filter[0] : 0)) + filterEpsilon}),
-                    scissorX: x,
-                    scissorWidth: panelSizeX,
-                    leftmost: I === leftmostIndex,
-                    rightmost: I === rightmostIndex,
+                    scissorX: I === leftmostIndex ? 0 : x,
+                    scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0),
                     I: I
                 };
                 renderBlock(regl, glAes, canvasWidth, canvasPanelSizeY, setChanged ? config.blockLineCount : sampleCount, sampleCount, item);
