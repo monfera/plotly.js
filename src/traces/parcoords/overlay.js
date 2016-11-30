@@ -121,7 +121,14 @@ module.exports = function (root, typedArrayModel, config) {
             .append('div')
             .classed('parcoordsModel', true);
 
-        var parcoordsControlOverlay = parcoordsModel.selectAll('.parcoordsControlOverlay')
+        var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
+            .data(viewModel.bind(0, width, height), keyFun)
+
+        parcoordsViewModel.enter()
+            .append('div')
+            .classed('parcoordsViewModel', true);
+
+        var parcoordsControlOverlay = parcoordsViewModel.selectAll('.parcoordsControlOverlay')
             .data(repeat, keyFun);
 
         parcoordsControlOverlay.enter()
@@ -167,21 +174,14 @@ module.exports = function (root, typedArrayModel, config) {
             .attr('stroke-opacity', controlConfig.filterBarStrokeOpacity)
             .attr('stroke-width', controlConfig.filterBarStrokeWidth);
 
-        var parcoordsViewModel = parcoordsControlOverlay.selectAll('.parcoordsViewModel')
-            .data(viewModel.bind(0, width, height), keyFun)
-
-        parcoordsViewModel.enter()
-            .append('g')
-            .classed('parcoordsViewModel', true);
-
-        var parcoordsView = parcoordsViewModel.selectAll('.parcoordsView')
+        var parcoordsControlView = parcoordsControlOverlay.selectAll('.parcoordsControlView')
             .data(repeat, keyFun);
 
-        parcoordsView.enter()
+        parcoordsControlView.enter()
             .append('g')
-            .classed('parcoordsView', true);
+            .classed('parcoordsControlView', true);
 
-        var panel = parcoordsView.selectAll('.panel')
+        var panel = parcoordsControlView.selectAll('.panel')
             .data(panelViewModel.bind(0, width, height), keyFun)
 
         var domainBrushing = false
