@@ -38,7 +38,8 @@ function makeIntegerScale(column) {
 }
 
 function viewModel(width, height, model) {
-    return [{
+
+    var viewModel = {
         key: model.key,
         columns: model.columns,
         xScale: d3.scale.ordinal().domain(d3.range(model.columns.length)).rangePoints([0, width], 0),
@@ -46,11 +47,9 @@ function viewModel(width, height, model) {
         domainScales: model.columns.map(makeDomainScale.bind(0, height)),
         integerScales: model.columns.map(makeIntegerScale),
         filters: model.columns.map(function() {return [0, 1];})
-    }];
-}
+    };
 
-function panelViewModel(width, height, viewModel) {
-    return viewModel.columns.map(function(column, i) {
+    viewModel.panels = viewModel.columns.map(function(column, i) {
         return {
             key: viewModel.columns[i].name,
             name: viewModel.columns[i].name,
@@ -67,7 +66,9 @@ function panelViewModel(width, height, viewModel) {
             filter: viewModel.filters[i],
             columns: viewModel.columns
         };
-    });
+    })
+
+    return [viewModel];
 }
 
 function styleExtentTexts(selection) {
@@ -185,7 +186,7 @@ module.exports = function (root, typedArrayModel, config) {
             .classed('parcoordsControlView', true);
 
         var panel = parcoordsControlView.selectAll('.panel')
-            .data(panelViewModel.bind(0, width, height), keyFun)
+            .data(function(vm) {return vm.panels;}, keyFun)
 
         var domainBrushing = false
         var axisDragging = false
