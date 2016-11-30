@@ -64,7 +64,8 @@ function viewModel(width, height, model) {
             domainScale: viewModel.domainScales[i],
             integerScale: viewModel.integerScales[i],
             filter: viewModel.filters[i],
-            columns: viewModel.columns
+            columns: viewModel.columns,
+            parent: viewModel
         };
     })
 
@@ -191,6 +192,10 @@ module.exports = function (root, typedArrayModel, config) {
         var domainBrushing = false
         var axisDragging = false
 
+        function someFiltersActive(view) {
+            return view.panels.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
+        }
+
         panel.enter()
             .append('g')
             .classed('panel', true)
@@ -213,7 +218,7 @@ module.exports = function (root, typedArrayModel, config) {
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                     panel.each(function(d, i) {variableViews[i] = d;});
-                    contextLineRender(variableViews);
+                    contextLineRender(variableViews, false, !someFiltersActive(d.parent));
                     lineRender(variableViews);
                 })
                 .on('dragend', function(d) {
@@ -225,7 +230,7 @@ module.exports = function (root, typedArrayModel, config) {
                     d.x = d.xScale(d.xIndex);
                     d3.select(this)
                         .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                    contextLineRender(variableViews);
+                    contextLineRender(variableViews, false, !someFiltersActive(d.parent));
                     lineRender(variableViews);
                 })
             );
@@ -393,6 +398,7 @@ module.exports = function (root, typedArrayModel, config) {
             .attr('y', -controlConfig.handleGlyphOverlap);
 
         var justStarted = false;
+        var contextShown = false;
 
         function axisBrushStarted() {
             justStarted = true;
@@ -411,6 +417,14 @@ module.exports = function (root, typedArrayModel, config) {
             if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
                 variableViews[variable.xIndex].filter = newExtent;
                 lineRender(variableViews, true);
+                var filtersActive = someFiltersActive(variable.parent);
+                if(!contextShown && filtersActive) {
+                    contextLineRender(variableViews, true);
+                    contextShown = true;
+                } else if(contextShown && !filtersActive) {
+                    contextLineRender(variableViews, true, true);
+                    contextShown = false;
+                }
             }
             justStarted = false;
         }
@@ -432,7 +446,6 @@ module.exports = function (root, typedArrayModel, config) {
             domainBrushing = false;
         }
 
-        contextLineRender(variableViews, true);
         lineRender(variableViews, true);
 
         return variableViews;
