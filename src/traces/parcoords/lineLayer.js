@@ -150,13 +150,6 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var shownVariableCount = variableCount;
     var shownPanelCount = shownVariableCount - 1;
 
-    var variableViews;
-
-    function render(newVariableViews, setChanged, clearOnly) {
-        variableViews = newVariableViews;
-        renderGLParcoords(setChanged, variableViews, clearOnly);
-    }
-
     var regl = createREGL({
         canvas: canvasGL,
         attributes: {
@@ -268,13 +261,13 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var previousAxisOrder = [];
 
-    function valid(i, offset) {
-        return i < shownVariableCount && i + offset < variableViews.length;
-    }
-
-    function renderGLParcoords(setChanged, variableViews, clearOnly) {
+    function renderGLParcoords(variableViews, setChanged, clearOnly) {
 
         var I;
+
+        function valid(i, offset) {
+            return i < shownVariableCount && i + offset < variableViews.length;
+        }
 
         function orig(i) {
             var index = variableViews.map(function(v) {return v.originalXIndex;}).indexOf(i);
@@ -334,7 +327,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     return {
         approach: approach,
-        render: render,
+        render: renderGLParcoords,
         destroy: destroy
     };
 }
