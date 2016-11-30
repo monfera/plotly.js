@@ -46,6 +46,10 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
             clear(regl, item.scissorX, 0, item.scissorWidth, item.viewBoxSize[1]);
         }
 
+        if(renderState.clearOnly) {
+            return;
+        }
+
         glAes(item);
         blockNumber++;
 
@@ -65,7 +69,8 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var renderState = {
         currentRafs: {},
-        drawCompleted: true
+        drawCompleted: true,
+        clearOnly: false
     };
 
     var data = model.data;
@@ -147,9 +152,9 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var variableViews;
 
-    function render(newVariableViews, setChanged) {
+    function render(newVariableViews, setChanged, clearOnly) {
         variableViews = newVariableViews;
-        renderGLParcoords(setChanged, variableViews);
+        renderGLParcoords(setChanged, variableViews, clearOnly);
     }
 
     var regl = createREGL({
@@ -267,7 +272,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         return i < shownVariableCount && i + offset < variableViews.length;
     }
 
-    function renderGLParcoords(setChanged, variableViews) {
+    function renderGLParcoords(setChanged, variableViews, clearOnly) {
 
         var I;
 
@@ -317,6 +322,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     scissorX: I === leftmostIndex ? 0 : x,
                     scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
                 };
+                renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? config.blockLineCount : sampleCount, sampleCount, item);
             }
         }
