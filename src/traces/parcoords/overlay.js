@@ -110,14 +110,21 @@ module.exports = function (root, typedArrayModel, config) {
 
     function enterOverlayPanels(lineRenderApproach, lineRender, contextLineRender) {
 
-        var lastApproached = null
+        var lastApproached = null;
 
         var variableViews = [];
 
-        var svg = d3.select(root).selectAll('.parcoordsSVG')
-            .data([model], keyFun)
+        var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
+            .data([model], keyFun);
 
-        svg.enter()
+        parcoordsModel.enter()
+            .append('div')
+            .classed('parcoordsModel', true);
+
+        var parcoordsControlOverlay = parcoordsModel.selectAll('.parcoordsControlOverlay')
+            .data(repeat, keyFun);
+
+        parcoordsControlOverlay.enter()
             .append('svg')
             .classed('parcoordsSVG', true)
             .attr('overflow', 'visible')
@@ -128,7 +135,7 @@ module.exports = function (root, typedArrayModel, config) {
             .style('overflow', 'visible')
             .style('shape-rendering', 'crispEdges');
 
-        var defs = svg.selectAll('defs')
+        var defs = parcoordsControlOverlay.selectAll('defs')
             .data(repeat, keyFun);
 
         defs.enter()
@@ -160,14 +167,7 @@ module.exports = function (root, typedArrayModel, config) {
             .attr('stroke-opacity', controlConfig.filterBarStrokeOpacity)
             .attr('stroke-width', controlConfig.filterBarStrokeWidth);
 
-        var parcoordsModel = svg.selectAll('.parcoordsModel')
-            .data(repeat, keyFun)
-
-        parcoordsModel.enter()
-            .append('g')
-            .classed('parcoordsModel', true);
-
-        var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
+        var parcoordsViewModel = parcoordsControlOverlay.selectAll('.parcoordsViewModel')
             .data(viewModel.bind(0, width, height), keyFun)
 
         parcoordsViewModel.enter()
