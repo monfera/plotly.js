@@ -108,6 +108,40 @@ module.exports = function (root, typedArrayModel, config) {
         columns: columns
     }
 
+    function enterSvgDefs(root) {
+        var defs = root.selectAll('defs')
+            .data(repeat, keyFun);
+
+        defs.enter()
+            .append('defs');
+
+        var filterBarPattern = defs.selectAll('#filterBarPattern')
+            .data(repeat, keyFun);
+
+        filterBarPattern.enter()
+            .append('pattern')
+            .attr('id', 'filterBarPattern')
+            .attr('width', brushCaptureWidth)
+            .attr('height', height)
+            .attr('x', -brushVisibleWidth)
+            .attr('patternUnits', 'userSpaceOnUse');
+
+        var filterBarPatternGlyph = filterBarPattern.selectAll('rect')
+            .data(repeat, keyFun);
+
+        filterBarPatternGlyph.enter()
+            .append('rect')
+            .attr('shape-rendering', 'crispEdges')
+            .attr('width', brushVisibleWidth)
+            .attr('height', height)
+            .attr('x', brushVisibleWidth / 2)
+            .attr('fill', controlConfig.filterBarFill)
+            .attr('fill-opacity', controlConfig.filterBarFillOpacity)
+            .attr('stroke', controlConfig.filterBarStroke)
+            .attr('stroke-opacity', controlConfig.filterBarStrokeOpacity)
+            .attr('stroke-width', controlConfig.filterBarStrokeWidth);
+    }
+
     function enterOverlayPanels(lineRenderApproach, lineRender, contextLineRender) {
 
         var lastApproached = null;
@@ -140,39 +174,8 @@ module.exports = function (root, typedArrayModel, config) {
             .style('position', 'absolute')
             .style('padding', config.padding + 'px')
             .style('overflow', 'visible')
-            .style('shape-rendering', 'crispEdges');
-
-        var defs = parcoordsControlOverlay.selectAll('defs')
-            .data(repeat, keyFun);
-
-        defs.enter()
-            .append('defs');
-
-        var filterBarPattern = defs.selectAll('#filterBarPattern')
-            .data(repeat, keyFun);
-
-        filterBarPattern.enter()
-            .append('pattern')
-            .attr('id', 'filterBarPattern')
-            .attr('width', brushCaptureWidth)
-            .attr('height', height)
-            .attr('x', -brushVisibleWidth)
-            .attr('patternUnits', 'userSpaceOnUse');
-
-        var filterBarPatternGlyph = filterBarPattern.selectAll('rect')
-            .data(repeat, keyFun);
-
-        filterBarPatternGlyph.enter()
-            .append('rect')
-            .attr('shape-rendering', 'crispEdges')
-            .attr('width', brushVisibleWidth)
-            .attr('height', height)
-            .attr('x', brushVisibleWidth / 2)
-            .attr('fill', controlConfig.filterBarFill)
-            .attr('fill-opacity', controlConfig.filterBarFillOpacity)
-            .attr('stroke', controlConfig.filterBarStroke)
-            .attr('stroke-opacity', controlConfig.filterBarStrokeOpacity)
-            .attr('stroke-width', controlConfig.filterBarStrokeWidth);
+            .style('shape-rendering', 'crispEdges')
+            .call(enterSvgDefs);
 
         var parcoordsControlView = parcoordsControlOverlay.selectAll('.parcoordsControlView')
             .data(repeat, keyFun);
