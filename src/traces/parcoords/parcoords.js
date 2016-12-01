@@ -32,5 +32,5 @@ module.exports = function plot(root, data) {
     var contextLineLayer = lineLayerMaker(contextCanvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor, true);
     var focusLineLayer = lineLayerMaker(focusCanvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor, false);
     var ol = overlay(root, model, config);
-    var variableViews = ol.enterOverlayPanels(focusLineLayer.approach, focusLineLayer.render, contextLineLayer.render);
+    var variableViews = ol.enterOverlayPanels(focusLineLayer.approach, focusLineLayer.render, contextLineLayer.render, focusLineLayer.setColorDomain);
 };

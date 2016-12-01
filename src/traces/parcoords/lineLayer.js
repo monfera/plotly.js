@@ -254,6 +254,10 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         count: regl.prop('count')
     });
 
+    function setColorDomain(unitDomain) {
+        console.log('Setting color domain to ', unitDomain);
+    }
+
     function approach(column) {
         //utils.ndarrayOrder(, column.index);
         //console.log('Approached ', JSON.stringify(column.name));
@@ -326,6 +330,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     }
 
     return {
+        setColorDomain: setColorDomain,
         approach: approach,
         render: renderGLParcoords,
         destroy: destroy
