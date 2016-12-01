@@ -4,8 +4,9 @@ precision lowp float;
 
 attribute vec4 p0, p1, p2, p3,
     p4, p5, p6, p7,
-    p8, p9, pa, pb,
-    color;
+    p8, p9, pa, pb;
+
+attribute float colorIndex;
 
 attribute float x,
     depth;
@@ -63,7 +64,8 @@ void main() {
         1.0
     );
 
-    fragColor = color;
+    fragColor = vec4(colorIndex, 0, 1, 1);
+    //fragColor = texture2D(colorIndex, vec2((index + 0.5) / 256.0, 0.5));
 }
 
 `
