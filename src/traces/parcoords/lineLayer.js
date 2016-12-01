@@ -142,7 +142,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var colorIndex = new Float32Array(sampleCount * 2);
     for(j = 0; j < sampleCount; j++) {
-        var prominence = colorProjection(j);
+        var prominence = 1 - colorProjection(j);
         for(var k = 0; k < 2; k++) {
             colorIndex[j * 2 + k] = prominence;
         }
@@ -261,14 +261,18 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             hiB: regl.prop('hiB'),
             loC: regl.prop('loC'),
             hiC: regl.prop('hiC'),
-            palette: paletteTexture
+            palette: paletteTexture,
+            colorClamp: regl.prop('colorClamp')
         },
         offset: regl.prop('offset'),
         count: regl.prop('count')
     });
 
+    var colorClamp = [0, 1];
+
     function setColorDomain(unitDomain) {
-        console.log('Setting color domain to ', unitDomain);
+        colorClamp[0] = unitDomain[0];
+        colorClamp[1] = unitDomain[1];
     }
 
     function approach(column) {
@@ -329,6 +333,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     hiB: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 16) ? orig(i + 16).filter[0] : 0)) + filterEpsilon}),
                     loC: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 32) ? orig(i + 32).filter[1] : 1)) - filterEpsilon}),
                     hiC: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 32) ? orig(i + 32).filter[0] : 0)) + filterEpsilon}),
+                    colorClamp: colorClamp,
                     scissorX: I === leftmostIndex ? 0 : x,
                     scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
                 };

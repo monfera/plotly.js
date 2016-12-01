@@ -4,7 +4,7 @@ module.exports = function(model) {
     var height = 275
 
     var colorScale = function(d) {
-        return Math.pow(Math.max(0, d), 1/2)
+        return Math.pow(Math.max(0, d), 1)
     }
 
     return {
