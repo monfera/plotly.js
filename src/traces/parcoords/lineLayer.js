@@ -135,8 +135,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
 
     var color = [];
     for(j = 0; j < 256; j++) {
-        var prominence = j / 255;
-        var c = unitToColor(1 - prominence);
+        var c = unitToColor(1 - j / 255);
         color.push((alphaBlending ? [0,0,0] : c).concat([alphaBlending ? 1 : 255]));
     }
 
