@@ -145,6 +145,14 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         }
     }
 
+    var colorIndex = new Float32Array(sampleCount * 2);
+    for(j = 0; j < sampleCount; j++) {
+        var prominence = colorProjection(j);
+        for(var k = 0; k < 2; k++) {
+            colorIndex[j * 2 + k] = prominence;
+        }
+    }
+
     var positionStride = gpuVariableCount * 4;
 
     var shownVariableCount = variableCount;
@@ -160,10 +168,10 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var positionBuffer = regl.buffer(new Float32Array(pointPairs));
 
     var attributes = {
-        color: {
-            stride: 16,
+        colorIndex: {
+            stride: 4,
             offset: 0,
-            buffer: color
+            buffer: colorIndex
         },
         x: {
             size: 1,
