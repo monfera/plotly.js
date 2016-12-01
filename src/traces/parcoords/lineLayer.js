@@ -133,16 +133,11 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             depthUnitScale(data.get(depthVariable, Math.round((d - d % 2) / 2)))));
     })
 
-    var color = new Float32Array(sampleCount * 2 * 4);
-    for(j = 0; j < sampleCount; j++) {
-        var prominence = colorProjection(j);
-        for(var k = 0; k < 2; k++) {
-            var c = unitToColor(1 - prominence);
-            color[j * 2 * 4 + k * 4]     = alphaBlending ? 0 : c[0] / 255;
-            color[j * 2 * 4 + k * 4 + 1] = alphaBlending ? 0 : c[1] / 255;
-            color[j * 2 * 4 + k * 4 + 2] = alphaBlending ? 0 : c[2] / 255;
-            color[j * 2 * 4 + k * 4 + 3] = alphaBlending ? .01 : 1;
-        }
+    var color = [];
+    for(j = 0; j < 256; j++) {
+        var prominence = j / 255;
+        var c = unitToColor(1 - prominence);
+        color.push((alphaBlending ? [0,0,0] : c).concat([alphaBlending ? 1 : 255]));
     }
 
     var colorIndex = new Float32Array(sampleCount * 2);
@@ -163,6 +158,15 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         attributes: {
             preserveDrawingBuffer: true
         }
+    });
+
+    var paletteTexture = regl.texture({
+        shape: [256, 1],
+        format: 'rgba',
+        type: 'uint8',
+        mag: 'nearest',
+        min: 'nearest',
+        data: color
     });
 
     var positionBuffer = regl.buffer(new Float32Array(pointPairs));
@@ -256,7 +260,8 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             loB: regl.prop('loB'),
             hiB: regl.prop('hiB'),
             loC: regl.prop('loC'),
-            hiC: regl.prop('hiC')
+            hiC: regl.prop('hiC'),
+            palette: paletteTexture
         },
         offset: regl.prop('offset'),
         count: regl.prop('count')

@@ -18,6 +18,8 @@ uniform vec2 resolution,
     viewBoxPosition,
     viewBoxSize;
 
+uniform sampler2D palette;
+
 varying vec4 fragColor;
 
 vec4 zero = vec4(0, 0, 0, 0);
@@ -64,8 +66,8 @@ void main() {
         1.0
     );
 
-    fragColor = vec4(colorIndex, 0, 1, 1);
-    //fragColor = texture2D(colorIndex, vec2((index + 0.5) / 256.0, 0.5));
+    //fragColor = vec4(colorIndex, 0, 1, 1);
+    fragColor = texture2D(palette, vec2((colorIndex * 255.0 + 0.5) / 256.0, 0.5));
 }
 
 `
