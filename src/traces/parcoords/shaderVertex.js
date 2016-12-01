@@ -20,6 +20,8 @@ uniform vec2 resolution,
 
 uniform sampler2D palette;
 
+uniform vec2 colorClamp;
+
 varying vec4 fragColor;
 
 vec4 zero = vec4(0, 0, 0, 0);
@@ -67,7 +69,8 @@ void main() {
     );
 
     //fragColor = vec4(colorIndex, 0, 1, 1);
-    fragColor = texture2D(palette, vec2((colorIndex * 255.0 + 0.5) / 256.0, 0.5));
+    float clampedColorIndex = clamp((colorIndex - colorClamp[0]) / (colorClamp[1] - colorClamp[0]), 0.0, 1.0);
+    fragColor = texture2D(palette, vec2((clampedColorIndex * 255.0 + 0.5) / 256.0, 0.5));
 }
 
 `
