@@ -144,7 +144,7 @@ module.exports = function (root, typedArrayModel, config) {
             .attr('stroke-width', controlConfig.filterBarStrokeWidth);
     }
 
-    function enterOverlayPanels(lineRenderApproach, lineRender, contextLineRender) {
+    function enterOverlayPanels(lineRenderApproach, lineRender, contextLineRender, setColorDomain) {
 
         var lastApproached = null;
 
@@ -415,6 +415,9 @@ module.exports = function (root, typedArrayModel, config) {
             }
             var newExtent = reset ? [0, 1] : extent.slice();
             if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
+                if(variable.originalXIndex === 0) {
+                    setColorDomain(newExtent);
+                }
                 variableViews[variable.xIndex].filter = newExtent;
                 lineRender(variableViews, true);
                 var filtersActive = someFiltersActive(variable.parent);
