@@ -179,10 +179,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var positionBuffer = regl.buffer(new Float32Array(pointPairs));
 
     var attributes = {
-        styling: {
-            size: 3,
-            buffer: regl.buffer(styling)
-        }
+        styling: styling
     };
 
     for(var i = 0; i < gpuVariableCount / 4; i++) {
