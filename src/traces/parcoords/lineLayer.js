@@ -152,6 +152,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             styling.push(1 - points[j * gpuVariableCount]); // colorIndex
             styling.push(points[j * gpuVariableCount]); // depth
             styling.push(k % 2); // x
+            styling.push(0.5); // currently unused
         }
     }
 
@@ -179,7 +180,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var positionBuffer = regl.buffer(new Float32Array(pointPairs));
 
     var attributes = {
-        styling: styling
+        pf: styling
     };
 
     for(var i = 0; i < gpuVariableCount / 4; i++) {
