@@ -104,7 +104,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         return colorScale(coloringVariableUnitScale(data.get(coloringVariable, j)));
     }
 
-    var gpuVariableCount = 48 // don't change this
+    var gpuVariableCount = 60; // don't change this
 
     function paddedUnit(d) {
         var unitPad = controlConfig.verticalPadding / panelSizeY;
@@ -177,7 +177,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         }
     };
 
-    for(var i = 0; i < 12; i++) {
+    for(var i = 0; i < gpuVariableCount / 4; i++) {
         attributes['p' + i.toString(16)] = {
             offset: i * 16,
             stride: positionStride,
@@ -246,12 +246,16 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
             var2B: regl.prop('var2B'),
             var1C: regl.prop('var1C'),
             var2C: regl.prop('var2C'),
+            var1D: regl.prop('var1D'),
+            var2D: regl.prop('var2D'),
             loA: regl.prop('loA'),
             hiA: regl.prop('hiA'),
             loB: regl.prop('loB'),
             hiB: regl.prop('hiB'),
             loC: regl.prop('loC'),
             hiC: regl.prop('hiC'),
+            loD: regl.prop('loD'),
+            hiD: regl.prop('hiD'),
             palette: paletteTexture,
             colorClamp: regl.prop('colorClamp')
         },
@@ -318,12 +322,16 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0}),
                     var1C: utils.range(16).map(function(d) {return d + 32 === i  ? 1 : 0}),
                     var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0}),
+                    var1D: utils.range(16).map(function(d) {return d + 48 === i  ? 1 : 0}),
+                    var2D: utils.range(16).map(function(d) {return d + 48 === ii ? 1 : 0}),
                     loA: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 0)  ? orig(i     ).filter[1] : 1)) - filterEpsilon}),
                     hiA: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 0)  ? orig(i     ).filter[0] : 0)) + filterEpsilon}),
                     loB: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 16) ? orig(i + 16).filter[1] : 1)) - filterEpsilon}),
                     hiB: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 16) ? orig(i + 16).filter[0] : 0)) + filterEpsilon}),
                     loC: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 32) ? orig(i + 32).filter[1] : 1)) - filterEpsilon}),
                     hiC: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 32) ? orig(i + 32).filter[0] : 0)) + filterEpsilon}),
+                    loD: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 48) ? orig(i + 48).filter[1] : 1)) - filterEpsilon}),
+                    hiD: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 48) ? orig(i + 48).filter[0] : 0)) + filterEpsilon}),
                     colorClamp: colorClamp,
                     scissorX: I === leftmostIndex ? 0 : x,
                     scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
