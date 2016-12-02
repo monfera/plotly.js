@@ -9,8 +9,8 @@ module.exports = function(tuple) {
     var filters = variableIds.map(function() {return [0, 1]})
     var domains = utils.ndarrayDomains(data)
     var domainToUnitScales = domains.map(function(d) {
-        var a = -1 / (d[1] - d[0])
-        var b = 1 - a * d[0]
+        var a = 1 / (d[1] - d[0])
+        var b = -a * d[0]
         return function(x) {return a * x + b}
     })
     return {

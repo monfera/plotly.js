@@ -127,20 +127,26 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         }
     }
 
+    function adjustDepth(d) {
+        return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon, d));
+    }
+
+/*
     var depth = utils.range(sampleCount * 2).map(function(d) {
         return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon,
             depthUnitScale(data.get(depthVariable, Math.round((d - d % 2) / 2)))));
     })
+*/
 
     var color = [];
     for(j = 0; j < 256; j++) {
-        var c = unitToColor(1 - j / 255);
+        var c = unitToColor(j / 255);
         color.push((alphaBlending ? [0,0,0] : c).concat([alphaBlending ? 1 : 255]));
     }
 
     var colorIndex = new Float32Array(sampleCount * 2);
     for(j = 0; j < sampleCount; j++) {
-        var prominence = 1 - colorProjection(j);
+        var prominence = colorProjection(j);
         for(var k = 0; k < 2; k++) {
             colorIndex[j * 2 + k] = prominence;
         }
@@ -149,9 +155,9 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var styling = [];
     for(j = 0; j < sampleCount; j++) {
         for(k = 0; k < 2; k++) {
-            styling.push(Math.round(2 * ((k % 2) - 0.5)) *  points[j * gpuVariableCount]); // colorIndex
-            styling.push(points[j * gpuVariableCount]); // depth
-            styling.push(k % 2 + 20 * filterEpsilon * (0.5 - k % 2)); // x
+            styling.push(Math.round(2 * ((k % 2) - 0.5)) *  adjustDepth(points[j * gpuVariableCount])); // colorIndex
+            styling.push(0.5); // currently unused
+            styling.push(0.5); // currently unused
             styling.push(0.5); // currently unused
         }
     }
@@ -330,14 +336,14 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
                     var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0}),
                     var1D: utils.range(16).map(function(d) {return d + 48 === i  ? 1 : 0}),
                     var2D: utils.range(16).map(function(d) {return d + 48 === ii ? 1 : 0}),
-                    loA: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 0)  ? orig(i     ).filter[1] : 1)) - filterEpsilon}),
-                    hiA: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 0)  ? orig(i     ).filter[0] : 0)) + filterEpsilon}),
-                    loB: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 16) ? orig(i + 16).filter[1] : 1)) - filterEpsilon}),
-                    hiB: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 16) ? orig(i + 16).filter[0] : 0)) + filterEpsilon}),
-                    loC: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 32) ? orig(i + 32).filter[1] : 1)) - filterEpsilon}),
-                    hiC: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 32) ? orig(i + 32).filter[0] : 0)) + filterEpsilon}),
-                    loD: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 48) ? orig(i + 48).filter[1] : 1)) - filterEpsilon}),
-                    hiD: utils.range(16).map(function(i) {return paddedUnit(1 - (!context && valid(i, 48) ? orig(i + 48).filter[0] : 0)) + filterEpsilon}),
+                    loA: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 0)  ? orig(i     ).filter[0] : 0)) - filterEpsilon}),
+                    hiA: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 0)  ? orig(i     ).filter[1] : 1)) + filterEpsilon}),
+                    loB: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 16) ? orig(i + 16).filter[0] : 0)) - filterEpsilon}),
+                    hiB: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 16) ? orig(i + 16).filter[1] : 1)) + filterEpsilon}),
+                    loC: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 32) ? orig(i + 32).filter[0] : 0)) - filterEpsilon}),
+                    hiC: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 32) ? orig(i + 32).filter[1] : 1)) + filterEpsilon}),
+                    loD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[0] : 0)) - filterEpsilon}),
+                    hiD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[1] : 1)) + filterEpsilon}),
                     colorClamp: colorClamp,
                     scissorX: I === leftmostIndex ? 0 : x,
                     scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
