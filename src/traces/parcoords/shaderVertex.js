@@ -7,7 +7,7 @@ attribute vec4 p0, p1, p2, p3,
                p8, p9, pa, pb,
                pc, pd, pe;
 
-attribute float x;
+attribute vec3 styling;
 
 uniform mat4 var1A, var2A, var1B, var2B, var1C, var2C, var1D, var2D,
              loA, hiA, loB, hiB, loC, hiC, loD, hiD;
@@ -43,8 +43,9 @@ float val(mat4 p, mat4 v) {
 
 void main() {
 
-    float depth = p0[0];
-    float colorIndex = 1.0 - p0[0];
+    float colorIndex = styling[0];
+    float depth = styling[1];
+    float x = styling[2];
     vec4 pf = vec4(0.5, 0.5, 0.5, 0.5);
 
     mat4 pA = mat4(p0, p1, p2, p3);
