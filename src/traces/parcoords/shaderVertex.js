@@ -43,8 +43,8 @@ float val(mat4 p, mat4 v) {
 
 void main() {
 
-    float x = 0.5 * sign(pf[0]) + 0.5;
-    float prominence = abs(pf[0]);
+    float x = 0.5 * sign(pf[3]) + 0.5;
+    float prominence = abs(pf[3]);
     float depth = 1.0 - prominence;
     float colorIndex = prominence;
 

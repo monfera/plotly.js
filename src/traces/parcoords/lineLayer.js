@@ -155,10 +155,10 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var styling = [];
     for(j = 0; j < sampleCount; j++) {
         for(k = 0; k < 2; k++) {
+            styling.push(0.5); // currently unused
+            styling.push(0.5); // currently unused
+            styling.push(0.5); // currently unused
             styling.push(Math.round(2 * ((k % 2) - 0.5)) *  adjustDepth(points[j * gpuVariableCount])); // colorIndex
-            styling.push(0.5); // currently unused
-            styling.push(0.5); // currently unused
-            styling.push(0.5); // currently unused
         }
     }
 
