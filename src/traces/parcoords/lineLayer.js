@@ -127,7 +127,6 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         }
     }
 
-    var leftOrRight = utils.range(sampleCount * 2).map(function(d) {return d % 2});
     var depth = utils.range(sampleCount * 2).map(function(d) {
         return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon,
             depthUnitScale(data.get(depthVariable, Math.round((d - d % 2) / 2)))));
@@ -144,6 +143,15 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         var prominence = 1 - colorProjection(j);
         for(var k = 0; k < 2; k++) {
             colorIndex[j * 2 + k] = prominence;
+        }
+    }
+
+    var styling = [];
+    for(j = 0; j < sampleCount; j++) {
+        for(k = 0; k < 2; k++) {
+            styling.push(1 - points[j * gpuVariableCount]); // colorIndex
+            styling.push(points[j * gpuVariableCount]); // depth
+            styling.push(k % 2); // x
         }
     }
 
@@ -171,9 +179,9 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var positionBuffer = regl.buffer(new Float32Array(pointPairs));
 
     var attributes = {
-        x: {
-            size: 1,
-            buffer: regl.buffer(leftOrRight)
+        styling: {
+            size: 3,
+            buffer: regl.buffer(styling)
         }
     };
 
