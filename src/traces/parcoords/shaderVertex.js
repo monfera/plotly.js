@@ -1,6 +1,6 @@
 module.exports = `
 
-precision lowp float;
+precision highp float;
 
 attribute vec4 p0, p1, p2, p3,
                p4, p5, p6, p7,
@@ -45,13 +45,12 @@ void main() {
 
     float colorIndex = pf[0];
     float depth = pf[1];
-    float x = pf[2];
-    vec4 pff = vec4(0.5, 0.5, 0.5, 0.5);
+    float x = floor(pf[2] + 0.5);
 
     mat4 pA = mat4(p0, p1, p2, p3);
     mat4 pB = mat4(p4, p5, p6, p7);
     mat4 pC = mat4(p8, p9, pa, pb);
-    mat4 pD = mat4(pc, pd, pe, pff);
+    mat4 pD = mat4(pc, pd, pe, pf);
     
     float show = float(mshow(pA, loA, hiA) &&
                        mshow(pB, loB, hiB) &&
