@@ -171,19 +171,11 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
     var positionBuffer = regl.buffer(new Float32Array(pointPairs));
 
     var attributes = {
-        colorIndex: {
-            stride: 4,
-            offset: 0,
-            buffer: colorIndex
-        },
         x: {
             size: 1,
             buffer: regl.buffer(leftOrRight)
-        },
-        depth: {
-            size: 1,
-            buffer: regl.buffer(depth)
-        }};
+        }
+    };
 
     for(var i = 0; i < 12; i++) {
         attributes['p' + i.toString(16)] = {
