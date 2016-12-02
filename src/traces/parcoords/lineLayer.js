@@ -151,7 +151,7 @@ module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, co
         for(k = 0; k < 2; k++) {
             styling.push(1 - points[j * gpuVariableCount]); // colorIndex
             styling.push(points[j * gpuVariableCount]); // depth
-            styling.push(k % 2); // x
+            styling.push(k % 2 + 20 * filterEpsilon * (0.5 - k % 2)); // x
             styling.push(0.5); // currently unused
         }
     }
