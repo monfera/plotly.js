@@ -24,7 +24,7 @@ varying vec4 fragColor;
 
 vec4 zero = vec4(0, 0, 0, 0);
 vec4 unit = vec4(1, 1, 1, 1);
-vec2 xyProjection = vec2(1, -1);
+vec2 xyProjection = vec2(1, 1);
 
 mat4 mclamp(mat4 m, mat4 lo, mat4 hi) {
     return mat4(clamp(m[0], lo[0], hi[0]),
@@ -44,8 +44,9 @@ float val(mat4 p, mat4 v) {
 void main() {
 
     float x = 0.5 * sign(pf[0]) + 0.5;
-    float depth = abs(pf[0]);
-    float colorIndex = 1.0 - abs(pf[0]);
+    float prominence = abs(pf[0]);
+    float depth = 1.0 - prominence;
+    float colorIndex = prominence;
 
     mat4 pA = mat4(p0, p1, p2, p3);
     mat4 pB = mat4(p4, p5, p6, p7);
