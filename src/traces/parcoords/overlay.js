@@ -1,3 +1,5 @@
+var lineLayerMaker = require('./lineLayer');
+var unitToColor = require('./colors');
 var controlConfig = require('./controlConfig');
 var utils = require('./utils');
 var d3 = require('d3');
@@ -144,7 +146,7 @@ module.exports = function (root, typedArrayModel, config) {
             .attr('stroke-width', controlConfig.filterBarStrokeWidth);
     }
 
-    function enterOverlayPanels(lineRenderApproach, lineRender, contextLineRender, setColorDomain) {
+    function enterOverlayPanels() {
 
         var lastApproached = null;
 
@@ -163,6 +165,36 @@ module.exports = function (root, typedArrayModel, config) {
         parcoordsViewModel.enter()
             .append('div')
             .classed('parcoordsViewModel', true);
+
+        var parcoordsLineLayer = parcoordsViewModel.selectAll('.parcoordsLineLayer')
+            .data(function(vm) {
+                return [true, false].map(function(context) {
+                    return {
+                        key: context,
+                        context: context,
+                        viewModel: vm
+                    };
+                });
+            }, keyFun);
+
+        var temporary = [];
+
+        parcoordsLineLayer.enter()
+            .append('canvas')
+            .classed('parcoordsLineLayer', true)
+            .style('position', 'absolute')
+            .style('padding', config.padding + 'px')
+            .style('overflow', 'visible')
+            .each(function(d) {
+                temporary.push(lineLayerMaker(this, config, typedArrayModel, unitToColor, d.context));
+            });
+
+        var contextLineLayer = temporary[0];
+        var focusLineLayer = temporary[1];
+        var lineRenderApproach = focusLineLayer.approach;
+        var lineRender = focusLineLayer.render;
+        var contextLineRender = contextLineLayer.render;
+        var setColorDomain = focusLineLayer.setColorDomain;
 
         var parcoordsControlOverlay = parcoordsViewModel.selectAll('.parcoordsControlOverlay')
             .data(repeat, keyFun);
