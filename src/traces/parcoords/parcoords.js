@@ -11,10 +11,9 @@
 var modelMaker = require('./model');
 var configMaker = require('./config');
 var overlay = require('./overlay');
-var vertexShaderSource = require('./shaderVertex');
-var fragmentShaderSource = require('./shaderFragment');
 var unitToColor = require('./colors');
 var lineLayerMaker = require('./lineLayer');
+var d3 = require('d3');
 
 module.exports = function plot(root, data) {
 
@@ -29,8 +28,8 @@ module.exports = function plot(root, data) {
     focusCanvasGL.setAttribute('style', 'position: absolute; padding: ' + config.padding + 'px;overflow: visible;');
     root.appendChild(focusCanvasGL);
 
-    var contextLineLayer = lineLayerMaker(contextCanvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor, true);
-    var focusLineLayer = lineLayerMaker(focusCanvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor, false);
     var ol = overlay(root, model, config);
+    var contextLineLayer = lineLayerMaker(contextCanvasGL, config, model, unitToColor, true);
+    var focusLineLayer = lineLayerMaker(focusCanvasGL, config, model, unitToColor, false);
     var variableViews = ol.enterOverlayPanels(focusLineLayer.approach, focusLineLayer.render, contextLineLayer.render, focusLineLayer.setColorDomain);
 };

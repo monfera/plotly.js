@@ -1,6 +1,8 @@
 var controlConfig = require('./controlConfig');
 var utils = require('./utils');
 var createREGL = require('regl');
+var vertexShaderSource = require('./shaderVertex');
+var fragmentShaderSource = require('./shaderFragment');
 
 var depthLimitEpsilon = 1e-6; // don't change; otherwise near/far plane lines are lost
 var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on domain boundaries
@@ -65,7 +67,7 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
     render(blockNumber);
 }
 
-module.exports = function(canvasGL, vertexShaderSource, fragmentShaderSource, config, model, unitToColor, context) {
+module.exports = function(canvasGL, config, model, unitToColor, context) {
 
     var renderState = {
         currentRafs: {},
