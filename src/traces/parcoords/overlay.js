@@ -405,6 +405,21 @@ module.exports = function (root, typedArrayModel, config) {
                 }
             });
 
+        axisBrush
+            .each(function(d) {
+                if(!d.brush) {
+                    console.log('attaching brush')
+                    d.brush = d3.svg.brush()
+                        .y(d.unitScale)
+                        .on('brushstart', axisBrushStarted)
+                        .on('brush', axisBrushMoved)
+                        .on('brushend', axisBrushEnded);
+                    d3.select(this).call(d.brush);
+                } else {
+                    console.log('avoided reattaching brush')
+                }
+            });
+
         axisBrushEnter
             .selectAll('rect')
             .attr('x', -brushCaptureWidth / 2)
@@ -429,20 +444,6 @@ module.exports = function (root, typedArrayModel, config) {
         axisBrushEnter
             .selectAll('.resize.s rect')
             .attr('y', -controlConfig.handleGlyphOverlap);
-
-        console.log('okay lets attach or not attach the axis brushes...')
-        axisBrush
-            .each(function(d) {
-                if(!d.brush) {
-                    console.log('attaching brush')
-                    d.brush = d3.svg.brush()
-                        .y(d.unitScale)
-                        .on('brushstart', axisBrushStarted)
-                        .on('brush', axisBrushMoved)
-                        .on('brushend', axisBrushEnded);
-                    d3.select(this).call(d.brush);
-                } else {console.log('avoided reattaching brush')}
-            });
 
         var justStarted = false;
         var contextShown = false;
