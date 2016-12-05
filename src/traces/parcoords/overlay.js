@@ -242,6 +242,8 @@ module.exports = function (root, typedArrayModel, config) {
             .append('g')
             .classed('panel', true)
             .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';})
+
+        panel
             .call(d3.behavior.drag()
                 .origin(function(d) {return d;})
                 .on('drag', function(d) {
