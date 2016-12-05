@@ -189,6 +189,7 @@ module.exports = function (root, typedArrayModel, config) {
                 temporary.push(lineLayerMaker(this, config, typedArrayModel, unitToColor, d.context));
             });
 
+        // HORRIBLE HACK
         var contextLineLayer = temporary[0];
         var focusLineLayer = temporary[1];
         var lineRenderApproach = focusLineLayer.approach;
