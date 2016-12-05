@@ -19,4 +19,5 @@ module.exports = function plot(root, data) {
 
     var ol = overlay(root, model, config);
     var variableViews = ol.enterOverlayPanels();
+    ol.enterOverlayPanels();
 };
