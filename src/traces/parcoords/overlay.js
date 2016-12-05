@@ -150,7 +150,7 @@ module.exports = function (root, typedArrayModel, config) {
 
         var lastApproached = null;
 
-        var variableViews = [];
+        var variableViews;
 
         var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
             .data([model], keyFun);
@@ -165,6 +165,13 @@ module.exports = function (root, typedArrayModel, config) {
         parcoordsViewModel.enter()
             .append('div')
             .classed('parcoordsViewModel', true);
+
+        console.log('okay lets set the variableViews...')
+        parcoordsViewModel
+            .each(function(d) {
+                console.log('set the variableViews')
+                variableViews = d.panels;
+            });
 
         var parcoordsLineLayer = parcoordsViewModel.selectAll('.parcoordsLineLayer')
             .data(function(vm) {
@@ -184,7 +191,9 @@ module.exports = function (root, typedArrayModel, config) {
             .classed('parcoordsLineLayer', true)
             .style('position', 'absolute')
             .style('padding', config.padding + 'px')
-            .style('overflow', 'visible')
+            .style('overflow', 'visible');
+
+        parcoordsLineLayer
             .each(function(d) {
                 temporary.push(lineLayerMaker(this, config, typedArrayModel, unitToColor, d.context));
             });
@@ -202,7 +211,7 @@ module.exports = function (root, typedArrayModel, config) {
 
         parcoordsControlOverlay.enter()
             .append('svg')
-            .classed('parcoordsSVG', true)
+            .classed('parcoordsControlOverlay', true)
             .attr('overflow', 'visible')
             .attr('width', width)
             .attr('height', height)
@@ -233,7 +242,6 @@ module.exports = function (root, typedArrayModel, config) {
             .append('g')
             .classed('panel', true)
             .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';})
-            .each(function(d) {variableViews.push(d);})
             .call(d3.behavior.drag()
                 .origin(function(d) {return d;})
                 .on('drag', function(d) {
@@ -251,8 +259,8 @@ module.exports = function (root, typedArrayModel, config) {
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                     panel.each(function(d, i) {variableViews[i] = d;});
-                    contextLineRender(variableViews, false, !someFiltersActive(d.parent));
-                    lineRender(variableViews);
+                    contextLineRender(d.parent.panels, false, !someFiltersActive(d.parent));
+                    lineRender(d.parent.panels);
                 })
                 .on('dragend', function(d) {
                     if(domainBrushing || !axisDragging) {
@@ -263,8 +271,8 @@ module.exports = function (root, typedArrayModel, config) {
                     d.x = d.xScale(d.xIndex);
                     d3.select(this)
                         .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                    contextLineRender(variableViews, false, !someFiltersActive(d.parent));
-                    lineRender(variableViews);
+                    contextLineRender(d.parent.panels, false, !someFiltersActive(d.parent));
+                    lineRender(d.parent.panels);
                 })
             );
 
@@ -395,14 +403,6 @@ module.exports = function (root, typedArrayModel, config) {
                     lineRenderApproach(column);
                     lastApproached = column;
                 }
-            })
-            .each(function(d) {
-                d.brush = d3.svg.brush()
-                    .y(d.unitScale)
-                    .on('brushstart', axisBrushStarted)
-                    .on('brush', axisBrushMoved)
-                    .on('brushend', axisBrushEnded);
-                d3.select(this).call(d.brush);
             });
 
         axisBrushEnter
@@ -429,6 +429,20 @@ module.exports = function (root, typedArrayModel, config) {
         axisBrushEnter
             .selectAll('.resize.s rect')
             .attr('y', -controlConfig.handleGlyphOverlap);
+
+        console.log('okay lets attach or not attach the axis brushes...')
+        axisBrush
+            .each(function(d) {
+                if(!d.brush) {
+                    console.log('attaching brush')
+                    d.brush = d3.svg.brush()
+                        .y(d.unitScale)
+                        .on('brushstart', axisBrushStarted)
+                        .on('brush', axisBrushMoved)
+                        .on('brushend', axisBrushEnded);
+                    d3.select(this).call(d.brush);
+                } else {console.log('avoided reattaching brush')}
+            });
 
         var justStarted = false;
         var contextShown = false;
