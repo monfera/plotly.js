@@ -25,16 +25,18 @@ module.exports = function plot(gd, cdpie) {
 
     var root = fullLayout._glcontainer.node() // fullLayout._parcoordslayer
 
+    var newFormat = cdpie[0];
+
     var legacy = {
-        variableNames: cdpie[0].map(function(v) {return v.variableName;}),
-        integer: cdpie[0].map(function(v) {return v.integer;}),
+        variableNames: newFormat.map(function(v) {return v.variableName;}),
+        integer: newFormat.map(function(v) {return v.integer;}),
         raw: (function(untypedColumns){
             var nd = ndarray(new Float64Array(untypedColumns.length * untypedColumns[0].length), [untypedColumns.length, untypedColumns[0].length], [1, untypedColumns.length]);
             for(var i = 0; i < untypedColumns.length; i++)
                 for(var j = 0; j < untypedColumns[0].length; j++)
                     nd.set(i, j, untypedColumns[i][j]);
             return nd
-        })(cdpie[0].map(function(v) {return v.values;}))
+        })(newFormat.map(function(v) {return v.values;}))
     }
 
     parcoords(root, legacy);
