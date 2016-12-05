@@ -39,7 +39,7 @@ module.exports = function calc(gd, trace) {
     }
 
     for(i = 0; i < vals.length; i++) {
-        v = vals[i];
+        v = vals[i].pieChartCheat;
         if(!isNumeric(v)) continue;
         v = +v;
         if(v < 0) continue;
@@ -76,7 +76,10 @@ module.exports = function calc(gd, trace) {
             label: label,
             color: color,
             i: i,
-            hidden: hidden
+            hidden: hidden,
+            integer: vals[i].integer,
+            variableName: vals[i].variableName,
+            values: vals[i].values
         });
     }
 

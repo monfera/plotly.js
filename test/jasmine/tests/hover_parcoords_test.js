@@ -7,6 +7,7 @@ var mouseEvent = require('../assets/mouse_event');
 
 describe('pie hovering', function() {
     var mock = require('@mocks/parcoords_simple.json');
+    var parcoordsMock = require('@src/traces/parcoords/mocks/k26.js');
 
     describe('event data', function() {
         var mockCopy = Lib.extendDeep({}, mock),
@@ -16,6 +17,20 @@ describe('pie hovering', function() {
 
         beforeEach(function(done) {
             gd = createGraphDiv();
+
+            mockCopy.data[0].values = parcoordsMock.variableNames.map(function(n, i, a) {
+                var columnView = parcoordsMock.raw.pick(i, null);
+                var untypedColumn = []
+                for(var j = 0; j < columnView.shape[0]; j++) {
+                    untypedColumn.push(columnView.get(j));
+                }
+                return {
+                    variableName: n,
+                    integer: parcoordsMock.integer[i],
+                    values: untypedColumn,
+                    pieChartCheat: a.length - i
+                }
+            })
 
             Plotly.plot(gd, mockCopy.data, mockCopy.layout)
                 .then(done);
