@@ -25799,7 +25799,7 @@ var parcoordsMock = {
   integer: integer
 }
 
-module.exports = parcoordsMock.variableNames.map(function(n, i, a) {
+var mock = parcoordsMock.variableNames.map(function(n, i, a) {
     var columnView = parcoordsMock.raw.pick(i, null);
     var untypedColumn = []
     for(var j = 0; j < columnView.shape[0]; j++) {
@@ -25808,7 +25808,9 @@ module.exports = parcoordsMock.variableNames.map(function(n, i, a) {
     return {
         variableName: n,
         integer: parcoordsMock.integer[i],
-        values: untypedColumn,
+        values: untypedColumn.filter(function(d, ii) {return true}).map(function(d) {return parcoordsMock.integer[i] ? d : Math.floor(d * 10000)}),
         pieChartCheat: a.length - i
     }
 })
+
+module.exports = mock;

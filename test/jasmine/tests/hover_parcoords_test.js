@@ -7,7 +7,7 @@ var mouseEvent = require('../assets/mouse_event');
 
 describe('pie hovering', function() {
     var mock = require('@mocks/parcoords_simple.json');
-    var parcoordsMock = require('@src/traces/parcoords/mocks/k26.js');
+    var parcoordsMock = require('@src/traces/parcoords/mocks/k2.json');
 
     describe('event data', function() {
         var mockCopy = Lib.extendDeep({}, mock),
