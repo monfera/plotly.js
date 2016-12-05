@@ -20,6 +20,7 @@ describe('pie hovering', function() {
 
             mockCopy.data[0].values = parcoordsMock
             Plotly.plot(gd, mockCopy.data, mockCopy.layout)
+                //.then(Plotly.plot(gd, mockCopy.data, mockCopy.layout))
                 .then(done);
         });
 
