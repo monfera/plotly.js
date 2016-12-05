@@ -16,6 +16,7 @@ var Drawing = require('../../components/drawing');
 var svgTextUtils = require('../../lib/svg_text_utils');
 
 var parcoords = require('./parcoords');
+var mockData = require('./mocks/k26');
 
 var helpers = require('./helpers');
 
@@ -24,7 +25,7 @@ module.exports = function plot(gd, cdpie) {
 
     var root = fullLayout._glcontainer.node() // fullLayout._parcoordslayer
 
-    parcoords(root);
+    parcoords(root, mockData);
 
     return;
 
