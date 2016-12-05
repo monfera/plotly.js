@@ -25793,8 +25793,22 @@ original = original0.concat(original0.map(function(d) {return d + 4}));
 original = [19, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 21].concat(original).concat([1,1,0,0,0,0,0,0,0,0,0,0])
  */
 
-module.exports = {
+var parcoordsMock = {
   raw: ndarray(new Float64Array(original), [variableNames.length, Math.floor(original.length / variableNames.length)], [1, variableNames.length]),
   variableNames: variableNames,
   integer: integer
 }
+
+module.exports = parcoordsMock.variableNames.map(function(n, i, a) {
+    var columnView = parcoordsMock.raw.pick(i, null);
+    var untypedColumn = []
+    for(var j = 0; j < columnView.shape[0]; j++) {
+        untypedColumn.push(columnView.get(j));
+    }
+    return {
+        variableName: n,
+        integer: parcoordsMock.integer[i],
+        values: untypedColumn,
+        pieChartCheat: a.length - i
+    }
+})
