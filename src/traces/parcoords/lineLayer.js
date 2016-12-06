@@ -85,7 +85,6 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
     };
 
     var variables = data;
-    var data = variables.map(function(v) {return v.values;});
     var variableCount = variables.length;
     var sampleCount = variables[0].values.length;
 
@@ -110,7 +109,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
     var coloringVariableUnitScale = variables[coloringVariable].domainToUnitScale;
 
     function colorProjection(j) {
-        return colorScale(coloringVariableUnitScale(data[coloringVariable][j]));
+        return colorScale(coloringVariableUnitScale(data[coloringVariable].values[j]));
     }
 
     var gpuVariableCount = 60; // don't change this; 3 + 1 extra variables also apply
@@ -123,7 +122,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
     var points = []
     for(var j = 0; j < sampleCount; j++)
         for(var i = 0; i < gpuVariableCount; i++)
-            points.push(i < variableCount ? paddedUnit(variables[i].domainToUnitScale(data[i][j])) : 0.5);
+            points.push(i < variableCount ? paddedUnit(variables[i].domainToUnitScale(data[i].values[j])) : 0.5);
 
     var pointPairs = [];
 
@@ -145,7 +144,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
     var depthUnitScale = variables[depthVariable].domainToUnitScale;
     var depth = utils.range(sampleCount * 2).map(function(d) {
         return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon,
-            depthUnitScale(data[depthVariable][Math.round((d - d % 2) / 2)])));
+            depthUnitScale(data[depthVariable].values[Math.round((d - d % 2) / 2)])));
     })
 */
 
@@ -201,7 +200,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
         pf: styling
     };
 
-    for(var i = 0; i < gpuVariableCount / 4; i++) {
+    for(i = 0; i < gpuVariableCount / 4; i++) {
         attributes['p' + i.toString(16)] = {
             offset: i * 16,
             stride: positionStride,
