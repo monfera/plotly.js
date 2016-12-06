@@ -195,7 +195,7 @@ module.exports = function (root, typedArrayModel, config) {
             .each(function(d) {
                 d.viewModel[d.key] = lineLayerMaker(this, config, typedArrayModel, unitToColor, d.context);
                 if(!d.context) {
-                    d.viewModel[d.key].render(variableViews, true);
+                    d.viewModel[d.key].render(d.viewModel.panels, true);
                 }
             });
 
@@ -253,7 +253,7 @@ module.exports = function (root, typedArrayModel, config) {
                     panel.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
-                    panel.each(function(d, i) {variableViews[i] = d;});
+                    panel.each(function(d, i) {d.parent.panels[i] = d;});
                     d.parent['contextLineLayer'].render(d.parent.panels, false, !someFiltersActive(d.parent));
                     d.parent['focusLineLayer'].render(d.parent.panels);
                 })
