@@ -49,8 +49,7 @@ function viewModel(width, height, model) {
 
     var viewModel = {
         key: 0,
-        xScale: d3.scale.ordinal().domain(d3.range(variables.length)).rangePoints([0, width], 0),
-        filters: variables.map(function() {return [0, 1];})
+        xScale: d3.scale.ordinal().domain(d3.range(variables.length)).rangePoints([0, width], 0)
     };
 
     viewModel.panels = variables.map(function(variable, i) {
@@ -67,7 +66,7 @@ function viewModel(width, height, model) {
             unitScale: makeUnitScale(height, variable),
             domainScale: makeDomainScale(height, variable),
             integerScale: makeIntegerScale(variable),
-            filter: viewModel.filters[i],
+            filter: [0, 1],
             variables: variables,
             parent: viewModel
         };
