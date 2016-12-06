@@ -45,14 +45,14 @@ function makeIntegerScale(variable) {
 
 function viewModel(width, height, model) {
 
-    var variables = model.variables;
+    var xScale = d3.scale.ordinal().domain(d3.range(model.variables.length)).rangePoints([0, width], 0);
 
     var viewModel = {
-        key: 0,
-        xScale: d3.scale.ordinal().domain(d3.range(variables.length)).rangePoints([0, width], 0)
+        key: model.key,
+        xScale: xScale
     };
 
-    viewModel.panels = variables.map(function(variable, i) {
+    viewModel.panels = model.variables.map(function(variable, i) {
         return {
             key: variable.variableName,
             variableName: variable.variableName,
@@ -61,16 +61,15 @@ function viewModel(width, height, model) {
             originalXIndex: i,
             height: height,
             values: variable.values,
-            xScale: viewModel.xScale,
-            x: viewModel.xScale(i),
+            xScale: xScale,
+            x: xScale(i),
             unitScale: makeUnitScale(height, variable),
             domainScale: makeDomainScale(height, variable),
             integerScale: makeIntegerScale(variable),
             filter: [0, 1],
-            variables: variables,
             parent: viewModel
         };
-    })
+    });
 
     return [viewModel];
 }
