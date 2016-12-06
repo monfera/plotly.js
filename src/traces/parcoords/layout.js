@@ -50,5 +50,5 @@ module.exports = (function() {
         captureZoneBorderColor: debug ? 'red' : "",
         captureZoneFillColor: debug ? 'rgba(255, 0, 0, 0.05)' : 'rgba(0, 0, 0, 0)'
 
-    }
+    };
 })();
