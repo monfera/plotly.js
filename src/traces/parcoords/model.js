@@ -1,25 +1,31 @@
 var utils = require('./utils');
+var d3 = require('d3');
 
-module.exports = function(tuple) {
+module.exports = function(variables) {
 
-    var data = tuple.raw
-    var variableCount = data.shape[0]
-    var sampleCount = data.shape[1]
-    var variableIds = utils.range(variableCount);
-    var filters = variableIds.map(function() {return [0, 1]})
-    var domains = utils.ndarrayDomains(data)
+    var variableCount = variables.length;
+    var sampleCount = variables[0].values.length;
+    var filters = variables.map(function() {return [0, 1]})
+    var domains = variables.map(function(v) {
+        var extent = d3.extent(v.values);
+        if(extent[0] === extent[1]) {
+            extent[0]--;
+            extent[1]++;
+        }
+        return extent;
+    });
     var domainToUnitScales = domains.map(function(d) {
         var a = 1 / (d[1] - d[0])
         var b = -a * d[0]
         return function(x) {return a * x + b}
     })
     return {
-        data: data,
+        variables: variables,
         variableCount: variableCount,
         sampleCount: sampleCount,
         domainToUnitScales: domainToUnitScales,
         filters: filters,
-        variableNames: tuple.variableNames,
-        integer: tuple.integer
+        variableNames: variables.map(function(v) {return v.variableName;}),
+        integer: variables.map(function(v) {return v.integer;})
     }
 };

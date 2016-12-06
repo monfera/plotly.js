@@ -16,7 +16,6 @@ var Drawing = require('../../components/drawing');
 var svgTextUtils = require('../../lib/svg_text_utils');
 
 var parcoords = require('./parcoords');
-var ndarray = require('ndarray');
 
 var helpers = require('./helpers');
 
@@ -25,21 +24,9 @@ module.exports = function plot(gd, cdpie) {
 
     var root = fullLayout._glcontainer.node() // fullLayout._parcoordslayer
 
-    var newFormat = cdpie[0];
+    var data = cdpie[0];
 
-    var legacy = {
-        variableNames: newFormat.map(function(v) {return v.variableName;}),
-        integer: newFormat.map(function(v) {return v.integer;}),
-        raw: (function(untypedColumns){
-            var nd = ndarray(new Float64Array(untypedColumns.length * untypedColumns[0].length), [untypedColumns.length, untypedColumns[0].length], [1, untypedColumns.length]);
-            for(var i = 0; i < untypedColumns.length; i++)
-                for(var j = 0; j < untypedColumns[0].length; j++)
-                    nd.set(i, j, untypedColumns[i][j]);
-            return nd
-        })(newFormat.map(function(v) {return v.values;}))
-    }
-
-    parcoords(root, legacy);
+    parcoords(root, data);
 
     return;
 

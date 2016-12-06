@@ -75,7 +75,7 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
         clearOnly: false
     };
 
-    var data = model.data;
+    var data = model.variables.map(function(v) {return v.values;});
     var variableCount = model.variableCount;
     var sampleCount = model.sampleCount;
     var domainToUnitScales = model.domainToUnitScales;
@@ -103,7 +103,7 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
     var depthUnitScale = domainToUnitScales[depthVariable];
 
     function colorProjection(j) {
-        return colorScale(coloringVariableUnitScale(data.get(coloringVariable, j)));
+        return colorScale(coloringVariableUnitScale(data[coloringVariable][j]));
     }
 
     var gpuVariableCount = 60; // don't change this
@@ -116,7 +116,7 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
     var points = []
     for(var j = 0; j < sampleCount; j++)
         for(var i = 0; i < gpuVariableCount; i++)
-            points.push(i < variableCount ? paddedUnit(domainToUnitScales[i](data.get(i, j))) : 0.5);
+            points.push(i < variableCount ? paddedUnit(domainToUnitScales[i](data[i][j])) : 0.5);
 
     var pointPairs = [];
 
@@ -136,7 +136,7 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
 /*
     var depth = utils.range(sampleCount * 2).map(function(d) {
         return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon,
-            depthUnitScale(data.get(depthVariable, Math.round((d - d % 2) / 2)))));
+            depthUnitScale(data[depthVariable][Math.round((d - d % 2) / 2)])));
     })
 */
 
