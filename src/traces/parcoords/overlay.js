@@ -204,7 +204,6 @@ module.exports = function (root, model, config) {
             .data(function(vm) {return vm.panels;}, keyFun)
 
         var domainBrushing = false
-        var axisDragging = false
 
         function someFiltersActive(view) {
             return view.panels.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
@@ -221,7 +220,6 @@ module.exports = function (root, model, config) {
                 .on('drag', function(d) {
                     if(domainBrushing)
                         return;
-                    axisDragging = true;
                     d.x = Math.max(-10, Math.min(width + 10, d3.event.x));
                     panel
                         .sort(function(a, b) {return a.x - b.x;})
@@ -237,11 +235,9 @@ module.exports = function (root, model, config) {
                     d.parent['focusLineLayer'].render(d.parent.panels);
                 })
                 .on('dragend', function(d) {
-                    if(domainBrushing || !axisDragging) {
-                        axisDragging = false;
+                    if(domainBrushing) {
                         return;
                     }
-                    axisDragging = false;
                     d.x = d.xScale(d.xIndex);
                     d3.select(this)
                         .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
@@ -373,7 +369,7 @@ module.exports = function (root, model, config) {
             .append('g')
             .classed('axisBrush', true)
             .on('mouseenter', function approach(variable) {
-                if(variable !== lastApproached && !axisDragging) {
+                if(variable !== lastApproached) {
                     variable.parent['focusLineLayer'].approach(variable);
                     lastApproached = variable;
                 }
@@ -480,5 +476,5 @@ module.exports = function (root, model, config) {
     return {
         enterOverlayPanels: enterOverlayPanels,
         destroy: destroy
-    }
+    };
 }
