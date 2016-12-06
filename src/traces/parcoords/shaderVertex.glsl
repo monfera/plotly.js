@@ -1,5 +1,3 @@
-module.exports = `
-
 precision highp float;
 
 attribute vec4 p0, p1, p2, p3,
@@ -76,5 +74,3 @@ void main() {
     float clampedColorIndex = clamp((colorIndex - colorClamp[0]) / (colorClamp[1] - colorClamp[0]), 0.0, 1.0);
     fragColor = texture2D(palette, vec2((clampedColorIndex * 255.0 + 0.5) / 256.0, 0.5));
 }
-
-`
