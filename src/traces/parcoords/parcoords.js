@@ -8,12 +8,10 @@
 
 'use strict';
 
-var configMaker = require('./config');
+var config = require('./config');
 var overlay = require('./overlay');
 
 module.exports = function plot(root, data) {
-
-    var config = configMaker(data);
 
     var ol = overlay(root, config);
     ol(data);
