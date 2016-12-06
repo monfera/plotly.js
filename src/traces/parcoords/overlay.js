@@ -166,10 +166,8 @@ module.exports = function (root, typedArrayModel, config) {
             .append('div')
             .classed('parcoordsViewModel', true);
 
-        console.log('okay lets set the variableViews...')
         parcoordsViewModel
             .each(function(d) {
-                console.log('set the variableViews')
                 variableViews = d.panels;
             });
 
@@ -405,15 +403,12 @@ module.exports = function (root, typedArrayModel, config) {
         axisBrush
             .each(function(d) {
                 if(!d.brush) {
-                    console.log('attaching brush')
                     d.brush = d3.svg.brush()
                         .y(d.unitScale)
                         .on('brushstart', axisBrushStarted)
                         .on('brush', axisBrushMoved)
                         .on('brushend', axisBrushEnded);
                     d3.select(this).call(d.brush);
-                } else {
-                    console.log('avoided reattaching brush')
                 }
             });
 
