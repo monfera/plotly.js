@@ -177,7 +177,7 @@ module.exports = function (root, typedArrayModel, config) {
             .data(function(vm) {
                 return [true, false].map(function(context) {
                     return {
-                        key: context,
+                        key: context ? 'contextLineLayer' : 'focusLineLayer',
                         context: context,
                         viewModel: vm
                     };
@@ -195,16 +195,13 @@ module.exports = function (root, typedArrayModel, config) {
 
         parcoordsLineLayer
             .each(function(d) {
-                temporary.push(lineLayerMaker(this, config, typedArrayModel, unitToColor, d.context));
+                d.viewModel[d.key] = lineLayerMaker(this, config, typedArrayModel, unitToColor, d.context);
+                temporary.push(d.viewModel[d.key]);
             });
 
         // HORRIBLE HACK
-        var contextLineLayer = temporary[0];
         var focusLineLayer = temporary[1];
-        var lineRenderApproach = focusLineLayer.approach;
         var lineRender = focusLineLayer.render;
-        var contextLineRender = contextLineLayer.render;
-        var setColorDomain = focusLineLayer.setColorDomain;
 
         var parcoordsControlOverlay = parcoordsViewModel.selectAll('.parcoordsControlOverlay')
             .data(repeat, keyFun);
@@ -261,8 +258,8 @@ module.exports = function (root, typedArrayModel, config) {
                         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                     d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                     panel.each(function(d, i) {variableViews[i] = d;});
-                    contextLineRender(d.parent.panels, false, !someFiltersActive(d.parent));
-                    lineRender(d.parent.panels);
+                    d.parent['contextLineLayer'].render(d.parent.panels, false, !someFiltersActive(d.parent));
+                    d.parent['focusLineLayer'].render(d.parent.panels);
                 })
                 .on('dragend', function(d) {
                     if(domainBrushing || !axisDragging) {
@@ -273,8 +270,8 @@ module.exports = function (root, typedArrayModel, config) {
                     d.x = d.xScale(d.xIndex);
                     d3.select(this)
                         .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                    contextLineRender(d.parent.panels, false, !someFiltersActive(d.parent));
-                    lineRender(d.parent.panels);
+                    d.parent['contextLineLayer'].render(d.parent.panels, false, !someFiltersActive(d.parent));
+                    d.parent['focusLineLayer'].render(d.parent.panels);
                 })
             );
 
@@ -402,7 +399,7 @@ module.exports = function (root, typedArrayModel, config) {
             .classed('axisBrush', true)
             .on('mouseenter', function approach(column) {
                 if(column !== lastApproached && !axisDragging) {
-                    lineRenderApproach(column);
+                    column.parent['focusLineLayer'].approach(column);
                     lastApproached = column;
                 }
             });
@@ -466,16 +463,16 @@ module.exports = function (root, typedArrayModel, config) {
             var newExtent = reset ? [0, 1] : extent.slice();
             if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
                 if(variable.originalXIndex === 0) {
-                    setColorDomain(newExtent);
+                    variable.parent['focusLineLayer'].setColorDomain(newExtent);
                 }
                 variableViews[variable.xIndex].filter = newExtent;
-                lineRender(variableViews, true);
+                variable.parent['focusLineLayer'].render(variableViews, true);
                 var filtersActive = someFiltersActive(variable.parent);
                 if(!contextShown && filtersActive) {
-                    contextLineRender(variableViews, true);
+                    variable.parent['contextLineLayer'].render(variableViews, true);
                     contextShown = true;
                 } else if(contextShown && !filtersActive) {
-                    contextLineRender(variableViews, true, true);
+                    variable.parent['contextLineLayer'].render(variableViews, true, true);
                     contextShown = false;
                 }
             }
@@ -494,7 +491,7 @@ module.exports = function (root, typedArrayModel, config) {
                     f[1] = Math.min(1, f[1] + 0.05);
                 }
                 d3.select(this).transition().duration(150).call(variable.brush.extent(f));
-                lineRender(variableViews, true);
+                variable.parent['focusLineLayer'].render(variableViews, true);
             }
             domainBrushing = false;
         }
