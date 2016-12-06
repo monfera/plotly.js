@@ -18,7 +18,6 @@ module.exports = function(variables) {
     return {
         variables: variables,
         filters: filters,
-        variableNames: variables.map(function(v) {return v.variableName;}),
-        integer: variables.map(function(v) {return v.integer;})
+        variableNames: variables.map(function(v) {return v.variableName;})
     }
 };
