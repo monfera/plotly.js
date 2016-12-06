@@ -57,8 +57,8 @@ function viewModel(width, height, model) {
 
     viewModel.panels = viewModel.columns.map(function(column, i) {
         return {
-            key: viewModel.columns[i].name,
-            name: viewModel.columns[i].name,
+            key: viewModel.columns[i].variableName,
+            variableName: viewModel.columns[i].variableName,
             integer: viewModel.columns[i].integer,
             xIndex: i,
             originalXIndex: i,
@@ -89,7 +89,7 @@ function styleExtentTexts(selection) {
         .style('user-select', 'none');
 }
 
-module.exports = function (root, typedArrayModel, config) {
+module.exports = function (root, model, config) {
 
     var width = config.width
     var height = config.height
@@ -98,18 +98,7 @@ module.exports = function (root, typedArrayModel, config) {
     var brushVisibleWidth = controlConfig.filterVisibleWidth;
     var brushCaptureWidth = controlConfig.filterCaptureWidth;
 
-    var columns = [];
-    for(var i = 0; i < typedArrayModel.variableCount; i++) {
-        var values = [];
-        for(var j = 0; j < typedArrayModel.sampleCount; j++) {
-            values.push(typedArrayModel.data.get(i, j));
-        }
-        columns.push({
-            name: typedArrayModel.variableNames[i],
-            integer: typedArrayModel.integer[i],
-            values: values
-        });
-    }
+    var columns = model.variables;
 
     function enterSvgDefs(root) {
         var defs = root.selectAll('defs')
@@ -183,7 +172,7 @@ module.exports = function (root, typedArrayModel, config) {
 
         parcoordsLineLayer
             .each(function(d) {
-                d.viewModel[d.key] = lineLayerMaker(this, config, typedArrayModel, unitToColor, d.context);
+                d.viewModel[d.key] = lineLayerMaker(this, config, model, unitToColor, d.context);
                 if(!d.context) {
                     d.viewModel[d.key].render(d.viewModel.panels, true);
                 }
@@ -323,7 +312,7 @@ module.exports = function (root, typedArrayModel, config) {
             .append('text')
             .classed('axisTitle', true)
             .attr('transform', 'translate(0,' + -(controlConfig.handleGlyphHeight + 20) + ')')
-            .text(function(d) {return d.name;})
+            .text(function(d) {return d.variableName;})
             .attr('text-anchor', 'middle')
             .style('font-family', 'sans-serif')
             .style('font-size', 'xx-small')
