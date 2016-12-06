@@ -12,7 +12,6 @@ var overlay = require('./overlay');
 
 module.exports = function plot(root, data, config) {
 
-    var ol = overlay(root, config);
-    ol(data);
-    ol(data);
+    overlay(root, data, config);
+    overlay(root, data, config);
 };
