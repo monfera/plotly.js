@@ -78,7 +78,6 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
     var data = model.variables.map(function(v) {return v.values;});
     var variableCount = model.variables.length;
     var sampleCount = model.variables[0].values.length;
-    var domainToUnitScales = model.domainToUnitScales;
 
     var alphaBlending = context; // controlConfig.alphaBlending;
 
@@ -99,8 +98,8 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
     canvasGL.style.width = width + 'px';
     canvasGL.style.height = height + 'px';
 
-    var coloringVariableUnitScale = domainToUnitScales[coloringVariable];
-    var depthUnitScale = domainToUnitScales[depthVariable];
+    var coloringVariableUnitScale = model.variables[coloringVariable].domainToUnitScale;
+    var depthUnitScale = model.variables[depthVariable].domainToUnitScale;
 
     function colorProjection(j) {
         return colorScale(coloringVariableUnitScale(data[coloringVariable][j]));
@@ -116,7 +115,7 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
     var points = []
     for(var j = 0; j < sampleCount; j++)
         for(var i = 0; i < gpuVariableCount; i++)
-            points.push(i < variableCount ? paddedUnit(domainToUnitScales[i](data[i][j])) : 0.5);
+            points.push(i < variableCount ? paddedUnit(model.variables[i].domainToUnitScale(data[i][j])) : 0.5);
 
     var pointPairs = [];
 
