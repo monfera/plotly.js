@@ -196,12 +196,10 @@ module.exports = function (root, typedArrayModel, config) {
         parcoordsLineLayer
             .each(function(d) {
                 d.viewModel[d.key] = lineLayerMaker(this, config, typedArrayModel, unitToColor, d.context);
-                temporary.push(d.viewModel[d.key]);
+                if(!d.context) {
+                    d.viewModel[d.key].render(variableViews, true);
+                }
             });
-
-        // HORRIBLE HACK
-        var focusLineLayer = temporary[1];
-        var lineRender = focusLineLayer.render;
 
         var parcoordsControlOverlay = parcoordsViewModel.selectAll('.parcoordsControlOverlay')
             .data(repeat, keyFun);
@@ -495,10 +493,6 @@ module.exports = function (root, typedArrayModel, config) {
             }
             domainBrushing = false;
         }
-
-        lineRender(variableViews, true);
-
-        return variableViews;
     }
 
     function destroy() {
