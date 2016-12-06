@@ -15,7 +15,7 @@ module.exports = function plot(root, data) {
 
     var config = configMaker(data);
 
-    var ol = overlay(root, data, config);
-    ol.enterOverlayPanels();
-    ol.enterOverlayPanels();
+    var ol = overlay(root, config);
+    ol.enterOverlayPanels(data);
+    ol.enterOverlayPanels(data);
 };
