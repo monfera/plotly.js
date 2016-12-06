@@ -141,7 +141,7 @@ module.exports = function (root, config) {
             .attr('stroke-width', controlConfig.filterBarStrokeWidth);
     }
 
-    function enterOverlayPanels(model) {
+    return function enterOverlayPanels(model) {
 
         var lastApproached = null;
 
@@ -473,15 +473,4 @@ module.exports = function (root, config) {
             domainBrushing = false;
         }
     }
-
-    function destroy() {
-        var range = document.createRange()
-        range.selectNodeContents(svg)
-        range.deleteContents()
-    }
-
-    return {
-        enterOverlayPanels: enterOverlayPanels,
-        destroy: destroy
-    };
 }
