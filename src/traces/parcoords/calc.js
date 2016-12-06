@@ -39,7 +39,6 @@ module.exports = function calc(gd, trace) {
     }
 
     for(i = 0; i < vals.length; i++) {
-        console.log('been here')
         v = vals.length - i // vals[i].pieChartCheat;
         if(!isNumeric(v)) continue;
         v = +v;
