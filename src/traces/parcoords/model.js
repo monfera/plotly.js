@@ -20,7 +20,6 @@ module.exports = function(variables) {
     })
     return {
         variables: variables,
-        sampleCount: sampleCount,
         domainToUnitScales: domainToUnitScales,
         filters: filters,
         variableNames: variables.map(function(v) {return v.variableName;}),
