@@ -447,7 +447,8 @@ module.exports = function (root, typedArrayModel, config) {
 
         function axisBrushMoved(variable) {
             var extent = variable.brush.extent();
-            var filter = variableViews[variable.xIndex].filter;
+            var panels = variable.parent.panels;
+            var filter = panels[variable.xIndex].filter;
             var reset = justStarted && (extent[0] == extent[1]);
             if(reset) {
                 variable.brush.clear();
@@ -458,14 +459,14 @@ module.exports = function (root, typedArrayModel, config) {
                 if(variable.originalXIndex === 0) {
                     variable.parent['focusLineLayer'].setColorDomain(newExtent);
                 }
-                variableViews[variable.xIndex].filter = newExtent;
-                variable.parent['focusLineLayer'].render(variableViews, true);
+                panels[variable.xIndex].filter = newExtent;
+                variable.parent['focusLineLayer'].render(panels, true);
                 var filtersActive = someFiltersActive(variable.parent);
                 if(!contextShown && filtersActive) {
-                    variable.parent['contextLineLayer'].render(variableViews, true);
+                    variable.parent['contextLineLayer'].render(panels, true);
                     contextShown = true;
                 } else if(contextShown && !filtersActive) {
-                    variable.parent['contextLineLayer'].render(variableViews, true, true);
+                    variable.parent['contextLineLayer'].render(panels, true, true);
                     contextShown = false;
                 }
             }
