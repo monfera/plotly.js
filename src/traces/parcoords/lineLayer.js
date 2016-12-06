@@ -154,14 +154,14 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
         }
     }
 
-    var styleColumnIndex = 0;
+    var styleVariableIndex = 0;
     var styling = [];
     for(j = 0; j < sampleCount; j++) {
         for(k = 0; k < 2; k++) {
             styling.push(points[j * gpuVariableCount + gpuVariableCount]);
             styling.push(points[j * gpuVariableCount + gpuVariableCount + 1]);
             styling.push(points[j * gpuVariableCount + gpuVariableCount + 2]); // currently unused
-            styling.push(Math.round(2 * ((k % 2) - 0.5)) *  adjustDepth(points[j * gpuVariableCount + styleColumnIndex]));
+            styling.push(Math.round(2 * ((k % 2) - 0.5)) *  adjustDepth(points[j * gpuVariableCount + styleVariableIndex]));
         }
     }
 
@@ -285,9 +285,9 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
         colorClamp[1] = unitDomain[1];
     }
 
-    function approach(column) {
-        //utils.ndarrayOrder(, column.index);
-        //console.log('Approached ', JSON.stringify(column.name));
+    function approach(variable) {
+        //utils.ndarrayOrder(, variable.index);
+        //console.log('Approached ', JSON.stringify(variable.name));
     }
 
     var previousAxisOrder = [];
