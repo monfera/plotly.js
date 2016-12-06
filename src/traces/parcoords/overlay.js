@@ -53,6 +53,7 @@ function makeDomainToUnitScale(variable) {
     var b = -a * extent[0];
     return function(x) {return a * x + b};
 }
+
 function viewModel(width, height, model) {
 
     var xScale = d3.scale.ordinal().domain(d3.range(model.variables.length)).rangePoints([0, width], 0);
@@ -97,7 +98,7 @@ function styleExtentTexts(selection) {
         .style('user-select', 'none');
 }
 
-module.exports = function (root, model, config) {
+module.exports = function (root, config) {
 
     var width = config.width
     var height = config.height
@@ -140,7 +141,7 @@ module.exports = function (root, model, config) {
             .attr('stroke-width', controlConfig.filterBarStrokeWidth);
     }
 
-    function enterOverlayPanels() {
+    function enterOverlayPanels(model) {
 
         var lastApproached = null;
 
