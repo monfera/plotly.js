@@ -66,7 +66,7 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
     render(blockNumber);
 }
 
-module.exports = function(canvasGL, config, model, unitToColor, context) {
+module.exports = function(canvasGL, layout, data, unitToColor, context) {
 
     var renderState = {
         currentRafs: {},
@@ -74,20 +74,19 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
         clearOnly: false
     };
 
-    var variables = model;
+    var variables = data;
     var data = variables.map(function(v) {return v.values;});
     var variableCount = variables.length;
     var sampleCount = variables[0].values.length;
 
     var alphaBlending = context; // controlConfig.alphaBlending;
 
-    var width = config.width;
-    var height = config.height;
-    var panelSizeY = config.panelSizeY;
-    var coloringVariable = config.coloringVariable;
-    var colorScale = config.colorScale;
-    var depthVariable = config.depthVariable;
-    var canvasPixelRatio = config.canvasPixelRatio;
+    var width = layout.width;
+    var height = layout.height;
+    var panelSizeY = layout.panelSizeY;
+    var coloringVariable = layout.coloringVariable;
+    var colorScale = layout.colorScale;
+    var canvasPixelRatio = layout.canvasPixelRatio;
 
     var canvasWidth = width * canvasPixelRatio;
     var canvasHeight = height * canvasPixelRatio;
@@ -107,7 +106,7 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
     var gpuVariableCount = 60; // don't change this; 3 + 1 extra variables also apply
 
     function paddedUnit(d) {
-        var unitPad = config.verticalPadding / panelSizeY;
+        var unitPad = layout.verticalPadding / panelSizeY;
         return unitPad + d * (1 - 2 * unitPad);
     }
 
@@ -132,6 +131,7 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
     }
 
 /*
+    var depthVariable = layout.depthVariable;
     var depthUnitScale = variables[depthVariable].domainToUnitScale;
     var depth = utils.range(sampleCount * 2).map(function(d) {
         return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon,
@@ -319,10 +319,10 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
         for(I = 0; I < shownPanelCount; I++) {
             var variableView = variableViews[I];
             var i = variableView.originalXIndex;
-            var x = variableView.x * config.canvasPixelRatio;
+            var x = variableView.x * layout.canvasPixelRatio;
             var nextVar = variableViews[(I + 1) % shownVariableCount];
             var ii = nextVar.originalXIndex;
-            var panelSizeX = nextVar.x * config.canvasPixelRatio - x;
+            var panelSizeX = nextVar.x * layout.canvasPixelRatio - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextVar.x) {
                 previousAxisOrder[i] = [x, nextVar.x];
                 var item = {
@@ -351,7 +351,7 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
                     scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
                 };
                 renderState.clearOnly = clearOnly;
-                renderBlock(regl, glAes, renderState, setChanged ? config.blockLineCount : sampleCount, sampleCount, item);
+                renderBlock(regl, glAes, renderState, setChanged ? layout.blockLineCount : sampleCount, sampleCount, item);
             }
         }
     }
@@ -366,4 +366,4 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
         render: renderGLParcoords,
         destroy: destroy
     };
-}
+};

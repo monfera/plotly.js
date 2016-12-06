@@ -97,14 +97,14 @@ function styleExtentTexts(selection) {
         .style('user-select', 'none');
 }
 
-module.exports = function (root, model, config) {
+module.exports = function (root, data, layout) {
 
-    var width = config.width
-    var height = config.height
+    var width = layout.width
+    var height = layout.height
 
-    var resizeHeight = config.handleGlyphHeight;
-    var brushVisibleWidth = config.filterVisibleWidth;
-    var brushCaptureWidth = config.filterCaptureWidth;
+    var resizeHeight = layout.handleGlyphHeight;
+    var brushVisibleWidth = layout.filterVisibleWidth;
+    var brushCaptureWidth = layout.filterCaptureWidth;
 
     function enterSvgDefs(root) {
         var defs = root.selectAll('defs')
@@ -133,24 +133,24 @@ module.exports = function (root, model, config) {
             .attr('width', brushVisibleWidth)
             .attr('height', height)
             .attr('x', brushVisibleWidth / 2)
-            .attr('fill', config.filterBarFill)
-            .attr('fill-opacity', config.filterBarFillOpacity)
-            .attr('stroke', config.filterBarStroke)
-            .attr('stroke-opacity', config.filterBarStrokeOpacity)
-            .attr('stroke-width', config.filterBarStrokeWidth);
+            .attr('fill', layout.filterBarFill)
+            .attr('fill-opacity', layout.filterBarFillOpacity)
+            .attr('stroke', layout.filterBarStroke)
+            .attr('stroke-opacity', layout.filterBarStrokeOpacity)
+            .attr('stroke-width', layout.filterBarStrokeWidth);
     }
 
     var lastApproached = null;
 
     var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
-        .data([{key: 0, variables: model}], keyFun);
+        .data([{key: 0, variables: data}], keyFun);
 
     parcoordsModel.enter()
         .append('div')
         .classed('parcoordsModel', true);
 
     var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
-        .data(viewModel.bind(0, config), keyFun)
+        .data(viewModel.bind(0, layout), keyFun)
 
     parcoordsViewModel.enter()
         .append('div')
@@ -171,12 +171,12 @@ module.exports = function (root, model, config) {
         .append('canvas')
         .classed('parcoordsLineLayer', true)
         .style('position', 'absolute')
-        .style('padding', config.padding + 'px')
+        .style('padding', layout.padding + 'px')
         .style('overflow', 'visible');
 
     parcoordsLineLayer
         .each(function(d) {
-            d.viewModel[d.key] = lineLayerMaker(this, config, d.viewModel.panels, unitToColor, d.context);
+            d.viewModel[d.key] = lineLayerMaker(this, layout, d.viewModel.panels, unitToColor, d.context);
             if(!d.context) {
                 d.viewModel[d.key].render(d.viewModel.panels, true);
             }
@@ -192,7 +192,7 @@ module.exports = function (root, model, config) {
         .attr('width', width)
         .attr('height', height)
         .style('position', 'absolute')
-        .style('padding', config.padding + 'px')
+        .style('padding', layout.padding + 'px')
         .style('overflow', 'visible')
         .style('shape-rendering', 'crispEdges')
         .call(enterSvgDefs);
@@ -264,7 +264,7 @@ module.exports = function (root, model, config) {
         .append('g')
         .classed('axis', true)
         .each(function(d) {
-            var wantedTickCount = height / config.averageTickDistance;
+            var wantedTickCount = height / layout.averageTickDistance;
             var scale = d.domainScale;
             var dom = scale.domain();
             d3.select(this)
@@ -311,7 +311,7 @@ module.exports = function (root, model, config) {
     axisTitle.enter()
         .append('text')
         .classed('axisTitle', true)
-        .attr('transform', 'translate(0,' + -(config.handleGlyphHeight + 20) + ')')
+        .attr('transform', 'translate(0,' + -(layout.handleGlyphHeight + 20) + ')')
         .text(function(d) {return d.variableName;})
         .attr('text-anchor', 'middle')
         .style('font-family', 'sans-serif')
@@ -332,7 +332,7 @@ module.exports = function (root, model, config) {
     axisExtentTop.enter()
         .append('g')
         .classed('axisExtentTop', true)
-        .attr('transform', 'translate(' + 0 + ',' + -(config.handleGlyphHeight - 2) + ')')
+        .attr('transform', 'translate(' + 0 + ',' + -(layout.handleGlyphHeight - 2) + ')')
 
     var axisExtentTopText = axisExtentTop.selectAll('.axisExtentTopText')
         .data(repeat, keyFun);
@@ -354,7 +354,7 @@ module.exports = function (root, model, config) {
     axisExtentBottom.enter()
         .append('g')
         .classed('axisExtentBottom', true)
-        .attr('transform', 'translate(' + 0 + ',' + (height + config.handleGlyphHeight - 2) + ')')
+        .attr('transform', 'translate(' + 0 + ',' + (height + layout.handleGlyphHeight - 2) + ')')
 
     var axisExtentBottomText = axisExtentBottom.selectAll('.axisExtentBottomText')
         .data(repeat, keyFun);
@@ -395,7 +395,7 @@ module.exports = function (root, model, config) {
         .selectAll('rect')
         .attr('x', -brushCaptureWidth / 2)
         .attr('width', brushCaptureWidth)
-        .attr('stroke', config.captureZoneBorderColor);
+        .attr('stroke', layout.captureZoneBorderColor);
 
     axisBrushEnter
         .selectAll('rect.extent')
@@ -405,16 +405,16 @@ module.exports = function (root, model, config) {
     axisBrushEnter
         .selectAll('.resize rect')
         .attr('height', resizeHeight)
-        .attr('fill-opacity', config.handleGlyphOpacity)
+        .attr('fill-opacity', layout.handleGlyphOpacity)
         .style('visibility', 'visible');
 
     axisBrushEnter
         .selectAll('.resize.n rect')
-        .attr('y', -resizeHeight + config.handleGlyphOverlap);
+        .attr('y', -resizeHeight + layout.handleGlyphOverlap);
 
     axisBrushEnter
         .selectAll('.resize.s rect')
-        .attr('y', -config.handleGlyphOverlap);
+        .attr('y', -layout.handleGlyphOverlap);
 
     var justStarted = false;
     var contextShown = false;
@@ -469,4 +469,4 @@ module.exports = function (root, model, config) {
         }
         domainBrushing = false;
     }
-}
+};

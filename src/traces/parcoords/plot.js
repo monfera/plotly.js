@@ -15,7 +15,7 @@ var Color = require('../../components/color');
 var Drawing = require('../../components/drawing');
 var svgTextUtils = require('../../lib/svg_text_utils');
 
-var config = require('./config');
+var layout = require('./layout');
 var parcoords = require('./parcoords');
 
 var helpers = require('./helpers');
@@ -27,7 +27,7 @@ module.exports = function plot(gd, cdpie) {
 
     var data = cdpie[0];
 
-    parcoords(root, data, config);
+    parcoords(root, data, layout);
 
     return;
 
