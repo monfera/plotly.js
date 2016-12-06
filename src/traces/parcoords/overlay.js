@@ -150,8 +150,6 @@ module.exports = function (root, typedArrayModel, config) {
 
         var lastApproached = null;
 
-        var variableViews;
-
         var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
             .data([model], keyFun);
 
@@ -166,11 +164,6 @@ module.exports = function (root, typedArrayModel, config) {
             .append('div')
             .classed('parcoordsViewModel', true);
 
-        parcoordsViewModel
-            .each(function(d) {
-                variableViews = d.panels;
-            });
-
         var parcoordsLineLayer = parcoordsViewModel.selectAll('.parcoordsLineLayer')
             .data(function(vm) {
                 return [true, false].map(function(context) {
@@ -181,8 +174,6 @@ module.exports = function (root, typedArrayModel, config) {
                     };
                 });
             }, keyFun);
-
-        var temporary = [];
 
         parcoordsLineLayer.enter()
             .append('canvas')
@@ -477,7 +468,8 @@ module.exports = function (root, typedArrayModel, config) {
             var extent = variable.brush.extent();
             var empty = extent[0] == extent[1];
             if(!empty && variable.integer) {
-                var f = variableViews[variable.xIndex].filter;
+                var panels = variable.parent.panels;
+                var f = panels[variable.xIndex].filter;
                 f[0] = utils.d3OrdinalScaleSnap(variable.integerScale, f[0]);
                 f[1] = utils.d3OrdinalScaleSnap(variable.integerScale, f[1]);
                 if(f[0] === f[1]) {
@@ -485,7 +477,7 @@ module.exports = function (root, typedArrayModel, config) {
                     f[1] = Math.min(1, f[1] + 0.05);
                 }
                 d3.select(this).transition().duration(150).call(variable.brush.extent(f));
-                variable.parent['focusLineLayer'].render(variableViews, true);
+                variable.parent['focusLineLayer'].render(panels, true);
             }
             domainBrushing = false;
         }
