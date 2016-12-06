@@ -74,8 +74,8 @@ function viewModel(config, model) {
 
     viewModel.panels = model.variables.map(function(variable, i) {
         return {
-            key: variable.variableName,
-            variableName: variable.variableName,
+            key: variable.id || Math.random(),
+            name: variable.name,
             integer:variable.integer,
             xIndex: i,
             originalXIndex: i,
@@ -322,7 +322,7 @@ module.exports = function (root, data, layout) {
         .append('text')
         .classed('axisTitle', true)
         .attr('transform', 'translate(0,' + -(layout.handleGlyphHeight + 20) + ')')
-        .text(function(d) {return d.variableName;})
+        .text(function(d) {return d.name;})
         .attr('text-anchor', 'middle')
         .style('font-family', 'sans-serif')
         .style('font-size', 'xx-small')
