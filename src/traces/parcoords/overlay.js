@@ -66,6 +66,8 @@ function viewModel(width, height, model) {
             unitScale: makeUnitScale(height, variable),
             domainScale: makeDomainScale(height, variable),
             integerScale: makeIntegerScale(variable),
+            domainToUnitScale: variable.domainToUnitScale,
+            pieChartCheat: variable.pieChartCheat,
             filter: [0, 1],
             parent: viewModel
         };
@@ -166,7 +168,7 @@ module.exports = function (root, model, config) {
 
         parcoordsLineLayer
             .each(function(d) {
-                d.viewModel[d.key] = lineLayerMaker(this, config, model, unitToColor, d.context);
+                d.viewModel[d.key] = lineLayerMaker(this, config, d.viewModel.panels, unitToColor, d.context);
                 if(!d.context) {
                     d.viewModel[d.key].render(d.viewModel.panels, true);
                 }

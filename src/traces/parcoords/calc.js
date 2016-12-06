@@ -39,7 +39,8 @@ module.exports = function calc(gd, trace) {
     }
 
     for(i = 0; i < vals.length; i++) {
-        v = vals[i].pieChartCheat;
+        console.log('been here')
+        v = vals.length - i // vals[i].pieChartCheat;
         if(!isNumeric(v)) continue;
         v = +v;
         if(v < 0) continue;
@@ -83,7 +84,7 @@ module.exports = function calc(gd, trace) {
         });
     }
 
-    if(trace.sort) cd.sort(function(a, b) { return b.v - a.v; });
+    //if(trace.sort) cd.sort(function(a, b) { return b.v - a.v; });
 
     /**
      * now go back and fill in colors we're still missing
