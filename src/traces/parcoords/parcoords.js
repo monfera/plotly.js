@@ -8,10 +8,9 @@
 
 'use strict';
 
-var config = require('./config');
 var overlay = require('./overlay');
 
-module.exports = function plot(root, data) {
+module.exports = function plot(root, data, config) {
 
     var ol = overlay(root, config);
     ol(data);

@@ -3,8 +3,9 @@
 
 var parcoords = require('./parcoords');
 var data = require('./dataAdapter');
+var config = require('./config');
 
 var div = document.createElement('div');
 document.body.appendChild(div);
 
-parcoords(div,  data);
+parcoords(div, data, config);
