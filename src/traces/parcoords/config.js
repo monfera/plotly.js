@@ -1,4 +1,4 @@
-module.exports = function(model) {
+module.exports = (function() {
 
     var width = 1480
     var height = 275
@@ -10,7 +10,6 @@ module.exports = function(model) {
     return {
         width: width,
         height: height,
-        panelSizeX: width / model.variableCount,
         panelSizeY: height,
         padding: 64, // useful to make room for brush capture zones when resize handle is on top or bottom
 
@@ -24,4 +23,4 @@ module.exports = function(model) {
         canvasPixelRatio: 1, //window.devicePixelRatio, // using 2 or devicePixelRatio sharpens lines, slower
         blockLineCount: 5000 // number of lines drawn in one increment
     }
-};
+})();
