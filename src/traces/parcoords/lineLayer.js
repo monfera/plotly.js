@@ -1,4 +1,4 @@
-var controlConfig = require('./controlConfig');
+var config = require('./config');
 var utils = require('./utils');
 var createREGL = require('regl');
 var vertexShaderSource = require('./shaderVertex');
@@ -108,7 +108,7 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
     var gpuVariableCount = 60; // don't change this; 3 + 1 extra variables also apply
 
     function paddedUnit(d) {
-        var unitPad = controlConfig.verticalPadding / panelSizeY;
+        var unitPad = config.verticalPadding / panelSizeY;
         return unitPad + d * (1 - 2 * unitPad);
     }
 

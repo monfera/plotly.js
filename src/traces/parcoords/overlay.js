@@ -1,6 +1,6 @@
 var lineLayerMaker = require('./lineLayer');
 var unitToColor = require('./colors');
-var controlConfig = require('./controlConfig');
+var config = require('./config');
 var utils = require('./utils');
 var d3 = require('d3');
 
@@ -23,15 +23,15 @@ function makeDomainScale(height, variable) {
     return variable.integer
         ? d3.scale.ordinal()
         .domain(d3.range(Math.round(lo), Math.round(hi + 1)))
-        .rangePoints([height - controlConfig.verticalPadding, controlConfig.verticalPadding], controlConfig.integerPadding)
+        .rangePoints([height - config.verticalPadding, config.verticalPadding], config.integerPadding)
         : d3.scale.linear()
         .domain([lo, hi])
-        .range([height - controlConfig.verticalPadding, controlConfig.verticalPadding]);
+        .range([height - config.verticalPadding, config.verticalPadding]);
 }
 
 function makeUnitScale(height) {
     return d3.scale.linear()
-        .range([height - controlConfig.verticalPadding, controlConfig.verticalPadding]);
+        .range([height - config.verticalPadding, config.verticalPadding]);
 }
 
 function makeIntegerScale(variable) {
@@ -40,7 +40,7 @@ function makeIntegerScale(variable) {
                 d3.range(0, Math.round(d3.max(variable.values) + 1) - Math.round(d3.min(variable.values)))
                     .map(function(d, _, a) {return d / (a.length - 1)})
             )
-            .rangePoints([0, 1], controlConfig.integerPadding)
+            .rangePoints([0, 1], config.integerPadding)
 }
 
 function makeDomainToUnitScale(variable) {
@@ -103,9 +103,9 @@ module.exports = function (root, config) {
     var width = config.width
     var height = config.height
 
-    var resizeHeight = controlConfig.handleGlyphHeight;
-    var brushVisibleWidth = controlConfig.filterVisibleWidth;
-    var brushCaptureWidth = controlConfig.filterCaptureWidth;
+    var resizeHeight = config.handleGlyphHeight;
+    var brushVisibleWidth = config.filterVisibleWidth;
+    var brushCaptureWidth = config.filterCaptureWidth;
 
     function enterSvgDefs(root) {
         var defs = root.selectAll('defs')
@@ -134,11 +134,11 @@ module.exports = function (root, config) {
             .attr('width', brushVisibleWidth)
             .attr('height', height)
             .attr('x', brushVisibleWidth / 2)
-            .attr('fill', controlConfig.filterBarFill)
-            .attr('fill-opacity', controlConfig.filterBarFillOpacity)
-            .attr('stroke', controlConfig.filterBarStroke)
-            .attr('stroke-opacity', controlConfig.filterBarStrokeOpacity)
-            .attr('stroke-width', controlConfig.filterBarStrokeWidth);
+            .attr('fill', config.filterBarFill)
+            .attr('fill-opacity', config.filterBarFillOpacity)
+            .attr('stroke', config.filterBarStroke)
+            .attr('stroke-opacity', config.filterBarStrokeOpacity)
+            .attr('stroke-width', config.filterBarStrokeWidth);
     }
 
     return function enterOverlayPanels(model) {
@@ -267,7 +267,7 @@ module.exports = function (root, config) {
             .append('g')
             .classed('axis', true)
             .each(function(d) {
-                var wantedTickCount = height / controlConfig.averageTickDistance;
+                var wantedTickCount = height / config.averageTickDistance;
                 var scale = d.domainScale;
                 var dom = scale.domain();
                 d3.select(this)
@@ -314,7 +314,7 @@ module.exports = function (root, config) {
         axisTitle.enter()
             .append('text')
             .classed('axisTitle', true)
-            .attr('transform', 'translate(0,' + -(controlConfig.handleGlyphHeight + 20) + ')')
+            .attr('transform', 'translate(0,' + -(config.handleGlyphHeight + 20) + ')')
             .text(function(d) {return d.variableName;})
             .attr('text-anchor', 'middle')
             .style('font-family', 'sans-serif')
@@ -335,7 +335,7 @@ module.exports = function (root, config) {
         axisExtentTop.enter()
             .append('g')
             .classed('axisExtentTop', true)
-            .attr('transform', 'translate(' + 0 + ',' + -(controlConfig.handleGlyphHeight - 2) + ')')
+            .attr('transform', 'translate(' + 0 + ',' + -(config.handleGlyphHeight - 2) + ')')
 
         var axisExtentTopText = axisExtentTop.selectAll('.axisExtentTopText')
             .data(repeat, keyFun);
@@ -357,7 +357,7 @@ module.exports = function (root, config) {
         axisExtentBottom.enter()
             .append('g')
             .classed('axisExtentBottom', true)
-            .attr('transform', 'translate(' + 0 + ',' + (height + controlConfig.handleGlyphHeight - 2) + ')')
+            .attr('transform', 'translate(' + 0 + ',' + (height + config.handleGlyphHeight - 2) + ')')
 
         var axisExtentBottomText = axisExtentBottom.selectAll('.axisExtentBottomText')
             .data(repeat, keyFun);
@@ -398,7 +398,7 @@ module.exports = function (root, config) {
             .selectAll('rect')
             .attr('x', -brushCaptureWidth / 2)
             .attr('width', brushCaptureWidth)
-            .attr('stroke', controlConfig.captureZoneBorderColor);
+            .attr('stroke', config.captureZoneBorderColor);
 
         axisBrushEnter
             .selectAll('rect.extent')
@@ -408,16 +408,16 @@ module.exports = function (root, config) {
         axisBrushEnter
             .selectAll('.resize rect')
             .attr('height', resizeHeight)
-            .attr('fill-opacity', controlConfig.handleGlyphOpacity)
+            .attr('fill-opacity', config.handleGlyphOpacity)
             .style('visibility', 'visible');
 
         axisBrushEnter
             .selectAll('.resize.n rect')
-            .attr('y', -resizeHeight + controlConfig.handleGlyphOverlap);
+            .attr('y', -resizeHeight + config.handleGlyphOverlap);
 
         axisBrushEnter
             .selectAll('.resize.s rect')
-            .attr('y', -controlConfig.handleGlyphOverlap);
+            .attr('y', -config.handleGlyphOverlap);
 
         var justStarted = false;
         var contextShown = false;
