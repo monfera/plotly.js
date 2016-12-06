@@ -12,15 +12,15 @@ function repeat(d) {
     return [d];
 }
 
-function makeDomainScale(height, column) {
-    var lo = d3.min(column.values);
-    var hi = d3.max(column.values);
+function makeDomainScale(height, variable) {
+    var lo = d3.min(variable.values);
+    var hi = d3.max(variable.values);
     // convert a zero-domain to a proper domain
-    if(!column.integer && lo === hi) {
+    if(!variable.integer && lo === hi) {
         lo *= 0.9;
         hi *= 1.1;
     }
-    return column.integer
+    return variable.integer
         ? d3.scale.ordinal()
         .domain(d3.range(Math.round(lo), Math.round(hi + 1)))
         .rangePoints([height - controlConfig.verticalPadding, controlConfig.verticalPadding], controlConfig.integerPadding)
@@ -34,10 +34,10 @@ function makeUnitScale(height) {
         .range([height - controlConfig.verticalPadding, controlConfig.verticalPadding]);
 }
 
-function makeIntegerScale(column) {
-    return column.integer && d3.scale.ordinal()
+function makeIntegerScale(variable) {
+    return variable.integer && d3.scale.ordinal()
             .domain(
-                d3.range(0, Math.round(d3.max(column.values) + 1) - Math.round(d3.min(column.values)))
+                d3.range(0, Math.round(d3.max(variable.values) + 1) - Math.round(d3.min(variable.values)))
                     .map(function(d, _, a) {return d / (a.length - 1)})
             )
             .rangePoints([0, 1], controlConfig.integerPadding)
@@ -45,34 +45,34 @@ function makeIntegerScale(column) {
 
 function viewModel(width, height, model) {
 
-    var columns = model.columns;
+    var variables = model.variables;
 
     var viewModel = {
         key: 0,
-        columns: columns,
-        xScale: d3.scale.ordinal().domain(d3.range(columns.length)).rangePoints([0, width], 0),
-        unitScales: columns.map(makeUnitScale.bind(0, height)),
-        domainScales: columns.map(makeDomainScale.bind(0, height)),
-        integerScales: columns.map(makeIntegerScale),
-        filters: columns.map(function() {return [0, 1];})
+        variables: variables,
+        xScale: d3.scale.ordinal().domain(d3.range(variables.length)).rangePoints([0, width], 0),
+        unitScales: variables.map(makeUnitScale.bind(0, height)),
+        domainScales: variables.map(makeDomainScale.bind(0, height)),
+        integerScales: variables.map(makeIntegerScale),
+        filters: variables.map(function() {return [0, 1];})
     };
 
-    viewModel.panels = viewModel.columns.map(function(column, i) {
+    viewModel.panels = viewModel.variables.map(function(variable, i) {
         return {
-            key: viewModel.columns[i].variableName,
-            variableName: viewModel.columns[i].variableName,
-            integer: viewModel.columns[i].integer,
+            key: viewModel.variables[i].variableName,
+            variableName: viewModel.variables[i].variableName,
+            integer: viewModel.variables[i].integer,
             xIndex: i,
             originalXIndex: i,
             height: height,
-            values: viewModel.columns[i].values,
+            values: viewModel.variables[i].values,
             xScale: viewModel.xScale,
             x: viewModel.xScale(i),
             unitScale: viewModel.unitScales[i],
             domainScale: viewModel.domainScales[i],
             integerScale: viewModel.integerScales[i],
             filter: viewModel.filters[i],
-            columns: viewModel.columns,
+            variables: viewModel.variables,
             parent: viewModel
         };
     })
@@ -99,8 +99,6 @@ module.exports = function (root, model, config) {
     var resizeHeight = controlConfig.handleGlyphHeight;
     var brushVisibleWidth = controlConfig.filterVisibleWidth;
     var brushCaptureWidth = controlConfig.filterCaptureWidth;
-
-    var columns = model.variables;
 
     function enterSvgDefs(root) {
         var defs = root.selectAll('defs')
@@ -141,7 +139,7 @@ module.exports = function (root, model, config) {
         var lastApproached = null;
 
         var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
-            .data([{key: 0, columns: model}], keyFun);
+            .data([{key: 0, variables: model}], keyFun);
 
         parcoordsModel.enter()
             .append('div')
@@ -374,10 +372,10 @@ module.exports = function (root, model, config) {
         var axisBrushEnter = axisBrush.enter()
             .append('g')
             .classed('axisBrush', true)
-            .on('mouseenter', function approach(column) {
-                if(column !== lastApproached && !axisDragging) {
-                    column.parent['focusLineLayer'].approach(column);
-                    lastApproached = column;
+            .on('mouseenter', function approach(variable) {
+                if(variable !== lastApproached && !axisDragging) {
+                    variable.parent['focusLineLayer'].approach(variable);
+                    lastApproached = variable;
                 }
             });
 
