@@ -9,3 +9,4 @@ var div = document.createElement('div');
 document.body.appendChild(div);
 
 parcoords(div, data, layout);
+parcoords(div, data, layout);
