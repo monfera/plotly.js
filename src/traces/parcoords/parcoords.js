@@ -8,16 +8,14 @@
 
 'use strict';
 
-var modelMaker = require('./model');
 var configMaker = require('./config');
 var overlay = require('./overlay');
 
 module.exports = function plot(root, data) {
 
-    var model = modelMaker(data);
-    var config = configMaker(model);
+    var config = configMaker(data);
 
-    var ol = overlay(root, model, config);
-    var variableViews = ol.enterOverlayPanels();
+    var ol = overlay(root, data, config);
+    ol.enterOverlayPanels();
     ol.enterOverlayPanels();
 };

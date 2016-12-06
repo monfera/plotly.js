@@ -43,6 +43,16 @@ function makeIntegerScale(variable) {
             .rangePoints([0, 1], controlConfig.integerPadding)
 }
 
+function makeDomainToUnitScale(variable) {
+    var extent = d3.extent(variable.values);
+    if(extent[0] === extent[1]) {
+        extent[0]--;
+        extent[1]++;
+    }
+    var a = 1 / (extent[1] - extent[0]);
+    var b = -a * extent[0];
+    return function(x) {return a * x + b};
+}
 function viewModel(width, height, model) {
 
     var xScale = d3.scale.ordinal().domain(d3.range(model.variables.length)).rangePoints([0, width], 0);
@@ -66,7 +76,7 @@ function viewModel(width, height, model) {
             unitScale: makeUnitScale(height, variable),
             domainScale: makeDomainScale(height, variable),
             integerScale: makeIntegerScale(variable),
-            domainToUnitScale: variable.domainToUnitScale,
+            domainToUnitScale: makeDomainToUnitScale(variable),
             pieChartCheat: variable.pieChartCheat,
             filter: [0, 1],
             parent: viewModel
