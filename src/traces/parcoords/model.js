@@ -1,4 +1,3 @@
-var utils = require('./utils');
 var d3 = require('d3');
 
 module.exports = function(variables) {
@@ -21,7 +20,6 @@ module.exports = function(variables) {
     })
     return {
         variables: variables,
-        variableCount: variableCount,
         sampleCount: sampleCount,
         domainToUnitScales: domainToUnitScales,
         filters: filters,

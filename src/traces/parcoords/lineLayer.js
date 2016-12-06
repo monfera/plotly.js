@@ -76,7 +76,7 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
     };
 
     var data = model.variables.map(function(v) {return v.values;});
-    var variableCount = model.variableCount;
+    var variableCount = model.variables.length;
     var sampleCount = model.sampleCount;
     var domainToUnitScales = model.domainToUnitScales;
 
