@@ -5,7 +5,7 @@ var utils = require('./utils');
 var d3 = require('d3');
 
 function keyFun(d) {
-    return d && d.key;
+    return d.key;
 }
 
 function repeat(d) {
@@ -15,6 +15,7 @@ function repeat(d) {
 function makeDomainScale(height, column) {
     var lo = d3.min(column.values);
     var hi = d3.max(column.values);
+    // convert a zero-domain to a proper domain
     if(!column.integer && lo === hi) {
         lo *= 0.9;
         hi *= 1.1;
@@ -35,7 +36,10 @@ function makeUnitScale(height) {
 
 function makeIntegerScale(column) {
     return column.integer && d3.scale.ordinal()
-            .domain(d3.range(0, Math.round(d3.max(column.values) + 1) - Math.round(d3.min(column.values))).map(function(d, _, a) {return d / (a.length - 1)}))
+            .domain(
+                d3.range(0, Math.round(d3.max(column.values) + 1) - Math.round(d3.min(column.values)))
+                    .map(function(d, _, a) {return d / (a.length - 1)})
+            )
             .rangePoints([0, 1], controlConfig.integerPadding)
 }
 
@@ -107,11 +111,6 @@ module.exports = function (root, typedArrayModel, config) {
         });
     }
 
-    var model = {
-        key: 0,
-        columns: columns
-    }
-
     function enterSvgDefs(root) {
         var defs = root.selectAll('defs')
             .data(repeat, keyFun);
@@ -151,7 +150,7 @@ module.exports = function (root, typedArrayModel, config) {
         var lastApproached = null;
 
         var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
-            .data([model], keyFun);
+            .data([{key: 0, columns: columns}], keyFun);
 
         parcoordsModel.enter()
             .append('div')
