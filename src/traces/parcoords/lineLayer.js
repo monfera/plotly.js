@@ -10,8 +10,9 @@
 
 var utils = require('./utils');
 var createREGL = require('regl');
-var vertexShaderSource = require('./shaderVertex');
-var fragmentShaderSource = require('./shaderFragment');
+var glslify = require('glslify');
+var vertexShaderSource = glslify('./shaderVertex.glsl');
+var fragmentShaderSource = glslify('./shaderFragment.glsl');
 
 var depthLimitEpsilon = 1e-6; // don't change; otherwise near/far plane lines are lost
 var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on domain boundaries

@@ -1,1 +1,0 @@
-module.exports = "\n     precision lowp float;\n     varying vec4 fragColor;\n     void main() {\n       gl_FragColor = fragColor;\n     }\n  ";
