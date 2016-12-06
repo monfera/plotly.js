@@ -1,4 +1,3 @@
-var config = require('./config');
 var utils = require('./utils');
 var createREGL = require('regl');
 var vertexShaderSource = require('./shaderVertex');
