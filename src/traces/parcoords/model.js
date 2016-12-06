@@ -2,8 +2,6 @@ var d3 = require('d3');
 
 module.exports = function(variables) {
 
-    var filters = variables.map(function() {return [0, 1]})
-
     variables.forEach(function(v) {
         var extent = d3.extent(v.values);
         if(extent[0] === extent[1]) {
@@ -16,7 +14,6 @@ module.exports = function(variables) {
     });
 
     return {
-        variables: variables,
-        filters: filters
+        variables: variables
     }
 };
