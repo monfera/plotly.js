@@ -17,7 +17,6 @@ module.exports = function(variables) {
 
     return {
         variables: variables,
-        filters: filters,
-        variableNames: variables.map(function(v) {return v.variableName;})
+        filters: filters
     }
 };
