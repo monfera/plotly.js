@@ -45,14 +45,16 @@ function makeIntegerScale(column) {
 
 function viewModel(width, height, model) {
 
+    var columns = model.columns;
+
     var viewModel = {
-        key: model.key,
-        columns: model.columns,
-        xScale: d3.scale.ordinal().domain(d3.range(model.columns.length)).rangePoints([0, width], 0),
-        unitScales: model.columns.map(makeUnitScale.bind(0, height)),
-        domainScales: model.columns.map(makeDomainScale.bind(0, height)),
-        integerScales: model.columns.map(makeIntegerScale),
-        filters: model.columns.map(function() {return [0, 1];})
+        key: 0,
+        columns: columns,
+        xScale: d3.scale.ordinal().domain(d3.range(columns.length)).rangePoints([0, width], 0),
+        unitScales: columns.map(makeUnitScale.bind(0, height)),
+        domainScales: columns.map(makeDomainScale.bind(0, height)),
+        integerScales: columns.map(makeIntegerScale),
+        filters: columns.map(function() {return [0, 1];})
     };
 
     viewModel.panels = viewModel.columns.map(function(column, i) {
@@ -139,7 +141,7 @@ module.exports = function (root, model, config) {
         var lastApproached = null;
 
         var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
-            .data([{key: 0, columns: columns}], keyFun);
+            .data([{key: 0, columns: model}], keyFun);
 
         parcoordsModel.enter()
             .append('div')

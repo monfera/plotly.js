@@ -75,9 +75,10 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
         clearOnly: false
     };
 
-    var data = model.variables.map(function(v) {return v.values;});
-    var variableCount = model.variables.length;
-    var sampleCount = model.variables[0].values.length;
+    var variables = model;
+    var data = variables.map(function(v) {return v.values;});
+    var variableCount = variables.length;
+    var sampleCount = variables[0].values.length;
 
     var alphaBlending = context; // controlConfig.alphaBlending;
 
@@ -98,14 +99,13 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
     canvasGL.style.width = width + 'px';
     canvasGL.style.height = height + 'px';
 
-    var coloringVariableUnitScale = model.variables[coloringVariable].domainToUnitScale;
-    var depthUnitScale = model.variables[depthVariable].domainToUnitScale;
+    var coloringVariableUnitScale = variables[coloringVariable].domainToUnitScale;
 
     function colorProjection(j) {
         return colorScale(coloringVariableUnitScale(data[coloringVariable][j]));
     }
 
-    var gpuVariableCount = 60; // don't change this
+    var gpuVariableCount = 60; // don't change this; 3 + 1 extra variables also apply
 
     function paddedUnit(d) {
         var unitPad = controlConfig.verticalPadding / panelSizeY;
@@ -115,7 +115,7 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
     var points = []
     for(var j = 0; j < sampleCount; j++)
         for(var i = 0; i < gpuVariableCount; i++)
-            points.push(i < variableCount ? paddedUnit(model.variables[i].domainToUnitScale(data[i][j])) : 0.5);
+            points.push(i < variableCount ? paddedUnit(variables[i].domainToUnitScale(data[i][j])) : 0.5);
 
     var pointPairs = [];
 
@@ -133,6 +133,7 @@ module.exports = function(canvasGL, config, model, unitToColor, context) {
     }
 
 /*
+    var depthUnitScale = variables[depthVariable].domainToUnitScale;
     var depth = utils.range(sampleCount * 2).map(function(d) {
         return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon,
             depthUnitScale(data[depthVariable][Math.round((d - d % 2) / 2)])));

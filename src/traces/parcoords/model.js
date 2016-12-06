@@ -13,7 +13,5 @@ module.exports = function(variables) {
         v.domainToUnitScale = function(x) {return a * x + b};
     });
 
-    return {
-        variables: variables
-    }
+    return variables
 };
