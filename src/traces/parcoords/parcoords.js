@@ -225,8 +225,10 @@ module.exports = function (root, data, layout) {
 
     panel.enter()
         .append('g')
-        .classed('panel', true)
-        .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';})
+        .classed('panel', true);
+
+    panel
+        .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
 
     panel
         .call(d3.behavior.drag()
@@ -259,6 +261,9 @@ module.exports = function (root, data, layout) {
                 d.parent['focusLineLayer'].render(d.parent.panels);
             })
         );
+
+    panel.exit()
+        .remove();
 
     var axisOverlays = panel.selectAll('.axisOverlays')
         .data(repeat, keyFun);
