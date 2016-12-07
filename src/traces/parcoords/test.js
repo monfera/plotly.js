@@ -17,15 +17,30 @@ window.setTimeout(function() {
 }, 10000)
 
 window.setTimeout(function() {
-    var steps = 30
+    var steps = 15
     var i = 0
     window.requestAnimationFrame(function anim() {
         if(i <= steps) {
-            tweakables.variables[1].scatter = Math.pow(i / steps, 1);
-            tweakables.renderers.forEach(function(r) {r()})
+            tweakables.variables[1].scatter = Math.pow(i / steps, 1/2);
+            tweakables.renderers[1]()
             //parcoords(div, data.filter(function(d) {return !d.integer}).slice(0, 6), layout);
             i++;
             window.requestAnimationFrame(anim)
         }
     })
-}, 1000)
+}, 2000)
+
+window.d = function() {
+    var steps = 15
+    var i = steps
+    window.requestAnimationFrame(function anim() {
+        if(i >= 0) {
+            tweakables.variables[1].scatter = Math.pow(i / steps, 1/2);
+            tweakables.renderers[0]()
+            tweakables.renderers[1]()
+            //parcoords(div, data.filter(function(d) {return !d.integer}).slice(0, 6), layout);
+            i--;
+            window.requestAnimationFrame(anim)
+        }
+    })
+}
