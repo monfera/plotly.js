@@ -8,14 +8,15 @@ var layout = require('./layout');
 var div = document.createElement('div');
 document.body.appendChild(div);
 
-var tweakables = parcoords(div, data.filter(function(d) {return !d.integer}), layout);
+var tweakables = parcoords(div, data.filter(function(d) {return true || !d.integer}).slice(0, Infinity), layout);
 
 function smoothstep(x) {
     return x * x * (3 - 2 * x);
 }
 
+var steps = 8
+
 window.s = function() {
-    var steps = 10
     var i = 0
     window.requestAnimationFrame(function anim() {
         if(i <= steps) {
@@ -28,7 +29,6 @@ window.s = function() {
     })
 }
 window.d = function() {
-    var steps = 10
     var i = steps
     window.requestAnimationFrame(function anim() {
         if(i >= 0) {
@@ -39,4 +39,11 @@ window.d = function() {
             window.requestAnimationFrame(anim)
         }
     })
+}
+
+if(0) {
+    var i = 0;
+    window.setInterval(function () {
+        if ((++i) % 2) s(); else d()
+    }, 2000)
 }
