@@ -17,7 +17,6 @@ describe('pie hovering', function() {
         beforeEach(function(done) {
             gd = createGraphDiv();
 
-            debugger
             Plotly.plot(gd, mockCopy.data, mockCopy.layout)
                 //.then(Plotly.plot(gd, mockCopy.data, mockCopy.layout))
                 .then(done);

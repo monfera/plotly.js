@@ -19,6 +19,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     var coerceFont = Lib.coerceFont;
 
     var vals = coerce('values');
+    coerce('settings');
     if(!Array.isArray(vals) || !vals.length) {
         traceOut.visible = false;
         return;

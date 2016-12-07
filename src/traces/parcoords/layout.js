@@ -46,4 +46,4 @@ module.exports = (function() {
         captureZoneFillColor: debug ? 'rgba(255, 0, 0, 0.05)' : 'rgba(0, 0, 0, 0)'
 
     };
-})();
+});
