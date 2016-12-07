@@ -2,13 +2,18 @@
 // budo index.js --live -- -e test.js -o bundle.js
 
 var parcoords = require('./parcoords');
-var data = require('./dataAdapter');
+var mock = require('./dataAdapter');
 var layout = require('./layout');
+var layout = mock.layout;
+var data = mock.data;
 
 var div = document.createElement('div');
 document.body.appendChild(div);
 
-var tweakables = parcoords(div, data.filter(function(d) {return true || !d.integer}).slice(0, Infinity), layout);
+var tweakables = parcoords(div, {
+    data: data.filter(function(d) {return true || !d.integer}).slice(0, Infinity),
+    layout: layout
+});
 
 function smoothstep(x) {
     return x * x * (3 - 2 * x);

@@ -93,9 +93,8 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
 
     var width = layout.width;
     var height = layout.height;
-    var panelSizeY = layout.panelSizeY;
+    var panelSizeY = layout.height;
     var coloringVariable = layout.coloringVariable;
-    var colorScale = layout.colorScale;
     var canvasPixelRatio = layout.canvasPixelRatio;
 
     var canvasWidth = width * canvasPixelRatio;
@@ -110,7 +109,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
     var coloringVariableUnitScale = variables[coloringVariable].domainToUnitScale;
 
     function colorProjection(j) {
-        return colorScale(coloringVariableUnitScale(data[coloringVariable].values[j]));
+        return coloringVariableUnitScale(data[coloringVariable].values[j]);
     }
 
     var gpuVariableCount = 60; // don't change this; 3 + 1 extra variables also apply

@@ -5,17 +5,11 @@ module.exports = (function() {
     var width = 1480
     var height = 275
 
-    var colorScale = function(d) {
-        return Math.pow(Math.max(0, d), 1)
-    }
-
     return {
-        width: width,
-        height: height,
-        panelSizeY: height,
+        width: 1480,
+        height: 275,
+        panelSizeY: 275,
         padding: 64, // useful to make room for brush capture zones when resize handle is on top or bottom
-
-        colorScale: colorScale,
 
         // coloring and depth variable should be the same unless for development testing
         coloringVariable: 0,
