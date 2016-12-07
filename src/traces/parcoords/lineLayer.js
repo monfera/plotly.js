@@ -152,7 +152,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
     var color = [];
     for(j = 0; j < 256; j++) {
         var c = unitToColor(j / 255);
-        color.push((alphaBlending ? [192,192,192] : c).concat([alphaBlending ? 255 : 255]));
+        color.push((alphaBlending ? layout.contextColor : c).concat([alphaBlending ? layout.contextOpacity : 255]));
     }
 
     var colorIndex = new Float32Array(sampleCount * 2);
