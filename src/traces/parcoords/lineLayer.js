@@ -152,7 +152,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
     var color = [];
     for(j = 0; j < 256; j++) {
         var c = unitToColor(j / 255);
-        color.push((alphaBlending ? [0,0,0] : c).concat([alphaBlending ? 1 : 255]));
+        color.push((alphaBlending ? [192,192,192] : c).concat([alphaBlending ? 255 : 255]));
     }
 
     var colorIndex = new Float32Array(sampleCount * 2);
@@ -281,7 +281,8 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
             loD: regl.prop('loD'),
             hiD: regl.prop('hiD'),
             palette: paletteTexture,
-            colorClamp: regl.prop('colorClamp')
+            colorClamp: regl.prop('colorClamp'),
+            scatter: regl.prop('scatter')
         },
         offset: regl.prop('offset'),
         count: regl.prop('count')
@@ -357,6 +358,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
                     loD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[0] : 0)) - filterEpsilon}),
                     hiD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[1] : 1)) + filterEpsilon}),
                     colorClamp: colorClamp,
+                    scatter: variableView.scatter ? 1 : 0,
                     scissorX: I === leftmostIndex ? 0 : x,
                     scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
                 };

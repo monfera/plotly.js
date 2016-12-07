@@ -18,6 +18,8 @@ uniform sampler2D palette;
 
 uniform vec2 colorClamp;
 
+uniform float scatter;
+
 varying vec4 fragColor;
 
 vec4 zero = vec4(0, 0, 0, 0);
@@ -59,9 +61,12 @@ void main() {
     vec2 yy = show * vec2(val(pA, var1A) + val(pB, var1B) + val(pC, var1C) + val(pD, var1D),
                           val(pA, var2A) + val(pB, var2B) + val(pC, var2C) + val(pD, var2D));
 
-    float y = dot(yy, vec2(1.0 - x, x));
+    vec2 dimensionToggle = vec2(1.0 - x, x);
 
-    vec2 viewBoxXY = viewBoxPosition + viewBoxSize * vec2(x, y);
+    float y = dot(yy, dimensionToggle);
+
+    vec2 viewBoxXY = viewBoxPosition + viewBoxSize * scatter * yy + scatter * dimensionToggle + (1.0 - scatter) * viewBoxSize * vec2(x, y);
+    //vec2 viewBoxXY = viewBoxPosition + viewBoxSize * scatter * (yy + dimensionToggle) + (1.0 - scatter) * vec2(x, y);
 
     float depthOrHide = depth + 2.0 * (1.0 - show);
 

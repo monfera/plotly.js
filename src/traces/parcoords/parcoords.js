@@ -77,6 +77,7 @@ function viewModel(config, model) {
             key: variable.id || Math.random(),
             name: variable.name,
             integer:variable.integer,
+            scatter: variable.scatter,
             xIndex: i,
             originalXIndex: i,
             height: config.height,
