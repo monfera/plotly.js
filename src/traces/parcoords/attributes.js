@@ -29,6 +29,11 @@ module.exports = {
         description: 'The styling, geometry and performance related settings of the parallel coordinates chart. (Will be broken down to smaller chunks.)'
     },
 
+    filterbar: {
+        valType: 'any',
+        description: 'The styling, geometry and performance related settings of the parallel coordinates chart. (Will be broken down to smaller chunks.)'
+    },
+
 
 
 

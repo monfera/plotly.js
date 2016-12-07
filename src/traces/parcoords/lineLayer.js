@@ -77,7 +77,7 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
     render(blockNumber);
 }
 
-module.exports = function(canvasGL, layout, data, unitToColor, context) {
+module.exports = function(canvasGL, settings, layout, data, unitToColor, context) {
 
     var renderState = {
         currentRafs: {},
@@ -94,8 +94,8 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
     var width = layout.width;
     var height = layout.height;
     var panelSizeY = layout.height;
-    var coloringVariable = layout.coloringVariable;
-    var canvasPixelRatio = layout.canvasPixelRatio;
+    var coloringVariable = settings.coloringVariable;
+    var canvasPixelRatio = settings.canvasPixelRatio;
 
     var canvasWidth = width * canvasPixelRatio;
     var canvasHeight = height * canvasPixelRatio;
@@ -115,7 +115,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
     var gpuVariableCount = 60; // don't change this; 3 + 1 extra variables also apply
 
     function paddedUnit(d) {
-        var unitPad = layout.verticalPadding / panelSizeY;
+        var unitPad = settings.verticalPadding / panelSizeY;
         return unitPad + d * (1 - 2 * unitPad);
     }
 
@@ -140,7 +140,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
     }
 
 /*
-    var depthVariable = layout.depthVariable;
+    var depthVariable = settings.depthVariable;
     var depthUnitScale = variables[depthVariable].domainToUnitScale;
     var depth = utils.range(sampleCount * 2).map(function(d) {
         return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon,
@@ -151,7 +151,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
     var color = [];
     for(j = 0; j < 256; j++) {
         var c = unitToColor(j / 255);
-        color.push((alphaBlending ? layout.contextColor : c).concat([alphaBlending ? layout.contextOpacity : 255]));
+        color.push((alphaBlending ? settings.contextColor : c).concat([alphaBlending ? settings.contextOpacity : 255]));
     }
 
     var colorIndex = new Float32Array(sampleCount * 2);
@@ -329,10 +329,10 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
         for(I = 0; I < shownPanelCount; I++) {
             var variableView = variableViews[I];
             var i = variableView.originalXIndex;
-            var x = variableView.x * layout.canvasPixelRatio;
+            var x = variableView.x * settings.canvasPixelRatio;
             var nextVar = variableViews[(I + 1) % shownVariableCount];
             var ii = nextVar.originalXIndex;
-            var panelSizeX = nextVar.x * layout.canvasPixelRatio - x;
+            var panelSizeX = nextVar.x * settings.canvasPixelRatio - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextVar.x) {
                 previousAxisOrder[i] = [x, nextVar.x];
                 var item = {
@@ -362,7 +362,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
                     scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
                 };
                 renderState.clearOnly = clearOnly;
-                renderBlock(regl, glAes, renderState, setChanged ? layout.blockLineCount : sampleCount, sampleCount, item);
+                renderBlock(regl, glAes, renderState, setChanged ? settings.blockLineCount : sampleCount, sampleCount, item);
             }
         }
     }

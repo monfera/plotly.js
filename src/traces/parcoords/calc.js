@@ -123,8 +123,9 @@ module.exports = function calc(gd, trace) {
     }
 
     return [{
-        cd: cd,
-        settings: trace.settings
+        variables: cd,
+        settings: trace.settings,
+        filterbar: trace.filterbar
     }];
 };
 

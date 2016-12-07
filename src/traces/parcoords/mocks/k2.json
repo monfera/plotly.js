@@ -6,22 +6,9 @@
     "data": [
         {
             "type": "parcoords",
-            "settings": {
-                "padding": 64,
-
-                "coloringVariable": 0,
-                "depthVariable": 0,
-                "contextColor": [0,0,0],
-                "contextOpacity": 16,
-
-                "canvasPixelRatio": 1,
-                "blockLineCount": 5000,
-
-
+            "filterbar": {
                 "filterVisibleWidth": 4,
                 "filterCaptureWidth": 20,
-                "mousemoveThrottle": 33.33,
-
                 "handleGlyphHeight": 16,
                 "handleGlyphOpacity": 0,
                 "handleGlyphOverlap": 0,
@@ -30,6 +17,20 @@
                 "filterBarStroke": "white",
                 "filterBarStrokeOpacity": 1,
                 "filterBarStrokeWidth": 1,
+            },
+            "settings": {
+                "padding": 64,
+
+                "coloringVariable": 0,
+                "contextColor": [0,0,0],
+                "contextOpacity": 16,
+
+                "canvasPixelRatio": 1,
+                "blockLineCount": 5000,
+
+
+                "mousemoveThrottle": 33.33,
+
                 "integerPadding": 0,
                 "averageTickDistance": 50,
                 "verticalPadding": 2,

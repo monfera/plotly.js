@@ -3,15 +3,15 @@
 
 var parcoords = require('./parcoords');
 var mock = require('./dataAdapter');
-var data = mock.data[0].variables;
+var data = mock.data[0];
 
 var div = document.createElement('div');
 document.body.appendChild(div);
 
-var tweakables = parcoords(div, {
-    data: data.filter(function(d) {return true || !d.integer}).slice(0, Infinity),
-    layout: Object.assign({}, mock.layout, mock.data[0].settings)
-});
+var tweakables = parcoords(div,
+    data,//.filter(function(d) {return true || !d.integer}).slice(0, Infinity),
+    mock.layout
+);
 
 function smoothstep(x) {
     return x * x * (3 - 2 * x);
