@@ -62,12 +62,13 @@ void main() {
                           val(pA, var1A) + val(pB, var1B) + val(pC, var1C) + val(pD, var1D));
 
     vec2 dimensionToggle = vec2(x, 1.0 - x);
-    vec2 scatterToggle = vec2(1.0 - scatter, scatter);
+
+    vec2 scatterToggle = vec2(scatter, 1.0 - scatter);
 
     float y = dot(yy, dimensionToggle);
-    //vec2 xy = vec2(viewBoxSize * vec2(x, y), viewBoxSize * yy + dimensionToggle);
+    mat2 xy = mat2(viewBoxSize * yy + dimensionToggle, viewBoxSize * vec2(x, y));
 
-    vec2 viewBoxXY = viewBoxPosition + viewBoxSize * scatter * yy + scatter * dimensionToggle + (1.0 - scatter) * viewBoxSize * vec2(x, y);
+    vec2 viewBoxXY = viewBoxPosition + xy * scatterToggle;
 
     float depthOrHide = depth + 2.0 * (1.0 - show);
 
