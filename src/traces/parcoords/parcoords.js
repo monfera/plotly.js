@@ -186,10 +186,13 @@ module.exports = function (root, data, layout) {
         .style('padding', layout.padding + 'px')
         .style('overflow', 'visible');
 
+    var tweakables = {renderers: [], variables: []};
+
     parcoordsLineLayer
         .each(function(d) {
             var lineLayer = lineLayerMaker(this, layout, d.viewModel.panels, unitToColor, d.context);
             d.viewModel[d.key] = lineLayer;
+            tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true)});
             lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
         });
 
@@ -226,7 +229,8 @@ module.exports = function (root, data, layout) {
 
     panel.enter()
         .append('g')
-        .classed('panel', true);
+        .classed('panel', true)
+        .each(function(d) {tweakables.variables.push(d)});
 
     panel
         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
@@ -485,4 +489,6 @@ module.exports = function (root, data, layout) {
         }
         domainBrushing = false;
     }
+
+    return tweakables;
 };
