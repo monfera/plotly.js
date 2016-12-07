@@ -8,8 +8,8 @@ var layout = require('./layout');
 var div = document.createElement('div');
 document.body.appendChild(div);
 
-parcoords(div, data.slice().sort(function(a,b) {return a.variableName < b.variableName ? -1 : a.variableName > b.variableName ? 1 : 0}), layout);
+parcoords(div, data, layout);
 
 window.setTimeout(function() {
-    parcoords(div, data, layout);
+    parcoords(div, data.sort(function(a,b) {return a.variableName < b.variableName ? -1 : a.variableName > b.variableName ? 1 : 0}), layout);
 }, 10000)

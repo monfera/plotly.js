@@ -88,7 +88,8 @@ function viewModel(config, model) {
             integerScale: makeIntegerScale(config.integerPadding, variable),
             domainToUnitScale: makeDomainToUnitScale(variable),
             pieChartCheat: variable.pieChartCheat,
-            filter: [0, 1],
+            filter: [0, 1], //variable.filter || (variable.filter = [0, 1]),
+            // one more problem: context lines get stuck
             parent: viewModel
         };
     });
@@ -186,10 +187,9 @@ module.exports = function (root, data, layout) {
 
     parcoordsLineLayer
         .each(function(d) {
-            d.viewModel[d.key] = lineLayerMaker(this, layout, d.viewModel.panels, unitToColor, d.context);
-            if(!d.context) {
-                d.viewModel[d.key].render(d.viewModel.panels, true);
-            }
+            var lineLayer = lineLayerMaker(this, layout, d.viewModel.panels, unitToColor, d.context);
+            d.viewModel[d.key] = lineLayer;
+            lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
         });
 
     var parcoordsControlOverlay = parcoordsViewModel.selectAll('.parcoordsControlOverlay')
