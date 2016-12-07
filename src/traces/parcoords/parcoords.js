@@ -112,14 +112,14 @@ function styleExtentTexts(selection) {
 module.exports = function (root, styledData, layout) {
 
     var data = styledData.variables;
-    var settings = Object.assign({}, styledData.settings, styledData.filterbar);
+    var settings = Object.assign({}, styledData.settings);
 
     var width = layout.width
     var height = layout.height
 
-    var resizeHeight = settings.handleGlyphHeight;
-    var brushVisibleWidth = settings.filterVisibleWidth;
-    var brushCaptureWidth = settings.filterCaptureWidth;
+    var resizeHeight = styledData.filterbar.handleGlyphHeight;
+    var brushVisibleWidth = styledData.filterbar.filterVisibleWidth;
+    var brushCaptureWidth = styledData.filterbar.filterCaptureWidth;
 
     function enterSvgDefs(root) {
         var defs = root.selectAll('defs')
@@ -148,11 +148,11 @@ module.exports = function (root, styledData, layout) {
             .attr('width', brushVisibleWidth)
             .attr('height', height)
             .attr('x', brushVisibleWidth / 2)
-            .attr('fill', settings.filterBarFill)
-            .attr('fill-opacity', settings.filterBarFillOpacity)
-            .attr('stroke', settings.filterBarStroke)
-            .attr('stroke-opacity', settings.filterBarStrokeOpacity)
-            .attr('stroke-width', settings.filterBarStrokeWidth);
+            .attr('fill', styledData.filterbar.filterBarFill)
+            .attr('fill-opacity', styledData.filterbar.filterBarFillOpacity)
+            .attr('stroke', styledData.filterbar.filterBarStroke)
+            .attr('stroke-opacity', styledData.filterbar.filterBarStrokeOpacity)
+            .attr('stroke-width', styledData.filterbar.filterBarStrokeWidth);
     }
 
     var lastApproached = null;
@@ -334,7 +334,7 @@ module.exports = function (root, styledData, layout) {
     axisTitle.enter()
         .append('text')
         .classed('axisTitle', true)
-        .attr('transform', 'translate(0,' + -(settings.handleGlyphHeight + 20) + ')')
+        .attr('transform', 'translate(0,' + -(styledData.filterbar.handleGlyphHeight + 20) + ')')
         .text(function(d) {return d.label;})
         .attr('text-anchor', 'middle')
         .style('font-family', 'sans-serif')
@@ -355,7 +355,7 @@ module.exports = function (root, styledData, layout) {
     axisExtentTop.enter()
         .append('g')
         .classed('axisExtentTop', true)
-        .attr('transform', 'translate(' + 0 + ',' + -(settings.handleGlyphHeight - 2) + ')')
+        .attr('transform', 'translate(' + 0 + ',' + -(styledData.filterbar.handleGlyphHeight - 2) + ')')
 
     var axisExtentTopText = axisExtentTop.selectAll('.axisExtentTopText')
         .data(repeat, keyFun);
@@ -377,7 +377,7 @@ module.exports = function (root, styledData, layout) {
     axisExtentBottom.enter()
         .append('g')
         .classed('axisExtentBottom', true)
-        .attr('transform', 'translate(' + 0 + ',' + (height + settings.handleGlyphHeight - 2) + ')')
+        .attr('transform', 'translate(' + 0 + ',' + (height + styledData.filterbar.handleGlyphHeight - 2) + ')')
 
     var axisExtentBottomText = axisExtentBottom.selectAll('.axisExtentBottomText')
         .data(repeat, keyFun);
@@ -428,16 +428,16 @@ module.exports = function (root, styledData, layout) {
     axisBrushEnter
         .selectAll('.resize rect')
         .attr('height', resizeHeight)
-        .attr('fill-opacity', settings.handleGlyphOpacity)
+        .attr('fill-opacity', styledData.filterbar.handleGlyphOpacity)
         .style('visibility', 'visible');
 
     axisBrushEnter
         .selectAll('.resize.n rect')
-        .attr('y', -resizeHeight + settings.handleGlyphOverlap);
+        .attr('y', -resizeHeight + styledData.filterbar.handleGlyphOverlap);
 
     axisBrushEnter
         .selectAll('.resize.s rect')
-        .attr('y', -settings.handleGlyphOverlap);
+        .attr('y', -styledData.filterbar.handleGlyphOverlap);
 
     var justStarted = false;
     var contextShown = false;
