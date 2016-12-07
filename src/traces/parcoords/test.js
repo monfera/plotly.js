@@ -11,6 +11,11 @@ document.body.appendChild(div);
 var tweakables = parcoords(div, data.filter(function(d) {return !d.integer}).slice(0, 6), layout);
 
 
+function smoothstep(value) {
+    var x = Math.max(0, Math.min(1, value));
+    return x * x * (3 - 2 * x);
+}
+
 if(0)
 window.setTimeout(function() {
     parcoords(div, data.sort(function(a,b) {return a.variableName < b.variableName ? -1 : a.variableName > b.variableName ? 1 : 0}), layout);
@@ -21,7 +26,7 @@ window.setTimeout(window.s =  function() {
     var i = 0
     window.requestAnimationFrame(function anim() {
         if(i <= steps) {
-            tweakables.variables[1].scatter = Math.pow(i / steps, 1/2);
+            tweakables.variables[0].scatter = smoothstep(i / steps);
             tweakables.renderers[0]()
             tweakables.renderers[1]()
             i++;
@@ -35,7 +40,7 @@ window.d = function() {
     var i = steps
     window.requestAnimationFrame(function anim() {
         if(i >= 0) {
-            tweakables.variables[1].scatter = Math.pow(i / steps, 1/2);
+            tweakables.variables[0].scatter = smoothstep(i / steps);
             tweakables.renderers[0]()
             tweakables.renderers[1]()
             i--;
