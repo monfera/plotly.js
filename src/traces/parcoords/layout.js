@@ -20,11 +20,12 @@ module.exports = (function() {
         // coloring and depth variable should be the same unless for development testing
         coloringVariable: 0,
         depthVariable: 0,
+        contextColor: [192,192,192], // rgb array, 0..255
+        contextOpacity: 255, // 0..255
 
         // technical config
         canvasPixelRatio: 1, //window.devicePixelRatio, // using 2 or devicePixelRatio sharpens lines, slower
         blockLineCount: 5000, // number of lines drawn in one increment
-
 
 
 
