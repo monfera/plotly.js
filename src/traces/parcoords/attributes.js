@@ -16,6 +16,25 @@ var extendFlat = require('../../lib/extend').extendFlat;
 
 
 module.exports = {
+
+    // PARCOORDS ATTRIBUTES
+
+    variables: {
+        valType: 'data_array',
+        description: 'The variables (dimensions) of the parallel coordinates chart.'
+    },
+
+    settings: {
+        valType: 'any',
+        description: 'The styling, geometry and performance related settings of the parallel coordinates chart. (Will be broken down to smaller chunks.)'
+    },
+
+
+
+
+    // OLD PIE CHART ATTRIBUTES BELOW
+
+
     labels: {
         valType: 'data_array',
         description: 'Sets the dimension labels.'
@@ -37,16 +56,6 @@ module.exports = {
         role: 'info',
         dflt: 1,
         description: 'Sets the label step. See `label0` for more info.'
-    },
-
-    values: {
-        valType: 'data_array',
-        description: 'Sets the samples of this parallel coordinates chart.'
-    },
-
-    settings: {
-        valType: 'any',
-        description: 'Settings'
     },
 
     marker: {
