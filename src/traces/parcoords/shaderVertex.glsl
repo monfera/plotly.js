@@ -58,12 +58,14 @@ void main() {
                        mshow(pC, loC, hiC) &&
                        mshow(pD, loD, hiD));
 
-    vec2 yy = show * vec2(val(pA, var1A) + val(pB, var1B) + val(pC, var1C) + val(pD, var1D),
-                          val(pA, var2A) + val(pB, var2B) + val(pC, var2C) + val(pD, var2D));
+    vec2 yy = show * vec2(val(pA, var2A) + val(pB, var2B) + val(pC, var2C) + val(pD, var2D),
+                          val(pA, var1A) + val(pB, var1B) + val(pC, var1C) + val(pD, var1D));
 
-    vec2 dimensionToggle = vec2(1.0 - x, x);
+    vec2 dimensionToggle = vec2(x, 1.0 - x);
+    vec2 scatterToggle = vec2(1.0 - scatter, scatter);
 
     float y = dot(yy, dimensionToggle);
+    //vec2 xy = vec2(viewBoxSize * vec2(x, y), viewBoxSize * yy + dimensionToggle);
 
     vec2 viewBoxXY = viewBoxPosition + viewBoxSize * scatter * yy + scatter * dimensionToggle + (1.0 - scatter) * viewBoxSize * vec2(x, y);
 
