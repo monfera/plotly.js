@@ -7,16 +7,16 @@
         {
             "type": "parcoords",
             "filterbar": {
-                "filterVisibleWidth": 4,
-                "filterCaptureWidth": 20,
-                "handleGlyphHeight": 16,
-                "handleGlyphOpacity": 0,
-                "handleGlyphOverlap": 0,
-                "filterBarFill": "magenta",
-                "filterBarFillOpacity": 1,
-                "filterBarStroke": "white",
-                "filterBarStrokeOpacity": 1,
-                "filterBarStrokeWidth": 1,
+                "visiblewidth": 4,
+                "capturewidth": 20,
+                "fillcolor": "magenta",
+                "fillopacity": 1,
+                "strokecolor": "white",
+                "strokeopacity": 1,
+                "strokewidth": 1,
+                "handleheight": 16,
+                "handleopacity": 0,
+                "handleoverlap": 0
             },
             "settings": {
                 "padding": 64,
