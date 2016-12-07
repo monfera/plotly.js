@@ -39,7 +39,7 @@
                 "captureZoneBorderColor": "",
                 "captureZoneFillColor": "rgba(0, 0, 0, 0)"
             },
-            "values": [
+            "variables": [
 
                 {
                     "id":"Preference",

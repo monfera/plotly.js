@@ -15,7 +15,7 @@ var Color = require('../../components/color');
 var helpers = require('./helpers');
 
 module.exports = function calc(gd, trace) {
-    var vals = trace.values,
+    var vals = trace.variables,
         labels = trace.labels,
         cd = [],
         fullLayout = gd._fullLayout,
@@ -73,12 +73,11 @@ module.exports = function calc(gd, trace) {
 
         cd.push({
             v: v,
-            label: label,
             color: color,
             i: i,
             hidden: hidden,
             integer: vals[i].integer,
-            variableName: vals[i].variableName,
+            label: vals[i].label,
             values: vals[i].values
         });
     }
