@@ -358,7 +358,7 @@ module.exports = function(canvasGL, layout, data, unitToColor, context) {
                     loD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[0] : 0)) - filterEpsilon}),
                     hiD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[1] : 1)) + filterEpsilon}),
                     colorClamp: colorClamp,
-                    scatter: variableView.scatter ? 1 : 0,
+                    scatter: variableView.scatter || 0,
                     scissorX: I === leftmostIndex ? 0 : x,
                     scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
                 };
