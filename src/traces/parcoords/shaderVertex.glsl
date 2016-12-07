@@ -65,7 +65,7 @@ void main() {
 
     float y = dot(yy, dimensionToggle);
 
-    vec2 viewBoxXY = viewBoxPosition + viewBoxSize * scatter * yy + scatter * dimensionToggle + (1.0 - scatter) * viewBoxSize * vec2(x, y);
+    vec2 viewBoxXY = viewBoxPosition + viewBoxSize * scatter * vec2(yy[1], yy[0]) + 1.5 * scatter * dimensionToggle + (1.0 - scatter) * viewBoxSize * vec2(x, y);
     //vec2 viewBoxXY = viewBoxPosition + viewBoxSize * scatter * (yy + dimensionToggle) + (1.0 - scatter) * vec2(x, y);
 
     float depthOrHide = depth + 2.0 * (1.0 - show);
