@@ -24,9 +24,9 @@ module.exports = function plot(gd, cdpie) {
 
     var root = fullLayout._glcontainer.node() // fullLayout._parcoordslayer
 
-    var data = cdpie[0][0].cd;
+    var data = cdpie[0][0];
 
-    parcoords(root, {data: data, layout: Object.assign({width: fullLayout.width, height: fullLayout.height}, cdpie[0][0].settings)});
+    parcoords(root, data, {width: fullLayout.width, height: fullLayout.height});
 
     return;
 

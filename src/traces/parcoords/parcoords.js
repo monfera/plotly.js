@@ -63,9 +63,9 @@ function makeDomainToUnitScale(variable) {
     return function(x) {return a * x + b};
 }
 
-function viewModel(config, model) {
+function viewModel(settings, layout, model) {
 
-    var xScale = d3.scale.ordinal().domain(d3.range(model.variables.length)).rangePoints([0, config.width], 0);
+    var xScale = d3.scale.ordinal().domain(d3.range(model.variables.length)).rangePoints([0, layout.width], 0);
 
     var viewModel = {
         key: model.key,
@@ -80,13 +80,13 @@ function viewModel(config, model) {
             scatter: variable.scatter,
             xIndex: i,
             originalXIndex: i,
-            height: config.height,
+            height: layout.height,
             values: variable.values,
             xScale: xScale,
             x: xScale(i),
-            unitScale: makeUnitScale(config.height, config.verticalPadding),
-            domainScale: makeDomainScale(config.height, config.verticalPadding, config.integerPadding, variable),
-            integerScale: makeIntegerScale(config.integerPadding, variable),
+            unitScale: makeUnitScale(layout.height, settings.verticalPadding),
+            domainScale: makeDomainScale(layout.height, settings.verticalPadding, settings.integerPadding, variable),
+            integerScale: makeIntegerScale(settings.integerPadding, variable),
             domainToUnitScale: makeDomainToUnitScale(variable),
             pieChartCheat: variable.pieChartCheat,
             filter: [0, 1], //variable.filter || (variable.filter = [0, 1]),
@@ -109,17 +109,17 @@ function styleExtentTexts(selection) {
         .style('user-select', 'none');
 }
 
-module.exports = function (root, dataAndLayout) {
+module.exports = function (root, styledData, layout) {
 
-    var data = dataAndLayout.data;
-    var layout = dataAndLayout.layout;
+    var data = styledData.variables;
+    var settings = Object.assign({}, styledData.settings, styledData.filterbar);
 
     var width = layout.width
     var height = layout.height
 
-    var resizeHeight = layout.handleGlyphHeight;
-    var brushVisibleWidth = layout.filterVisibleWidth;
-    var brushCaptureWidth = layout.filterCaptureWidth;
+    var resizeHeight = settings.handleGlyphHeight;
+    var brushVisibleWidth = settings.filterVisibleWidth;
+    var brushCaptureWidth = settings.filterCaptureWidth;
 
     function enterSvgDefs(root) {
         var defs = root.selectAll('defs')
@@ -148,11 +148,11 @@ module.exports = function (root, dataAndLayout) {
             .attr('width', brushVisibleWidth)
             .attr('height', height)
             .attr('x', brushVisibleWidth / 2)
-            .attr('fill', layout.filterBarFill)
-            .attr('fill-opacity', layout.filterBarFillOpacity)
-            .attr('stroke', layout.filterBarStroke)
-            .attr('stroke-opacity', layout.filterBarStrokeOpacity)
-            .attr('stroke-width', layout.filterBarStrokeWidth);
+            .attr('fill', settings.filterBarFill)
+            .attr('fill-opacity', settings.filterBarFillOpacity)
+            .attr('stroke', settings.filterBarStroke)
+            .attr('stroke-opacity', settings.filterBarStrokeOpacity)
+            .attr('stroke-width', settings.filterBarStrokeWidth);
     }
 
     var lastApproached = null;
@@ -165,7 +165,7 @@ module.exports = function (root, dataAndLayout) {
         .classed('parcoordsModel', true);
 
     var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
-        .data(viewModel.bind(0, layout), keyFun)
+        .data(viewModel.bind(0, settings, layout), keyFun)
 
     parcoordsViewModel.enter()
         .append('div')
@@ -186,14 +186,14 @@ module.exports = function (root, dataAndLayout) {
         .append('canvas')
         .classed('parcoordsLineLayer', true)
         .style('position', 'absolute')
-        .style('padding', layout.padding + 'px')
+        .style('padding', settings.padding + 'px')
         .style('overflow', 'visible');
 
     var tweakables = {renderers: [], variables: []};
 
     parcoordsLineLayer
         .each(function(d) {
-            var lineLayer = lineLayerMaker(this, layout, d.viewModel.panels, unitToColor, d.context);
+            var lineLayer = lineLayerMaker(this, settings, layout, d.viewModel.panels, unitToColor, d.context);
             d.viewModel[d.key] = lineLayer;
             tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true)});
             lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
@@ -209,7 +209,7 @@ module.exports = function (root, dataAndLayout) {
         .attr('width', width)
         .attr('height', height)
         .style('position', 'absolute')
-        .style('padding', layout.padding + 'px')
+        .style('padding', settings.padding + 'px')
         .style('overflow', 'visible')
         .style('shape-rendering', 'crispEdges')
         .call(enterSvgDefs);
@@ -287,7 +287,7 @@ module.exports = function (root, dataAndLayout) {
         .append('g')
         .classed('axis', true)
         .each(function(d) {
-            var wantedTickCount = height / layout.averageTickDistance;
+            var wantedTickCount = height / settings.averageTickDistance;
             var scale = d.domainScale;
             var dom = scale.domain();
             d3.select(this)
@@ -334,7 +334,7 @@ module.exports = function (root, dataAndLayout) {
     axisTitle.enter()
         .append('text')
         .classed('axisTitle', true)
-        .attr('transform', 'translate(0,' + -(layout.handleGlyphHeight + 20) + ')')
+        .attr('transform', 'translate(0,' + -(settings.handleGlyphHeight + 20) + ')')
         .text(function(d) {return d.label;})
         .attr('text-anchor', 'middle')
         .style('font-family', 'sans-serif')
@@ -355,7 +355,7 @@ module.exports = function (root, dataAndLayout) {
     axisExtentTop.enter()
         .append('g')
         .classed('axisExtentTop', true)
-        .attr('transform', 'translate(' + 0 + ',' + -(layout.handleGlyphHeight - 2) + ')')
+        .attr('transform', 'translate(' + 0 + ',' + -(settings.handleGlyphHeight - 2) + ')')
 
     var axisExtentTopText = axisExtentTop.selectAll('.axisExtentTopText')
         .data(repeat, keyFun);
@@ -377,7 +377,7 @@ module.exports = function (root, dataAndLayout) {
     axisExtentBottom.enter()
         .append('g')
         .classed('axisExtentBottom', true)
-        .attr('transform', 'translate(' + 0 + ',' + (height + layout.handleGlyphHeight - 2) + ')')
+        .attr('transform', 'translate(' + 0 + ',' + (height + settings.handleGlyphHeight - 2) + ')')
 
     var axisExtentBottomText = axisExtentBottom.selectAll('.axisExtentBottomText')
         .data(repeat, keyFun);
@@ -418,7 +418,7 @@ module.exports = function (root, dataAndLayout) {
         .selectAll('rect')
         .attr('x', -brushCaptureWidth / 2)
         .attr('width', brushCaptureWidth)
-        .attr('stroke', layout.captureZoneBorderColor);
+        .attr('stroke', settings.captureZoneBorderColor);
 
     axisBrushEnter
         .selectAll('rect.extent')
@@ -428,16 +428,16 @@ module.exports = function (root, dataAndLayout) {
     axisBrushEnter
         .selectAll('.resize rect')
         .attr('height', resizeHeight)
-        .attr('fill-opacity', layout.handleGlyphOpacity)
+        .attr('fill-opacity', settings.handleGlyphOpacity)
         .style('visibility', 'visible');
 
     axisBrushEnter
         .selectAll('.resize.n rect')
-        .attr('y', -resizeHeight + layout.handleGlyphOverlap);
+        .attr('y', -resizeHeight + settings.handleGlyphOverlap);
 
     axisBrushEnter
         .selectAll('.resize.s rect')
-        .attr('y', -layout.handleGlyphOverlap);
+        .attr('y', -settings.handleGlyphOverlap);
 
     var justStarted = false;
     var contextShown = false;

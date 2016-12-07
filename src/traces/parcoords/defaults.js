@@ -21,6 +21,8 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     var variables = coerce('variables');
 
     coerce('settings');
+    coerce('filterbar');
+
     if(!Array.isArray(variables) || !variables.length) {
         traceOut.visible = false;
         return;
