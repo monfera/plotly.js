@@ -74,8 +74,8 @@ function viewModel(config, model) {
 
     viewModel.panels = model.variables.map(function(variable, i) {
         return {
-            key: variable.id || Math.random(),
-            name: variable.name,
+            key: variable.id || (variable.label + ' ' + Math.floor(1e6 * Math.random())),
+            label: variable.label,
             integer:variable.integer,
             scatter: variable.scatter,
             xIndex: i,
@@ -109,7 +109,10 @@ function styleExtentTexts(selection) {
         .style('user-select', 'none');
 }
 
-module.exports = function (root, data, layout) {
+module.exports = function (root, dataAndLayout) {
+
+    var data = dataAndLayout.data;
+    var layout = dataAndLayout.layout;
 
     var width = layout.width
     var height = layout.height
@@ -332,7 +335,7 @@ module.exports = function (root, data, layout) {
         .append('text')
         .classed('axisTitle', true)
         .attr('transform', 'translate(0,' + -(layout.handleGlyphHeight + 20) + ')')
-        .text(function(d) {return d.name;})
+        .text(function(d) {return d.label;})
         .attr('text-anchor', 'middle')
         .style('font-family', 'sans-serif')
         .style('font-size', 'xx-small')
