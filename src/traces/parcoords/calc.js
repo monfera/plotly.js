@@ -123,7 +123,10 @@ module.exports = function calc(gd, trace) {
         }
     }
 
-    return cd;
+    return [{
+        cd: cd,
+        settings: trace.settings
+    }];
 };
 
 /**

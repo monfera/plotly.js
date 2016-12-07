@@ -44,6 +44,11 @@ module.exports = {
         description: 'Sets the samples of this parallel coordinates chart.'
     },
 
+    settings: {
+        valType: 'any',
+        description: 'Settings'
+    },
+
     marker: {
         colors: {
             valType: 'data_array',  // TODO 'color_array' ?
