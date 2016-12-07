@@ -16,14 +16,14 @@ window.setTimeout(function() {
     parcoords(div, data.sort(function(a,b) {return a.variableName < b.variableName ? -1 : a.variableName > b.variableName ? 1 : 0}), layout);
 }, 10000)
 
-window.setTimeout(function() {
-    var steps = 15
+window.setTimeout(window.s =  function() {
+    var steps = 10
     var i = 0
     window.requestAnimationFrame(function anim() {
         if(i <= steps) {
             tweakables.variables[1].scatter = Math.pow(i / steps, 1/2);
+            tweakables.renderers[0]()
             tweakables.renderers[1]()
-            //parcoords(div, data.filter(function(d) {return !d.integer}).slice(0, 6), layout);
             i++;
             window.requestAnimationFrame(anim)
         }
@@ -31,14 +31,13 @@ window.setTimeout(function() {
 }, 2000)
 
 window.d = function() {
-    var steps = 15
+    var steps = 10
     var i = steps
     window.requestAnimationFrame(function anim() {
         if(i >= 0) {
             tweakables.variables[1].scatter = Math.pow(i / steps, 1/2);
             tweakables.renderers[0]()
             tweakables.renderers[1]()
-            //parcoords(div, data.filter(function(d) {return !d.integer}).slice(0, 6), layout);
             i--;
             window.requestAnimationFrame(anim)
         }
