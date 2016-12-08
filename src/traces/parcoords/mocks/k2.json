@@ -27,7 +27,7 @@
                 "verticalpadding": 2,
                 "integerpadding": 0
             },
-            "settings": {
+            "geometry": {
                 "padding": 64,
 
                 "averageTickDistance": 50

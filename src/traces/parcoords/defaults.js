@@ -20,7 +20,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     var variables = coerce('variables');
 
-    coerce('settings');
+    coerce('geometry');
     coerce('lines');
     coerce('filterbar.visiblewidth');
     coerce('filterbar.capturewidth');
