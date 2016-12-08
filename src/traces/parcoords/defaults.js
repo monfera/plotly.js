@@ -20,8 +20,8 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     var variables = coerce('variables');
 
-    coerce('geometry');
-    coerce('lines');
+    coerce('geometry.padding');
+    coerce('geometry.tickdistance');
     coerce('filterbar.visiblewidth');
     coerce('filterbar.capturewidth');
     coerce('filterbar.fillcolor');
@@ -31,6 +31,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('filterbar.strokewidth');
     coerce('filterbar.handleheight');
     coerce('filterbar.handleoverlap');
+    coerce('lines');
 
     if(!Array.isArray(variables) || !variables.length) {
         traceOut.visible = false;

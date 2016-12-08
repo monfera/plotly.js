@@ -6,6 +6,10 @@
     "data": [
         {
             "type": "parcoords",
+            "geometry": {
+                "padding": 64,
+                "tickdistance": 50
+            },
             "filterbar": {
                 "visiblewidth": 4,
                 "capturewidth": 20,
@@ -26,11 +30,6 @@
                 "focusalphablending": false,
                 "verticalpadding": 2,
                 "integerpadding": 0
-            },
-            "geometry": {
-                "padding": 64,
-
-                "averageTickDistance": 50
             },
             "variables": [
 

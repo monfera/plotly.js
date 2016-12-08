@@ -25,8 +25,27 @@ module.exports = {
     },
 
     geometry: {
-        valType: 'any',
-        description: 'The styling, geometry and performance related settings of the parallel coordinates chart. (Will be broken down to smaller chunks.)'
+        padding: {
+            valType: 'number',
+            dflt: 64,
+            min: 64,
+            max: 128,
+            role: 'style',
+            description: [
+                'Width of the padding around the actual parcoords line painting area in pixels. Padding provides',
+                'the perimeter space for text annotations such as variable name labels, domain extent values,',
+                'leftmost axis ticks and bar resize handles.'
+            ]
+        },
+        tickdistance: {
+            valType: 'number',
+            dflt: 50,
+            min: 32,
+            role: 'style',
+            description: [
+                'The desired approximate tick distance (in pixels) between axis ticks on an axis.'
+            ]
+        }
     },
 
     lines: {
