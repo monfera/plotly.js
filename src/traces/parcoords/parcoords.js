@@ -288,7 +288,7 @@ module.exports = function (root, styledData, layout) {
         .append('g')
         .classed('axis', true)
         .each(function(d) {
-            var wantedTickCount = height / geometry.averageTickDistance;
+            var wantedTickCount = height / geometry.tickdistance;
             var scale = d.domainScale;
             var dom = scale.domain();
             d3.select(this)

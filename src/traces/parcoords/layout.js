@@ -36,7 +36,7 @@ module.exports = (function() {
         strokeopacity: 1,
         strokewidth: 1,
         integerpadding: 0, // use 1 to offset integer extreme values by half pitch
-        averageTickDistance: 50, // in pixels,
+        tickdistance: 50, // in pixels,
         verticalpadding: 2,
 
         focusalphablending: false,
