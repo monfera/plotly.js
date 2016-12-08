@@ -25,7 +25,7 @@ module.exports = (function() {
 
         visiblewidth: 4,
         capturewidth: 48,
-        mousemoveThrottle: 1000 / 30,
+        mousethrottle: 1000 / 30,
 
         handleheight: 16,
         handleopacity: 0,
