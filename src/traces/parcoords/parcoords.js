@@ -63,7 +63,7 @@ function makeDomainToUnitScale(variable) {
     return function(x) {return a * x + b};
 }
 
-function viewModel(settings, layout, model) {
+function viewModel(lines, layout, model) {
 
     var xScale = d3.scale.ordinal().domain(d3.range(model.variables.length)).rangePoints([0, layout.width], 0);
 
@@ -84,9 +84,9 @@ function viewModel(settings, layout, model) {
             values: variable.values,
             xScale: xScale,
             x: xScale(i),
-            unitScale: makeUnitScale(layout.height, settings.verticalPadding),
-            domainScale: makeDomainScale(layout.height, settings.verticalPadding, settings.integerPadding, variable),
-            integerScale: makeIntegerScale(settings.integerPadding, variable),
+            unitScale: makeUnitScale(layout.height, lines.verticalpadding),
+            domainScale: makeDomainScale(layout.height, lines.verticalpadding, lines.integerpadding, variable),
+            integerScale: makeIntegerScale(lines.integerpadding, variable),
             domainToUnitScale: makeDomainToUnitScale(variable),
             pieChartCheat: variable.pieChartCheat,
             filter: [0, 1], //variable.filter || (variable.filter = [0, 1]),
@@ -112,7 +112,8 @@ function styleExtentTexts(selection) {
 module.exports = function (root, styledData, layout) {
 
     var data = styledData.variables;
-    var settings = Object.assign({}, styledData.settings);
+    var settings = styledData.settings;
+    var lines = styledData.lines;
 
     var width = layout.width
     var height = layout.height
@@ -165,7 +166,7 @@ module.exports = function (root, styledData, layout) {
         .classed('parcoordsModel', true);
 
     var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
-        .data(viewModel.bind(0, settings, layout), keyFun)
+        .data(viewModel.bind(0, lines, layout), keyFun)
 
     parcoordsViewModel.enter()
         .append('div')
@@ -193,7 +194,7 @@ module.exports = function (root, styledData, layout) {
 
     parcoordsLineLayer
         .each(function(d) {
-            var lineLayer = lineLayerMaker(this, settings, layout, d.viewModel.panels, unitToColor, d.context);
+            var lineLayer = lineLayerMaker(this, settings, lines, layout, d.viewModel.panels, unitToColor, d.context);
             d.viewModel[d.key] = lineLayer;
             tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true)});
             lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));

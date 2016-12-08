@@ -77,7 +77,7 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
     render(blockNumber);
 }
 
-module.exports = function(canvasGL, settings, layout, data, unitToColor, context) {
+module.exports = function(canvasGL, settings, lines, layout, data, unitToColor, context) {
 
     var renderState = {
         currentRafs: {},
@@ -89,13 +89,13 @@ module.exports = function(canvasGL, settings, layout, data, unitToColor, context
     var variableCount = variables.length;
     var sampleCount = variables[0].values.length;
 
-    var alphaBlending = context; // controlConfig.alphaBlending;
+    var focusAlphaBlending = context; // controlConfig.focusAlphaBlending;
 
     var width = layout.width;
     var height = layout.height;
     var panelSizeY = layout.height;
-    var coloringVariable = settings.coloringVariable;
-    var canvasPixelRatio = settings.canvasPixelRatio;
+    var coloringVariable = lines.coloringvariable;
+    var canvasPixelRatio = lines.pixelratio;
 
     var canvasWidth = width * canvasPixelRatio;
     var canvasHeight = height * canvasPixelRatio;
@@ -115,7 +115,7 @@ module.exports = function(canvasGL, settings, layout, data, unitToColor, context
     var gpuVariableCount = 60; // don't change this; 3 + 1 extra variables also apply
 
     function paddedUnit(d) {
-        var unitPad = settings.verticalPadding / panelSizeY;
+        var unitPad = lines.verticalpadding / panelSizeY;
         return unitPad + d * (1 - 2 * unitPad);
     }
 
@@ -151,7 +151,7 @@ module.exports = function(canvasGL, settings, layout, data, unitToColor, context
     var color = [];
     for(j = 0; j < 256; j++) {
         var c = unitToColor(j / 255);
-        color.push((alphaBlending ? settings.contextColor : c).concat([alphaBlending ? settings.contextOpacity : 255]));
+        color.push((focusAlphaBlending ? lines.contextcolor : c).concat([focusAlphaBlending ? lines.contextopacity : 255]));
     }
 
     var colorIndex = new Float32Array(sampleCount * 2);
@@ -213,7 +213,7 @@ module.exports = function(canvasGL, settings, layout, data, unitToColor, context
         profile: false,
 
         blend: {
-            enable: alphaBlending,
+            enable: focusAlphaBlending,
             func: {
                 srcRGB: 'src alpha',
                 dstRGB: 'one minus src alpha',
@@ -228,7 +228,7 @@ module.exports = function(canvasGL, settings, layout, data, unitToColor, context
         },
 
         depth: {
-            enable: !alphaBlending,
+            enable: !focusAlphaBlending,
             mask: true,
             func: 'less',
             range: [0, 1]
@@ -329,10 +329,10 @@ module.exports = function(canvasGL, settings, layout, data, unitToColor, context
         for(I = 0; I < shownPanelCount; I++) {
             var variableView = variableViews[I];
             var i = variableView.originalXIndex;
-            var x = variableView.x * settings.canvasPixelRatio;
+            var x = variableView.x * lines.pixelratio;
             var nextVar = variableViews[(I + 1) % shownVariableCount];
             var ii = nextVar.originalXIndex;
-            var panelSizeX = nextVar.x * settings.canvasPixelRatio - x;
+            var panelSizeX = nextVar.x * lines.pixelratio - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextVar.x) {
                 previousAxisOrder[i] = [x, nextVar.x];
                 var item = {
@@ -362,7 +362,7 @@ module.exports = function(canvasGL, settings, layout, data, unitToColor, context
                     scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
                 };
                 renderState.clearOnly = clearOnly;
-                renderBlock(regl, glAes, renderState, setChanged ? settings.blockLineCount : sampleCount, sampleCount, item);
+                renderBlock(regl, glAes, renderState, setChanged ? lines.blocklinecount : sampleCount, sampleCount, item);
             }
         }
     }
