@@ -21,7 +21,15 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     var variables = coerce('variables');
 
     coerce('settings');
-    coerce('filterbar');
+    coerce('filterbar.visiblewidth');
+    coerce('filterbar.capturewidth');
+    coerce('filterbar.fillcolor');
+    coerce('filterbar.fillopacity');
+    coerce('filterbar.strokecolor');
+    coerce('filterbar.strokeopacity');
+    coerce('filterbar.strokewidth');
+    coerce('filterbar.handleheight');
+    coerce('filterbar.handleoverlap');
 
     if(!Array.isArray(variables) || !variables.length) {
         traceOut.visible = false;

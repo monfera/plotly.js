@@ -428,7 +428,7 @@ module.exports = function (root, styledData, layout) {
     axisBrushEnter
         .selectAll('.resize rect')
         .attr('height', resizeHeight)
-        .attr('fill-opacity', styledData.filterbar.handleopacity)
+        .attr('opacity', 0)
         .style('visibility', 'visible');
 
     axisBrushEnter
