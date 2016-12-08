@@ -112,7 +112,7 @@ function styleExtentTexts(selection) {
 module.exports = function (root, styledData, layout) {
 
     var data = styledData.variables;
-    var settings = styledData.settings;
+    var geometry = styledData.geometry;
     var lines = styledData.lines;
 
     var width = layout.width
@@ -187,14 +187,14 @@ module.exports = function (root, styledData, layout) {
         .append('canvas')
         .classed('parcoordsLineLayer', true)
         .style('position', 'absolute')
-        .style('padding', settings.padding + 'px')
+        .style('padding', geometry.padding + 'px')
         .style('overflow', 'visible');
 
     var tweakables = {renderers: [], variables: []};
 
     parcoordsLineLayer
         .each(function(d) {
-            var lineLayer = lineLayerMaker(this, settings, lines, layout, d.viewModel.panels, unitToColor, d.context);
+            var lineLayer = lineLayerMaker(this, lines, layout, d.viewModel.panels, unitToColor, d.context);
             d.viewModel[d.key] = lineLayer;
             tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true)});
             lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
@@ -210,7 +210,7 @@ module.exports = function (root, styledData, layout) {
         .attr('width', width)
         .attr('height', height)
         .style('position', 'absolute')
-        .style('padding', settings.padding + 'px')
+        .style('padding', geometry.padding + 'px')
         .style('overflow', 'visible')
         .style('shape-rendering', 'crispEdges')
         .call(enterSvgDefs);
@@ -288,7 +288,7 @@ module.exports = function (root, styledData, layout) {
         .append('g')
         .classed('axis', true)
         .each(function(d) {
-            var wantedTickCount = height / settings.averageTickDistance;
+            var wantedTickCount = height / geometry.averageTickDistance;
             var scale = d.domainScale;
             var dom = scale.domain();
             d3.select(this)

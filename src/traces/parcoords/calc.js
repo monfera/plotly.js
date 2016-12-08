@@ -124,7 +124,7 @@ module.exports = function calc(gd, trace) {
 
     return [{
         variables: cd,
-        settings: trace.settings,
+        geometry: trace.geometry,
         lines: trace.lines,
         filterbar: trace.filterbar
     }];

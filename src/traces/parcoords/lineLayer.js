@@ -77,7 +77,7 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
     render(blockNumber);
 }
 
-module.exports = function(canvasGL, settings, lines, layout, data, unitToColor, context) {
+module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
 
     var renderState = {
         currentRafs: {},
@@ -140,7 +140,7 @@ module.exports = function(canvasGL, settings, lines, layout, data, unitToColor, 
     }
 
 /*
-    var depthVariable = settings.depthVariable;
+    var depthVariable = geometry.depthVariable;
     var depthUnitScale = variables[depthVariable].domainToUnitScale;
     var depth = utils.range(sampleCount * 2).map(function(d) {
         return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon,

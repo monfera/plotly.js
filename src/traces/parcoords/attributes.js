@@ -24,7 +24,7 @@ module.exports = {
         description: 'The variables (dimensions) of the parallel coordinates chart.'
     },
 
-    settings: {
+    geometry: {
         valType: 'any',
         description: 'The styling, geometry and performance related settings of the parallel coordinates chart. (Will be broken down to smaller chunks.)'
     },
