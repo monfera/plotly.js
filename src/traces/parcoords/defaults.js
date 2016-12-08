@@ -33,7 +33,14 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('filterbar.handleheight');
     coerce('filterbar.handleoverlap');
 
-    coerce('lines');
+    coerce('lines.coloringvariable');
+    coerce('lines.contextcolor');
+    coerce('lines.contextopacity');
+    coerce('lines.pixelratio');
+    coerce('lines.blocklinecount');
+    coerce('lines.focusalphablending');
+    coerce('lines.verticalpadding');
+    coerce('lines.integerpadding');
 
     if(!Array.isArray(variables) || !variables.length) {
         traceOut.visible = false;
