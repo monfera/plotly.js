@@ -418,8 +418,7 @@ module.exports = function (root, styledData, layout) {
     axisBrushEnter
         .selectAll('rect')
         .attr('x', -brushCaptureWidth / 2)
-        .attr('width', brushCaptureWidth)
-        .attr('stroke', settings.captureZoneBorderColor);
+        .attr('width', brushCaptureWidth);
 
     axisBrushEnter
         .selectAll('rect.extent')
