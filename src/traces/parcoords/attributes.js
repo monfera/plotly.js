@@ -19,6 +19,9 @@ module.exports = {
 
     // PARCOORDS ATTRIBUTES
 
+    // todo add attribute to `variables` for switching variables on/off
+    // todo add attribute to `variables` for initial filter domain
+    // todo how to describe `variables` properly, i.e. we want to say, an array of structure X?
     variables: {
         valType: 'data_array',
         description: 'The variables (dimensions) of the parallel coordinates chart.'
@@ -37,6 +40,7 @@ module.exports = {
                 'leftmost axis ticks and bar resize handles.'
             ]
         },
+
         tickdistance: {
             valType: 'number',
             dflt: 50,
@@ -49,11 +53,89 @@ module.exports = {
     },
 
     lines: {
-        valType: 'any',
-        description: 'The styling, geometry and performance related settings of the parallel coordinates chart. (Will be broken down to smaller chunks.)'
+
+        // todo consider variable id or label rather than index
+        // todo add attribute for color clamping
+        coloringvariable: {
+            valType: 'number',
+            dflt: 0,
+            min: 0,
+            role: 'info',
+            description: 'The index of the variable that serves as the basis for coloring and depth ordering the lines.'
+        },
+
+        // todo switch to ploty standard color notation rather than RGB tuple
+        contextcolor: {
+            valType: 'data_array',
+            dflt: [0, 0, 0],
+            role: 'style',
+            description: 'Color of the context line layer as an RGB triplet where each number is 0..255.'
+        },
+
+        // todo switch to 0..1 rather than 0..255
+        contextopacity: {
+            valType: 'number',
+            dflt: 16,
+            min: 0,
+            max: 255,
+            role: 'style',
+            description: 'Opacity of the context lines, on a scale of 0 (invisible) to 255 (fully opaque).'
+        },
+
+        // todo tie it to window.devicePixelRatio in `defaults.js`
+        pixelratio: {
+            valType: 'number',
+            dflt: 1,
+            min: 0.25,
+            max: 4,
+            role: 'style',
+            description: 'Line rendering pixel ratio. A lower value yields faster rendering but blockier lines.'
+        },
+
+        blocklinecount: {
+            valType: 'number',
+            dflt: 5000,
+            min: 1,
+            role: 'info',
+            description: [
+                'The number of lines rendered in one 16ms rendering frame. Use 2000-5000 on low-end hardware to remain',
+                'responsive, and 10000 .. 100000 on strong hardware for faster rendering.'
+            ]
+        },
+
+        // todo consider if we need a `focusopacity` attribute as well; making settings more symmetric between focus and context
+        focusalphablending: {
+            valType: 'boolean',
+            dflt: false,
+            role: 'style',
+            description: [
+                'By default, the rendered lines are opaque. Setting it to `true` is necessary if opacity is needed.'
+            ]
+        },
+
+        // todo hardcode it
+        verticalpadding: {
+            valType: 'number',
+            dflt: 2,
+            min: 0,
+            max: 4,
+            role: 'style',
+            description: 'Lines have thickness, and without padding, horizontal lines at extreme values appear thinner.'
+        },
+
+        // todo this minor but ergonomic thing isn't fully working yet - either finish it or remove it
+        integerpadding: {
+            valType: 'number',
+            dflt: 0,
+            min: 0,
+            max: 1,
+            role: 'style',
+            description: 'Setting it to `1` offsets the extreme points on integer axes by half pitch.'
+        }
     },
 
     filterbar: {
+
         visiblewidth: {
             valType: 'number',
             dflt: 4,
@@ -62,6 +144,7 @@ module.exports = {
             role: 'style',
             description: 'Visible width of the filter bar.'
         },
+
         capturewidth: {
             valType: 'number',
             dflt: 20,
@@ -70,12 +153,14 @@ module.exports = {
             role: 'style',
             description: 'Mouse capture width of the filter bar.'
         },
+
         fillcolor: {
             valType: 'color',
             dflt: 'magenta',
             role: 'style',
             description: 'Color of the filter bar fill.'
         },
+
         fillopacity: {
             valType: 'number',
             dflt: 1,
@@ -84,12 +169,14 @@ module.exports = {
             role: 'style',
             description: 'Filter bar fill opacity.'
         },
+
         strokecolor: {
             valType: 'color',
             dflt: 'white',
             role: 'style',
             description: 'Color of the filter bar side lines.'
         },
+
         strokeopacity: {
             valType: 'number',
             dflt: 1,
@@ -99,6 +186,7 @@ module.exports = {
             role: 'style',
             description: 'Filter bar side stroke opacity.'
         },
+
         strokewidth: {
             valType: 'number',
             dflt: 1,
@@ -107,6 +195,7 @@ module.exports = {
             role: 'style',
             description: 'Filter bar side stroke width.'
         },
+
         handleheight: {
             valType: 'number',
             dflt: 16,
@@ -115,6 +204,7 @@ module.exports = {
             role: 'style',
             description: 'Height of the filter bar vertical resize areas on top and bottom.'
         },
+
         handleopacity: {
             valType: 'number',
             dflt: 1,
@@ -124,6 +214,7 @@ module.exports = {
             role: 'style',
             description: 'Opacity of the filter bar vertical resize areas on top and bottom.'
         },
+
         handleoverlap: {
             valType: 'number',
             dflt: 0,
