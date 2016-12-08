@@ -12,14 +12,14 @@ module.exports = (function() {
         padding: 64, // useful to make room for brush capture zones when resize handle is on top or bottom
 
         // coloring and depth variable should be the same unless for development testing
-        coloringVariable: 0,
+        coloringvariable: 0,
         depthVariable: 0,
-        contextColor: [0,0,0], // [192,192,192], // rgb array, 0..255
-        contextOpacity: 16, // 255, // 0..255
+        contextcolor: [0,0,0], // [192,192,192], // rgb array, 0..255
+        contextopacity: 16, // 255, // 0..255
 
         // technical config
-        canvasPixelRatio: 1, //window.devicePixelRatio, // using 2 or devicePixelRatio sharpens lines, slower
-        blockLineCount: 5000, // number of lines drawn in one increment
+        pixelratio: 1, //window.devicePixelRatio, // using 2 or devicePixelRatio sharpens lines, slower
+        blocklinecount: 5000, // number of lines drawn in one increment
 
 
 
@@ -35,11 +35,11 @@ module.exports = (function() {
         strokecolor: 'white',
         strokeopacity: 1,
         strokewidth: 1,
-        integerPadding: 0, // use 1 to offset integer extreme values by half pitch
+        integerpadding: 0, // use 1 to offset integer extreme values by half pitch
         averageTickDistance: 50, // in pixels,
-        verticalPadding: 2,
+        verticalpadding: 2,
 
-        alphaBlending: false,
+        focusalphablending: false,
 
         // for debugging:
         captureZoneBorderColor: debug ? 'red' : "",
