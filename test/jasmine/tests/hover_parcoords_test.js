@@ -6,7 +6,7 @@ var destroyGraphDiv = require('../assets/destroy_graph_div');
 var mouseEvent = require('../assets/mouse_event');
 
 describe('pie hovering', function() {
-    var mock = require('@mocks/pie_simple.json');
+    var mock = require('@src/traces/parcoords/mocks/k2.json');
 
     describe('event data', function() {
         var mockCopy = Lib.extendDeep({}, mock),
@@ -18,13 +18,14 @@ describe('pie hovering', function() {
             gd = createGraphDiv();
 
             Plotly.plot(gd, mockCopy.data, mockCopy.layout)
+                //.then(Plotly.plot(gd, mockCopy.data, mockCopy.layout))
                 .then(done);
         });
 
         //afterEach(destroyGraphDiv);
 
-        it('should contain the correct fields', function() {
-
+        fit('should contain the correct fields', function() {
+return;
             /*
              * expected = [{
              *         v: 4,
