@@ -19,12 +19,12 @@ module.exports = {
 
     // PARCOORDS ATTRIBUTES
 
-    // todo add attribute to `variables` for switching variables on/off
-    // todo add attribute to `variables` for initial filter domain
-    // todo how to describe `variables` properly, i.e. we want to say, an array of structure X?
-    variables: {
+    // todo add attribute to `dimensions` for switching dimensions on/off
+    // todo add attribute to `dimensions` for initial filter domain
+    // todo how to describe `dimensions` properly, i.e. we want to say, an array of structure X?
+    dimensions: {
         valType: 'data_array',
-        description: 'The variables (dimensions) of the parallel coordinates chart.'
+        description: 'The dimensions (variables) of the parallel coordinates chart.'
     },
 
     geometry: {

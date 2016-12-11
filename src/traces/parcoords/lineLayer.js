@@ -85,9 +85,9 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
         clearOnly: false
     };
 
-    var variables = data;
-    var variableCount = variables.length;
-    var sampleCount = variables[0].values.length;
+    var dimensions = data;
+    var variableCount = dimensions.length;
+    var sampleCount = dimensions[0].values.length;
 
     var focusAlphaBlending = context; // controlConfig.focusAlphaBlending;
 
@@ -106,13 +106,13 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
     canvasGL.style.width = width + 'px';
     canvasGL.style.height = height + 'px';
 
-    var coloringVariableUnitScale = variables[coloringVariable].domainToUnitScale;
+    var coloringVariableUnitScale = dimensions[coloringVariable].domainToUnitScale;
 
     function colorProjection(j) {
         return coloringVariableUnitScale(data[coloringVariable].values[j]);
     }
 
-    var gpuVariableCount = 60; // don't change this; 3 + 1 extra variables also apply
+    var gpuVariableCount = 60; // don't change this; 3 + 1 extra dimensions also apply
 
     function paddedUnit(d) {
         var unitPad = lines.verticalpadding / panelSizeY;
@@ -122,7 +122,7 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
     var points = []
     for(var j = 0; j < sampleCount; j++)
         for(var i = 0; i < gpuVariableCount; i++)
-            points.push(i < variableCount ? paddedUnit(variables[i].domainToUnitScale(data[i].values[j])) : 0.5);
+            points.push(i < variableCount ? paddedUnit(dimensions[i].domainToUnitScale(data[i].values[j])) : 0.5);
 
     var pointPairs = [];
 
@@ -141,7 +141,7 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
 
 /*
     var depthVariable = geometry.depthVariable;
-    var depthUnitScale = variables[depthVariable].domainToUnitScale;
+    var depthUnitScale = dimensions[depthVariable].domainToUnitScale;
     var depth = utils.range(sampleCount * 2).map(function(d) {
         return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon,
             depthUnitScale(data[depthVariable].values[Math.round((d - d % 2) / 2)])));

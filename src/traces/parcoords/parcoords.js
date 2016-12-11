@@ -65,14 +65,14 @@ function makeDomainToUnitScale(variable) {
 
 function viewModel(lines, layout, model) {
 
-    var xScale = d3.scale.ordinal().domain(d3.range(model.variables.length)).rangePoints([0, layout.width], 0);
+    var xScale = d3.scale.ordinal().domain(d3.range(model.dimensions.length)).rangePoints([0, layout.width], 0);
 
     var viewModel = {
         key: model.key,
         xScale: xScale
     };
 
-    viewModel.panels = model.variables.map(function(variable, i) {
+    viewModel.panels = model.dimensions.map(function(variable, i) {
         return {
             key: variable.id || (variable.label + ' ' + Math.floor(1e6 * Math.random())),
             label: variable.label,
@@ -111,7 +111,7 @@ function styleExtentTexts(selection) {
 
 module.exports = function (root, styledData, layout) {
 
-    var data = styledData.variables;
+    var data = styledData.dimensions;
     var geometry = styledData.geometry;
     var lines = styledData.lines;
 
@@ -159,7 +159,7 @@ module.exports = function (root, styledData, layout) {
     var lastApproached = null;
 
     var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
-        .data([{key: 0, variables: data}], keyFun);
+        .data([{key: 0, dimensions: data}], keyFun);
 
     parcoordsModel.enter()
         .append('div')
@@ -190,7 +190,7 @@ module.exports = function (root, styledData, layout) {
         .style('padding', geometry.padding + 'px')
         .style('overflow', 'visible');
 
-    var tweakables = {renderers: [], variables: []};
+    var tweakables = {renderers: [], dimensions: []};
 
     parcoordsLineLayer
         .each(function(d) {
@@ -234,7 +234,7 @@ module.exports = function (root, styledData, layout) {
     panel.enter()
         .append('g')
         .classed('panel', true)
-        .each(function(d) {tweakables.variables.push(d)});
+        .each(function(d) {tweakables.dimensions.push(d)});
 
     panel
         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});

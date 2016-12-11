@@ -18,7 +18,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     var coerceFont = Lib.coerceFont;
 
-    var variables = coerce('variables');
+    var dimensions = coerce('dimensions');
 
     coerce('geometry.padding');
     coerce('geometry.tickdistance');
@@ -42,7 +42,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('lines.verticalpadding');
     coerce('lines.integerpadding');
 
-    if(!Array.isArray(variables) || !variables.length) {
+    if(!Array.isArray(dimensions) || !dimensions.length) {
         traceOut.visible = false;
         return;
     }
