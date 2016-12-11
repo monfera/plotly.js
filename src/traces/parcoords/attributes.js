@@ -36,7 +36,7 @@ module.exports = {
             role: 'style',
             description: [
                 'Width of the padding around the actual parcoords line painting area in pixels. Padding provides',
-                'the perimeter space for text annotations such as variable name labels, domain extent values,',
+                'the perimeter space for text annotations such as dimension name labels, domain extent values,',
                 'leftmost axis ticks and bar resize handles.'
             ]
         },
@@ -54,14 +54,14 @@ module.exports = {
 
     lines: {
 
-        // todo consider variable id or label rather than index
+        // todo consider dimension id or label rather than index
         // todo add attribute for color clamping
-        coloringvariable: {
+        coloringdimension: {
             valType: 'number',
             dflt: 0,
             min: 0,
             role: 'info',
-            description: 'The index of the variable that serves as the basis for coloring and depth ordering the lines.'
+            description: 'The index of the dimension that serves as the basis for coloring and depth ordering the lines.'
         },
 
         // todo switch to ploty standard color notation rather than RGB tuple

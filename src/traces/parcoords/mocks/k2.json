@@ -21,7 +21,7 @@
             "handleoverlap": 0
         },
         "lines": {
-            "coloringvariable": 0,
+            "coloringdimension": 0,
             "contextcolor": [0,0,0],
             "contextopacity": 16,
             "pixelratio": 1,

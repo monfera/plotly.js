@@ -21,15 +21,15 @@ function repeat(d) {
     return [d];
 }
 
-function makeDomainScale(height, padding, integerPadding, variable) {
-    var lo = d3.min(variable.values);
-    var hi = d3.max(variable.values);
+function makeDomainScale(height, padding, integerPadding, dimension) {
+    var lo = d3.min(dimension.values);
+    var hi = d3.max(dimension.values);
     // convert a zero-domain to a proper domain
-    if(!variable.integer && lo === hi) {
+    if(!dimension.integer && lo === hi) {
         lo *= 0.9;
         hi *= 1.1;
     }
-    return variable.integer
+    return dimension.integer
         ? d3.scale.ordinal()
         .domain(d3.range(Math.round(lo), Math.round(hi + 1)))
         .rangePoints([height - padding, padding], integerPadding)
@@ -43,17 +43,17 @@ function makeUnitScale(height, padding) {
         .range([height - padding, padding]);
 }
 
-function makeIntegerScale(integerPadding, variable) {
-    return variable.integer && d3.scale.ordinal()
+function makeIntegerScale(integerPadding, dimension) {
+    return dimension.integer && d3.scale.ordinal()
             .domain(
-                d3.range(0, Math.round(d3.max(variable.values) + 1) - Math.round(d3.min(variable.values)))
+                d3.range(0, Math.round(d3.max(dimension.values) + 1) - Math.round(d3.min(dimension.values)))
                     .map(function(d, _, a) {return d / (a.length - 1)})
             )
             .rangePoints([0, 1], integerPadding)
 }
 
-function makeDomainToUnitScale(variable) {
-    var extent = d3.extent(variable.values);
+function makeDomainToUnitScale(dimension) {
+    var extent = d3.extent(dimension.values);
     if(extent[0] === extent[1]) {
         extent[0]--;
         extent[1]++;
@@ -72,24 +72,24 @@ function viewModel(lines, layout, model) {
         xScale: xScale
     };
 
-    viewModel.panels = model.dimensions.map(function(variable, i) {
+    viewModel.panels = model.dimensions.map(function(dimension, i) {
         return {
-            key: variable.id || (variable.label + ' ' + Math.floor(1e6 * Math.random())),
-            label: variable.label,
-            integer:variable.integer,
-            scatter: variable.scatter,
+            key: dimension.id || (dimension.label + ' ' + Math.floor(1e6 * Math.random())),
+            label: dimension.label,
+            integer:dimension.integer,
+            scatter: dimension.scatter,
             xIndex: i,
             originalXIndex: i,
             height: layout.height,
-            values: variable.values,
+            values: dimension.values,
             xScale: xScale,
             x: xScale(i),
             unitScale: makeUnitScale(layout.height, lines.verticalpadding),
-            domainScale: makeDomainScale(layout.height, lines.verticalpadding, lines.integerpadding, variable),
-            integerScale: makeIntegerScale(lines.integerpadding, variable),
-            domainToUnitScale: makeDomainToUnitScale(variable),
-            pieChartCheat: variable.pieChartCheat,
-            filter: [0, 1], //variable.filter || (variable.filter = [0, 1]),
+            domainScale: makeDomainScale(layout.height, lines.verticalpadding, lines.integerpadding, dimension),
+            integerScale: makeIntegerScale(lines.integerpadding, dimension),
+            domainToUnitScale: makeDomainToUnitScale(dimension),
+            pieChartCheat: dimension.pieChartCheat,
+            filter: [0, 1], //dimension.filter || (dimension.filter = [0, 1]),
             // one more problem: context lines get stuck
             parent: viewModel
         };
@@ -396,10 +396,10 @@ module.exports = function (root, styledData, layout) {
     var axisBrushEnter = axisBrush.enter()
         .append('g')
         .classed('axisBrush', true)
-        .on('mouseenter', function approach(variable) {
-            if(variable !== lastApproached) {
-                variable.parent['focusLineLayer'].approach(variable);
-                lastApproached = variable;
+        .on('mouseenter', function approach(dimension) {
+            if(dimension !== lastApproached) {
+                dimension.parent['focusLineLayer'].approach(dimension);
+                lastApproached = dimension;
             }
         });
 
@@ -447,48 +447,48 @@ module.exports = function (root, styledData, layout) {
         domainBrushing = true;
     }
 
-    function axisBrushMoved(variable) {
-        var extent = variable.brush.extent();
-        var panels = variable.parent.panels;
-        var filter = panels[variable.xIndex].filter;
+    function axisBrushMoved(dimension) {
+        var extent = dimension.brush.extent();
+        var panels = dimension.parent.panels;
+        var filter = panels[dimension.xIndex].filter;
         var reset = justStarted && (extent[0] == extent[1]);
         if(reset) {
-            variable.brush.clear();
+            dimension.brush.clear();
             d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
         }
         var newExtent = reset ? [0, 1] : extent.slice();
         if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
-            if(variable.originalXIndex === 0) {
-                variable.parent['focusLineLayer'].setColorDomain(newExtent);
+            if(dimension.originalXIndex === 0) {
+                dimension.parent['focusLineLayer'].setColorDomain(newExtent);
             }
-            panels[variable.xIndex].filter = newExtent;
-            variable.parent['focusLineLayer'].render(panels, true);
-            var filtersActive = someFiltersActive(variable.parent);
+            panels[dimension.xIndex].filter = newExtent;
+            dimension.parent['focusLineLayer'].render(panels, true);
+            var filtersActive = someFiltersActive(dimension.parent);
             if(!contextShown && filtersActive) {
-                variable.parent['contextLineLayer'].render(panels, true);
+                dimension.parent['contextLineLayer'].render(panels, true);
                 contextShown = true;
             } else if(contextShown && !filtersActive) {
-                variable.parent['contextLineLayer'].render(panels, true, true);
+                dimension.parent['contextLineLayer'].render(panels, true, true);
                 contextShown = false;
             }
         }
         justStarted = false;
     }
 
-    function axisBrushEnded(variable) {
-        var extent = variable.brush.extent();
+    function axisBrushEnded(dimension) {
+        var extent = dimension.brush.extent();
         var empty = extent[0] == extent[1];
-        if(!empty && variable.integer) {
-            var panels = variable.parent.panels;
-            var f = panels[variable.xIndex].filter;
-            f[0] = utils.d3OrdinalScaleSnap(variable.integerScale, f[0]);
-            f[1] = utils.d3OrdinalScaleSnap(variable.integerScale, f[1]);
+        if(!empty && dimension.integer) {
+            var panels = dimension.parent.panels;
+            var f = panels[dimension.xIndex].filter;
+            f[0] = utils.d3OrdinalScaleSnap(dimension.integerScale, f[0]);
+            f[1] = utils.d3OrdinalScaleSnap(dimension.integerScale, f[1]);
             if(f[0] === f[1]) {
                 f[0] = Math.max(0, f[0] - 0.05);
                 f[1] = Math.min(1, f[1] + 0.05);
             }
-            d3.select(this).transition().duration(150).call(variable.brush.extent(f));
-            variable.parent['focusLineLayer'].render(panels, true);
+            d3.select(this).transition().duration(150).call(dimension.brush.extent(f));
+            dimension.parent['focusLineLayer'].render(panels, true);
         }
         domainBrushing = false;
     }

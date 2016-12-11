@@ -1,6 +1,6 @@
 var ndarray = require('ndarray');
 
-var variableNames = ["Preference","Block height","Block width","Cylinder material","Block material","Total weight","Assembly total cost","Assembly penalty weight","Height st width","Min height width","Min width diameter","RF block"];
+var dimensionNames = ["Preference","Block height","Block width","Cylinder material","Block material","Total weight","Assembly total cost","Assembly penalty weight","Height st width","Min height width","Min width diameter","RF block"];
 var integer = [false, false, false, true, true, false, false, false, false, false, false, false];
 
 var original = [
@@ -25776,7 +25776,7 @@ var original = [
 
 
 var testSampleCount = Infinity;
-original = original.slice(0, testSampleCount * variableNames.length);
+original = original.slice(0, testSampleCount * dimensionNames.length);
 
 original2 = [
  -0.004094021, 3.2, 26.863, 0, 0, 0.0160782302215097, 0.112547611550568, 0.000964527565622515, 23.663, 0.5137, 9.8453478079074, 0.141773008433867, 
@@ -25794,19 +25794,19 @@ original = [19, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 21].concat(original).con
  */
 
 var parcoordsMock = {
-  raw: ndarray(new Float64Array(original), [variableNames.length, Math.floor(original.length / variableNames.length)], [1, variableNames.length]),
-  variableNames: variableNames,
+  raw: ndarray(new Float64Array(original), [dimensionNames.length, Math.floor(original.length / dimensionNames.length)], [1, dimensionNames.length]),
+  dimensionNames: dimensionNames,
   integer: integer
 }
 
-var mock = parcoordsMock.variableNames.map(function(n, i, a) {
+var mock = parcoordsMock.dimensionNames.map(function(n, i, a) {
     var columnView = parcoordsMock.raw.pick(i, null);
     var untypedColumn = []
     for(var j = 0; j < columnView.shape[0]; j++) {
         untypedColumn.push(columnView.get(j));
     }
     return {
-        variableName: n,
+        dimensionName: n,
         integer: parcoordsMock.integer[i],
         values: untypedColumn.filter(function(d, ii) {return true}).map(function(d) {return parcoordsMock.integer[i] ? d : Math.floor(d * 10000)}),
         pieChartCheat: a.length - i
