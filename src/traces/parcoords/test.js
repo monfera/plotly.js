@@ -23,7 +23,7 @@ window.s = function() {
     var i = 0
     window.requestAnimationFrame(function anim() {
         if(i <= steps) {
-            tweakables.variables[0].scatter = smoothstep(i / steps);
+            tweakables.dimensions[0].scatter = smoothstep(i / steps);
             tweakables.renderers[0]()
             tweakables.renderers[1]()
             i++;
@@ -35,7 +35,7 @@ window.d = function() {
     var i = steps
     window.requestAnimationFrame(function anim() {
         if(i >= 0) {
-            tweakables.variables[0].scatter = smoothstep(i / steps);
+            tweakables.dimensions[0].scatter = smoothstep(i / steps);
             tweakables.renderers[0]()
             tweakables.renderers[1]()
             i--;

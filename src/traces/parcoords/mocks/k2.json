@@ -30,7 +30,7 @@
             "verticalpadding": 2,
             "integerpadding": 0
         },
-        "variables": [
+        "dimensions": [
             {
                 "id":"Preference",
                 "label":"Preference",
