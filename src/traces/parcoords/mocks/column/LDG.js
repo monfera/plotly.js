@@ -1,4 +1,4 @@
-var variableNames = ['fuselageDiameter','wingSpan','wingRootChord','wingTaperRatio','wingSweep','rangeResponse','enduranceResponse','programCostResponse','totalCostResponse','transportCostResponse'];
+var dimensionNames = ['fuselageDiameter','wingSpan','wingRootChord','wingTaperRatio','wingSweep','rangeResponse','enduranceResponse','programCostResponse','totalCostResponse','transportCostResponse'];
 
 var rowData = [
     [4.63781743556261,46.2749207854271,2.2247399571538,0.265985679715872,4.07703817784786,835.381959400078,3.74446412659518,18360031.7598,26308.2495,173141.5671],
@@ -209,7 +209,7 @@ function transpose(a) {
 
 var columnData = transpose(rowData)
 
-module.exports = variableNames.map(function(name, i) {
+module.exports = dimensionNames.map(function(name, i) {
     return {
         name: name,
         values: columnData[i]

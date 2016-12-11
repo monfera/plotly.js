@@ -86,7 +86,7 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
     };
 
     var dimensions = data;
-    var variableCount = dimensions.length;
+    var dimensionCount = dimensions.length;
     var sampleCount = dimensions[0].values.length;
 
     var focusAlphaBlending = context; // controlConfig.focusAlphaBlending;
@@ -94,7 +94,7 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
     var width = layout.width;
     var height = layout.height;
     var panelSizeY = layout.height;
-    var coloringVariable = lines.coloringvariable;
+    var coloringDimension = lines.coloringdimension;
     var canvasPixelRatio = lines.pixelratio;
 
     var canvasWidth = width * canvasPixelRatio;
@@ -106,13 +106,13 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
     canvasGL.style.width = width + 'px';
     canvasGL.style.height = height + 'px';
 
-    var coloringVariableUnitScale = dimensions[coloringVariable].domainToUnitScale;
+    var coloringDimensionUnitScale = dimensions[coloringDimension].domainToUnitScale;
 
     function colorProjection(j) {
-        return coloringVariableUnitScale(data[coloringVariable].values[j]);
+        return coloringDimensionUnitScale(data[coloringDimension].values[j]);
     }
 
-    var gpuVariableCount = 60; // don't change this; 3 + 1 extra dimensions also apply
+    var gpuDimensionCount = 60; // don't change this; 3 + 1 extra dimensions also apply
 
     function paddedUnit(d) {
         var unitPad = lines.verticalpadding / panelSizeY;
@@ -121,17 +121,17 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
 
     var points = []
     for(var j = 0; j < sampleCount; j++)
-        for(var i = 0; i < gpuVariableCount; i++)
-            points.push(i < variableCount ? paddedUnit(dimensions[i].domainToUnitScale(data[i].values[j])) : 0.5);
+        for(var i = 0; i < gpuDimensionCount; i++)
+            points.push(i < dimensionCount ? paddedUnit(dimensions[i].domainToUnitScale(data[i].values[j])) : 0.5);
 
     var pointPairs = [];
 
     for (j = 0; j < sampleCount; j++) {
-        for (i = 0; i < gpuVariableCount; i++) {
-            pointPairs.push(points[j * gpuVariableCount + i]);
+        for (i = 0; i < gpuDimensionCount; i++) {
+            pointPairs.push(points[j * gpuDimensionCount + i]);
         }
-        for (i = 0; i < gpuVariableCount; i++) {
-            pointPairs.push(points[j * gpuVariableCount + i]);
+        for (i = 0; i < gpuDimensionCount; i++) {
+            pointPairs.push(points[j * gpuDimensionCount + i]);
         }
     }
 
@@ -140,11 +140,11 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
     }
 
 /*
-    var depthVariable = geometry.depthVariable;
-    var depthUnitScale = dimensions[depthVariable].domainToUnitScale;
+    var depthDimension = geometry.depthDimension;
+    var depthUnitScale = dimensions[depthDimension].domainToUnitScale;
     var depth = utils.range(sampleCount * 2).map(function(d) {
         return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon,
-            depthUnitScale(data[depthVariable].values[Math.round((d - d % 2) / 2)])));
+            depthUnitScale(data[depthDimension].values[Math.round((d - d % 2) / 2)])));
     })
 */
 
@@ -162,21 +162,21 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
         }
     }
 
-    var styleVariableIndex = 0;
+    var styleDimensionIndex = 0;
     var styling = [];
     for(j = 0; j < sampleCount; j++) {
         for(k = 0; k < 2; k++) {
-            styling.push(points[j * gpuVariableCount + gpuVariableCount]);
-            styling.push(points[j * gpuVariableCount + gpuVariableCount + 1]);
-            styling.push(points[j * gpuVariableCount + gpuVariableCount + 2]); // currently unused
-            styling.push(Math.round(2 * ((k % 2) - 0.5)) *  adjustDepth(points[j * gpuVariableCount + styleVariableIndex]));
+            styling.push(points[j * gpuDimensionCount + gpuDimensionCount]);
+            styling.push(points[j * gpuDimensionCount + gpuDimensionCount + 1]);
+            styling.push(points[j * gpuDimensionCount + gpuDimensionCount + 2]); // currently unused
+            styling.push(Math.round(2 * ((k % 2) - 0.5)) *  adjustDepth(points[j * gpuDimensionCount + styleDimensionIndex]));
         }
     }
 
-    var positionStride = gpuVariableCount * 4;
+    var positionStride = gpuDimensionCount * 4;
 
-    var shownVariableCount = variableCount;
-    var shownPanelCount = shownVariableCount - 1;
+    var shownDimensionCount = dimensionCount;
+    var shownPanelCount = shownDimensionCount - 1;
 
     var regl = createREGL({
         canvas: canvasGL,
@@ -200,7 +200,7 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
         pf: styling
     };
 
-    for(i = 0; i < gpuVariableCount / 4; i++) {
+    for(i = 0; i < gpuDimensionCount / 4; i++) {
         attributes['p' + i.toString(16)] = {
             offset: i * 16,
             stride: positionStride,
@@ -294,49 +294,49 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
         colorClamp[1] = unitDomain[1];
     }
 
-    function approach(variable) {
-        //utils.ndarrayOrder(, variable.index);
-        //console.log('Approached ', JSON.stringify(variable.name));
+    function approach(dimension) {
+        //utils.ndarrayOrder(, dimension.index);
+        //console.log('Approached ', JSON.stringify(dimension.name));
     }
 
     var previousAxisOrder = [];
 
-    function renderGLParcoords(variableViews, setChanged, clearOnly) {
+    function renderGLParcoords(dimensionViews, setChanged, clearOnly) {
 
         var I;
 
         function valid(i, offset) {
-            return i < shownVariableCount && i + offset < variableViews.length;
+            return i < shownDimensionCount && i + offset < dimensionViews.length;
         }
 
         function orig(i) {
-            var index = variableViews.map(function(v) {return v.originalXIndex;}).indexOf(i);
-            return variableViews[index];
+            var index = dimensionViews.map(function(v) {return v.originalXIndex;}).indexOf(i);
+            return dimensionViews[index];
         }
 
         var leftmostIndex, rightmostIndex, lowestX = Infinity, highestX = -Infinity;
         for(I = 0; I < shownPanelCount; I++) {
-            if(variableViews[I].x > highestX) {
-                highestX = variableViews[I].x;
+            if(dimensionViews[I].x > highestX) {
+                highestX = dimensionViews[I].x;
                 rightmostIndex = I;
             }
-            if(variableViews[I].x < lowestX) {
-                lowestX = variableViews[I].x;
+            if(dimensionViews[I].x < lowestX) {
+                lowestX = dimensionViews[I].x;
                 leftmostIndex = I;
             }
         }
 
         for(I = 0; I < shownPanelCount; I++) {
-            var variableView = variableViews[I];
-            var i = variableView.originalXIndex;
-            var x = variableView.x * lines.pixelratio;
-            var nextVar = variableViews[(I + 1) % shownVariableCount];
+            var dimensionView = dimensionViews[I];
+            var i = dimensionView.originalXIndex;
+            var x = dimensionView.x * lines.pixelratio;
+            var nextVar = dimensionViews[(I + 1) % shownDimensionCount];
             var ii = nextVar.originalXIndex;
             var panelSizeX = nextVar.x * lines.pixelratio - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextVar.x) {
                 previousAxisOrder[i] = [x, nextVar.x];
                 var item = {
-                    key: variableView.originalXIndex,
+                    key: dimensionView.originalXIndex,
                     resolution: [canvasWidth, canvasHeight],
                     viewBoxPosition: [x, 0],
                     viewBoxSize: [panelSizeX, canvasPanelSizeY],
@@ -357,7 +357,7 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
                     loD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[0] : 0)) - filterEpsilon}),
                     hiD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[1] : 1)) + filterEpsilon}),
                     colorClamp: colorClamp,
-                    scatter: variableView.scatter || 0,
+                    scatter: dimensionView.scatter || 0,
                     scissorX: I === leftmostIndex ? 0 : x,
                     scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
                 };

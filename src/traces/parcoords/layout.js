@@ -11,9 +11,9 @@ module.exports = (function() {
         panelSizeY: 275,
         padding: 64, // useful to make room for brush capture zones when resize handle is on top or bottom
 
-        // coloring and depth variable should be the same unless for development testing
-        coloringvariable: 0,
-        depthVariable: 0,
+        // coloring and depth dimension should be the same unless for development testing
+        coloringdimension: 0,
+        depthDimension: 0,
         contextcolor: [0,0,0], // [192,192,192], // rgb array, 0..255
         contextopacity: 16, // 255, // 0..255
 
