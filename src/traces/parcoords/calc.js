@@ -125,6 +125,7 @@ module.exports = function calc(gd, trace) {
     return [{
         dimensions: cd,
         geometry: trace.geometry,
+        tickdistance: trace.tickdistance,
         lines: trace.lines,
         filterbar: trace.filterbar
     }];

@@ -11,6 +11,37 @@
 var Lib = require('../../lib');
 var attributes = require('./attributes');
 
+function dimensionsDefaults(traceIn, traceOut) {
+    var dimensionsIn = traceIn.dimensions || [],
+        dimensionsOut = traceOut.dimensions = [];
+
+    var dimensionIn, dimensionOut;
+
+    function coerce(attr, dflt) {
+        return Lib.coerce(dimensionIn, dimensionOut, attributes.dimensions, attr, dflt);
+    }
+
+    for(var i = 0; i < dimensionsIn.length; i++) {
+        dimensionIn = dimensionsIn[i];
+        dimensionOut = {};
+
+        if(!Lib.isPlainObject(dimensionIn) || !Array.isArray(dimensionIn.values)) {
+            continue;
+        }
+
+        coerce('id');
+        coerce('label');
+        coerce('integer');
+        coerce('values');
+
+        dimensionOut._index = i;
+        dimensionsOut.push(dimensionOut);
+    }
+
+    return dimensionsOut;
+}
+
+
 module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout) {
     function coerce(attr, dflt) {
         return Lib.coerce(traceIn, traceOut, attributes, attr, dflt);
@@ -18,10 +49,15 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     var coerceFont = Lib.coerceFont;
 
-    var dimensions = coerce('dimensions');
+    var dimensions = dimensionsDefaults(traceIn, traceOut);
+
+    if(!Array.isArray(dimensions) || !dimensions.length) {
+        traceOut.visible = false;
+        return;
+    }
 
     coerce('geometry.padding');
-    coerce('geometry.tickdistance');
+    coerce('tickdistance');
 
     coerce('filterbar.visiblewidth');
     coerce('filterbar.capturewidth');
@@ -42,10 +78,6 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('lines.verticalpadding');
     coerce('lines.integerpadding');
 
-    if(!Array.isArray(dimensions) || !dimensions.length) {
-        traceOut.visible = false;
-        return;
-    }
 
     var labels = coerce('labels');
     if(!Array.isArray(labels)) {
