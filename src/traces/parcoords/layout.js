@@ -2,9 +2,6 @@ module.exports = (function() {
 
     var debug = false
 
-    var width = 1480
-    var height = 275
-
     return {
         width: 1480,
         height: 275,

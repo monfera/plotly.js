@@ -21,10 +21,45 @@ module.exports = {
 
     // todo add attribute to `dimensions` for switching dimensions on/off
     // todo add attribute to `dimensions` for initial filter domain
-    // todo how to describe `dimensions` properly, i.e. we want to say, an array of structure X?
     dimensions: {
-        valType: 'data_array',
+        // todo clarify what the actual use of `_isLinkedToArray: 'dimension'` - esp. the value - is below
+        _isLinkedToArray: 'dimension',
+        id: {
+            valType: 'string',
+            role: 'info',
+            description: "Identifier of a dimension. Must be a unique string across all dimensions."
+        },
+        label: {
+            valType: 'string',
+            role: 'info',
+            description: "The shown name of the dimension."
+        },
+        integer: {
+            valType: 'boolean',
+            dflt: false,
+            role: 'info',
+            description: "The shown name of the dimension."
+        },
+        values: {
+            valType: 'data_array',
+            role: 'info',
+            description: [
+                'Dimension values. `values[n]` represents the value of the `n`th point in the dataset,',
+                'therefore the `values` vector for all dimensions must be the same (longer vectors',
+                'will be truncated). Each value must be a finite number.'
+            ].join(' ')
+        },
         description: 'The dimensions (variables) of the parallel coordinates chart.'
+    },
+
+    tickdistance: {
+        valType: 'number',
+        dflt: 50,
+        min: 32,
+        role: 'style',
+        description: [
+            'The desired approximate tick distance (in pixels) between axis ticks on an axis.'
+        ]
     },
 
     geometry: {
@@ -38,16 +73,6 @@ module.exports = {
                 'Width of the padding around the actual parcoords line painting area in pixels. Padding provides',
                 'the perimeter space for text annotations such as dimension name labels, domain extent values,',
                 'leftmost axis ticks and bar resize handles.'
-            ]
-        },
-
-        tickdistance: {
-            valType: 'number',
-            dflt: 50,
-            min: 32,
-            role: 'style',
-            description: [
-                'The desired approximate tick distance (in pixels) between axis ticks on an axis.'
             ]
         }
     },

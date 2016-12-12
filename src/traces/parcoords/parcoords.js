@@ -113,6 +113,7 @@ module.exports = function (root, styledData, layout) {
 
     var data = styledData.dimensions;
     var geometry = styledData.geometry;
+    var tickDistance = styledData.tickdistance;
     var lines = styledData.lines;
 
     var width = layout.width
@@ -288,7 +289,7 @@ module.exports = function (root, styledData, layout) {
         .append('g')
         .classed('axis', true)
         .each(function(d) {
-            var wantedTickCount = height / geometry.tickdistance;
+            var wantedTickCount = height / tickDistance;
             var scale = d.domainScale;
             var dom = scale.domain();
             d3.select(this)
