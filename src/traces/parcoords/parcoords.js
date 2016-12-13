@@ -114,9 +114,9 @@ module.exports = function (root, styledData, layout) {
     var data = styledData.dimensions;
     var geometry = styledData.geometry;
     var tickDistance = styledData.tickdistance;
-    var coloringDomainToUnitScale = makeDomainToUnitScale(styledData.lines.coloringpoints);
+    var coloringDomainToUnitScale = makeDomainToUnitScale(styledData.lines.color);
     var lines = utils.extend(styledData.lines, {
-        coloringPoints: styledData.lines.coloringpoints
+        color: styledData.lines.color
             .map(coloringDomainToUnitScale)
     });
 
