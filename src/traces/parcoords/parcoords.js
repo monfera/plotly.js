@@ -463,9 +463,11 @@ module.exports = function (root, styledData, layout) {
         }
         var newExtent = reset ? [0, 1] : extent.slice();
         if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
+/*          // the 1st dimension is special: brushing on it changes the color projection
             if(dimension.originalXIndex === 0) {
                 dimension.parent['focusLineLayer'].setColorDomain(newExtent);
             }
+*/
             panels[dimension.xIndex].filter = newExtent;
             dimension.parent['focusLineLayer'].render(panels, true);
             var filtersActive = someFiltersActive(dimension.parent);
