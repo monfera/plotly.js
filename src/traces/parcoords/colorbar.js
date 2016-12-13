@@ -19,7 +19,7 @@ var drawColorbar = require('../../components/colorbar/draw');
 
 module.exports = function colorbar(gd, cd) {
     var trace = cd[0].trace,
-        marker = trace.marker,
+        line = trace.line,
         cbId = 'cb' + trace.uid;
 
     gd._fullLayout._infolayer.selectAll('.' + cbId).remove();
@@ -27,14 +27,14 @@ module.exports = function colorbar(gd, cd) {
     // TODO unify parcoords, scatter and heatmap colorbar
     // TODO make Colorbar.draw support multiple colorbar per trace
 
-    if((marker === undefined) || !marker.showscale) {
+    if((line === undefined) || !line.showscale) {
         Plots.autoMargin(gd, cbId);
         return;
     }
 
-    var vals = marker.color,
-        cmin = marker.cmin,
-        cmax = marker.cmax;
+    var vals = line.color,
+        cmin = line.cmin,
+        cmax = line.cmax;
 
     if(!isNumeric(cmin)) cmin = Lib.aggNums(Math.min, null, vals);
     if(!isNumeric(cmax)) cmax = Lib.aggNums(Math.max, null, vals);
@@ -42,7 +42,7 @@ module.exports = function colorbar(gd, cd) {
     var cb = cd[0].t.cb = drawColorbar(gd, cbId);
     var sclFunc = Colorscale.makeColorScaleFunc(
         Colorscale.extractScale(
-            marker.colorscale,
+            line.colorscale,
             cmin,
             cmax
         ),
@@ -51,5 +51,5 @@ module.exports = function colorbar(gd, cd) {
 
     cb.fillcolor(sclFunc)
         .filllevels({start: cmin, end: cmax, size: (cmax - cmin) / 254})
-        .options(marker.colorbar)();
+        .options(line.colorbar)();
 };
