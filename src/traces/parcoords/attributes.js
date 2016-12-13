@@ -8,12 +8,16 @@
 
 'use strict';
 
+var colorAttributes = require('../../components/colorscale/color_attributes');
 var colorAttrs = require('../../components/color/attributes');
 var fontAttrs = require('../../plots/font_attributes');
 var plotAttrs = require('../../plots/attributes');
+var colorbarAttrs = require('../../components/colorbar/attributes');
 
 var extendFlat = require('../../lib/extend').extendFlat;
 
+var hasColorscale = require('../../components/colorscale/has_colorscale');
+var colorscaleDefaults = require('../../components/colorscale/defaults');
 
 module.exports = {
 
@@ -77,17 +81,21 @@ module.exports = {
         }
     },
 
-    line: {
-        color: {
-            // todo check how it should maybe support a singular value (`arrayOk`) for monochromatic lines
-            valType: 'data_array',
-            role: 'info',
-            description: [
-                'Specifies the values that serve as the basis for coloring lines. The array values map linearly',
-                'to the `colorscale`.'
-            ].join(' ')
+    line: extendFlat({},
+        colorAttributes('line'),
+        {
+            showscale: {
+                valType: 'boolean',
+                role: 'info',
+                dflt: false,
+                description: [
+                    'Has an effect only if `marker.color` is set to a numerical array.',
+                    'Determines whether or not a colorbar is displayed.'
+                ].join(' ')
+            },
+            colorbar: colorbarAttrs
         }
-    },
+    ),
 
     // todo add attribute for color clamping
     lines: {

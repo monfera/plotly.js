@@ -10,6 +10,29 @@
 
 var Lib = require('../../lib');
 var attributes = require('./attributes');
+var hasColorscale = require('../../components/colorscale/has_colorscale');
+var colorscaleDefaults = require('../../components/colorscale/defaults');
+
+// todo unify with scatter/line_defaults.js (which needs to handle line width and dash as well)
+var handleLineDefaults = function lineDefaults(traceIn, traceOut, defaultColor, layout, coerce) {
+    var markerColor = (traceIn.marker || {}).color;
+
+    coerce('line.color', defaultColor);
+
+    if(hasColorscale(traceIn, 'line')) {
+        colorscaleDefaults(traceIn, traceOut, layout, coerce, {prefix: 'line.', cLetter: 'c'});
+    }
+    else {
+        var lineColorDflt = (Array.isArray(markerColor) ? false : markerColor) || defaultColor;
+        coerce('line.color', lineColorDflt);
+    }
+/*
+    // parcoords doesn't have these but scatter does
+    coerce('line.width');
+    coerce('line.dash');
+*/
+};
+
 
 function dimensionsDefaults(traceIn, traceOut) {
     var dimensionsIn = traceIn.dimensions || [],
@@ -55,6 +78,8 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
         traceOut.visible = false;
         return;
     }
+
+    handleLineDefaults(traceIn, traceOut, defaultColor, layout, coerce);
 
     coerce('geometry.padding');
     coerce('tickdistance');
