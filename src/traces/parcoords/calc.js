@@ -127,6 +127,7 @@ module.exports = function calc(gd, trace) {
         geometry: trace.geometry,
         tickdistance: trace.tickdistance,
         lines: trace.lines,
+        line: trace.line,
         filterbar: trace.filterbar
     }];
 };

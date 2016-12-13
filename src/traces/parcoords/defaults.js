@@ -68,7 +68,8 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('filterbar.handleheight');
     coerce('filterbar.handleoverlap');
 
-    coerce('lines.color');
+    coerce('line.color');
+
     coerce('lines.contextcolor');
     coerce('lines.contextopacity');
     coerce('lines.pixelratio');
