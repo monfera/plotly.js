@@ -120,8 +120,8 @@ module.exports = function (root, styledData, layout) {
     var height = layout.height
 
     var resizeHeight = styledData.filterbar.handleheight;
-    var brushVisibleWidth = styledData.filterbar.visiblewidth;
-    var brushCaptureWidth = styledData.filterbar.capturewidth;
+    var brushVisibleWidth = styledData.filterbar.width;
+    var brushCaptureWidth = styledData.filterbar.capturewidth || Math.min(32, brushVisibleWidth + 16);
 
     function enterSvgDefs(root) {
         var defs = root.selectAll('defs')

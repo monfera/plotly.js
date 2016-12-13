@@ -161,22 +161,13 @@ module.exports = {
 
     filterbar: {
 
-        visiblewidth: {
+        width: {
             valType: 'number',
             dflt: 4,
             min: 2,
             max: 20,
             role: 'style',
             description: 'Visible width of the filter bar.'
-        },
-
-        capturewidth: {
-            valType: 'number',
-            dflt: 20,
-            min: 2,
-            max: 50,
-            role: 'style',
-            description: 'Mouse capture width of the filter bar.'
         },
 
         fillcolor: {

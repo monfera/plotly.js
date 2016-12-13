@@ -10,8 +10,7 @@
             "padding": 64
         },
         "filterbar": {
-            "visiblewidth": 4,
-            "capturewidth": 20,
+            "width": 4,
             "fillcolor": "magenta",
             "fillopacity": 1,
             "strokecolor": "white",
