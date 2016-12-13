@@ -8,6 +8,8 @@ var data = mock.data[0];
 var div = document.createElement('div');
 document.body.appendChild(div);
 
+data.unitToColor = require('./colors');
+
 var tweakables = parcoords(div,
     data,//.filter(function(d) {return true || !d.integer}).slice(0, Infinity),
     mock.layout

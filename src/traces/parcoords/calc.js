@@ -154,13 +154,27 @@ module.exports = function calc(gd, trace) {
             .range(colorTuples.map(prop(key)));
     });
 
+    var colorToUnitScale = d3.scale.linear()
+        .domain(d3.extent(trace.line.color));
+
+    var unitMin = colorToUnitScale(trace.line.cmin);
+    var unitMax = colorToUnitScale(trace.line.cmax);
+
+    var cScale = d3.scale.linear()
+        .clamp(true)
+        .domain([unitMin, unitMax]);
+
     return [{
         dimensions: cd,
         geometry: trace.geometry,
         tickdistance: trace.tickdistance,
         lines: trace.lines,
         line: trace.line,
-        unitToColor: function(d) {return polylinearUnitScales.map(function(s) {return s(d);});},
+        unitToColor: function(d) {
+            return polylinearUnitScales.map(function(s) {
+                return s(cScale(d));
+            });
+        },
         filterbar: trace.filterbar
     }];
 };
