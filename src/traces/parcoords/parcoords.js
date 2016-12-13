@@ -9,7 +9,6 @@
 'use strict';
 
 var lineLayerMaker = require('./lineLayer');
-var unitToColor = require('./colors');
 var utils = require('./utils');
 var d3 = require('d3');
 
