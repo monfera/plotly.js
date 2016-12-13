@@ -70,7 +70,7 @@ module.exports = {
         padding: {
             valType: 'number',
             dflt: 64,
-            min: 64,
+            min: 0,
             max: 128,
             role: 'style',
             description: [

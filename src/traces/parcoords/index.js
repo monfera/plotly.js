@@ -23,7 +23,7 @@ Parcoords.styleOne = require('./style_one');
 Parcoords.moduleType = 'trace';
 Parcoords.name = 'parcoords';
 Parcoords.basePlotModule = require('./base_plot');
-Parcoords.categories = ['pie', 'showLegend'];
+Parcoords.categories = ['parcoords',  'lineColorscale'];
 Parcoords.meta = {
     description: [
         'Parallel coordinates for multidimensional exploratory data analysis.',

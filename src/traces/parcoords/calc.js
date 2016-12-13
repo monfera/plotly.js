@@ -10,6 +10,20 @@
 
 var isNumeric = require('fast-isnumeric');
 var tinycolor = require('tinycolor2');
+var d3 = require('d3');
+
+function _convertArray(convert, data, count) {
+    var result = new Array(count),
+        data0 = data[0];
+
+    for(var i = 0; i < count; ++i) {
+        result[i] = (i >= data.length) ?
+            convert(data0) :
+            convert(data[i]);
+    }
+
+    return result;
+}
 
 var Color = require('../../components/color');
 var calcColorscale = require('./colorscale_calc');
@@ -123,7 +137,22 @@ module.exports = function calc(gd, trace) {
         }
     }
 
+    // todo should it be in defaults.js?
     calcColorscale(trace, trace.line.color, 'line', 'c');
+
+    var colorStops = trace.line.colorscale.map(function(d) {return d[0];});
+    var colorStrings = trace.line.colorscale.map(function(d) {return d[1];});
+    var colorTuples = colorStrings.map(function(c) {return d3.rgb(c);})
+    var prop = function(n) {return function(o) {return o[n];};};
+
+    // We can't use d3 color interpolation as we may have non-uniform color palette raster
+    // (various color stop distances).
+    var polylinearUnitScales = 'rgb'.split('').map(function(key) {
+        return d3.scale.linear()
+            .clamp(true)
+            .domain(colorStops)
+            .range(colorTuples.map(prop(key)));
+    });
 
     return [{
         dimensions: cd,
@@ -131,6 +160,7 @@ module.exports = function calc(gd, trace) {
         tickdistance: trace.tickdistance,
         lines: trace.lines,
         line: trace.line,
+        unitToColor: function(d) {return polylinearUnitScales.map(function(s) {return s(d);});},
         filterbar: trace.filterbar
     }];
 };
