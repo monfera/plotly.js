@@ -114,10 +114,9 @@ module.exports = function (root, styledData, layout) {
     var data = styledData.dimensions;
     var geometry = styledData.geometry;
     var tickDistance = styledData.tickdistance;
-    var coloringDomainToUnitScale = makeDomainToUnitScale(styledData.lines.color);
+    var coloringDomainToUnitScale = makeDomainToUnitScale(styledData.line.color);
     var lines = utils.extend(styledData.lines, {
-        color: styledData.lines.color
-            .map(coloringDomainToUnitScale)
+        color: styledData.line.color.map(coloringDomainToUnitScale)
     });
 
     var width = layout.width

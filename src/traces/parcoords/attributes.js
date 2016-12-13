@@ -77,13 +77,16 @@ module.exports = {
         }
     },
 
-    // todo add attribute for color clamping
-    lines: {
+    line: {
         color: {
             valType: 'data_array',
             role: 'info',
             description: ["Vector for coloring and depth."].join(' ')
-        },
+        }
+    },
+
+    // todo add attribute for color clamping
+    lines: {
         // todo switch to ploty standard color notation rather than RGB tuple
         contextcolor: {
             valType: 'data_array',
