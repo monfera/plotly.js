@@ -79,9 +79,13 @@ module.exports = {
 
     line: {
         color: {
+            // todo check how it should maybe support a singular value (`arrayOk`) for monochromatic lines
             valType: 'data_array',
             role: 'info',
-            description: ["Vector for coloring and depth."].join(' ')
+            description: [
+                'Specifies the values that serve as the basis for coloring lines. The array values map linearly',
+                'to the `colorscale`.'
+            ].join(' ')
         }
     },
 
