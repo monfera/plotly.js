@@ -59,8 +59,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('geometry.padding');
     coerce('tickdistance');
 
-    coerce('filterbar.visiblewidth');
-    coerce('filterbar.capturewidth');
+    coerce('filterbar.width');
     coerce('filterbar.fillcolor');
     coerce('filterbar.fillopacity');
     coerce('filterbar.strokecolor');
