@@ -106,6 +106,12 @@ module.exports = (function() {
 
         range: range,
 
+        extend: function extend(object, props) {
+            // this is a simple placeholder for a proper `extend` supplied by
+            // comprehensive library utilities
+            return Object.create(object, Object.getOwnPropertyDescriptors(props));
+        },
+
         d3OrdinalScaleSnap: function closestValue(scale, v) {
             for(var i = 0, a = scale.range(), prevDiff = Infinity, prevValue = a[0], diff; i < a.length; i++) {
                 if((diff = Math.abs(a[i] - v)) > prevDiff) {

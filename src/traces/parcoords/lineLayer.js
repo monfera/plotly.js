@@ -94,7 +94,8 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
     var width = layout.width;
     var height = layout.height;
     var panelSizeY = layout.height;
-    var coloringDimension = lines.coloringdimension;
+    var coloringPoints = lines.coloringPoints.map(paddedUnit);
+
     var canvasPixelRatio = lines.pixelratio;
 
     var canvasWidth = width * canvasPixelRatio;
@@ -105,12 +106,6 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
     canvasGL.setAttribute('height', canvasHeight);
     canvasGL.style.width = width + 'px';
     canvasGL.style.height = height + 'px';
-
-    var coloringDimensionUnitScale = dimensions[coloringDimension].domainToUnitScale;
-
-    function colorProjection(j) {
-        return coloringDimensionUnitScale(data[coloringDimension].values[j]);
-    }
 
     var gpuDimensionCount = 60; // don't change this; 3 + 1 extra dimensions also apply
 
@@ -154,22 +149,13 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
         color.push((focusAlphaBlending ? lines.contextcolor : c).concat([focusAlphaBlending ? lines.contextopacity : 255]));
     }
 
-    var colorIndex = new Float32Array(sampleCount * 2);
-    for(j = 0; j < sampleCount; j++) {
-        var prominence = colorProjection(j);
-        for(var k = 0; k < 2; k++) {
-            colorIndex[j * 2 + k] = prominence;
-        }
-    }
-
-    var styleDimensionIndex = 0;
     var styling = [];
     for(j = 0; j < sampleCount; j++) {
-        for(k = 0; k < 2; k++) {
+        for(var k = 0; k < 2; k++) {
             styling.push(points[j * gpuDimensionCount + gpuDimensionCount]);
             styling.push(points[j * gpuDimensionCount + gpuDimensionCount + 1]);
             styling.push(points[j * gpuDimensionCount + gpuDimensionCount + 2]); // currently unused
-            styling.push(Math.round(2 * ((k % 2) - 0.5)) *  adjustDepth(points[j * gpuDimensionCount + styleDimensionIndex]));
+            styling.push(Math.round(2 * ((k % 2) - 0.5)) * adjustDepth(coloringPoints[j]));
         }
     }
 

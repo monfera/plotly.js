@@ -77,18 +77,13 @@ module.exports = {
         }
     },
 
+    // todo add attribute for color clamping
     lines: {
-
-        // todo consider dimension id or label rather than index
-        // todo add attribute for color clamping
-        coloringdimension: {
-            valType: 'number',
-            dflt: 0,
-            min: 0,
+        coloringpoints: {
+            valType: 'data_array',
             role: 'info',
-            description: 'The index of the dimension that serves as the basis for coloring and depth ordering the lines.'
+            description: ["Vector for coloring and depth."].join(' ')
         },
-
         // todo switch to ploty standard color notation rather than RGB tuple
         contextcolor: {
             valType: 'data_array',

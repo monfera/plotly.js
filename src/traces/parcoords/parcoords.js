@@ -52,8 +52,8 @@ function makeIntegerScale(integerPadding, dimension) {
             .rangePoints([0, 1], integerPadding)
 }
 
-function makeDomainToUnitScale(dimension) {
-    var extent = d3.extent(dimension.values);
+function makeDomainToUnitScale(values) {
+    var extent = d3.extent(values);
     if(extent[0] === extent[1]) {
         extent[0]--;
         extent[1]++;
@@ -87,7 +87,7 @@ function viewModel(lines, layout, model) {
             unitScale: makeUnitScale(layout.height, lines.verticalpadding),
             domainScale: makeDomainScale(layout.height, lines.verticalpadding, lines.integerpadding, dimension),
             integerScale: makeIntegerScale(lines.integerpadding, dimension),
-            domainToUnitScale: makeDomainToUnitScale(dimension),
+            domainToUnitScale: makeDomainToUnitScale(dimension.values),
             pieChartCheat: dimension.pieChartCheat,
             filter: [0, 1], //dimension.filter || (dimension.filter = [0, 1]),
             // one more problem: context lines get stuck
@@ -114,7 +114,11 @@ module.exports = function (root, styledData, layout) {
     var data = styledData.dimensions;
     var geometry = styledData.geometry;
     var tickDistance = styledData.tickdistance;
-    var lines = styledData.lines;
+    var coloringDomainToUnitScale = makeDomainToUnitScale(styledData.lines.coloringpoints);
+    var lines = utils.extend(styledData.lines, {
+        coloringPoints: styledData.lines.coloringpoints
+            .map(coloringDomainToUnitScale)
+    });
 
     var width = layout.width
     var height = layout.height
