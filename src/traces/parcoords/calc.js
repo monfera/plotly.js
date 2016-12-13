@@ -12,6 +12,7 @@ var isNumeric = require('fast-isnumeric');
 var tinycolor = require('tinycolor2');
 
 var Color = require('../../components/color');
+var calcColorscale = require('./colorscale_calc');
 var helpers = require('./helpers');
 
 module.exports = function calc(gd, trace) {
@@ -121,6 +122,8 @@ module.exports = function calc(gd, trace) {
             pt.text = thisText.join('<br>');
         }
     }
+
+    calcColorscale(trace, trace.line.color, 'line', 'c');
 
     return [{
         dimensions: cd,
