@@ -111,6 +111,8 @@ function styleExtentTexts(selection) {
 
 module.exports = function (root, styledData, layout) {
 
+    var unitToColor = styledData.unitToColor;
+
     var data = styledData.dimensions;
     var geometry = styledData.geometry;
     var tickDistance = styledData.tickdistance;

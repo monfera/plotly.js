@@ -19,21 +19,21 @@ var parcoords = require('./parcoords');
 
 var helpers = require('./helpers');
 
-module.exports = function plot(gd, cdpie) {
+module.exports = function plot(gd, cdparcoords) {
     var fullLayout = gd._fullLayout;
 
     var root = fullLayout._glcontainer.node() // fullLayout._parcoordslayer
 
-    var data = cdpie[0][0];
+    var data = cdparcoords[0][0];
 
     parcoords(root, data, {width: fullLayout.width, height: fullLayout.height});
 
     return;
 
 
-    scalePies(cdpie, fullLayout._size);
+   scalePies(cdparcoords, fullLayout._size);
 
-    var pieGroups = fullLayout._pielayer.selectAll('g.trace').data(cdpie);
+    var pieGroups = fullLayout._pielayer.selectAll('g.trace').data(cdparcoords);
 
 
 
