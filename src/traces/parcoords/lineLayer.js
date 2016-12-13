@@ -94,7 +94,7 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
     var width = layout.width;
     var height = layout.height;
     var panelSizeY = layout.height;
-    var coloringPoints = lines.coloringPoints.map(paddedUnit);
+    var color = lines.color.map(paddedUnit);
 
     var canvasPixelRatio = lines.pixelratio;
 
@@ -144,10 +144,10 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
     })
 */
 
-    var color = [];
+    var ccolor = [];
     for(j = 0; j < 256; j++) {
         var c = unitToColor(j / 255);
-        color.push((focusAlphaBlending ? lines.contextcolor : c).concat([focusAlphaBlending ? lines.contextopacity : 255]));
+        ccolor.push((focusAlphaBlending ? lines.contextcolor : c).concat([focusAlphaBlending ? lines.contextopacity : 255]));
     }
 
     var styling = [];
@@ -156,7 +156,7 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
             styling.push(points[(j + 1) * strideableVectorAttributeCount]);
             styling.push(points[(j + 1) * strideableVectorAttributeCount + 1]);
             styling.push(points[(j + 1) * strideableVectorAttributeCount + 2]);
-            styling.push(Math.round(2 * ((k % 2) - 0.5)) * adjustDepth(coloringPoints[j]));
+            styling.push(Math.round(2 * ((k % 2) - 0.5)) * adjustDepth(color[j]));
         }
     }
 
@@ -178,7 +178,7 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
         type: 'uint8',
         mag: 'nearest',
         min: 'nearest',
-        data: color
+        data: ccolor
     });
 
     var positionBuffer = regl.buffer(new Float32Array(pointPairs));

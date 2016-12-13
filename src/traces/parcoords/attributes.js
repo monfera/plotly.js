@@ -79,7 +79,7 @@ module.exports = {
 
     // todo add attribute for color clamping
     lines: {
-        coloringpoints: {
+        color: {
             valType: 'data_array',
             role: 'info',
             description: ["Vector for coloring and depth."].join(' ')
