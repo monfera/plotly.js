@@ -122,6 +122,7 @@ module.exports = function (root, styledData, layout) {
 
     var width = layout.width
     var height = layout.height
+    var padding = styledData.geometry.padding
 
     var resizeHeight = styledData.filterbar.handleheight;
     var brushVisibleWidth = styledData.filterbar.width;
@@ -212,10 +213,9 @@ module.exports = function (root, styledData, layout) {
         .append('svg')
         .classed('parcoordsControlOverlay', true)
         .attr('overflow', 'visible')
-        .attr('width', width)
-        .attr('height', height)
+        .attr('width', width + 2 * padding)
+        .attr('height', height + 2 * padding)
         .style('position', 'absolute')
-        .style('padding', geometry.padding + 'px')
         .style('overflow', 'visible')
         .style('shape-rendering', 'crispEdges')
         .call(enterSvgDefs);
@@ -225,6 +225,7 @@ module.exports = function (root, styledData, layout) {
 
     parcoordsControlView.enter()
         .append('g')
+        .attr('transform', 'translate(' + padding + ',' + padding + ')')
         .classed('parcoordsControlView', true);
 
     var panel = parcoordsControlView.selectAll('.panel')
