@@ -77,7 +77,7 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
     render(blockNumber);
 }
 
-module.exports = function(canvasGL, lines, width, height, data, unitToColor, context) {
+module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unitToColor, context) {
 
     var renderState = {
         currentRafs: {},
@@ -91,22 +91,18 @@ module.exports = function(canvasGL, lines, width, height, data, unitToColor, con
 
     var focusAlphaBlending = context; // controlConfig.focusAlphaBlending;
 
-    var panelSizeY = height;
-    var color = lines.color.map(paddedUnit);
-
     var canvasPixelRatio = lines.pixelratio;
-
-    var canvasWidth = width * canvasPixelRatio;
-    var canvasHeight = height * canvasPixelRatio;
-    var canvasPanelSizeY = panelSizeY * canvasPixelRatio;
+    var canvasPanelSizeY = canvasHeight;
 
     var gpuDimensionCount = 64;
     var strideableVectorAttributeCount = gpuDimensionCount - 4; // stride can't be an exact 256
 
-    function paddedUnit(d) {
-        var unitPad = lines.verticalpadding / panelSizeY;
+    var paddedUnit = function paddedUnit(d) {
+        var unitPad = lines.verticalpadding / canvasPanelSizeY;
         return unitPad + d * (1 - 2 * unitPad);
     }
+
+    var color = lines.color.map(paddedUnit);
 
     var points = []
     for(var j = 0; j < sampleCount; j++)
@@ -309,10 +305,10 @@ module.exports = function(canvasGL, lines, width, height, data, unitToColor, con
         for(I = 0; I < shownPanelCount; I++) {
             var dimensionView = dimensionViews[I];
             var i = dimensionView.originalXIndex;
-            var x = dimensionView.x * lines.pixelratio;
+            var x = dimensionView.x * canvasPixelRatio;
             var nextVar = dimensionViews[(I + 1) % shownDimensionCount];
             var ii = nextVar.originalXIndex;
-            var panelSizeX = nextVar.x * lines.pixelratio - x;
+            var panelSizeX = nextVar.x * canvasPixelRatio - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextVar.x) {
                 previousAxisOrder[i] = [x, nextVar.x];
                 var item = {
