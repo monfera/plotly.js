@@ -103,6 +103,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
     }
 
     var color = lines.color.map(paddedUnit);
+    var overdrag = lines.overdrag;
 
     var points = []
     for(var j = 0; j < sampleCount; j++)
@@ -335,7 +336,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
                     colorClamp: colorClamp,
                     scatter: dimensionView.scatter || 0,
                     scissorX: I === leftmostIndex ? 0 : x,
-                    scissorWidth: I === rightmostIndex ? canvasWidth : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
+                    scissorWidth: I === rightmostIndex ? 2 * panelSizeX : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
                 };
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blocklinecount : sampleCount, sampleCount, item);

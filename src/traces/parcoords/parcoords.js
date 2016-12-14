@@ -115,8 +115,10 @@ module.exports = function (root, styledData, layout) {
     var data = styledData.dimensions;
     var tickDistance = styledData.tickdistance;
     var coloringDomainToUnitScale = makeDomainToUnitScale(styledData.line.color);
+    var overdrag = 10;
     var lines = utils.extend(styledData.lines, {
-        color: styledData.line.color.map(coloringDomainToUnitScale)
+        color: styledData.line.color.map(coloringDomainToUnitScale),
+        overdrag: overdrag
     });
 
     var legendWidth = 80;
@@ -259,7 +261,7 @@ module.exports = function (root, styledData, layout) {
             .on('drag', function(d) {
                 if(domainBrushing)
                     return;
-                d.x = Math.max(-10, Math.min(width + 10, d3.event.x));
+                d.x = Math.max(-overdrag, Math.min(width + overdrag, d3.event.x));
                 panel
                     .sort(function(a, b) {return a.x - b.x;})
                     .each(function(dd, i) {
