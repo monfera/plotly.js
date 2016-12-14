@@ -122,7 +122,7 @@ module.exports = function (root, styledData, layout) {
 
     var width = layout.width
     var height = layout.height
-    var padding = styledData.geometry.padding
+    var padding = styledData.padding || 80;
 
     var resizeHeight = styledData.filterbar.handleheight;
     var brushVisibleWidth = styledData.filterbar.width;
@@ -193,7 +193,7 @@ module.exports = function (root, styledData, layout) {
         .append('canvas')
         .classed('parcoordsLineLayer', true)
         .style('position', 'absolute')
-        .style('padding', geometry.padding + 'px')
+        .style('padding', padding + 'px')
         .style('overflow', 'visible');
 
     var tweakables = {renderers: [], dimensions: []};
