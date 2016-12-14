@@ -124,6 +124,9 @@ module.exports = function (root, styledData, layout) {
     var width = layout.width - 2 * padding - legendWidth; // leavig room for the colorbar
     var height = layout.height - 2 * padding;
 
+    var canvasPixelRatio = lines.pixelratio;
+    var canvasWidth = width * canvasPixelRatio;
+    var canvasHeight = height * canvasPixelRatio;
 
     var resizeHeight = styledData.filterbar.handleheight;
     var brushVisibleWidth = styledData.filterbar.width;
@@ -195,13 +198,17 @@ module.exports = function (root, styledData, layout) {
         .classed('parcoordsLineLayer', true)
         .style('position', 'absolute')
         .style('padding', padding + 'px')
-        .style('overflow', 'visible');
+        .style('overflow', 'visible')
+        .attr('width', canvasWidth)
+        .attr('height', canvasHeight)
+        .style('width', width + 'px')
+        .style('height', height + 'px');
 
     var tweakables = {renderers: [], dimensions: []};
 
     parcoordsLineLayer
         .each(function(d) {
-            var lineLayer = lineLayerMaker(this, lines, layout.width, height, d.viewModel.panels, unitToColor, d.context);
+            var lineLayer = lineLayerMaker(this, lines, width, height, d.viewModel.panels, unitToColor, d.context);
             d.viewModel[d.key] = lineLayer;
             tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true)});
             lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));

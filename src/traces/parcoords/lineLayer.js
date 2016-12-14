@@ -100,11 +100,6 @@ module.exports = function(canvasGL, lines, width, height, data, unitToColor, con
     var canvasHeight = height * canvasPixelRatio;
     var canvasPanelSizeY = panelSizeY * canvasPixelRatio;
 
-    canvasGL.setAttribute('width', canvasWidth);
-    canvasGL.setAttribute('height', canvasHeight);
-    canvasGL.style.width = width + 'px';
-    canvasGL.style.height = height + 'px';
-
     var gpuDimensionCount = 64;
     var strideableVectorAttributeCount = gpuDimensionCount - 4; // stride can't be an exact 256
 
@@ -344,7 +339,7 @@ module.exports = function(canvasGL, lines, width, height, data, unitToColor, con
                     colorClamp: colorClamp,
                     scatter: dimensionView.scatter || 0,
                     scissorX: I === leftmostIndex ? 0 : x,
-                    scissorWidth: I === rightmostIndex ? width : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
+                    scissorWidth: I === rightmostIndex ? canvasWidth : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
                 };
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blocklinecount : sampleCount, sampleCount, item);
