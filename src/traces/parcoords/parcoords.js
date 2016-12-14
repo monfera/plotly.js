@@ -62,9 +62,9 @@ function makeDomainToUnitScale(values) {
     return function(x) {return a * x + b};
 }
 
-function viewModel(lines, layout, model) {
+function viewModel(lines, width, height, model) {
 
-    var xScale = d3.scale.ordinal().domain(d3.range(model.dimensions.length)).rangePoints([0, layout.width], 0);
+    var xScale = d3.scale.ordinal().domain(d3.range(model.dimensions.length)).rangePoints([0, width], 0);
 
     var viewModel = {
         key: model.key,
@@ -79,12 +79,12 @@ function viewModel(lines, layout, model) {
             scatter: dimension.scatter,
             xIndex: i,
             originalXIndex: i,
-            height: layout.height,
+            height: height,
             values: dimension.values,
             xScale: xScale,
             x: xScale(i),
-            unitScale: makeUnitScale(layout.height, lines.verticalpadding),
-            domainScale: makeDomainScale(layout.height, lines.verticalpadding, lines.integerpadding, dimension),
+            unitScale: makeUnitScale(height, lines.verticalpadding),
+            domainScale: makeDomainScale(height, lines.verticalpadding, lines.integerpadding, dimension),
             integerScale: makeIntegerScale(lines.integerpadding, dimension),
             domainToUnitScale: makeDomainToUnitScale(dimension.values),
             pieChartCheat: dimension.pieChartCheat,
@@ -113,16 +113,17 @@ module.exports = function (root, styledData, layout) {
     var unitToColor = styledData.unitToColor;
 
     var data = styledData.dimensions;
-    var geometry = styledData.geometry;
     var tickDistance = styledData.tickdistance;
     var coloringDomainToUnitScale = makeDomainToUnitScale(styledData.line.color);
     var lines = utils.extend(styledData.lines, {
         color: styledData.line.color.map(coloringDomainToUnitScale)
     });
 
-    var width = layout.width
-    var height = layout.height
+    var legendWidth = 80;
     var padding = styledData.padding || 80;
+    var width = layout.width - 2 * padding - legendWidth; // leavig room for the colorbar
+    var height = layout.height - 2 * padding;
+
 
     var resizeHeight = styledData.filterbar.handleheight;
     var brushVisibleWidth = styledData.filterbar.width;
@@ -172,7 +173,7 @@ module.exports = function (root, styledData, layout) {
         .classed('parcoordsModel', true);
 
     var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
-        .data(viewModel.bind(0, lines, layout), keyFun)
+        .data(viewModel.bind(0, lines, width, height), keyFun)
 
     parcoordsViewModel.enter()
         .append('div')
@@ -200,7 +201,7 @@ module.exports = function (root, styledData, layout) {
 
     parcoordsLineLayer
         .each(function(d) {
-            var lineLayer = lineLayerMaker(this, lines, layout, d.viewModel.panels, unitToColor, d.context);
+            var lineLayer = lineLayerMaker(this, lines, layout.width, height, d.viewModel.panels, unitToColor, d.context);
             d.viewModel[d.key] = lineLayer;
             tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true)});
             lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
