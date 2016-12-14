@@ -77,7 +77,7 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
     render(blockNumber);
 }
 
-module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
+module.exports = function(canvasGL, lines, width, height, data, unitToColor, context) {
 
     var renderState = {
         currentRafs: {},
@@ -91,9 +91,7 @@ module.exports = function(canvasGL, lines, layout, data, unitToColor, context) {
 
     var focusAlphaBlending = context; // controlConfig.focusAlphaBlending;
 
-    var width = layout.width;
-    var height = layout.height;
-    var panelSizeY = layout.height;
+    var panelSizeY = height;
     var color = lines.color.map(paddedUnit);
 
     var canvasPixelRatio = lines.pixelratio;
