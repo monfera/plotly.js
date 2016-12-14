@@ -4,11 +4,10 @@
         "height": 256
     },
     "data": [{
-        "type": "parcoords",
-        "tickdistance": 50,
-        "geometry": {
-            "padding": 80
-        },
+
+
+
+        "padding": 80,
         "filterbar": {
             "width": 4,
             "fillcolor": "magenta",
@@ -28,6 +27,10 @@
             "verticalpadding": 2,
             "integerpadding": 0
         },
+
+
+        "type": "parcoords",
+        "tickdistance": 50,
         "line": {
             "showscale": true,
             "reversescale": true,
