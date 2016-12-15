@@ -132,7 +132,7 @@ module.exports = function (root, styledData, layout) {
     var height = layoutHeight - 2 * padding;
 
     var canvasPixelRatio = lines.pixelratio;
-    var canvasWidth = (width + overdrag) * canvasPixelRatio;
+    var canvasWidth = (width + 2 * overdrag) * canvasPixelRatio;
     var canvasHeight = height * canvasPixelRatio;
 
     var resizeHeight = styledData.filterbar.handleheight;
@@ -204,12 +204,13 @@ module.exports = function (root, styledData, layout) {
     parcoordsLineLayer.enter()
         .append('canvas')
         .classed('parcoordsLineLayer', true)
+        .style('transform', 'translate(' + (-overdrag) + 'px, 0)')
         .style('position', 'absolute')
         .style('padding', padding + 'px')
         .style('overflow', 'visible')
         .attr('width', canvasWidth)
         .attr('height', canvasHeight)
-        .style('width', (width + overdrag) + 'px')
+        .style('width', (width + 2 * overdrag) + 'px')
         .style('height', height + 'px');
 
     var tweakables = {renderers: [], dimensions: []};

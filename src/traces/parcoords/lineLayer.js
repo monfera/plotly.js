@@ -103,7 +103,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
     }
 
     var color = lines.color.map(paddedUnit);
-    var overdrag = lines.overdrag;
+    var overdrag = lines.overdrag * canvasPixelRatio;
 
     var points = []
     for(var j = 0; j < sampleCount; j++)
@@ -315,7 +315,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
                 var item = {
                     key: dimensionView.originalXIndex,
                     resolution: [canvasWidth, canvasHeight],
-                    viewBoxPosition: [x, 0],
+                    viewBoxPosition: [x + overdrag, 0],
                     viewBoxSize: [panelSizeX, canvasPanelSizeY],
                     var1A: utils.range(16).map(function(d) {return d === i  ? 1 : 0}),
                     var2A: utils.range(16).map(function(d) {return d === ii ? 1 : 0}),
@@ -335,8 +335,8 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
                     hiD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[1] : 1)) + filterEpsilon}),
                     colorClamp: colorClamp,
                     scatter: dimensionView.scatter || 0,
-                    scissorX: I === leftmostIndex ? 0 : x,
-                    scissorWidth: I === rightmostIndex ? 2 * panelSizeX : panelSizeX + 1 + (I === leftmostIndex ? x : 0)
+                    scissorX: I === leftmostIndex ? 0 : x + overdrag,
+                    scissorWidth: I === rightmostIndex ? 2 * panelSizeX : panelSizeX + 1 + (I === leftmostIndex ? x + overdrag : 0)
                 };
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blocklinecount : sampleCount, sampleCount, item);
