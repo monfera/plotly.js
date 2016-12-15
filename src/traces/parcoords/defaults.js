@@ -26,11 +26,6 @@ var handleLineDefaults = function lineDefaults(traceIn, traceOut, defaultColor, 
         var lineColorDflt = (Array.isArray(markerColor) ? false : markerColor) || defaultColor;
         coerce('line.color', lineColorDflt);
     }
-/*
-    // parcoords doesn't have these but scatter does
-    coerce('line.width');
-    coerce('line.dash');
-*/
 };
 
 
@@ -70,8 +65,6 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
         return Lib.coerce(traceIn, traceOut, attributes, attr, dflt);
     }
 
-    var coerceFont = Lib.coerceFont;
-
     var dimensions = dimensionsDefaults(traceIn, traceOut);
 
     if(!Array.isArray(dimensions) || !dimensions.length) {
@@ -105,58 +98,4 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('lines.focusalphablending');
     coerce('lines.verticalpadding');
     coerce('lines.integerpadding');
-
-
-    var labels = coerce('labels');
-    if(!Array.isArray(labels)) {
-        coerce('label0');
-        coerce('dlabel');
-    }
-
-    var lineWidth = coerce('marker.line.width');
-    if(lineWidth) coerce('marker.line.color');
-
-    var colors = coerce('marker.colors');
-    if(!Array.isArray(colors)) traceOut.marker.colors = []; // later this will get padded with default colors
-
-    coerce('scalegroup');
-    // TODO: tilt, depth, and hole all need to be coerced to the same values within a scaleegroup
-    // (ideally actually, depth would get set the same *after* scaling, ie the same absolute depth)
-    // and if colors aren't specified we should match these up - potentially even if separate pies
-    // are NOT in the same sharegroup
-
-
-    var textData = coerce('text');
-    var textInfo = coerce('textinfo', Array.isArray(textData) ? 'text+percent' : 'percent');
-
-    coerce('hoverinfo', (layout._dataLength === 1) ? 'label+text+value+percent' : undefined);
-
-    if(textInfo && textInfo !== 'none') {
-        var textPosition = coerce('textposition'),
-            hasBoth = Array.isArray(textPosition) || textPosition === 'auto',
-            hasInside = hasBoth || textPosition === 'inside',
-            hasOutside = hasBoth || textPosition === 'outside';
-
-        if(hasInside || hasOutside) {
-            var dfltFont = coerceFont(coerce, 'textfont', layout.font);
-            if(hasInside) coerceFont(coerce, 'insidetextfont', dfltFont);
-            if(hasOutside) coerceFont(coerce, 'outsidetextfont', dfltFont);
-        }
-    }
-
-    // 3D attributes commented out until I finish them in a later PR
-    // var tilt = coerce('tilt');
-    // if(tilt) {
-    //     coerce('tiltaxis');
-    //     coerce('depth');
-    //     coerce('shading');
-    // }
-
-    coerce('hole');
-
-    coerce('sort');
-    coerce('direction');
-    coerce('rotation');
-
-    coerce('pull');
 };
