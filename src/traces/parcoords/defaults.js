@@ -83,6 +83,10 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     coerce('tickdistance');
 
+    coerce('domain.x');
+    coerce('domain.y');
+
+
     coerce('filterbar.width');
     coerce('filterbar.fillcolor');
     coerce('filterbar.fillopacity');
@@ -139,9 +143,6 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
             if(hasOutside) coerceFont(coerce, 'outsidetextfont', dfltFont);
         }
     }
-
-    coerce('domain.x');
-    coerce('domain.y');
 
     // 3D attributes commented out until I finish them in a later PR
     // var tilt = coerce('tilt');

@@ -165,6 +165,7 @@ module.exports = function calc(gd, trace) {
         .domain([unitMin, unitMax]);
 
     return [{
+        domain: trace.domain,
         dimensions: cd,
         tickdistance: trace.tickdistance,
         lines: trace.lines,
