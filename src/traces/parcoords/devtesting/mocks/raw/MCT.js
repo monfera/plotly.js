@@ -1,3 +1,11 @@
+/**
+* Copyright 2012-2016, Plotly, Inc.
+* All rights reserved.
+*
+* This source code is licensed under the MIT license found in the
+* LICENSE file in the root directory of this source tree.
+*/
+
 module.exports = require('ndarray')(new Float64Array([1.894827648,2.07981E+11,10005394.06,0.000465563,28255400,83147600,
 1.92826997,2.11328E+11,10117214.63,0.00048425,29349900,87065800,
 2.084991222,2.10021E+11,9728770.799,0.000571726,31786400,97794300,
