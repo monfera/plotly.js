@@ -1,7 +1,7 @@
 // for WIP development stage only, use it by
 // budo index.js --live -- -e test.js -o bundle.js
 
-var parcoords = require('./parcoords');
+var parcoords = require('./../parcoords');
 var mock = require('./dataAdapter');
 var data = mock.data[0];
 
