@@ -121,10 +121,15 @@ module.exports = function (root, styledData, layout) {
         overdrag: overdrag
     });
 
+    var layoutWidth = layout.width * (styledData.domain.x[1] - styledData.domain.x[0]);
+    var layoutHeight = layout.height * (styledData.domain.y[1] - styledData.domain.y[0]);
+
     var legendWidth = 80;
     var padding = styledData.padding || 80;
-    var width = layout.width - 2 * padding - legendWidth; // leavig room for the colorbar
-    var height = layout.height - 2 * padding;
+    var translateX = (styledData.domain.x[0] || 0) * layout.width;
+    var translateY = (styledData.domain.y[0] || 0) * layout.height;
+    var width = layoutWidth - 2 * padding - legendWidth; // leavig room for the colorbar
+    var height = layoutHeight - 2 * padding;
 
     var canvasPixelRatio = lines.pixelratio;
     var canvasWidth = width * canvasPixelRatio;
@@ -182,7 +187,8 @@ module.exports = function (root, styledData, layout) {
 
     parcoordsViewModel.enter()
         .append('div')
-        .classed('parcoordsViewModel', true);
+        .classed('parcoordsViewModel', true)
+        .style('transform', 'translate(' + translateX + 'px,' + translateY + 'px)');
 
     var parcoordsLineLayer = parcoordsViewModel.selectAll('.parcoordsLineLayer')
         .data(function(vm) {

@@ -5,7 +5,10 @@
     },
     "data": [{
 
-
+        "domain": {
+            "x": [0, 1],
+            "y": [0, 1]
+        },
 
         "padding": 80,
         "filterbar": {

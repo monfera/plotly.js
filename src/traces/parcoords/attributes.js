@@ -20,6 +20,36 @@ module.exports = {
 
     // PARCOORDS ATTRIBUTES
 
+    // todo I'm sure it could be DRIED up
+    domain: {
+        x: {
+            valType: 'info_array',
+            role: 'info',
+            items: [
+                {valType: 'number', min: 0, max: 1},
+                {valType: 'number', min: 0, max: 1}
+            ],
+            dflt: [0, 1],
+            description: [
+                'Sets the horizontal domain of this pie trace',
+                '(in plot fraction).'
+            ].join(' ')
+        },
+        y: {
+            valType: 'info_array',
+            role: 'info',
+            items: [
+                {valType: 'number', min: 0, max: 1},
+                {valType: 'number', min: 0, max: 1}
+            ],
+            dflt: [0, 1],
+            description: [
+                'Sets the vertical domain of this pie trace',
+                '(in plot fraction).'
+            ].join(' ')
+        }
+    },
+
     // todo add attribute to `dimensions` for switching dimensions on/off
     // todo add attribute to `dimensions` for initial filter domain
     dimensions: {
@@ -348,35 +378,6 @@ module.exports = {
         description: 'Sets the font used for `textinfo` lying outside the pie.'
     }),
 
-    // position and shape
-    domain: {
-        x: {
-            valType: 'info_array',
-            role: 'info',
-            items: [
-                {valType: 'number', min: 0, max: 1},
-                {valType: 'number', min: 0, max: 1}
-            ],
-            dflt: [0, 1],
-            description: [
-                'Sets the horizontal domain of this pie trace',
-                '(in plot fraction).'
-            ].join(' ')
-        },
-        y: {
-            valType: 'info_array',
-            role: 'info',
-            items: [
-                {valType: 'number', min: 0, max: 1},
-                {valType: 'number', min: 0, max: 1}
-            ],
-            dflt: [0, 1],
-            description: [
-                'Sets the vertical domain of this pie trace',
-                '(in plot fraction).'
-            ].join(' ')
-        }
-    },
     hole: {
         valType: 'number',
         role: 'style',
