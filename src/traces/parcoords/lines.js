@@ -306,6 +306,36 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
             }
         }
 
+        // todo turn it into something DRYer and using efficient loops
+        function makeItem(i, ii, x, panelSizeX, originalXIndex, scatter) {
+            return {
+                key: originalXIndex,
+                resolution: [canvasWidth, canvasHeight],
+                viewBoxPosition: [x + overdrag, 0],
+                viewBoxSize: [panelSizeX, canvasPanelSizeY],
+                var1A: utils.range(16).map(function(d) {return d === i ? 1 : 0;}),
+                var2A: utils.range(16).map(function(d) {return d === ii ? 1 : 0;}),
+                var1B: utils.range(16).map(function(d) {return d + 16 === i ? 1 : 0;}),
+                var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0;}),
+                var1C: utils.range(16).map(function(d) {return d + 32 === i ? 1 : 0;}),
+                var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0;}),
+                var1D: utils.range(16).map(function(d) {return d + 48 === i ? 1 : 0;}),
+                var2D: utils.range(16).map(function(d) {return d + 48 === ii ? 1 : 0;}),
+                loA: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 0) ? orig(i).filter[0] : 0)) - filterEpsilon;}),
+                hiA: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 0) ? orig(i).filter[1] : 1)) + filterEpsilon;}),
+                loB: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 16) ? orig(i + 16).filter[0] : 0)) - filterEpsilon;}),
+                hiB: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 16) ? orig(i + 16).filter[1] : 1)) + filterEpsilon;}),
+                loC: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 32) ? orig(i + 32).filter[0] : 0)) - filterEpsilon;}),
+                hiC: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 32) ? orig(i + 32).filter[1] : 1)) + filterEpsilon;}),
+                loD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[0] : 0)) - filterEpsilon;}),
+                hiD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[1] : 1)) + filterEpsilon;}),
+                colorClamp: colorClamp,
+                scatter: scatter || 0,
+                scissorX: I === leftmostIndex ? 0 : x + overdrag,
+                scissorWidth: I === rightmostIndex ? 2 * panelSizeX : panelSizeX + 1 + (I === leftmostIndex ? x + overdrag : 0)
+            };
+        }
+
         for(I = 0; I < shownPanelCount; I++) {
             var dimensionView = dimensionViews[I];
             var i = dimensionView.originalXIndex;
@@ -315,32 +345,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
             var panelSizeX = nextVar.x * canvasPixelRatio - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextVar.x) {
                 previousAxisOrder[i] = [x, nextVar.x];
-                var item = {
-                    key: dimensionView.originalXIndex,
-                    resolution: [canvasWidth, canvasHeight],
-                    viewBoxPosition: [x + overdrag, 0],
-                    viewBoxSize: [panelSizeX, canvasPanelSizeY],
-                    var1A: utils.range(16).map(function(d) {return d === i ? 1 : 0;}),
-                    var2A: utils.range(16).map(function(d) {return d === ii ? 1 : 0;}),
-                    var1B: utils.range(16).map(function(d) {return d + 16 === i ? 1 : 0;}),
-                    var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0;}),
-                    var1C: utils.range(16).map(function(d) {return d + 32 === i ? 1 : 0;}),
-                    var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0;}),
-                    var1D: utils.range(16).map(function(d) {return d + 48 === i ? 1 : 0;}),
-                    var2D: utils.range(16).map(function(d) {return d + 48 === ii ? 1 : 0;}),
-                    loA: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 0) ? orig(i).filter[0] : 0)) - filterEpsilon;}),
-                    hiA: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 0) ? orig(i).filter[1] : 1)) + filterEpsilon;}),
-                    loB: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 16) ? orig(i + 16).filter[0] : 0)) - filterEpsilon;}),
-                    hiB: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 16) ? orig(i + 16).filter[1] : 1)) + filterEpsilon;}),
-                    loC: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 32) ? orig(i + 32).filter[0] : 0)) - filterEpsilon;}),
-                    hiC: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 32) ? orig(i + 32).filter[1] : 1)) + filterEpsilon;}),
-                    loD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[0] : 0)) - filterEpsilon;}),
-                    hiD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[1] : 1)) + filterEpsilon;}),
-                    colorClamp: colorClamp,
-                    scatter: dimensionView.scatter || 0,
-                    scissorX: I === leftmostIndex ? 0 : x + overdrag,
-                    scissorWidth: I === rightmostIndex ? 2 * panelSizeX : panelSizeX + 1 + (I === leftmostIndex ? x + overdrag : 0)
-                };
+                var item = makeItem(i, ii, x, panelSizeX, dimensionView.originalXIndex, dimensionView.scatter);
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blocklinecount : sampleCount, sampleCount, item);
             }
