@@ -12,7 +12,6 @@ var Parcoords = {};
 
 Parcoords.attributes = require('./attributes');
 Parcoords.supplyDefaults = require('./defaults');
-Parcoords.layoutAttributes = require('./layout_attributes');
 Parcoords.calc = require('./calc');
 Parcoords.plot = require('./plot');
 Parcoords.colorbar = require('./colorbar');
