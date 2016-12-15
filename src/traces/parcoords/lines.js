@@ -106,8 +106,9 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
     var overdrag = lines.overdrag * canvasPixelRatio;
 
     var points = [];
-    for(var j = 0; j < sampleCount; j++) {
-        for(var i = 0; i < strideableVectorAttributeCount; i++) {
+    var i, j;
+    for(j = 0; j < sampleCount; j++) {
+        for(i = 0; i < strideableVectorAttributeCount; i++) {
             points.push(i < dimensionCount ? paddedUnit(dimensions[i].domainToUnitScale(data[i].values[j])) : 0.5);
         }
     }
@@ -118,7 +119,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
         for(i = 0; i < strideableVectorAttributeCount; i++) {
             pointPairs.push(points[j * strideableVectorAttributeCount + i]);
         }
-        for (i = 0; i < strideableVectorAttributeCount; i++) {
+        for(i = 0; i < strideableVectorAttributeCount; i++) {
             pointPairs.push(points[j * strideableVectorAttributeCount + i]);
         }
     }
@@ -273,9 +274,9 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
         colorClamp[1] = unitDomain[1];
     }
 
-    function approach(dimension) {
-        //utils.ndarrayOrder(, dimension.index);
-        //console.log('Approached ', JSON.stringify(dimension.name));
+    function approach(/* dimension */) {
+        // utils.ndarrayOrder(, dimension.index);
+        // console.log('Approached ', JSON.stringify(dimension.name));
     }
 
     var previousAxisOrder = [];
@@ -319,22 +320,22 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
                     resolution: [canvasWidth, canvasHeight],
                     viewBoxPosition: [x + overdrag, 0],
                     viewBoxSize: [panelSizeX, canvasPanelSizeY],
-                    var1A: utils.range(16).map(function(d) {return d === i  ? 1 : 0}),
-                    var2A: utils.range(16).map(function(d) {return d === ii ? 1 : 0}),
-                    var1B: utils.range(16).map(function(d) {return d + 16 === i  ? 1 : 0}),
-                    var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0}),
-                    var1C: utils.range(16).map(function(d) {return d + 32 === i  ? 1 : 0}),
-                    var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0}),
-                    var1D: utils.range(16).map(function(d) {return d + 48 === i  ? 1 : 0}),
-                    var2D: utils.range(16).map(function(d) {return d + 48 === ii ? 1 : 0}),
-                    loA: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 0)  ? orig(i     ).filter[0] : 0)) - filterEpsilon}),
-                    hiA: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 0)  ? orig(i     ).filter[1] : 1)) + filterEpsilon}),
-                    loB: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 16) ? orig(i + 16).filter[0] : 0)) - filterEpsilon}),
-                    hiB: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 16) ? orig(i + 16).filter[1] : 1)) + filterEpsilon}),
-                    loC: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 32) ? orig(i + 32).filter[0] : 0)) - filterEpsilon}),
-                    hiC: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 32) ? orig(i + 32).filter[1] : 1)) + filterEpsilon}),
-                    loD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[0] : 0)) - filterEpsilon}),
-                    hiD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[1] : 1)) + filterEpsilon}),
+                    var1A: utils.range(16).map(function(d) {return d === i ? 1 : 0;}),
+                    var2A: utils.range(16).map(function(d) {return d === ii ? 1 : 0;}),
+                    var1B: utils.range(16).map(function(d) {return d + 16 === i ? 1 : 0;}),
+                    var2B: utils.range(16).map(function(d) {return d + 16 === ii ? 1 : 0;}),
+                    var1C: utils.range(16).map(function(d) {return d + 32 === i ? 1 : 0;}),
+                    var2C: utils.range(16).map(function(d) {return d + 32 === ii ? 1 : 0;}),
+                    var1D: utils.range(16).map(function(d) {return d + 48 === i ? 1 : 0;}),
+                    var2D: utils.range(16).map(function(d) {return d + 48 === ii ? 1 : 0;}),
+                    loA: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 0) ? orig(i).filter[0] : 0)) - filterEpsilon;}),
+                    hiA: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 0) ? orig(i).filter[1] : 1)) + filterEpsilon;}),
+                    loB: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 16) ? orig(i + 16).filter[0] : 0)) - filterEpsilon;}),
+                    hiB: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 16) ? orig(i + 16).filter[1] : 1)) + filterEpsilon;}),
+                    loC: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 32) ? orig(i + 32).filter[0] : 0)) - filterEpsilon;}),
+                    hiC: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 32) ? orig(i + 32).filter[1] : 1)) + filterEpsilon;}),
+                    loD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[0] : 0)) - filterEpsilon;}),
+                    hiD: utils.range(16).map(function(i) {return paddedUnit((!context && valid(i, 48) ? orig(i + 48).filter[1] : 1)) + filterEpsilon;}),
                     colorClamp: colorClamp,
                     scatter: dimensionView.scatter || 0,
                     scissorX: I === leftmostIndex ? 0 : x + overdrag,
