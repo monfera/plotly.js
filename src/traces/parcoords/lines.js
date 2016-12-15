@@ -17,7 +17,7 @@ var fragmentShaderSource = glslify('./shaderFragment.glsl');
 var depthLimitEpsilon = 1e-6; // don't change; otherwise near/far plane lines are lost
 var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on domain boundaries
 
-var dummyPixel = new Uint8Array(4)
+var dummyPixel = new Uint8Array(4);
 function ensureDraw(regl) {
     regl.read({
         x: 0,
@@ -100,20 +100,22 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
     var paddedUnit = function paddedUnit(d) {
         var unitPad = lines.verticalpadding / canvasPanelSizeY;
         return unitPad + d * (1 - 2 * unitPad);
-    }
+    };
 
     var color = lines.color.map(paddedUnit);
     var overdrag = lines.overdrag * canvasPixelRatio;
 
-    var points = []
-    for(var j = 0; j < sampleCount; j++)
-        for(var i = 0; i < strideableVectorAttributeCount; i++)
+    var points = [];
+    for(var j = 0; j < sampleCount; j++) {
+        for(var i = 0; i < strideableVectorAttributeCount; i++) {
             points.push(i < dimensionCount ? paddedUnit(dimensions[i].domainToUnitScale(data[i].values[j])) : 0.5);
+        }
+    }
 
     var pointPairs = [];
 
-    for (j = 0; j < sampleCount; j++) {
-        for (i = 0; i < strideableVectorAttributeCount; i++) {
+    for(j = 0; j < sampleCount; j++) {
+        for(i = 0; i < strideableVectorAttributeCount; i++) {
             pointPairs.push(points[j * strideableVectorAttributeCount + i]);
         }
         for (i = 0; i < strideableVectorAttributeCount; i++) {

@@ -7,12 +7,12 @@ var mouseEvent = require('../assets/mouse_event');
 
 describe('pie hovering', function() {
     var mock = require('@mocks/parcoords.json');
-    //var mock = require('@mocks/gl2d_scatter-colorscale-colorbar.json');
+    // var mock = require('@mocks/gl2d_scatter-colorscale-colorbar.json');
 
     describe('event data', function() {
         var mockCopy = Lib.extendDeep({}, mock),
-            width = mockCopy.layout.width,
-            height = mockCopy.layout.height,
+            // width = mockCopy.layout.width,
+            // height = mockCopy.layout.height,
             gd;
 
         beforeEach(function(done) {
@@ -23,10 +23,10 @@ describe('pie hovering', function() {
                 .then(done);
         });
 
-        //afterEach(destroyGraphDiv);
+        // afterEach(destroyGraphDiv);
 
         it('should contain the correct fields', function() {
-return;
+            return;
             /*
              * expected = [{
              *         v: 4,
@@ -44,35 +44,6 @@ return;
              *         cyFinal: 160
              *     }];
              */
-            var hoverData,
-                unhoverData;
-
-
-            gd.on('plotly_hover', function(data) {
-                hoverData = data;
-            });
-
-            gd.on('plotly_unhover', function(data) {
-                unhoverData = data;
-            });
-
-            mouseEvent('mouseover', width / 2 - 7, height / 2 - 7);
-            mouseEvent('mouseout', width / 2 - 7, height / 2 - 7);
-
-            expect(hoverData.points.length).toEqual(1);
-            expect(unhoverData.points.length).toEqual(1);
-
-            var fields = [
-                'v', 'label', 'color', 'i', 'hidden',
-                'text', 'px1', 'pxmid', 'midangle',
-                'px0', 'largeArc', 'cxFinal', 'cyFinal'
-            ];
-
-            expect(Object.keys(hoverData.points[0])).toEqual(fields);
-            expect(hoverData.points[0].i).toEqual(3);
-
-            expect(Object.keys(unhoverData.points[0])).toEqual(fields);
-            expect(unhoverData.points[0].i).toEqual(3);
         });
 
         it('should fire hover event when moving from one slice to another', function(done) {
