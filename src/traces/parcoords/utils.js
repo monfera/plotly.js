@@ -38,19 +38,19 @@ module.exports = (function() {
     return {
 
         // simple throttle function
-        throttle: function throttle (callback, limit) {
+        throttle: function throttle(callback, limit) {
 
             var wait = false;
-            return function () {
-                if (!wait) {
+            return function() {
+                if(!wait) {
 
                     callback.apply(null, arguments);
                     wait = true;
-                    setTimeout(function () {
+                    setTimeout(function() {
                         wait = false;
                     }, limit);
                 }
-            }
+            };
         },
 
         // typed array slice (for non-ES2015 browsers... IE11)
@@ -59,62 +59,64 @@ module.exports = (function() {
         // widen a typed array `a` to desired `columnCount` for testing
         // by repeating columns as needed
         widen: function widen(a, columnCount) {
-            var origSize = a.size
-            var origShape = a.shape
-            var origColumnCount = origShape[0]
-            var rowCount = origShape[1]
-            var r = ndarray(new Float64Array(origSize * columnCount / origColumnCount), [columnCount, rowCount], [1, columnCount])
+            var origSize = a.size;
+            var origShape = a.shape;
+            var origColumnCount = origShape[0];
+            var rowCount = origShape[1];
+            var r = ndarray(new Float64Array(origSize * columnCount / origColumnCount), [columnCount, rowCount], [1, columnCount]);
             for(var j = 0; j < rowCount; j++) {
                 for(var i = 0; i < columnCount; i++) {
-                    r.set(i, j, a.get(i % origColumnCount, j))
+                    r.set(i, j, a.get(i % origColumnCount, j));
                 }
             }
-            return r
+            return r;
         },
 
-        ndarrayOrder: function ndarrayOrder(unsortedData, orderByColumn) {
+        ndarrayOrder: function ndarrayOrder(unsortedData/* , orderByColumn */) {
 
-            var columnCount = unsortedData.shape[0]
-            var rowCount = unsortedData.shape[1]
-            var orderByVector = []
-            var i, j
+            var columnCount = unsortedData.shape[0];
+            var rowCount = unsortedData.shape[1];
+            var orderByVector = [];
+            var i, j;
             for(j = 0; j < rowCount; j++) {
-                //orderByVector.push(-unsortedData.get(orderByColumn, j))
-                orderByVector.push(Math.random())
+                // orderByVector.push(-unsortedData.get(orderByColumn, j))
+                orderByVector.push(Math.random());
             }
 
             var sortedSampleIndices = range(rowCount)
-                .sort(function(a, b) {return orderByVector[a] < orderByVector[b] ? 1 : orderByVector[a] > orderByVector[b] ? -1 : 0})
+                .sort(function(a, b) {return orderByVector[a] < orderByVector[b] ? 1 : orderByVector[a] > orderByVector[b] ? -1 : 0;});
 
-            var data = ndarray(slice64(unsortedData.data), unsortedData.shape, unsortedData.stride, unsortedData.offset)
-            for(j = 0; j < rowCount; j++)
-                for(i = 0; i < columnCount; i++)
-                    data.set(i, j, unsortedData.get(i, sortedSampleIndices[j]))
+            var data = ndarray(slice64(unsortedData.data), unsortedData.shape, unsortedData.stride, unsortedData.offset);
+            for(j = 0; j < rowCount; j++) {
+                for(i = 0; i < columnCount; i++) {
+                    data.set(i, j, unsortedData.get(i, sortedSampleIndices[j]));
+                }
+            }
 
-            return data
+            return data;
 
         },
 
         ndarrayDomains: function ndarrayDomains(data) {
 
-            var columnCount = data.shape[0]
-            var rowCount = data.shape[1]
+            var columnCount = data.shape[0];
+            var rowCount = data.shape[1];
 
-            var domains = range(columnCount).map(function() {return [Infinity, -Infinity];})
+            var domains = range(columnCount).map(function() {return [Infinity, -Infinity];});
 
             for(var i = 0; i < columnCount; i++) {
-                for (var j = 0; j < rowCount; j++) {
-                    domains[i][0] = Math.min(domains[i][0], data.get(i, j))
-                    domains[i][1] = Math.max(domains[i][1], data.get(i, j))
+                for(var j = 0; j < rowCount; j++) {
+                    domains[i][0] = Math.min(domains[i][0], data.get(i, j));
+                    domains[i][1] = Math.max(domains[i][1], data.get(i, j));
                 }
                 // avoid degenerate case of domain with zero extent
                 if(domains[i][0] === domains[i][1]) {
-                    domains[i][0]--
-                    domains[i][1]++
+                    domains[i][0]--;
+                    domains[i][1]++;
                 }
             }
 
-            return domains
+            return domains;
         },
 
         range: range,
@@ -126,7 +128,8 @@ module.exports = (function() {
         },
 
         d3OrdinalScaleSnap: function closestValue(scale, v) {
-            for(var i = 0, a = scale.range(), prevDiff = Infinity, prevValue = a[0], diff; i < a.length; i++) {
+            var i, a, prevDiff, prevValue, diff;
+            for(i = 0, a = scale.range(), prevDiff = Infinity, prevValue = a[0], diff; i < a.length; i++) {
                 if((diff = Math.abs(a[i] - v)) > prevDiff) {
                     return prevValue;
                 }
@@ -135,6 +138,6 @@ module.exports = (function() {
             }
             return a[a.length - 1];
         }
-    }
+    };
 
 })();

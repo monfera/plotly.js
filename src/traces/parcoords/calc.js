@@ -18,7 +18,7 @@ function colorScale(trace) {
     if(hasColorscale(trace, 'line')) {
         calcColorscale(trace, trace.line.color, 'line', 'c');
     }
-};
+}
 
 module.exports = function calc(gd, trace) {
     var vals = trace.dimensions,
@@ -45,7 +45,7 @@ module.exports = function calc(gd, trace) {
 
     var colorStops = trace.line.colorscale.map(function(d) {return d[0];});
     var colorStrings = trace.line.colorscale.map(function(d) {return d[1];});
-    var colorTuples = colorStrings.map(function(c) {return d3.rgb(c);})
+    var colorTuples = colorStrings.map(function(c) {return d3.rgb(c);});
     var prop = function(n) {return function(o) {return o[n];};};
 
     // We can't use d3 color interpolation as we may have non-uniform color palette raster

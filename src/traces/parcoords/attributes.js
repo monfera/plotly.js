@@ -53,18 +53,18 @@ module.exports = {
         id: {
             valType: 'string',
             role: 'info',
-            description: "Identifier of a dimension. Must be a unique string across all dimensions."
+            description: 'Identifier of a dimension. Must be a unique string across all dimensions.'
         },
         label: {
             valType: 'string',
             role: 'info',
-            description: "The shown name of the dimension."
+            description: 'The shown name of the dimension.'
         },
         integer: {
             valType: 'boolean',
             dflt: false,
             role: 'info',
-            description: "The shown name of the dimension."
+            description: 'The shown name of the dimension.'
         },
         values: {
             valType: 'data_array',

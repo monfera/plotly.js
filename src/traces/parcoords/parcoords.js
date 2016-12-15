@@ -8,7 +8,7 @@
 
 'use strict';
 
-var lineLayerMaker = require('./lineLayer');
+var lineLayerMaker = require('./lines');
 var utils = require('./utils');
 var d3 = require('d3');
 
@@ -28,11 +28,11 @@ function makeDomainScale(height, padding, integerPadding, dimension) {
         lo *= 0.9;
         hi *= 1.1;
     }
-    return dimension.integer
-        ? d3.scale.ordinal()
+    return dimension.integer ?
+        d3.scale.ordinal()
         .domain(d3.range(Math.round(lo), Math.round(hi + 1)))
-        .rangePoints([height - padding, padding], integerPadding)
-        : d3.scale.linear()
+        .rangePoints([height - padding, padding], integerPadding) :
+        d3.scale.linear()
         .domain([lo, hi])
         .range([height - padding, padding]);
 }
@@ -46,9 +46,9 @@ function makeIntegerScale(integerPadding, dimension) {
     return dimension.integer && d3.scale.ordinal()
             .domain(
                 d3.range(0, Math.round(d3.max(dimension.values) + 1) - Math.round(d3.min(dimension.values)))
-                    .map(function(d, _, a) {return d / (a.length - 1)})
+                    .map(function(d, _, a) {return d / (a.length - 1);})
             )
-            .rangePoints([0, 1], integerPadding)
+            .rangePoints([0, 1], integerPadding);
 }
 
 function makeDomainToUnitScale(values) {
@@ -59,7 +59,7 @@ function makeDomainToUnitScale(values) {
     }
     var a = 1 / (extent[1] - extent[0]);
     var b = -a * extent[0];
-    return function(x) {return a * x + b};
+    return function(x) {return a * x + b;};
 }
 
 function viewModel(lines, width, height, model) {
@@ -75,7 +75,7 @@ function viewModel(lines, width, height, model) {
         return {
             key: dimension.id || (dimension.label + ' ' + Math.floor(1e6 * Math.random())),
             label: dimension.label,
-            integer:dimension.integer,
+            integer: dimension.integer,
             scatter: dimension.scatter,
             xIndex: i,
             originalXIndex: i,
@@ -88,7 +88,7 @@ function viewModel(lines, width, height, model) {
             integerScale: makeIntegerScale(lines.integerpadding, dimension),
             domainToUnitScale: makeDomainToUnitScale(dimension.values),
             pieChartCheat: dimension.pieChartCheat,
-            filter: [0, 1], //dimension.filter || (dimension.filter = [0, 1]),
+            filter: [0, 1], // dimension.filter || (dimension.filter = [0, 1]),
             // one more problem: context lines get stuck
             parent: viewModel
         };
@@ -108,7 +108,7 @@ function styleExtentTexts(selection) {
         .style('user-select', 'none');
 }
 
-module.exports = function (root, styledData, layout) {
+module.exports = function(root, styledData, layout) {
 
     var unitToColor = styledData.unitToColor;
 
@@ -183,7 +183,7 @@ module.exports = function (root, styledData, layout) {
         .classed('parcoordsModel', true);
 
     var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
-        .data(viewModel.bind(0, lines, width, height), keyFun)
+        .data(viewModel.bind(0, lines, width, height), keyFun);
 
     parcoordsViewModel.enter()
         .append('div')
@@ -219,7 +219,7 @@ module.exports = function (root, styledData, layout) {
         .each(function(d) {
             var lineLayer = lineLayerMaker(this, lines, canvasWidth, canvasHeight, d.viewModel.panels, unitToColor, d.context);
             d.viewModel[d.key] = lineLayer;
-            tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true)});
+            tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true);});
             lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
         });
 
@@ -246,9 +246,9 @@ module.exports = function (root, styledData, layout) {
         .classed('parcoordsControlView', true);
 
     var panel = parcoordsControlView.selectAll('.panel')
-        .data(function(vm) {return vm.panels;}, keyFun)
+        .data(function(vm) {return vm.panels;}, keyFun);
 
-    var domainBrushing = false
+    var domainBrushing = false;
 
     function someFiltersActive(view) {
         return view.panels.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
@@ -257,7 +257,7 @@ module.exports = function (root, styledData, layout) {
     panel.enter()
         .append('g')
         .classed('panel', true)
-        .each(function(d) {tweakables.dimensions.push(d)});
+        .each(function(d) {tweakables.dimensions.push(d);});
 
     panel
         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
@@ -266,21 +266,22 @@ module.exports = function (root, styledData, layout) {
         .call(d3.behavior.drag()
             .origin(function(d) {return d;})
             .on('drag', function(d) {
-                if(domainBrushing)
+                if(domainBrushing) {
                     return;
+                }
                 d.x = Math.max(-overdrag, Math.min(width + overdrag, d3.event.x));
                 panel
                     .sort(function(a, b) {return a.x - b.x;})
                     .each(function(dd, i) {
                         dd.xIndex = i;
-                        dd.x = d == dd ? dd.x : dd.xScale(dd.xIndex);
+                        dd.x = d === dd ? dd.x : dd.xScale(dd.xIndex);
                     });
                 panel.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                 d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                 panel.each(function(d, i) {d.parent.panels[i] = d;});
-                d.parent['contextLineLayer'].render(d.parent.panels, false, !someFiltersActive(d.parent));
-                d.parent['focusLineLayer'].render(d.parent.panels);
+                d.parent.contextLineLayer.render(d.parent.panels, false, !someFiltersActive(d.parent));
+                d.parent.focusLineLayer.render(d.parent.panels);
             })
             .on('dragend', function(d) {
                 if(domainBrushing) {
@@ -289,8 +290,8 @@ module.exports = function (root, styledData, layout) {
                 d.x = d.xScale(d.xIndex);
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                d.parent['contextLineLayer'].render(d.parent.panels, false, !someFiltersActive(d.parent));
-                d.parent['focusLineLayer'].render(d.parent.panels);
+                d.parent.contextLineLayer.render(d.parent.panels, false, !someFiltersActive(d.parent));
+                d.parent.focusLineLayer.render(d.parent.panels);
             })
         );
 
@@ -320,9 +321,9 @@ module.exports = function (root, styledData, layout) {
                     .tickSize(4)
                     .outerTickSize(2)
                     .ticks(wantedTickCount, '3s') // works for continuous scales only...
-                    .tickValues(d.integer // and this works for ordinal scales
-                        ? dom.filter(function(d, i) {return !(i % Math.round((dom.length / wantedTickCount)));})
-                        : null)
+                    .tickValues(d.integer ? // and this works for ordinal scales
+                        dom.filter(function(d, i) {return !(i % Math.round((dom.length / wantedTickCount)));}) :
+                        null)
                     .scale(scale));
         });
 
@@ -350,7 +351,7 @@ module.exports = function (root, styledData, layout) {
 
     axisHeading.enter()
         .append('g')
-        .classed('axisHeading', true)
+        .classed('axisHeading', true);
 
     var axisTitle = axisHeading.selectAll('.axisTitle')
         .data(repeat, keyFun);
@@ -379,7 +380,7 @@ module.exports = function (root, styledData, layout) {
     axisExtentTop.enter()
         .append('g')
         .classed('axisExtentTop', true)
-        .attr('transform', 'translate(' + 0 + ',' + -(styledData.filterbar.handleheight - 2) + ')')
+        .attr('transform', 'translate(' + 0 + ',' + -(styledData.filterbar.handleheight - 2) + ')');
 
     var axisExtentTopText = axisExtentTop.selectAll('.axisExtentTopText')
         .data(repeat, keyFun);
@@ -401,7 +402,7 @@ module.exports = function (root, styledData, layout) {
     axisExtentBottom.enter()
         .append('g')
         .classed('axisExtentBottom', true)
-        .attr('transform', 'translate(' + 0 + ',' + (height + styledData.filterbar.handleheight - 2) + ')')
+        .attr('transform', 'translate(' + 0 + ',' + (height + styledData.filterbar.handleheight - 2) + ')');
 
     var axisExtentBottomText = axisExtentBottom.selectAll('.axisExtentBottomText')
         .data(repeat, keyFun);
@@ -421,7 +422,7 @@ module.exports = function (root, styledData, layout) {
         .classed('axisBrush', true)
         .on('mouseenter', function approach(dimension) {
             if(dimension !== lastApproached) {
-                dimension.parent['focusLineLayer'].approach(dimension);
+                dimension.parent.focusLineLayer.approach(dimension);
                 lastApproached = dimension;
             }
         });
@@ -474,7 +475,7 @@ module.exports = function (root, styledData, layout) {
         var extent = dimension.brush.extent();
         var panels = dimension.parent.panels;
         var filter = panels[dimension.xIndex].filter;
-        var reset = justStarted && (extent[0] == extent[1]);
+        var reset = justStarted && (extent[0] === extent[1]);
         if(reset) {
             dimension.brush.clear();
             d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
@@ -487,13 +488,13 @@ module.exports = function (root, styledData, layout) {
             }
 */
             panels[dimension.xIndex].filter = newExtent;
-            dimension.parent['focusLineLayer'].render(panels, true);
+            dimension.parent.focusLineLayer.render(panels, true);
             var filtersActive = someFiltersActive(dimension.parent);
             if(!contextShown && filtersActive) {
-                dimension.parent['contextLineLayer'].render(panels, true);
+                dimension.parent.contextLineLayer.render(panels, true);
                 contextShown = true;
             } else if(contextShown && !filtersActive) {
-                dimension.parent['contextLineLayer'].render(panels, true, true);
+                dimension.parent.contextLineLayer.render(panels, true, true);
                 contextShown = false;
             }
         }
@@ -502,7 +503,7 @@ module.exports = function (root, styledData, layout) {
 
     function axisBrushEnded(dimension) {
         var extent = dimension.brush.extent();
-        var empty = extent[0] == extent[1];
+        var empty = extent[0] === extent[1];
         if(!empty && dimension.integer) {
             var panels = dimension.parent.panels;
             var f = panels[dimension.xIndex].filter;
@@ -513,7 +514,7 @@ module.exports = function (root, styledData, layout) {
                 f[1] = Math.min(1, f[1] + 0.05);
             }
             d3.select(this).transition().duration(150).call(dimension.brush.extent(f));
-            dimension.parent['focusLineLayer'].render(panels, true);
+            dimension.parentfocusLineLayer.render(panels, true);
         }
         domainBrushing = false;
     }

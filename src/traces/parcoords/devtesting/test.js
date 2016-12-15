@@ -7,7 +7,7 @@
 */
 
 // todo remove the `devtesting` directory; for WIP development stage only
-
+'use strict';
 var parcoords = require('./../parcoords');
 var mock = require('../../../../test/image/mocks/parcoords.json');
 var data = mock.data[0];
@@ -17,45 +17,52 @@ document.body.appendChild(div);
 
 data.unitToColor = require('./colors');
 
-var tweakables = parcoords(div,
-    data,//.filter(function(d) {return true || !d.integer}).slice(0, Infinity),
+/*
+ var tweakables =
+*/
+
+parcoords(div,
+    data, // .filter(function(d) {return true || !d.integer}).slice(0, Infinity),
     mock.layout
 );
 
-function smoothstep(x) {
+// looping
+/*
+
+
+ function smoothstep(x) {
     return x * x * (3 - 2 * x);
 }
 
-var steps = 8
+var steps = 8;
 
 window.s = function() {
-    var i = 0
+    var i = 0;
     window.requestAnimationFrame(function anim() {
         if(i <= steps) {
             tweakables.dimensions[0].scatter = smoothstep(i / steps);
-            tweakables.renderers[0]()
-            tweakables.renderers[1]()
+            tweakables.renderers[0]();
+            tweakables.renderers[1]();
             i++;
-            window.requestAnimationFrame(anim)
+            window.requestAnimationFrame(anim);
         }
     })
-}
+};
 window.d = function() {
-    var i = steps
+    var i = steps;
     window.requestAnimationFrame(function anim() {
         if(i >= 0) {
             tweakables.dimensions[0].scatter = smoothstep(i / steps);
-            tweakables.renderers[0]()
-            tweakables.renderers[1]()
+            tweakables.renderers[0]();
+            tweakables.renderers[1]();
             i--;
-            window.requestAnimationFrame(anim)
+            window.requestAnimationFrame(anim);
         }
-    })
-}
+    });
+};
 
-if(0) {
-    var i = 0;
-    window.setInterval(function () {
-        if ((++i) % 2) s(); else d()
-    }, 2000)
-}
+var i = 0;
+window.setInterval(function() {
+    if ((++i) % 2) s(); else d();
+}, 2000);
+*/
