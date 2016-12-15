@@ -8,10 +8,17 @@
 
 'use strict';
 
+var hasColorscale = require('../../components/colorscale/has_colorscale');
+var calcColorscale = require('../../components/colorscale/calc');
 var isNumeric = require('fast-isnumeric');
 var d3 = require('d3');
 
-var calcColorscale = require('./colorscale_calc');
+// todo consider unifying common parts with e.g. `scatter`
+function colorScale(trace) {
+    if(hasColorscale(trace, 'line')) {
+        calcColorscale(trace, trace.line.color, 'line', 'c');
+    }
+};
 
 module.exports = function calc(gd, trace) {
     var vals = trace.dimensions,
@@ -34,7 +41,7 @@ module.exports = function calc(gd, trace) {
     }
 
     // todo should it be in defaults.js?
-    calcColorscale(trace, trace.line.color, 'line', 'c');
+    colorScale(trace, trace.line.color, 'line', 'c');
 
     var colorStops = trace.line.colorscale.map(function(d) {return d[0];});
     var colorStrings = trace.line.colorscale.map(function(d) {return d[1];});
