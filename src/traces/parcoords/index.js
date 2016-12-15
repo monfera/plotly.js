@@ -12,13 +12,10 @@ var Parcoords = {};
 
 Parcoords.attributes = require('./attributes');
 Parcoords.supplyDefaults = require('./defaults');
-Parcoords.supplyLayoutDefaults = require('./layout_defaults');
 Parcoords.layoutAttributes = require('./layout_attributes');
 Parcoords.calc = require('./calc');
 Parcoords.plot = require('./plot');
-Parcoords.style = require('./style');
 Parcoords.colorbar = require('./colorbar');
-Parcoords.styleOne = require('./style_one');
 
 Parcoords.moduleType = 'trace';
 Parcoords.name = 'parcoords';
