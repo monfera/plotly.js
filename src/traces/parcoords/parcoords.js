@@ -132,7 +132,7 @@ module.exports = function (root, styledData, layout) {
     var height = layoutHeight - 2 * padding;
 
     var canvasPixelRatio = lines.pixelratio;
-    var canvasWidth = width * canvasPixelRatio;
+    var canvasWidth = (width + overdrag) * canvasPixelRatio;
     var canvasHeight = height * canvasPixelRatio;
 
     var resizeHeight = styledData.filterbar.handleheight;
@@ -209,7 +209,7 @@ module.exports = function (root, styledData, layout) {
         .style('overflow', 'visible')
         .attr('width', canvasWidth)
         .attr('height', canvasHeight)
-        .style('width', width + 'px')
+        .style('width', (width + overdrag) + 'px')
         .style('height', height + 'px');
 
     var tweakables = {renderers: [], dimensions: []};
