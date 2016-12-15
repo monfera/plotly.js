@@ -6,7 +6,7 @@ var destroyGraphDiv = require('../assets/destroy_graph_div');
 var mouseEvent = require('../assets/mouse_event');
 
 describe('pie hovering', function() {
-    var mock = require('@src/traces/parcoords/mocks/k2.json');
+    var mock = require('@mocks/parcoords.json');
     //var mock = require('@mocks/gl2d_scatter-colorscale-colorbar.json');
 
     describe('event data', function() {

@@ -2,7 +2,7 @@
 // budo index.js --live -- -e test.js -o bundle.js
 
 var parcoords = require('./../parcoords');
-var mock = require('./dataAdapter');
+var mock = require('../../../../test/image/mocks/parcoords.json');
 var data = mock.data[0];
 
 var div = document.createElement('div');
