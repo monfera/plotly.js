@@ -13,9 +13,24 @@ var colorbarAttrs = require('../../components/colorbar/attributes');
 
 var extendFlat = require('../../lib/extend').extendFlat;
 
+/*
+todo comments (some of them relating to items that should be unexposed anyway):
+- `domain` should be DRYed up across other plots
+- add attribute to `dimensions` for switching dimensions on/off
+- add attribute to `dimensions` for initial filter domain
+- clarify what the actual use of `_isLinkedToArray: 'dimension'` - esp. the value - is below
+- add attribute for color clamping
+- switch to ploty standard color notation rather than RGB tuple
+- switch to 0..1 for opacity rather than 0..255
+- tie pixelratio to window.devicePixelRatio in `defaults.js`
+- consider if we need a `focusopacity` attribute besides focusalphablending; making settings more symmetric between
+      focus and context
+- hardcode verticalpadding
+- this minor but ergonomic `integerpadding` isn't fully working yet - either finish it or remove it
+*/
+
 module.exports = {
 
-    // todo it could be DRYed up across other plots
     domain: {
         x: {
             valType: 'info_array',
@@ -45,10 +60,7 @@ module.exports = {
         }
     },
 
-    // todo add attribute to `dimensions` for switching dimensions on/off
-    // todo add attribute to `dimensions` for initial filter domain
     dimensions: {
-        // todo clarify what the actual use of `_isLinkedToArray: 'dimension'` - esp. the value - is below
         _isLinkedToArray: 'dimension',
         id: {
             valType: 'string',
@@ -83,9 +95,7 @@ module.exports = {
         dflt: 50,
         min: 32,
         role: 'style',
-        description: [
-            'The desired approximate tick distance (in pixels) between axis ticks on an axis.'
-        ]
+        description: 'The desired approximate tick distance (in pixels) between axis ticks on an axis.'
     },
 
     line: extendFlat({},
@@ -104,9 +114,7 @@ module.exports = {
         }
     ),
 
-    // todo add attribute for color clamping
     lines: {
-        // todo switch to ploty standard color notation rather than RGB tuple
         contextcolor: {
             valType: 'data_array',
             dflt: [0, 0, 0],
@@ -114,7 +122,6 @@ module.exports = {
             description: 'Color of the context line layer as an RGB triplet where each number is 0..255.'
         },
 
-        // todo switch to 0..1 rather than 0..255
         contextopacity: {
             valType: 'number',
             dflt: 16,
@@ -124,7 +131,6 @@ module.exports = {
             description: 'Opacity of the context lines, on a scale of 0 (invisible) to 255 (fully opaque).'
         },
 
-        // todo tie it to window.devicePixelRatio in `defaults.js`
         pixelratio: {
             valType: 'number',
             dflt: 1,
@@ -142,20 +148,18 @@ module.exports = {
             description: [
                 'The number of lines rendered in one 16ms rendering frame. Use 2000-5000 on low-end hardware to remain',
                 'responsive, and 10000 .. 100000 on strong hardware for faster rendering.'
-            ]
+            ].join(' ')
         },
 
-        // todo consider if we need a `focusopacity` attribute as well; making settings more symmetric between focus and context
         focusalphablending: {
             valType: 'boolean',
             dflt: false,
             role: 'style',
             description: [
                 'By default, the rendered lines are opaque. Setting it to `true` is necessary if opacity is needed.'
-            ]
+            ].join(' ')
         },
 
-        // todo hardcode it
         verticalpadding: {
             valType: 'number',
             dflt: 2,
@@ -165,7 +169,6 @@ module.exports = {
             description: 'Lines have thickness, and without padding, horizontal lines at extreme values appear thinner.'
         },
 
-        // todo this minor but ergonomic thing isn't fully working yet - either finish it or remove it
         integerpadding: {
             valType: 'number',
             dflt: 0,
@@ -257,7 +260,7 @@ module.exports = {
             description: [
                 'If zero, the vertical resize areas on top and bottom are just above and below the filter bar itself.',
                 'A larger than zero value causes overlaps with the filter bar. The overlap is represented as pixels.'
-            ]
+            ].join(' ')
         }
     }
 };
