@@ -19,7 +19,7 @@ describe('pie hovering', function() {
             gd = createGraphDiv();
 
             Plotly.plot(gd, mockCopy.data, mockCopy.layout)
-                //.then(Plotly.plot(gd, mockCopy.data, mockCopy.layout))
+                .then(Plotly.plot(gd, mockCopy.data, mockCopy.layout))
                 .then(done);
         });
 
