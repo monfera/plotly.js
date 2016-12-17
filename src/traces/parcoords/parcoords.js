@@ -186,8 +186,6 @@ module.exports = function(root, styledData, layout) {
             .attr('stroke-width', styledData.filterbar.strokewidth);
     }
 
-    var lastApproached = null;
-
     var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
         .data([{key: 0, dimensions: data}], keyFun);
 
@@ -435,13 +433,7 @@ module.exports = function(root, styledData, layout) {
 
     var axisBrushEnter = axisBrush.enter()
         .append('g')
-        .classed('axisBrush', true)
-        .on('mouseenter', function approach(dimension) {
-            if(dimension !== lastApproached) {
-                dimension.parent.focusLineLayer.approach(dimension);
-                lastApproached = dimension;
-            }
-        });
+        .classed('axisBrush', true);
 
     axisBrush
         .each(function(d) {

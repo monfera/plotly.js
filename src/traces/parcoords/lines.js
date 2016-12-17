@@ -264,10 +264,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
         colorClamp[1] = unitDomain[1];
     }
 
-    function approach(/* dimension */) {
-        // console.log('Approached ', JSON.stringify(dimension.name));
-    }
-
     var previousAxisOrder = [];
 
     var dims = d3.range(2).map(function() {return d3.range(4).map(function() {return new Float32Array(16);});});
@@ -365,7 +361,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
 
     return {
         setColorDomain: setColorDomain,
-        approach: approach,
         render: renderGLParcoords,
         destroy: destroy
     };
