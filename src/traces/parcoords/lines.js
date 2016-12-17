@@ -80,6 +80,15 @@ function adjustDepth(d) {
     return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon, d));
 }
 
+function ccolor(unitToColor, context, lines_contextcolor, lines_contextopacity) {
+    var result = [];
+    for(var j = 0; j < 256; j++) {
+        var c = unitToColor(j / 255);
+        result.push((context ? lines_contextcolor : c).concat([context ? lines_contextopacity : 255]));
+    }
+
+    return result;
+}
 
 module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnitScale, data, unitToColor, context) {
 
@@ -103,8 +112,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
     var color = lines.color.map(paddedUnitScale);
     var overdrag = lines.canvasOverdrag;
 
-
-
     var points = [];
     var i, j;
     for(j = 0; j < sampleCount; j++) {
@@ -122,12 +129,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
         for(i = 0; i < strideableVectorAttributeCount; i++) {
             pointPairs.push(points[j * strideableVectorAttributeCount + i]);
         }
-    }
-
-    var ccolor = [];
-    for(j = 0; j < 256; j++) {
-        var c = unitToColor(j / 255);
-        ccolor.push((focusAlphaBlending ? lines.contextcolor : c).concat([focusAlphaBlending ? lines.contextopacity : 255]));
     }
 
     var styling = [];
@@ -158,7 +159,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
         type: 'uint8',
         mag: 'nearest',
         min: 'nearest',
-        data: ccolor
+        data: ccolor(unitToColor, context, lines.contextcolor, lines.contextopacity)
     });
 
     var positionBuffer = regl.buffer(new Float32Array(pointPairs));
