@@ -9,6 +9,7 @@
 'use strict';
 
 var createREGL = require('regl');
+var ndarray = require('ndarray');
 var glslify = require('glslify');
 var vertexShaderSource = glslify('./shaders/vertex.glsl');
 var fragmentShaderSource = glslify('./shaders/fragment.glsl');
@@ -102,6 +103,40 @@ function makePoints(sampleCount, dimensionCount, gpuDimensionCount, paddedUnitSc
     return points;
 }
 
+function makeP(points, sampleCount, strideableVectorAttributeCount, gpuDimensionCount, color) {
+    var i, j;
+    var pointPairs = [];
+
+    for(j = 0; j < sampleCount; j++) {
+        for(i = 0; i < strideableVectorAttributeCount; i++) {
+            pointPairs.push(points[j * gpuDimensionCount + i]);
+        }
+        for(i = 0; i < strideableVectorAttributeCount; i++) {
+            pointPairs.push(points[j * gpuDimensionCount + i]);
+        }
+    }
+
+    var pfUntyped = [];
+    for(j = 0; j < sampleCount; j++) {
+        for(var k = 0; k < 2; k++) {
+            pfUntyped.push(points[(j + 1) * gpuDimensionCount]);
+            pfUntyped.push(points[(j + 1) * gpuDimensionCount + 1]);
+            pfUntyped.push(points[(j + 1) * gpuDimensionCount + 2]);
+            pfUntyped.push(Math.round(2 * ((k % 2) - 0.5)) * adjustDepth(color[j]));
+        }
+    }
+
+    var pad = new Float32Array(pointPairs)
+    var pf = new Float32Array(pfUntyped);
+
+    var p = {
+        strideable: pad,
+        pf: pf
+    }
+
+    return p;
+}
+
 module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnitScale, data, unitToColor, context) {
 
     var renderState = {
@@ -125,27 +160,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
     var overdrag = lines.canvasOverdrag;
 
     var points = makePoints(sampleCount, dimensionCount, gpuDimensionCount, paddedUnitScale, dimensions, data)
-    var i, j;
-    var pointPairs = [];
-
-    for(j = 0; j < sampleCount; j++) {
-        for(i = 0; i < strideableVectorAttributeCount; i++) {
-            pointPairs.push(points[j * gpuDimensionCount + i]);
-        }
-        for(i = 0; i < strideableVectorAttributeCount; i++) {
-            pointPairs.push(points[j * gpuDimensionCount + i]);
-        }
-    }
-
-    var pf = [];
-    for(j = 0; j < sampleCount; j++) {
-        for(var k = 0; k < 2; k++) {
-            pf.push(points[(j + 1) * gpuDimensionCount]);
-            pf.push(points[(j + 1) * gpuDimensionCount + 1]);
-            pf.push(points[(j + 1) * gpuDimensionCount + 2]);
-            pf.push(Math.round(2 * ((k % 2) - 0.5)) * adjustDepth(color[j]));
-        }
-    }
+    var p = makeP(points, sampleCount, strideableVectorAttributeCount, gpuDimensionCount, color);
 
     var positionStride = strideableVectorAttributeCount * 4;
 
@@ -168,13 +183,14 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
         data: ccolor(unitToColor, context, lines.contextcolor, lines.contextopacity)
     });
 
-    var positionBuffer = regl.buffer(new Float32Array(pointPairs));
+    var positionBuffer = regl.buffer(p.strideable);
+    var pfBuffer = regl.buffer(p.pf);
 
     var attributes = {
-        pf: pf
+        pf: pfBuffer
     };
 
-    for(i = 0; i < strideableVectorAttributeCount / 4; i++) {
+    for(var i = 0; i < strideableVectorAttributeCount / 4; i++) {
         attributes['p' + i.toString(16)] = {
             offset: i * 16,
             stride: positionStride,
