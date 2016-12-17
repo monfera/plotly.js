@@ -17,6 +17,8 @@ var fragmentShaderSource = glslify('./shaders/fragment.glsl');
 var depthLimitEpsilon = 1e-6; // don't change; otherwise near/far plane lines are lost
 var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on domain boundaries
 
+var sectionVertexCount = 2;
+
 var dummyPixel = new Uint8Array(4);
 function ensureDraw(regl) {
     regl.read({
@@ -51,8 +53,8 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
 
         count = Math.min(blockLineCount, sampleCount - blockNumber * blockLineCount);
 
-        item.offset = 2 * blockNumber * blockLineCount;
-        item.count = 2 * count;
+        item.offset = sectionVertexCount * blockNumber * blockLineCount;
+        item.count = sectionVertexCount * count;
         if(blockNumber === 0) {
             window.cancelAnimationFrame(renderState.currentRafs[rafKey]); // stop drawing possibly stale glyphs before clearing
             clear(regl, item.scissorX, 0, item.scissorWidth, item.viewBoxSize[1]);
@@ -109,23 +111,23 @@ function makeVecAttr() {
 
 function makeP(points, sampleCount, strideableVectorAttributeCount, gpuDimensionCount, color) {
     var i, j, k;
-    var pointPairs = []; // new Float32Array(2 * sampleCount * strideableVectorAttributeCount);
+    var pointPairs = new Float32Array(sampleCount * sectionVertexCount * strideableVectorAttributeCount);
 
     for(j = 0; j < sampleCount; j++) {
-        for (k = 0; k < 2; k++) {
+        for (k = 0; k < sectionVertexCount; k++) {
             for (i = 0; i < strideableVectorAttributeCount; i++) {
-                pointPairs.push(points[j * gpuDimensionCount + i]);
+                pointPairs[i + k * strideableVectorAttributeCount + j * sectionVertexCount * strideableVectorAttributeCount] = points[j * gpuDimensionCount + i];
             }
         }
     }
 
     var pfUntyped = [];
     for(j = 0; j < sampleCount; j++) {
-        for(k = 0; k < 2; k++) {
+        for(k = 0; k < sectionVertexCount; k++) {
             pfUntyped.push(points[(j + 1) * gpuDimensionCount]);
             pfUntyped.push(points[(j + 1) * gpuDimensionCount + 1]);
             pfUntyped.push(points[(j + 1) * gpuDimensionCount + 2]);
-            pfUntyped.push(Math.round(2 * ((k % 2) - 0.5)) * adjustDepth(color[j]));
+            pfUntyped.push(Math.round(sectionVertexCount * ((k % sectionVertexCount) - 0.5)) * adjustDepth(color[j]));
         }
     }
 
