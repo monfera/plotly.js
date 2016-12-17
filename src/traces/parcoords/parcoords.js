@@ -78,9 +78,13 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
 
     var xScale = d3.scale.ordinal().domain(d3.range(model.dimensions.length)).rangePoints([0, width], 0);
 
+    var unitPad = lines.verticalpadding / (height * canvasPixelRatio);
+    var unitPadScale = (1 - 2 * unitPad);
+
     var viewModel = {
         key: model.key,
-        xScale: xScale
+        xScale: xScale,
+        paddedUnitScale: function(d) {return unitPad + unitPadScale * d;}
     };
 
     viewModel.panels = model.dimensions.map(function(dimension, i) {
@@ -102,7 +106,6 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
             domainToUnitScale: makeDomainToUnitScale(dimension.values),
             pieChartCheat: dimension.pieChartCheat,
             filter: [0, 1], // dimension.filter || (dimension.filter = [0, 1]),
-            // one more problem: context lines get stuck
             parent: viewModel
         };
     });
@@ -228,7 +231,7 @@ module.exports = function(root, styledData, layout) {
 
     parcoordsLineLayer
         .each(function(d) {
-            var lineLayer = lineLayerMaker(this, lines, canvasWidth, canvasHeight, d.viewModel.panels, unitToColor, d.context);
+            var lineLayer = lineLayerMaker(this, lines, canvasWidth, canvasHeight, d.viewModel.paddedUnitScale, d.viewModel.panels, unitToColor, d.context);
             d.viewModel[d.key] = lineLayer;
             tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true);});
             lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
