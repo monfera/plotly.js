@@ -8,7 +8,6 @@
 
 'use strict';
 
-var d3 = require('d3');
 var createREGL = require('regl');
 var glslify = require('glslify');
 var vertexShaderSource = glslify('./shaders/vertex.glsl');
@@ -266,8 +265,8 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
 
     var previousAxisOrder = [];
 
-    var dims = d3.range(2).map(function() {return d3.range(4).map(function() {return new Float32Array(16);});});
-    var lims = d3.range(2).map(function() {return d3.range(4).map(function() {return new Float32Array(16);});});
+    var dims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
+    var lims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
 
     function renderGLParcoords(dimensionViews, setChanged, clearOnly) {
 
