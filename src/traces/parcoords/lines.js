@@ -288,12 +288,12 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
 
         var leftmostIndex, rightmostIndex, lowestX = Infinity, highestX = -Infinity;
         for(I = 0; I < shownPanelCount; I++) {
-            if(dimensionViews[I].x > highestX) {
-                highestX = dimensionViews[I].x;
+            if(dimensionViews[I].canvasX > highestX) {
+                highestX = dimensionViews[I].canvasX;
                 rightmostIndex = I;
             }
-            if(dimensionViews[I].x < lowestX) {
-                lowestX = dimensionViews[I].x;
+            if(dimensionViews[I].canvasX < lowestX) {
+                lowestX = dimensionViews[I].canvasX;
                 leftmostIndex = I;
             }
         }
@@ -350,8 +350,8 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
             var nextDim = dimensionViews[(I + 1) % shownDimensionCount];
             var ii = nextDim.originalXIndex;
             var panelSizeX = nextDim.canvasX - x;
-            if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextDim.x) {
-                previousAxisOrder[i] = [x, nextDim.x];
+            if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextDim.canvasX) {
+                previousAxisOrder[i] = [x, nextDim.canvasX];
                 var item = makeItem(i, ii, x, panelSizeX, dimensionView.originalXIndex, dimensionView.scatter);
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blocklinecount : sampleCount, sampleCount, item);
