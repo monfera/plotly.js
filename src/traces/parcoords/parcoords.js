@@ -74,7 +74,7 @@ function makeDomainToUnitScale(values) {
     return function(x) {return a * x + b;};
 }
 
-function viewModel(lines, width, height, model) {
+function viewModel(lines, width, height, canvasPixelRatio, model) {
 
     var xScale = d3.scale.ordinal().domain(d3.range(model.dimensions.length)).rangePoints([0, width], 0);
 
@@ -95,6 +95,7 @@ function viewModel(lines, width, height, model) {
             values: dimension.values,
             xScale: xScale,
             x: xScale(i),
+            canvasX: xScale(i) * canvasPixelRatio,
             unitScale: makeUnitScale(height, lines.verticalpadding),
             domainScale: makeDomainScale(height, lines.verticalpadding, lines.integerpadding, dimension),
             integerScale: makeIntegerScale(lines.integerpadding, dimension),
@@ -128,9 +129,10 @@ module.exports = function(root, styledData, layout) {
     var tickDistance = styledData.tickdistance;
     var coloringDomainToUnitScale = makeDomainToUnitScale(styledData.line.color);
     var overdrag = 40;
+    var canvasPixelRatio = styledData.lines.pixelratio;
     var lines = Lib.extendDeep(styledData.lines, {
         color: styledData.line.color.map(coloringDomainToUnitScale),
-        overdrag: overdrag
+        canvasOverdrag: overdrag * canvasPixelRatio
     });
 
     var layoutWidth = layout.width * (styledData.domain.x[1] - styledData.domain.x[0]);
@@ -143,8 +145,7 @@ module.exports = function(root, styledData, layout) {
     var width = layoutWidth - 2 * padding - legendWidth; // leavig room for the colorbar
     var height = layoutHeight - 2 * padding;
 
-    var canvasPixelRatio = lines.pixelratio;
-    var canvasWidth = (width + 2 * overdrag) * canvasPixelRatio;
+    var canvasWidth = width * canvasPixelRatio + 2 * lines.canvasOverdrag;
     var canvasHeight = height * canvasPixelRatio;
 
     var resizeHeight = styledData.filterbar.handleheight;
@@ -195,7 +196,7 @@ module.exports = function(root, styledData, layout) {
         .classed('parcoordsModel', true);
 
     var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
-        .data(viewModel.bind(0, lines, width, height), keyFun);
+        .data(viewModel.bind(0, lines, width, height, canvasPixelRatio), keyFun);
 
     parcoordsViewModel.enter()
         .append('div')
@@ -282,11 +283,13 @@ module.exports = function(root, styledData, layout) {
                     return;
                 }
                 d.x = Math.max(-overdrag, Math.min(width + overdrag, d3.event.x));
+                d.canvasX = d.x * canvasPixelRatio;
                 panel
                     .sort(function(a, b) {return a.x - b.x;})
                     .each(function(dd, i) {
                         dd.xIndex = i;
                         dd.x = d === dd ? dd.x : dd.xScale(dd.xIndex);
+                        dd.canvasX = dd.x * canvasPixelRatio;
                     });
                 panel.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
@@ -300,6 +303,7 @@ module.exports = function(root, styledData, layout) {
                     return;
                 }
                 d.x = d.xScale(d.xIndex);
+                d.canvasX = d.x * canvasPixelRatio;
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                 d.parent.contextLineLayer.render(d.parent.panels, false, !someFiltersActive(d.parent));
