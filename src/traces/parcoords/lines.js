@@ -137,6 +137,27 @@ function makeP(points, sampleCount, strideableVectorAttributeCount, gpuDimension
     return p;
 }
 
+function makeAttributes(bufferMaker, strideableVectorAttributeCount, positionStride, p) {
+
+    var positionBuffer = bufferMaker(p.strideable);
+    var pfBuffer = bufferMaker(p.pf);
+
+    var attributes = {
+        pf: pfBuffer
+    };
+
+    for(var i = 0; i < strideableVectorAttributeCount / 4; i++) {
+        attributes['p' + i.toString(16)] = {
+            offset: i * 16,
+            stride: positionStride,
+            buffer: positionBuffer
+        };
+    }
+
+    return attributes;
+
+}
+
 module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnitScale, data, unitToColor, context) {
 
     var renderState = {
@@ -174,6 +195,8 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
         }
     });
 
+    var attributes = makeAttributes(regl.buffer, strideableVectorAttributeCount, positionStride, p);
+
     var paletteTexture = regl.texture({
         shape: [256, 1],
         format: 'rgba',
@@ -182,21 +205,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
         min: 'nearest',
         data: ccolor(unitToColor, context, lines.contextcolor, lines.contextopacity)
     });
-
-    var positionBuffer = regl.buffer(p.strideable);
-    var pfBuffer = regl.buffer(p.pf);
-
-    var attributes = {
-        pf: pfBuffer
-    };
-
-    for(var i = 0; i < strideableVectorAttributeCount / 4; i++) {
-        attributes['p' + i.toString(16)] = {
-            offset: i * 16,
-            stride: positionStride,
-            buffer: positionBuffer
-        };
-    }
 
     var glAes = regl({
 
