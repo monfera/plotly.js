@@ -90,6 +90,18 @@ function ccolor(unitToColor, context, lines_contextcolor, lines_contextopacity) 
     return result;
 }
 
+function makePoints(sampleCount, dimensionCount, gpuDimensionCount, paddedUnitScale, dimensions, data) {
+
+    var points = [];
+    for(var j = 0; j < sampleCount; j++) {
+        for(var i = 0; i < gpuDimensionCount; i++) {
+            points.push(i < dimensionCount ? paddedUnitScale(dimensions[i].domainToUnitScale(data[i].values[j])) : 0.5);
+        }
+    }
+
+    return points;
+}
+
 module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnitScale, data, unitToColor, context) {
 
     var renderState = {
@@ -112,14 +124,8 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
     var color = lines.color.map(paddedUnitScale);
     var overdrag = lines.canvasOverdrag;
 
-    var points = [];
+    var points = makePoints(sampleCount, dimensionCount, strideableVectorAttributeCount, paddedUnitScale, dimensions, data)
     var i, j;
-    for(j = 0; j < sampleCount; j++) {
-        for(i = 0; i < strideableVectorAttributeCount; i++) {
-            points.push(i < dimensionCount ? paddedUnitScale(dimensions[i].domainToUnitScale(data[i].values[j])) : 0.5);
-        }
-    }
-
     var pointPairs = [];
 
     for(j = 0; j < sampleCount; j++) {
