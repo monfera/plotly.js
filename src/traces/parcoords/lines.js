@@ -137,13 +137,13 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
         }
     }
 
-    var styling = [];
+    var pf = [];
     for(j = 0; j < sampleCount; j++) {
         for(var k = 0; k < 2; k++) {
-            styling.push(points[(j + 1) * gpuDimensionCount]);
-            styling.push(points[(j + 1) * gpuDimensionCount + 1]);
-            styling.push(points[(j + 1) * gpuDimensionCount + 2]);
-            styling.push(Math.round(2 * ((k % 2) - 0.5)) * adjustDepth(color[j]));
+            pf.push(points[(j + 1) * gpuDimensionCount]);
+            pf.push(points[(j + 1) * gpuDimensionCount + 1]);
+            pf.push(points[(j + 1) * gpuDimensionCount + 2]);
+            pf.push(Math.round(2 * ((k % 2) - 0.5)) * adjustDepth(color[j]));
         }
     }
 
@@ -171,7 +171,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
     var positionBuffer = regl.buffer(new Float32Array(pointPairs));
 
     var attributes = {
-        pf: styling
+        pf: pf
     };
 
     for(i = 0; i < strideableVectorAttributeCount / 4; i++) {
