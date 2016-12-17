@@ -124,25 +124,25 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
     var color = lines.color.map(paddedUnitScale);
     var overdrag = lines.canvasOverdrag;
 
-    var points = makePoints(sampleCount, dimensionCount, strideableVectorAttributeCount, paddedUnitScale, dimensions, data)
+    var points = makePoints(sampleCount, dimensionCount, gpuDimensionCount, paddedUnitScale, dimensions, data)
     var i, j;
     var pointPairs = [];
 
     for(j = 0; j < sampleCount; j++) {
         for(i = 0; i < strideableVectorAttributeCount; i++) {
-            pointPairs.push(points[j * strideableVectorAttributeCount + i]);
+            pointPairs.push(points[j * gpuDimensionCount + i]);
         }
         for(i = 0; i < strideableVectorAttributeCount; i++) {
-            pointPairs.push(points[j * strideableVectorAttributeCount + i]);
+            pointPairs.push(points[j * gpuDimensionCount + i]);
         }
     }
 
     var styling = [];
     for(j = 0; j < sampleCount; j++) {
         for(var k = 0; k < 2; k++) {
-            styling.push(points[(j + 1) * strideableVectorAttributeCount]);
-            styling.push(points[(j + 1) * strideableVectorAttributeCount + 1]);
-            styling.push(points[(j + 1) * strideableVectorAttributeCount + 2]);
+            styling.push(points[(j + 1) * gpuDimensionCount]);
+            styling.push(points[(j + 1) * gpuDimensionCount + 1]);
+            styling.push(points[(j + 1) * gpuDimensionCount + 2]);
             styling.push(Math.round(2 * ((k % 2) - 0.5)) * adjustDepth(color[j]));
         }
     }
