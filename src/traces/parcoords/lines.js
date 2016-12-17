@@ -103,22 +103,25 @@ function makePoints(sampleCount, dimensionCount, gpuDimensionCount, paddedUnitSc
     return points;
 }
 
+function makeVecAttr() {
+
+}
+
 function makeP(points, sampleCount, strideableVectorAttributeCount, gpuDimensionCount, color) {
-    var i, j;
-    var pointPairs = [];
+    var i, j, k;
+    var pointPairs = []; // new Float32Array(2 * sampleCount * strideableVectorAttributeCount);
 
     for(j = 0; j < sampleCount; j++) {
-        for(i = 0; i < strideableVectorAttributeCount; i++) {
-            pointPairs.push(points[j * gpuDimensionCount + i]);
-        }
-        for(i = 0; i < strideableVectorAttributeCount; i++) {
-            pointPairs.push(points[j * gpuDimensionCount + i]);
+        for (k = 0; k < 2; k++) {
+            for (i = 0; i < strideableVectorAttributeCount; i++) {
+                pointPairs.push(points[j * gpuDimensionCount + i]);
+            }
         }
     }
 
     var pfUntyped = [];
     for(j = 0; j < sampleCount; j++) {
-        for(var k = 0; k < 2; k++) {
+        for(k = 0; k < 2; k++) {
             pfUntyped.push(points[(j + 1) * gpuDimensionCount]);
             pfUntyped.push(points[(j + 1) * gpuDimensionCount + 1]);
             pfUntyped.push(points[(j + 1) * gpuDimensionCount + 2]);
@@ -126,8 +129,8 @@ function makeP(points, sampleCount, strideableVectorAttributeCount, gpuDimension
         }
     }
 
-    var pad = new Float32Array(pointPairs)
     var pf = new Float32Array(pfUntyped);
+    var pad = new Float32Array(pointPairs)
 
     var p = {
         strideable: pad,
