@@ -76,6 +76,11 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
     render(blockNumber);
 }
 
+function adjustDepth(d) {
+    return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon, d));
+}
+
+
 module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnitScale, data, unitToColor, context) {
 
     var renderState = {
@@ -98,6 +103,8 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
     var color = lines.color.map(paddedUnitScale);
     var overdrag = lines.canvasOverdrag;
 
+
+
     var points = [];
     var i, j;
     for(j = 0; j < sampleCount; j++) {
@@ -115,10 +122,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
         for(i = 0; i < strideableVectorAttributeCount; i++) {
             pointPairs.push(points[j * strideableVectorAttributeCount + i]);
         }
-    }
-
-    function adjustDepth(d) {
-        return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon, d));
     }
 
     var ccolor = [];
@@ -349,13 +352,9 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
         }
     }
 
-    function destroy() {
-        regl.destroy();
-    }
-
     return {
         setColorDomain: setColorDomain,
         render: renderGLParcoords,
-        destroy: destroy
+        destroy: regl.destroy
     };
 };
