@@ -76,7 +76,7 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
     render(blockNumber);
 }
 
-module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unitToColor, context) {
+module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnitScale, data, unitToColor, context) {
 
     var renderState = {
         currentRafs: {},
@@ -95,19 +95,14 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
     var gpuDimensionCount = 64;
     var strideableVectorAttributeCount = gpuDimensionCount - 4; // stride can't be an exact 256
 
-    var paddedUnit = function paddedUnit(d) {
-        var unitPad = lines.verticalpadding / canvasPanelSizeY;
-        return unitPad + d * (1 - 2 * unitPad);
-    };
-
-    var color = lines.color.map(paddedUnit);
+    var color = lines.color.map(paddedUnitScale);
     var overdrag = lines.canvasOverdrag;
 
     var points = [];
     var i, j;
     for(j = 0; j < sampleCount; j++) {
         for(i = 0; i < strideableVectorAttributeCount; i++) {
-            points.push(i < dimensionCount ? paddedUnit(dimensions[i].domainToUnitScale(data[i].values[j])) : 0.5);
+            points.push(i < dimensionCount ? paddedUnitScale(dimensions[i].domainToUnitScale(data[i].values[j])) : 0.5);
         }
     }
 
@@ -302,7 +297,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
                 for(abcd = 0; abcd < 4; abcd++) {
                     for(d = 0; d < 16; d++) {
                         dims[loHi][abcd][d] = d + 16 * abcd === index ? 1 : 0;
-                        lims[loHi][abcd][d] = paddedUnit((!context && valid(d, 16 * abcd) ? orig(d + 16 * abcd).filter[loHi] : loHi)) + (2 * loHi - 1) * filterEpsilon;
+                        lims[loHi][abcd][d] = paddedUnitScale((!context && valid(d, 16 * abcd) ? orig(d + 16 * abcd).filter[loHi] : loHi)) + (2 * loHi - 1) * filterEpsilon;
                     }
                 }
             }
