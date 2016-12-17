@@ -91,7 +91,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
 
     var focusAlphaBlending = context; // controlConfig.focusAlphaBlending;
 
-    var canvasPixelRatio = lines.pixelratio;
     var canvasPanelSizeY = canvasHeight;
 
     var gpuDimensionCount = 64;
@@ -103,7 +102,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
     };
 
     var color = lines.color.map(paddedUnit);
-    var overdrag = lines.overdrag * canvasPixelRatio;
+    var overdrag = lines.canvasOverdrag;
 
     var points = [];
     var i, j;
@@ -347,10 +346,10 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, data, unit
         for(I = 0; I < shownPanelCount; I++) {
             var dimensionView = dimensionViews[I];
             var i = dimensionView.originalXIndex;
-            var x = dimensionView.x * canvasPixelRatio;
+            var x = dimensionView.canvasX;
             var nextDim = dimensionViews[(I + 1) % shownDimensionCount];
             var ii = nextDim.originalXIndex;
-            var panelSizeX = nextDim.x * canvasPixelRatio - x;
+            var panelSizeX = nextDim.canvasX - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextDim.x) {
                 previousAxisOrder[i] = [x, nextDim.x];
                 var item = makeItem(i, ii, x, panelSizeX, dimensionView.originalXIndex, dimensionView.scatter);
