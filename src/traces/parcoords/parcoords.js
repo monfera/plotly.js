@@ -30,7 +30,7 @@ function ordinalScaleSnap(scale, v) {
     return a[a.length - 1];
 }
 
-function makeDomainScale(height, padding, integerPadding, dimension) {
+function domainScale(height, padding, integerPadding, dimension) {
     var lo = d3.min(dimension.values);
     var hi = d3.max(dimension.values);
     // convert a zero-domain to a proper domain
@@ -47,11 +47,11 @@ function makeDomainScale(height, padding, integerPadding, dimension) {
             .range([height - padding, padding]);
 }
 
-function makeUnitScale(height, padding) {
+function unitScale(height, padding) {
     return d3.scale.linear().range([height - padding, padding]);
 }
 
-function makeIntegerScale(integerPadding, dimension) {
+function integerScale(integerPadding, dimension) {
     return dimension.integer && d3.scale.ordinal()
             .domain(d3.range(0, Math.round(d3.max(dimension.values) + 1) - Math.round(d3.min(dimension.values)))
                 .map(function(d, _, a) {return d / (a.length - 1);}))
@@ -96,9 +96,9 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
             xScale: xScale,
             x: xScale(i),
             canvasX: xScale(i) * canvasPixelRatio,
-            unitScale: makeUnitScale(height, lines.verticalpadding),
-            domainScale: makeDomainScale(height, lines.verticalpadding, lines.integerpadding, dimension),
-            integerScale: makeIntegerScale(lines.integerpadding, dimension),
+            unitScale: unitScale(height, lines.verticalpadding),
+            domainScale: domainScale(height, lines.verticalpadding, lines.integerpadding, dimension),
+            integerScale: integerScale(lines.integerpadding, dimension),
             pieChartCheat: dimension.pieChartCheat,
             filter: [0, 1], // todo dimension.filter || (dimension.filter = [0, 1]),
             parent: viewModel
