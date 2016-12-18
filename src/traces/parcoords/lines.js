@@ -309,7 +309,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
                 for(abcd = 0; abcd < 4; abcd++) {
                     for(d = 0; d < 16; d++) {
                         dims[loHi][abcd][d] = d + 16 * abcd === index ? 1 : 0;
-                        lims[loHi][abcd][d] = paddedUnitScale((!context && valid(d, 16 * abcd) ? orig(d + 16 * abcd).filter[loHi] : loHi)) + (2 * loHi - 1) * filterEpsilon;
+                        lims[loHi][abcd][d] = (!context && valid(d, 16 * abcd) ? orig(d + 16 * abcd).filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
                     }
                 }
             }
