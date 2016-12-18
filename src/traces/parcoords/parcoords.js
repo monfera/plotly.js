@@ -106,7 +106,7 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
             domainScale: makeDomainScale(height, lines.verticalpadding, lines.integerpadding, dimension),
             integerScale: makeIntegerScale(lines.integerpadding, dimension),
             pieChartCheat: dimension.pieChartCheat,
-            filter: [0, 1], // dimension.filter || (dimension.filter = [0, 1]),
+            filter: [0, 1], // todo dimension.filter || (dimension.filter = [0, 1]),
             parent: viewModel
         };
     });
