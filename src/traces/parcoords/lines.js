@@ -245,19 +245,12 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             loD: regl.prop('loD'),
             hiD: regl.prop('hiD'),
             palette: paletteTexture,
-            colorClamp: regl.prop('colorClamp'),
+            colorClamp: [0, 1],
             scatter: regl.prop('scatter')
         },
         offset: regl.prop('offset'),
         count: regl.prop('count')
     });
-
-    var colorClamp = [0, 1];
-
-    function setColorDomain(unitDomain) {
-        colorClamp[0] = unitDomain[0];
-        colorClamp[1] = unitDomain[1];
-    }
 
     var previousAxisOrder = [];
 
@@ -327,7 +320,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
                 hiC: lims[1][2],
                 hiD: lims[1][3],
 
-                colorClamp: colorClamp,
                 scatter: scatter || 0,
                 scissorX: I === leftmostIndex ? 0 : x + overdrag,
                 scissorWidth: I === rightmostIndex ? 2 * panelSizeX : panelSizeX + 1 + (I === leftmostIndex ? x + overdrag : 0)
@@ -351,7 +343,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
     }
 
     return {
-        setColorDomain: setColorDomain,
         render: renderGLParcoords,
         destroy: regl.destroy
     };
