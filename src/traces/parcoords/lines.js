@@ -14,6 +14,7 @@ var glslify = require('glslify');
 var vertexShaderSource = glslify('./shaders/vertex.glsl');
 var fragmentShaderSource = glslify('./shaders/fragment.glsl');
 
+var depthLimitEpsilon = 1e-6; // don't change; otherwise near/far plane lines are lost
 var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on domain boundaries
 
 var gpuDimensionCount = 64;
@@ -78,6 +79,10 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
     }
 
     render(blockNumber);
+}
+
+function adjustDepth(d) {
+    return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon, d));
 }
 
 function ccolor(unitToColor, context, lines_contextcolor, lines_contextopacity) {
