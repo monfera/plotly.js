@@ -17,8 +17,13 @@ var fragmentShaderSource = glslify('./shaders/fragment.glsl');
 var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on domain boundaries
 
 var gpuDimensionCount = 64;
+var vec4NumberCount = 4;
+var mat4RowCount = 4;
+var mat4NumberCount = vec4NumberCount * mat4RowCount;
+var gpuMatrixCount = gpuDimensionCount / mat4NumberCount;
 var sectionVertexCount = 2;
-var vec4NumberCount = 4
+var panelVariableCount = 2;
+var domainBoundsCount = 2;
 
 var dummyPixel = new Uint8Array(4);
 function ensureDraw(regl) {
@@ -283,10 +288,10 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
         }
 
         // set filter lo/hi domains
-        for(var loHi = 0; loHi < 2; loHi++) {
-            for(var abcd = 0; abcd < 4; abcd++) {
-                for(var d = 0; d < 16; d++) {
-                    lims[loHi][abcd][d] = (!context && valid(d, 16 * abcd) ? orig(d + 16 * abcd).filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
+        for(var loHi = 0; loHi < domainBoundsCount; loHi++) {
+            for(var mat = 0; mat < gpuMatrixCount; mat++) {
+                for(var d = 0; d < mat4NumberCount; d++) {
+                    lims[loHi][mat][d] = (!context && valid(d, mat4NumberCount * mat) ? orig(d + mat4NumberCount * mat).filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
                 }
             }
         }
@@ -294,11 +299,12 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
         function makeItem(i, ii, x, panelSizeX, originalXIndex, scatter) {
             var leftRight = [i, ii], index;
 
-            for(var loHi = 0; loHi < 2; loHi++) {
-                index = leftRight[loHi];
-                for(var abcd = 0; abcd < 4; abcd++) {
-                    for(var d = 0; d < 16; d++) {
-                        dims[loHi][abcd][d] = d + 16 * abcd === index ? 1 : 0;
+            // set panel left, right variables
+            for(var lr = 0; lr < panelVariableCount; lr++) {
+                index = leftRight[lr];
+                for(var mat = 0; mat < gpuMatrixCount; mat++) {
+                    for(var d = 0; d < mat4NumberCount; d++) {
+                        dims[lr][mat][d] = d + mat4NumberCount * mat === index ? 1 : 0;
                     }
                 }
             }
