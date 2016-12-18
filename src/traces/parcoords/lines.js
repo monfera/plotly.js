@@ -158,7 +158,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
 
     var canvasPanelSizeY = canvasHeight;
 
-    var color = lines.color.map(paddedUnitScale);
+    var color = lines.color;
     var overdrag = lines.canvasOverdrag;
 
     var shownDimensionCount = dimensionCount;
