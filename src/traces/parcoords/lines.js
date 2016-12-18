@@ -111,30 +111,30 @@ function makePoints(sampleCount, dimensionCount, paddedUnitScale, dimensions, co
     return points;
 }
 
-function makeAttributes(sampleCount, points) {
+function makeVecAttr(sampleCount, points, vecIndex) {
 
-    function makeVecAttr(vecIndex) {
+    var i, j, k;
+    var pointPairs = [];
 
-        var i, j, k;
-        var pointPairs = [];
-
-        for(j = 0; j < sampleCount; j++) {
-            for (k = 0; k < sectionVertexCount; k++) {
-                for (i = 0; i < vec4NumberCount; i++) {
-                    pointPairs.push(points[j * gpuDimensionCount + vecIndex * vec4NumberCount + i]);
-                    if(vecIndex * vec4NumberCount + i === gpuDimensionCount - 1 && k % 2 === 0) {
-                        pointPairs[pointPairs.length - 1] *= -1;
-                    }
+    for(j = 0; j < sampleCount; j++) {
+        for (k = 0; k < sectionVertexCount; k++) {
+            for (i = 0; i < vec4NumberCount; i++) {
+                pointPairs.push(points[j * gpuDimensionCount + vecIndex * vec4NumberCount + i]);
+                if(vecIndex * vec4NumberCount + i === gpuDimensionCount - 1 && k % 2 === 0) {
+                    pointPairs[pointPairs.length - 1] *= -1;
                 }
             }
         }
-
-        return pointPairs;
     }
 
+    return pointPairs;
+}
+
+function makeAttributes(sampleCount, points) {
+
     var attributes = {};
-    for(var i = 0; i < gpuDimensionCount / 4; i++) {
-        attributes['p' + i.toString(16)] = makeVecAttr(i);
+    for(var vecIndex = 0; vecIndex < gpuDimensionCount / vec4NumberCount; vecIndex++) {
+        attributes['p' + vecIndex.toString(16)] = makeVecAttr(sampleCount, points, vecIndex);
     }
 
     return attributes;
