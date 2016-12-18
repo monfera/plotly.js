@@ -285,6 +285,25 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
 
     var dims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
 
+    var renderInvariant = {
+        profile: false,
+
+        // for polygons
+        cull: {
+            enable: true,
+            face: 'back'
+        },
+
+        dither: false,
+
+        vert: vertexShaderSource,
+
+        frag: fragmentShaderSource,
+
+        primitive: 'lines',
+        lineWidth: 1
+    };
+
     function renderGLParcoords(dimensionViews, setChanged, clearOnly) {
 
         var I;
@@ -303,33 +322,21 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
 
         var filters = context ? makeDummyFilters(dimensionViews) : makeFilters(dimensionViews);
 
-        var itemInvariant = {
-            profile: false,
+        var itemInvariant = Object.assign(
+            {},
+            renderInvariant,
+            {
 
-            // for polygons
-            cull: {
-                enable: true,
-                face: 'back'
-            },
-
-            dither: false,
-
-            vert: vertexShaderSource,
-
-            frag: fragmentShaderSource,
-
-            primitive: 'lines',
-            lineWidth: 1,
-
-            uniforms: Object.assign(
-                {},
-                filters,
-                {
-                    resolution: [canvasWidth, canvasHeight],
-                    palette: paletteTexture,
-                    colorClamp: [0, 1]
-                })
-        };
+                uniforms: Object.assign(
+                    {},
+                    filters,
+                    {
+                        resolution: [canvasWidth, canvasHeight],
+                        palette: paletteTexture,
+                        colorClamp: [0, 1]
+                    })
+            }
+        );
 
         function makeItem(i, ii, x, panelSizeX, originalXIndex, scatter) {
             var leftRight = [i, ii], index;
