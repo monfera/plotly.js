@@ -78,6 +78,12 @@ module.exports = {
             role: 'info',
             description: 'The shown name of the dimension.'
         },
+        hidden: {
+            valType: 'boolean',
+            dflt: false,
+            role: 'info',
+            description: 'Hides the dimension when set to true.'
+        },
         values: {
             valType: 'data_array',
             role: 'info',
