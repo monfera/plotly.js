@@ -17,6 +17,7 @@ var fragmentShaderSource = glslify('./shaders/fragment.glsl');
 var depthLimitEpsilon = 1e-6; // don't change; otherwise near/far plane lines are lost
 var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on domain boundaries
 
+var gpuDimensionCount = 64;
 var sectionVertexCount = 2;
 
 var dummyPixel = new Uint8Array(4);
@@ -93,70 +94,46 @@ function ccolor(unitToColor, context, lines_contextcolor, lines_contextopacity) 
     return result;
 }
 
-function makePoints(sampleCount, dimensionCount, gpuDimensionCount, paddedUnitScale, dimensions, data) {
+function makePoints(sampleCount, dimensionCount, paddedUnitScale, dimensions, color, data) {
 
     var points = [];
     for(var j = 0; j < sampleCount; j++) {
         for(var i = 0; i < gpuDimensionCount; i++) {
-            points.push(i < dimensionCount ? paddedUnitScale(dimensions[i].domainToUnitScale(data[i].values[j])) : 0.5);
+            points.push(i < dimensionCount ? paddedUnitScale(dimensions[i].domainToUnitScale(data[i].values[j]))
+                : i === (gpuDimensionCount - 1) ? adjustDepth(color[j]) : 0.5);
         }
     }
 
     return points;
 }
 
-function makeVecAttr() {
+function makeAttributes(sampleCount, points) {
 
-}
-
-function makeP(points, sampleCount, strideableVectorAttributeCount, gpuDimensionCount, color) {
     var i, j, k;
-    var pointPairs = new Float32Array(sampleCount * sectionVertexCount * strideableVectorAttributeCount);
+    var vec4NumberCount = 4
 
-    for(j = 0; j < sampleCount; j++) {
-        for (k = 0; k < sectionVertexCount; k++) {
-            for (i = 0; i < strideableVectorAttributeCount; i++) {
-                pointPairs[i + k * strideableVectorAttributeCount + j * sectionVertexCount * strideableVectorAttributeCount] = points[j * gpuDimensionCount + i];
+    function makeVecAttr(vecIndex) {
+
+        var i, j, k;
+        var pointPairs = [];
+
+        for(j = 0; j < sampleCount; j++) {
+            for (k = 0; k < sectionVertexCount; k++) {
+                for (i = 0; i < vec4NumberCount; i++) {
+                    var multiplier = vecIndex * vec4NumberCount + i === gpuDimensionCount - 1
+                        ? Math.round(sectionVertexCount * ((k % sectionVertexCount) - 0.5))
+                        : 1;
+                    pointPairs.push(multiplier * points[j * gpuDimensionCount + vecIndex * vec4NumberCount + i]);
+                }
             }
         }
+
+        return pointPairs;
     }
 
-    var pfUntyped = [];
-    for(j = 0; j < sampleCount; j++) {
-        for(k = 0; k < sectionVertexCount; k++) {
-            pfUntyped.push(points[(j + 1) * gpuDimensionCount]);
-            pfUntyped.push(points[(j + 1) * gpuDimensionCount + 1]);
-            pfUntyped.push(points[(j + 1) * gpuDimensionCount + 2]);
-            pfUntyped.push(Math.round(sectionVertexCount * ((k % sectionVertexCount) - 0.5)) * adjustDepth(color[j]));
-        }
-    }
-
-    var pf = new Float32Array(pfUntyped);
-    var pad = new Float32Array(pointPairs)
-
-    var p = {
-        strideable: pad,
-        pf: pf
-    }
-
-    return p;
-}
-
-function makeAttributes(bufferMaker, strideableVectorAttributeCount, positionStride, p) {
-
-    var positionBuffer = bufferMaker(p.strideable);
-    var pfBuffer = bufferMaker(p.pf);
-
-    var attributes = {
-        pf: pfBuffer
-    };
-
-    for(var i = 0; i < strideableVectorAttributeCount / 4; i++) {
-        attributes['p' + i.toString(16)] = {
-            offset: i * 16,
-            stride: positionStride,
-            buffer: positionBuffer
-        };
+    var attributes = {};
+    for(i = 0; i < gpuDimensionCount / 4; i++) {
+        attributes['p' + i.toString(16)] = makeVecAttr(i);
     }
 
     return attributes;
@@ -179,19 +156,15 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
 
     var canvasPanelSizeY = canvasHeight;
 
-    var gpuDimensionCount = 64;
-    var strideableVectorAttributeCount = gpuDimensionCount - 4; // stride can't be an exact 256
-
     var color = lines.color.map(paddedUnitScale);
     var overdrag = lines.canvasOverdrag;
 
-    var points = makePoints(sampleCount, dimensionCount, gpuDimensionCount, paddedUnitScale, dimensions, data)
-    var p = makeP(points, sampleCount, strideableVectorAttributeCount, gpuDimensionCount, color);
-
-    var positionStride = strideableVectorAttributeCount * 4;
-
     var shownDimensionCount = dimensionCount;
+
     var shownPanelCount = shownDimensionCount - 1;
+
+    var points = makePoints(sampleCount, dimensionCount, paddedUnitScale, dimensions, color, data);
+    var attributes = makeAttributes(sampleCount, points);
 
     var regl = createREGL({
         canvas: canvasGL,
@@ -199,8 +172,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
             preserveDrawingBuffer: true
         }
     });
-
-    var attributes = makeAttributes(regl.buffer, strideableVectorAttributeCount, positionStride, p);
 
     var paletteTexture = regl.texture({
         shape: [256, 1],
