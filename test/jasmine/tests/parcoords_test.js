@@ -31,7 +31,7 @@ var mock = {
             'contextcolor': [0, 0, 0],
             'contextopacity': 16,
             'pixelratio': 1,
-            'blocklinecount': 5000,
+            'blocklinecount': 50,
             'focusalphablending': false,
             'verticalpadding': 2,
             'integerpadding': 0
@@ -118,7 +118,7 @@ var mock = {
     }]
 };
 
-describe('parcoords', function() {
+fdescribe('parcoords', function() {
     var mockCopy = Lib.extendDeep({}, mock),
         gd;
 
@@ -126,7 +126,7 @@ describe('parcoords', function() {
         gd = createGraphDiv();
     });
 
-    afterEach(destroyGraphDiv);
+    //afterEach(destroyGraphDiv);
 
     it('should generate a parcoords plot', function(done) {
         Plotly.plot(gd, mockCopy.data, mockCopy.layout).then(done);

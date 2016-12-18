@@ -268,9 +268,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
 
     var previousAxisOrder = [];
 
-    var dims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
-    var lims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
-
     function renderGLParcoords(dimensionViews, setChanged, clearOnly) {
 
         var I;
@@ -299,6 +296,9 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
         function makeItem(i, ii, x, panelSizeX, originalXIndex, scatter) {
             var loHi, abcd, d, index;
             var leftRight = [i, ii];
+
+            var dims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
+            var lims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
 
             for(loHi = 0; loHi < 2; loHi++) {
                 index = leftRight[loHi];
