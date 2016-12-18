@@ -85,7 +85,7 @@ function adjustDepth(d) {
     return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon, d));
 }
 
-function ccolor(unitToColor, context, lines_contextcolor, lines_contextopacity) {
+function palette(unitToColor, context, lines_contextcolor, lines_contextopacity) {
     var result = [];
     for(var j = 0; j < 256; j++) {
         var c = unitToColor(j / 255);
@@ -179,7 +179,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
         type: 'uint8',
         mag: 'nearest',
         min: 'nearest',
-        data: ccolor(unitToColor, context, lines.contextcolor, lines.contextopacity)
+        data: palette(unitToColor, context, lines.contextcolor, lines.contextopacity)
     });
 
     var glAes = regl({
