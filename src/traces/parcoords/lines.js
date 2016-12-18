@@ -25,6 +25,26 @@ var sectionVertexCount = 2;
 var panelVariableCount = 2;
 var domainBoundsCount = 2;
 
+var renderInvariant = {
+    profile: false,
+
+    // for polygons
+    cull: {
+        enable: true,
+        face: 'back'
+    },
+
+    dither: false,
+
+    vert: vertexShaderSource,
+
+    frag: fragmentShaderSource,
+
+    primitive: 'lines',
+    lineWidth: 1
+};
+
+
 var dummyPixel = new Uint8Array(4);
 function ensureDraw(regl) {
     regl.read({
@@ -284,25 +304,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
     var previousAxisOrder = [];
 
     var dims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
-
-    var renderInvariant = {
-        profile: false,
-
-        // for polygons
-        cull: {
-            enable: true,
-            face: 'back'
-        },
-
-        dither: false,
-
-        vert: vertexShaderSource,
-
-        frag: fragmentShaderSource,
-
-        primitive: 'lines',
-        lineWidth: 1
-    };
 
     function renderGLParcoords(dimensionViews, setChanged, clearOnly) {
 
