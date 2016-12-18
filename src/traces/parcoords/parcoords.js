@@ -12,13 +12,11 @@ var lineLayerMaker = require('./lines');
 var Lib = require('../../lib');
 var d3 = require('d3');
 
-function keyFun(d) {
-    return d.key;
-}
+function keyFun(d) {return d.key;}
 
-function repeat(d) {
-    return [d];
-}
+function repeat(d) {return [d];}
+
+function visible(dimension) {return !dimension.hidden;}
 
 function ordinalScaleSnap(scale, v) {
     var i, a, prevDiff, prevValue, diff;
@@ -42,24 +40,21 @@ function makeDomainScale(height, padding, integerPadding, dimension) {
     }
     return dimension.integer ?
         d3.scale.ordinal()
-        .domain(d3.range(Math.round(lo), Math.round(hi + 1)))
-        .rangePoints([height - padding, padding], integerPadding) :
+            .domain(d3.range(Math.round(lo), Math.round(hi + 1)))
+            .rangePoints([height - padding, padding], integerPadding) :
         d3.scale.linear()
-        .domain([lo, hi])
-        .range([height - padding, padding]);
+            .domain([lo, hi])
+            .range([height - padding, padding]);
 }
 
 function makeUnitScale(height, padding) {
-    return d3.scale.linear()
-        .range([height - padding, padding]);
+    return d3.scale.linear().range([height - padding, padding]);
 }
 
 function makeIntegerScale(integerPadding, dimension) {
     return dimension.integer && d3.scale.ordinal()
-            .domain(
-                d3.range(0, Math.round(d3.max(dimension.values) + 1) - Math.round(d3.min(dimension.values)))
-                    .map(function(d, _, a) {return d / (a.length - 1);})
-            )
+            .domain(d3.range(0, Math.round(d3.max(dimension.values) + 1) - Math.round(d3.min(dimension.values)))
+                .map(function(d, _, a) {return d / (a.length - 1);}))
             .rangePoints([0, 1], integerPadding);
 }
 
@@ -72,10 +67,6 @@ function domainToUnitScale(values) {
     var a = 1 / (extent[1] - extent[0]);
     var b = -a * extent[0];
     return function(x) {return a * x + b;};
-}
-
-function visible(dimension) {
-    return !dimension.hidden;
 }
 
 function viewModel(lines, width, height, canvasPixelRatio, model) {
