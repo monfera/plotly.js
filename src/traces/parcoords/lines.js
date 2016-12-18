@@ -95,13 +95,13 @@ function ccolor(unitToColor, context, lines_contextcolor, lines_contextopacity) 
     return result;
 }
 
-function makePoints(sampleCount, dimensionCount, paddedUnitScale, dimensions, color) {
+function makePoints(sampleCount, dimensionCount, dimensions, color) {
 
     var points = [];
     for(var j = 0; j < sampleCount; j++) {
         for(var i = 0; i < gpuDimensionCount; i++) {
             points.push(i < dimensionCount ?
-                paddedUnitScale(dimensions[i].domainToUnitScale(dimensions[i].values[j])) :
+                dimensions[i].paddedUnitValues[j] :
                 i === (gpuDimensionCount - 1) ?
                     adjustDepth(color[j]) :
                     0.5);
@@ -165,7 +165,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnit
 
     var shownPanelCount = shownDimensionCount - 1;
 
-    var points = makePoints(sampleCount, dimensionCount, paddedUnitScale, dimensions, color);
+    var points = makePoints(sampleCount, dimensionCount, dimensions, color);
     var attributes = makeAttributes(sampleCount, points);
 
     var regl = createREGL({
