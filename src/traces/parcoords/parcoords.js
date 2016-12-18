@@ -80,14 +80,16 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
 
     var unitPad = lines.verticalpadding / (height * canvasPixelRatio);
     var unitPadScale = (1 - 2 * unitPad);
+    var paddedUnitScale = function(d) {return unitPad + unitPadScale * d;};
 
     var viewModel = {
         key: model.key,
         xScale: xScale,
-        paddedUnitScale: function(d) {return unitPad + unitPadScale * d;}
+        paddedUnitScale: paddedUnitScale
     };
 
     viewModel.panels = model.dimensions.map(function(dimension, i) {
+        var domainToUnitScale = makeDomainToUnitScale(dimension.values);
         return {
             key: dimension.id || (dimension.label + ' ' + Math.floor(1e6 * Math.random())),
             label: dimension.label,
@@ -97,13 +99,14 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
             originalXIndex: i,
             height: height,
             values: dimension.values,
+            paddedUnitValues: dimension.values.map(domainToUnitScale).map(paddedUnitScale),
             xScale: xScale,
             x: xScale(i),
             canvasX: xScale(i) * canvasPixelRatio,
             unitScale: makeUnitScale(height, lines.verticalpadding),
             domainScale: makeDomainScale(height, lines.verticalpadding, lines.integerpadding, dimension),
             integerScale: makeIntegerScale(lines.integerpadding, dimension),
-            domainToUnitScale: makeDomainToUnitScale(dimension.values),
+            domainToUnitScale: domainToUnitScale,
             pieChartCheat: dimension.pieChartCheat,
             filter: [0, 1], // dimension.filter || (dimension.filter = [0, 1]),
             parent: viewModel
