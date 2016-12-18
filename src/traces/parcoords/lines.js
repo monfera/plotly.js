@@ -19,6 +19,7 @@ var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on do
 
 var gpuDimensionCount = 64;
 var sectionVertexCount = 2;
+var vec4NumberCount = 4
 
 var dummyPixel = new Uint8Array(4);
 function ensureDraw(regl) {
@@ -99,8 +100,11 @@ function makePoints(sampleCount, dimensionCount, paddedUnitScale, dimensions, co
     var points = [];
     for(var j = 0; j < sampleCount; j++) {
         for(var i = 0; i < gpuDimensionCount; i++) {
-            points.push(i < dimensionCount ? paddedUnitScale(dimensions[i].domainToUnitScale(data[i].values[j]))
-                : i === (gpuDimensionCount - 1) ? adjustDepth(color[j]) : 0.5);
+            points.push(i < dimensionCount ?
+                paddedUnitScale(dimensions[i].domainToUnitScale(data[i].values[j])) :
+                i === (gpuDimensionCount - 1) ?
+                    adjustDepth(color[j]) :
+                    0.5);
         }
     }
 
@@ -108,9 +112,6 @@ function makePoints(sampleCount, dimensionCount, paddedUnitScale, dimensions, co
 }
 
 function makeAttributes(sampleCount, points) {
-
-    var i, j, k;
-    var vec4NumberCount = 4
 
     function makeVecAttr(vecIndex) {
 
@@ -120,10 +121,10 @@ function makeAttributes(sampleCount, points) {
         for(j = 0; j < sampleCount; j++) {
             for (k = 0; k < sectionVertexCount; k++) {
                 for (i = 0; i < vec4NumberCount; i++) {
-                    var multiplier = vecIndex * vec4NumberCount + i === gpuDimensionCount - 1
-                        ? Math.round(sectionVertexCount * ((k % sectionVertexCount) - 0.5))
-                        : 1;
-                    pointPairs.push(multiplier * points[j * gpuDimensionCount + vecIndex * vec4NumberCount + i]);
+                    pointPairs.push(points[j * gpuDimensionCount + vecIndex * vec4NumberCount + i]);
+                    if(vecIndex * vec4NumberCount + i === gpuDimensionCount - 1 && k % 2 === 0) {
+                        pointPairs[pointPairs.length - 1] *= -1;
+                    }
                 }
             }
         }
@@ -132,7 +133,7 @@ function makeAttributes(sampleCount, points) {
     }
 
     var attributes = {};
-    for(i = 0; i < gpuDimensionCount / 4; i++) {
+    for(var i = 0; i < gpuDimensionCount / 4; i++) {
         attributes['p' + i.toString(16)] = makeVecAttr(i);
     }
 
