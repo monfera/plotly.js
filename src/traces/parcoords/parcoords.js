@@ -84,8 +84,7 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
 
     var viewModel = {
         key: model.key,
-        xScale: xScale,
-        paddedUnitScale: paddedUnitScale
+        xScale: xScale
     };
 
     viewModel.panels = model.dimensions.map(function(dimension, i) {
@@ -106,7 +105,6 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
             unitScale: makeUnitScale(height, lines.verticalpadding),
             domainScale: makeDomainScale(height, lines.verticalpadding, lines.integerpadding, dimension),
             integerScale: makeIntegerScale(lines.integerpadding, dimension),
-            domainToUnitScale: domainToUnitScale,
             pieChartCheat: dimension.pieChartCheat,
             filter: [0, 1], // dimension.filter || (dimension.filter = [0, 1]),
             parent: viewModel
@@ -234,7 +232,7 @@ module.exports = function(root, styledData, layout) {
 
     parcoordsLineLayer
         .each(function(d) {
-            var lineLayer = lineLayerMaker(this, lines, canvasWidth, canvasHeight, d.viewModel.paddedUnitScale, d.viewModel.panels, unitToColor, d.context);
+            var lineLayer = lineLayerMaker(this, lines, canvasWidth, canvasHeight, d.viewModel.panels, unitToColor, d.context);
             d.viewModel[d.key] = lineLayer;
             tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true);});
             lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));

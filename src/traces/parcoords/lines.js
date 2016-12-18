@@ -143,7 +143,7 @@ function makeAttributes(sampleCount, points) {
     return attributes;
 }
 
-module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, paddedUnitScale, dimensions, unitToColor, context) {
+module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions, unitToColor, context) {
 
     var renderState = {
         currentRafs: {},
