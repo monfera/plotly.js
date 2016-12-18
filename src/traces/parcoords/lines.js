@@ -82,6 +82,9 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
 }
 
 function adjustDepth(d) {
+    // WebGL matrix operations use floats with limited precision, potentially causing a number near a border of [0, 1]
+    // to end up slightly outside the border. With an epsilon, we reduce the chance that a line gets clipped by the
+    // near or the far plane.
     return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon, d));
 }
 
