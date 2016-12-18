@@ -291,8 +291,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             dim2C: regl.prop('dim2C'),
             dim1D: regl.prop('dim1D'),
             dim2D: regl.prop('dim2D'),
-            palette: paletteTexture,
-            colorClamp: [0, 1],
             scatter: regl.prop('scatter')
         },
         offset: regl.prop('offset'),
@@ -326,7 +324,9 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
                 {},
                 filters,
                 {
-                    resolution: [canvasWidth, canvasHeight]
+                    resolution: [canvasWidth, canvasHeight],
+                    palette: paletteTexture,
+                    colorClamp: [0, 1]
                 })
         };
 
