@@ -282,16 +282,23 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             }
         }
 
-        function makeItem(i, ii, x, panelSizeX, originalXIndex, scatter) {
-            var loHi, abcd, d, index;
-            var leftRight = [i, ii];
+        // set filter lo/hi domains
+        for(var loHi = 0; loHi < 2; loHi++) {
+            for(var abcd = 0; abcd < 4; abcd++) {
+                for(var d = 0; d < 16; d++) {
+                    lims[loHi][abcd][d] = (!context && valid(d, 16 * abcd) ? orig(d + 16 * abcd).filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
+                }
+            }
+        }
 
-            for(loHi = 0; loHi < 2; loHi++) {
+        function makeItem(i, ii, x, panelSizeX, originalXIndex, scatter) {
+            var leftRight = [i, ii], index;
+
+            for(var loHi = 0; loHi < 2; loHi++) {
                 index = leftRight[loHi];
-                for(abcd = 0; abcd < 4; abcd++) {
-                    for(d = 0; d < 16; d++) {
+                for(var abcd = 0; abcd < 4; abcd++) {
+                    for(var d = 0; d < 16; d++) {
                         dims[loHi][abcd][d] = d + 16 * abcd === index ? 1 : 0;
-                        lims[loHi][abcd][d] = (!context && valid(d, 16 * abcd) ? orig(d + 16 * abcd).filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
                     }
                 }
             }
