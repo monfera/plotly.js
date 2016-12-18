@@ -278,15 +278,15 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             }
         }
 
-        var filters = (function() {
+        var filters = (function(dimensions) {
 
             function valid(i, offset) {
-                return i < dimensionCount && i + offset < dimensionViews.length;
+                return i + offset < dimensions.length;
             }
 
             function orig(i) {
-                var index = dimensionViews.map(function(v) {return v.originalXIndex;}).indexOf(i);
-                return dimensionViews[index];
+                var index = dimensions.map(function(v) {return v.originalXIndex;}).indexOf(i);
+                return dimensions[index];
             }
 
             for(var loHi = 0; loHi < domainBoundsCount; loHi++) {
@@ -307,7 +307,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
                 hiC: lims[1][2],
                 hiD: lims[1][3]
             }
-        })();
+        })(dimensionViews);
 
         var itemInvariant = Object.assign({}, filters, {
             resolution: [canvasWidth, canvasHeight]
