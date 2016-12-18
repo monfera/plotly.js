@@ -139,6 +139,57 @@ function makeAttributes(sampleCount, points) {
     return attributes;
 }
 
+function makeDummyFilters() {
+    var l = -filterEpsilon;
+    var h = 1 + filterEpsilon;
+    var lows = [l,l,l,l,l,l,l,l,l,l,l,l,l,l,l,l];
+    var highs = [h,h,h,h,h,h,h,h,h,h,h,h,h,h,h,h];
+    return {
+        loA: lows,
+        loB: lows,
+        loC: lows,
+        loD: lows,
+        hiA: highs,
+        hiB: highs,
+        hiC: highs,
+        hiD: highs
+    }
+}
+
+function makeFilters(dimensions) {
+
+    var lims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
+
+    function valid(i, offset) {
+        return i + offset < dimensions.length;
+    }
+
+    function orig(i) {
+        var index = dimensions.map(function(v) {return v.originalXIndex;}).indexOf(i);
+        return dimensions[index];
+    }
+
+    for(var loHi = 0; loHi < domainBoundsCount; loHi++) {
+        for(var mat = 0; mat < gpuMatrixCount; mat++) {
+            for(var d = 0; d < mat4NumberCount; d++) {
+                lims[loHi][mat][d] = (valid(d, mat4NumberCount * mat) ? orig(d + mat4NumberCount * mat).filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
+            }
+        }
+    }
+
+    return {
+        loA: lims[0][0],
+        loB: lims[0][1],
+        loC: lims[0][2],
+        loD: lims[0][3],
+        hiA: lims[1][0],
+        hiB: lims[1][1],
+        hiC: lims[1][2],
+        hiD: lims[1][3]
+    }
+}
+
+
 module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions, unitToColor, context) {
 
     var renderState = {
@@ -260,38 +311,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
     var previousAxisOrder = [];
 
     var dims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
-    var lims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
-
-    function makeFilters(dimensions) {
-
-        function valid(i, offset) {
-            return i + offset < dimensions.length;
-        }
-
-        function orig(i) {
-            var index = dimensions.map(function(v) {return v.originalXIndex;}).indexOf(i);
-            return dimensions[index];
-        }
-
-        for(var loHi = 0; loHi < domainBoundsCount; loHi++) {
-            for(var mat = 0; mat < gpuMatrixCount; mat++) {
-                for(var d = 0; d < mat4NumberCount; d++) {
-                    lims[loHi][mat][d] = (!context && valid(d, mat4NumberCount * mat) ? orig(d + mat4NumberCount * mat).filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
-                }
-            }
-        }
-
-        return {
-            loA: lims[0][0],
-            loB: lims[0][1],
-            loC: lims[0][2],
-            loD: lims[0][3],
-            hiA: lims[1][0],
-            hiB: lims[1][1],
-            hiC: lims[1][2],
-            hiD: lims[1][3]
-        }
-    }
 
     function renderGLParcoords(dimensionViews, setChanged, clearOnly) {
 
@@ -309,7 +328,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             }
         }
 
-        var filters = makeFilters(dimensionViews);
+        var filters = context ? makeDummyFilters(dimensionViews) : makeFilters(dimensionViews);
 
         var itemInvariant = Object.assign({}, filters, {
             resolution: [canvasWidth, canvasHeight]
