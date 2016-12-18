@@ -262,6 +262,37 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
     var dims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
     var lims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
 
+    function makeFilters(dimensions) {
+
+        function valid(i, offset) {
+            return i + offset < dimensions.length;
+        }
+
+        function orig(i) {
+            var index = dimensions.map(function(v) {return v.originalXIndex;}).indexOf(i);
+            return dimensions[index];
+        }
+
+        for(var loHi = 0; loHi < domainBoundsCount; loHi++) {
+            for(var mat = 0; mat < gpuMatrixCount; mat++) {
+                for(var d = 0; d < mat4NumberCount; d++) {
+                    lims[loHi][mat][d] = (!context && valid(d, mat4NumberCount * mat) ? orig(d + mat4NumberCount * mat).filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
+                }
+            }
+        }
+
+        return {
+            loA: lims[0][0],
+            loB: lims[0][1],
+            loC: lims[0][2],
+            loD: lims[0][3],
+            hiA: lims[1][0],
+            hiB: lims[1][1],
+            hiC: lims[1][2],
+            hiD: lims[1][3]
+        }
+    }
+
     function renderGLParcoords(dimensionViews, setChanged, clearOnly) {
 
         var I;
@@ -278,36 +309,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             }
         }
 
-        var filters = (function(dimensions) {
-
-            function valid(i, offset) {
-                return i + offset < dimensions.length;
-            }
-
-            function orig(i) {
-                var index = dimensions.map(function(v) {return v.originalXIndex;}).indexOf(i);
-                return dimensions[index];
-            }
-
-            for(var loHi = 0; loHi < domainBoundsCount; loHi++) {
-                for(var mat = 0; mat < gpuMatrixCount; mat++) {
-                    for(var d = 0; d < mat4NumberCount; d++) {
-                        lims[loHi][mat][d] = (!context && valid(d, mat4NumberCount * mat) ? orig(d + mat4NumberCount * mat).filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
-                    }
-                }
-            }
-
-            return {
-                loA: lims[0][0],
-                loB: lims[0][1],
-                loC: lims[0][2],
-                loD: lims[0][3],
-                hiA: lims[1][0],
-                hiB: lims[1][1],
-                hiC: lims[1][2],
-                hiD: lims[1][3]
-            }
-        })(dimensionViews);
+        var filters = makeFilters(dimensionViews);
 
         var itemInvariant = Object.assign({}, filters, {
             resolution: [canvasWidth, canvasHeight]
