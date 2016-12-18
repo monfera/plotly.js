@@ -74,9 +74,13 @@ function domainToUnitScale(values) {
     return function(x) {return a * x + b;};
 }
 
+function visible(dimension) {
+    return !dimension.hidden;
+}
+
 function viewModel(lines, width, height, canvasPixelRatio, model) {
 
-    var xScale = d3.scale.ordinal().domain(d3.range(model.dimensions.length)).rangePoints([0, width], 0);
+    var xScale = d3.scale.ordinal().domain(d3.range(model.dimensions.filter(visible).length)).rangePoints([0, width], 0);
 
     var unitPad = lines.verticalpadding / (height * canvasPixelRatio);
     var unitPadScale = (1 - 2 * unitPad);
@@ -87,7 +91,7 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
         xScale: xScale
     };
 
-    viewModel.panels = model.dimensions.map(function(dimension, i) {
+    viewModel.panels = model.dimensions.filter(visible).map(function(dimension, i) {
         return {
             key: dimension.id || (dimension.label + ' ' + Math.floor(1e6 * Math.random())),
             label: dimension.label,

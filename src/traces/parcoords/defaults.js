@@ -50,6 +50,7 @@ function dimensionsDefaults(traceIn, traceOut) {
         coerce('id');
         coerce('label');
         coerce('integer');
+        coerce('hidden');
         coerce('values');
 
         dimensionOut._index = i;
