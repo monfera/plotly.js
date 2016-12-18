@@ -281,7 +281,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
         lineWidth: 1,
         attributes: attributes,
         uniforms: {
-            //resolution: regl.prop('resolution'),
             viewBoxPosition: regl.prop('viewBoxPosition'),
             viewBoxSize: regl.prop('viewBoxSize'),
             dim1A: regl.prop('dim1A'),
@@ -292,14 +291,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             dim2C: regl.prop('dim2C'),
             dim1D: regl.prop('dim1D'),
             dim2D: regl.prop('dim2D'),
-            loA: regl.prop('loA'),
-            hiA: regl.prop('hiA'),
-            loB: regl.prop('loB'),
-            hiB: regl.prop('hiB'),
-            loC: regl.prop('loC'),
-            hiC: regl.prop('hiC'),
-            loD: regl.prop('loD'),
-            hiD: regl.prop('hiD'),
             palette: paletteTexture,
             colorClamp: [0, 1],
             scatter: regl.prop('scatter')
@@ -330,12 +321,14 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
 
         var filters = context ? makeDummyFilters(dimensionViews) : makeFilters(dimensionViews);
 
-        var itemInvariant = Object.assign(
-            {},
-            filters,
-            {
-                resolution: [canvasWidth, canvasHeight]
-            });
+        var itemInvariant = {
+            uniforms: Object.assign(
+                {},
+                filters,
+                {
+                    resolution: [canvasWidth, canvasHeight]
+                })
+        };
 
         function makeItem(i, ii, x, panelSizeX, originalXIndex, scatter) {
             var leftRight = [i, ii], index;
@@ -370,11 +363,8 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             };
         }
 
-        regl({
-            uniforms: {
-                resolution: [canvasWidth, canvasHeight]
-            }
-        })(function() {
+        regl(itemInvariant)(function() {
+
             for(I = 0; I < panelCount; I++) {
                 var dimensionView = dimensionViews[I];
                 var i = dimensionView.originalXIndex;
@@ -388,7 +378,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
                     previousAxisOrder[i] = [x, nextDim.canvasX];
                     var item = Object.assign(
                         {},
-                        filters,
                         makeItem(i, ii, x, panelSizeX, dimensionView.originalXIndex, dimensionView.scatter)
                     );
                     renderState.clearOnly = clearOnly;
