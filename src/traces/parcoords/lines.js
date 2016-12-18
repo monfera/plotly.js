@@ -100,11 +100,7 @@ function makePoints(sampleCount, dimensionCount, dimensions, color) {
     var points = [];
     for(var j = 0; j < sampleCount; j++) {
         for(var i = 0; i < gpuDimensionCount; i++) {
-            points.push(i < dimensionCount ?
-                dimensions[i].paddedUnitValues[j] :
-                i === (gpuDimensionCount - 1) ?
-                    adjustDepth(color[j]) :
-                    0.5);
+            points.push(i < dimensionCount ? dimensions[i].paddedUnitValues[j] : 0.5);
         }
     }
 
@@ -120,7 +116,7 @@ function makeVecAttr(sampleCount, points, vecIndex) {
         for (k = 0; k < sectionVertexCount; k++) {
             for (i = 0; i < vec4NumberCount; i++) {
                 pointPairs.push(points[j * gpuDimensionCount + vecIndex * vec4NumberCount + i]);
-                if(vecIndex * vec4NumberCount + i === gpuDimensionCount - 1 && k % 2 === 0) {
+                if(vecIndex * vec4NumberCount + i === 0 && k % 2 === 0) {
                     pointPairs[pointPairs.length - 1] *= -1;
                 }
             }
