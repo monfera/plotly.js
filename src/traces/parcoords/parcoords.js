@@ -123,7 +123,7 @@ module.exports = function(root, styledData, layout) {
 
     var unitToColor = styledData.unitToColor;
 
-    var dimensions = [{label: '_color', hidden: false, values: styledData.line.color}].concat(styledData.dimensions);
+    var data = styledData.dimensions;
     var tickDistance = styledData.tickdistance;
     var coloringDomainToUnitScale = domainToUnitScale(styledData.line.color);
     var overdrag = 40;
@@ -185,7 +185,7 @@ module.exports = function(root, styledData, layout) {
     }
 
     var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
-        .data([{key: 0, dimensions: dimensions}], keyFun);
+        .data([{key: 0, dimensions: data}], keyFun);
 
     parcoordsModel.enter()
         .append('div')

@@ -3,7 +3,9 @@ precision highp float;
 attribute vec4 p0, p1, p2, p3,
                p4, p5, p6, p7,
                p8, p9, pa, pb,
-               pc, pd, pe, pf;
+               pc, pd, pe;
+
+attribute vec4 pf;
 
 uniform mat4 dim1A, dim2A, dim1B, dim2B, dim1C, dim2C, dim1D, dim2D,
              loA, hiA, loB, hiB, loC, hiC, loD, hiD;
@@ -41,15 +43,15 @@ float val(mat4 p, mat4 v) {
 
 void main() {
 
-    float x = 0.5 * sign(p0[0]) + 0.5;
-    float prominence = abs(p0[0]);
+    float x = 0.5 * sign(pf[3]) + 0.5;
+    float prominence = abs(pf[3]);
     float depth = 1.0 - prominence;
     float colorIndex = prominence;
 
-    mat4 pA = mat4(abs(p0), p1, p2, p3);
-    mat4 pB = mat4(    p4,  p5, p6, p7);
-    mat4 pC = mat4(    p8,  p9, pa, pb);
-    mat4 pD = mat4(    pc,  pd, pe, pf);
+    mat4 pA = mat4(p0, p1, p2, p3);
+    mat4 pB = mat4(p4, p5, p6, p7);
+    mat4 pC = mat4(p8, p9, pa, pb);
+    mat4 pD = mat4(pc, pd, pe, abs(pf));
     
     float show = float(mshow(pA, loA, hiA) &&
                        mshow(pB, loB, hiB) &&
