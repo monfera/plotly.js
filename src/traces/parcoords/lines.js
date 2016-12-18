@@ -14,7 +14,6 @@ var glslify = require('glslify');
 var vertexShaderSource = glslify('./shaders/vertex.glsl');
 var fragmentShaderSource = glslify('./shaders/fragment.glsl');
 
-var depthLimitEpsilon = 1e-6; // don't change; otherwise near/far plane lines are lost
 var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on domain boundaries
 
 var gpuDimensionCount = 64;
@@ -81,11 +80,7 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
     render(blockNumber);
 }
 
-function adjustDepth(d) {
-    return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon, d));
-}
-
-function ccolor(unitToColor, context, lines_contextcolor, lines_contextopacity) {
+function palette(unitToColor, context, lines_contextcolor, lines_contextopacity) {
     var result = [];
     for(var j = 0; j < 256; j++) {
         var c = unitToColor(j / 255);
@@ -157,9 +152,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
     var color = lines.color;
     var overdrag = lines.canvasOverdrag;
 
-    var shownDimensionCount = dimensionCount;
-
-    var shownPanelCount = shownDimensionCount - 1;
+    var panelCount = dimensionCount - 1;
 
     var points = makePoints(sampleCount, dimensionCount, dimensions, color);
     var attributes = makeAttributes(sampleCount, points);
@@ -177,7 +170,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
         type: 'uint8',
         mag: 'nearest',
         min: 'nearest',
-        data: ccolor(unitToColor, context, lines.contextcolor, lines.contextopacity)
+        data: palette(unitToColor, context, lines.contextcolor, lines.contextopacity)
     });
 
     var glAes = regl({
@@ -276,7 +269,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
         var I;
 
         function valid(i, offset) {
-            return i < shownDimensionCount && i + offset < dimensionViews.length;
+            return i < dimensionCount && i + offset < dimensionViews.length;
         }
 
         function orig(i) {
@@ -285,7 +278,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
         }
 
         var leftmostIndex, rightmostIndex, lowestX = Infinity, highestX = -Infinity;
-        for(I = 0; I < shownPanelCount; I++) {
+        for(I = 0; I < panelCount; I++) {
             if(dimensionViews[I].canvasX > highestX) {
                 highestX = dimensionViews[I].canvasX;
                 rightmostIndex = I;
@@ -341,11 +334,11 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             };
         }
 
-        for(I = 0; I < shownPanelCount; I++) {
+        for(I = 0; I < panelCount; I++) {
             var dimensionView = dimensionViews[I];
             var i = dimensionView.originalXIndex;
             var x = dimensionView.canvasX;
-            var nextDim = dimensionViews[(I + 1) % shownDimensionCount];
+            var nextDim = dimensionViews[(I + 1) % dimensionCount];
             var ii = nextDim.originalXIndex;
             var panelSizeX = nextDim.canvasX - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextDim.canvasX) {
