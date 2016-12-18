@@ -63,7 +63,7 @@ function makeIntegerScale(integerPadding, dimension) {
             .rangePoints([0, 1], integerPadding);
 }
 
-function makeDomainToUnitScale(values) {
+function domainToUnitScale(values) {
     var extent = d3.extent(values);
     if(extent[0] === extent[1]) {
         extent[0]--;
@@ -88,7 +88,6 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
     };
 
     viewModel.panels = model.dimensions.map(function(dimension, i) {
-        var domainToUnitScale = makeDomainToUnitScale(dimension.values);
         return {
             key: dimension.id || (dimension.label + ' ' + Math.floor(1e6 * Math.random())),
             label: dimension.label,
@@ -98,7 +97,7 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
             originalXIndex: i,
             height: height,
             values: dimension.values,
-            paddedUnitValues: dimension.values.map(domainToUnitScale).map(paddedUnitScale),
+            paddedUnitValues: dimension.values.map(domainToUnitScale(dimension.values)).map(paddedUnitScale),
             xScale: xScale,
             x: xScale(i),
             canvasX: xScale(i) * canvasPixelRatio,
@@ -131,7 +130,7 @@ module.exports = function(root, styledData, layout) {
 
     var data = styledData.dimensions;
     var tickDistance = styledData.tickdistance;
-    var coloringDomainToUnitScale = makeDomainToUnitScale(styledData.line.color);
+    var coloringDomainToUnitScale = domainToUnitScale(styledData.line.color);
     var overdrag = 40;
     var canvasPixelRatio = styledData.lines.pixelratio;
     var lines = Lib.extendDeep(styledData.lines, {
