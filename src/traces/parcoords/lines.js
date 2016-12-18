@@ -266,15 +266,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
 
         var I;
 
-        function valid(i, offset) {
-            return i < dimensionCount && i + offset < dimensionViews.length;
-        }
-
-        function orig(i) {
-            var index = dimensionViews.map(function(v) {return v.originalXIndex;}).indexOf(i);
-            return dimensionViews[index];
-        }
-
         var leftmostIndex, rightmostIndex, lowestX = Infinity, highestX = -Infinity;
         for(I = 0; I < panelCount; I++) {
             if(dimensionViews[I].canvasX > highestX) {
@@ -288,6 +279,15 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
         }
 
         var filters = (function() {
+
+            function valid(i, offset) {
+                return i < dimensionCount && i + offset < dimensionViews.length;
+            }
+
+            function orig(i) {
+                var index = dimensionViews.map(function(v) {return v.originalXIndex;}).indexOf(i);
+                return dimensionViews[index];
+            }
 
             for(var loHi = 0; loHi < domainBoundsCount; loHi++) {
                 for(var mat = 0; mat < gpuMatrixCount; mat++) {
