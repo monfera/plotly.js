@@ -231,8 +231,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
 
     var glAes = regl({
 
-        profile: false,
-
         blend: {
             enable: focusAlphaBlending,
             func: {
@@ -255,12 +253,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             range: [0, 1]
         },
 
-        // for polygons
-        cull: {
-            enable: true,
-            face: 'back'
-        },
-
         scissor: {
             enable: true,
             box: {
@@ -271,14 +263,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             }
         },
 
-        dither: false,
-
-        vert: vertexShaderSource,
-
-        frag: fragmentShaderSource,
-
-        primitive: 'lines',
-        lineWidth: 1,
         attributes: attributes,
         uniforms: {
             viewBoxPosition: regl.prop('viewBoxPosition'),
@@ -320,6 +304,23 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
         var filters = context ? makeDummyFilters(dimensionViews) : makeFilters(dimensionViews);
 
         var itemInvariant = {
+            profile: false,
+
+            // for polygons
+            cull: {
+                enable: true,
+                face: 'back'
+            },
+
+            dither: false,
+
+            vert: vertexShaderSource,
+
+            frag: fragmentShaderSource,
+
+            primitive: 'lines',
+            lineWidth: 1,
+
             uniforms: Object.assign(
                 {},
                 filters,
