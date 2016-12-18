@@ -350,27 +350,24 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
                 }
             }
 
-            return Object.assign(
-                {},
-                itemInvariant,
-                {
-                    key: originalXIndex,
-                    viewBoxPosition: [x + overdrag, 0],
-                    viewBoxSize: [panelSizeX, canvasPanelSizeY],
+            return {
+                key: originalXIndex,
+                viewBoxPosition: [x + overdrag, 0],
+                viewBoxSize: [panelSizeX, canvasPanelSizeY],
 
-                    dim1A: dims[0][0],
-                    dim1B: dims[0][1],
-                    dim1C: dims[0][2],
-                    dim1D: dims[0][3],
-                    dim2A: dims[1][0],
-                    dim2B: dims[1][1],
-                    dim2C: dims[1][2],
-                    dim2D: dims[1][3],
+                dim1A: dims[0][0],
+                dim1B: dims[0][1],
+                dim1C: dims[0][2],
+                dim1D: dims[0][3],
+                dim2A: dims[1][0],
+                dim2B: dims[1][1],
+                dim2C: dims[1][2],
+                dim2D: dims[1][3],
 
-                    scatter: scatter || 0,
-                    scissorX: I === leftmostIndex ? 0 : x + overdrag,
-                    scissorWidth: I === rightmostIndex ? 2 * panelSizeX : panelSizeX + 1 + (I === leftmostIndex ? x + overdrag : 0)
-                });
+                scatter: scatter || 0,
+                scissorX: I === leftmostIndex ? 0 : x + overdrag,
+                scissorWidth: I === rightmostIndex ? 2 * panelSizeX : panelSizeX + 1 + (I === leftmostIndex ? x + overdrag : 0)
+            };
         }
 
         for(I = 0; I < panelCount; I++) {
@@ -382,7 +379,11 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             var panelSizeX = nextDim.canvasX - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextDim.canvasX) {
                 previousAxisOrder[i] = [x, nextDim.canvasX];
-                var item = makeItem(i, ii, x, panelSizeX, dimensionView.originalXIndex, dimensionView.scatter);
+                var item = Object.assign(
+                    {},
+                    itemInvariant,
+                    makeItem(i, ii, x, panelSizeX, dimensionView.originalXIndex, dimensionView.scatter)
+                );
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blocklinecount : sampleCount, sampleCount, item);
             }
