@@ -14,7 +14,6 @@ var glslify = require('glslify');
 var vertexShaderSource = glslify('./shaders/vertex.glsl');
 var fragmentShaderSource = glslify('./shaders/fragment.glsl');
 
-var depthLimitEpsilon = 1e-6; // don't change; otherwise near/far plane lines are lost
 var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on domain boundaries
 
 var gpuDimensionCount = 64;
@@ -79,10 +78,6 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
     }
 
     render(blockNumber);
-}
-
-function adjustDepth(d) {
-    return Math.max(depthLimitEpsilon, Math.min(1 - depthLimitEpsilon, d));
 }
 
 function ccolor(unitToColor, context, lines_contextcolor, lines_contextopacity) {
@@ -157,9 +152,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
     var color = lines.color;
     var overdrag = lines.canvasOverdrag;
 
-    var shownDimensionCount = dimensionCount;
-
-    var shownPanelCount = shownDimensionCount - 1;
+    var panelCount = dimensionCount - 1;
 
     var points = makePoints(sampleCount, dimensionCount, dimensions, color);
     var attributes = makeAttributes(sampleCount, points);
@@ -268,27 +261,27 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
 
     var previousAxisOrder = [];
 
-    function renderGLParcoords(dimensionViews, setChanged, clearOnly) {
+    function renderGLParcoords(dimensions, setChanged, clearOnly) {
 
         var I;
 
         function valid(i, offset) {
-            return i < shownDimensionCount && i + offset < dimensionViews.length;
+            return i + offset < dimensions.length;
         }
 
         function orig(i) {
-            var index = dimensionViews.map(function(v) {return v.originalXIndex;}).indexOf(i);
-            return dimensionViews[index];
+            var index = dimensions.map(function(v) {return v.originalXIndex;}).indexOf(i);
+            return dimensions[index];
         }
 
         var leftmostIndex, rightmostIndex, lowestX = Infinity, highestX = -Infinity;
-        for(I = 0; I < shownPanelCount; I++) {
-            if(dimensionViews[I].canvasX > highestX) {
-                highestX = dimensionViews[I].canvasX;
+        for(I = 0; I < panelCount; I++) {
+            if(dimensions[I].canvasX > highestX) {
+                highestX = dimensions[I].canvasX;
                 rightmostIndex = I;
             }
-            if(dimensionViews[I].canvasX < lowestX) {
-                lowestX = dimensionViews[I].canvasX;
+            if(dimensions[I].canvasX < lowestX) {
+                lowestX = dimensions[I].canvasX;
                 leftmostIndex = I;
             }
         }
@@ -341,16 +334,16 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             };
         }
 
-        for(I = 0; I < shownPanelCount; I++) {
-            var dimensionView = dimensionViews[I];
-            var i = dimensionView.originalXIndex;
-            var x = dimensionView.canvasX;
-            var nextDim = dimensionViews[(I + 1) % shownDimensionCount];
+        for(I = 0; I < panelCount; I++) {
+            var dimension = dimensions[I];
+            var i = dimension.originalXIndex;
+            var x = dimension.canvasX;
+            var nextDim = dimensions[(I + 1) % dimensionCount];
             var ii = nextDim.originalXIndex;
             var panelSizeX = nextDim.canvasX - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextDim.canvasX) {
                 previousAxisOrder[i] = [x, nextDim.canvasX];
-                var item = makeItem(i, ii, x, panelSizeX, dimensionView.originalXIndex, dimensionView.scatter);
+                var item = makeItem(i, ii, x, panelSizeX, dimension.originalXIndex, dimension.scatter);
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blocklinecount : sampleCount, sampleCount, item);
             }
