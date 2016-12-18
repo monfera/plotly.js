@@ -287,14 +287,31 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
             }
         }
 
-        // set filter lo/hi domains
-        for(var loHi = 0; loHi < domainBoundsCount; loHi++) {
-            for(var mat = 0; mat < gpuMatrixCount; mat++) {
-                for(var d = 0; d < mat4NumberCount; d++) {
-                    lims[loHi][mat][d] = (!context && valid(d, mat4NumberCount * mat) ? orig(d + mat4NumberCount * mat).filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
+        var filters = (function() {
+
+            for(var loHi = 0; loHi < domainBoundsCount; loHi++) {
+                for(var mat = 0; mat < gpuMatrixCount; mat++) {
+                    for(var d = 0; d < mat4NumberCount; d++) {
+                        lims[loHi][mat][d] = (!context && valid(d, mat4NumberCount * mat) ? orig(d + mat4NumberCount * mat).filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
+                    }
                 }
             }
-        }
+
+            return {
+                loA: lims[0][0],
+                loB: lims[0][1],
+                loC: lims[0][2],
+                loD: lims[0][3],
+                hiA: lims[1][0],
+                hiB: lims[1][1],
+                hiC: lims[1][2],
+                hiD: lims[1][3]
+            }
+        })();
+
+        var itemInvariant = Object.assign({}, filters, {
+            resolution: [canvasWidth, canvasHeight]
+        });
 
         function makeItem(i, ii, x, panelSizeX, originalXIndex, scatter) {
             var leftRight = [i, ii], index;
@@ -309,9 +326,8 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
                 }
             }
 
-            return {
+            return Object.assign({}, itemInvariant, {
                 key: originalXIndex,
-                resolution: [canvasWidth, canvasHeight],
                 viewBoxPosition: [x + overdrag, 0],
                 viewBoxSize: [panelSizeX, canvasPanelSizeY],
 
@@ -324,19 +340,10 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, dimensions
                 dim2C: dims[1][2],
                 dim2D: dims[1][3],
 
-                loA: lims[0][0],
-                loB: lims[0][1],
-                loC: lims[0][2],
-                loD: lims[0][3],
-                hiA: lims[1][0],
-                hiB: lims[1][1],
-                hiC: lims[1][2],
-                hiD: lims[1][3],
-
                 scatter: scatter || 0,
                 scissorX: I === leftmostIndex ? 0 : x + overdrag,
                 scissorWidth: I === rightmostIndex ? 2 * panelSizeX : panelSizeX + 1 + (I === leftmostIndex ? x + overdrag : 0)
-            };
+            });
         }
 
         for(I = 0; I < panelCount; I++) {
