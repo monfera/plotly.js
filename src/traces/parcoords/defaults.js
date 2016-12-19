@@ -51,7 +51,7 @@ function dimensionsDefaults(traceIn, traceOut) {
         coerce('label');
         coerce('integer');
         coerce('hidden');
-        coerce('initialdomain');
+        coerce('constraintrange');
         coerce('values');
 
         dimensionOut._index = i;

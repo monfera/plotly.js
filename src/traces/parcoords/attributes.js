@@ -84,7 +84,7 @@ module.exports = {
             role: 'info',
             description: 'Hides the dimension when set to true.'
         },
-        initialdomain: {
+        constraintrange: {
             valType: 'data_array',
             role: 'info',
             description: [

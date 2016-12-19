@@ -100,7 +100,7 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
             integerScale: integerScale(lines.integerpadding, dimension),
             domainToUnitScale: domainToUnit,
             pieChartCheat: dimension.pieChartCheat,
-            filter: dimension.initialdomain ? dimension.initialdomain.map(domainToUnit) : [0, 1],
+            filter: dimension.constraintrange ? dimension.constraintrange.map(domainToUnit) : [0, 1],
             parent: viewModel
         };
     });
@@ -433,7 +433,7 @@ module.exports = function(root, styledData, layout, callbacks) {
         .append('g')
         .classed('axisBrush', true);
 
-    axisBrush
+    axisBrushEnter
         .each(function(d) {
             if(!d.brush) {
                 d.brush = d3.svg.brush()
@@ -441,7 +441,10 @@ module.exports = function(root, styledData, layout, callbacks) {
                     .on('brushstart', axisBrushStarted)
                     .on('brush', axisBrushMoved)
                     .on('brushend', axisBrushEnded);
-                d3.select(this).call(d.brush);
+                if(d.filter[0] !== 0 || d.filter[1] !== 1) {
+                    d.brush.extent(d.filter);
+                }
+                d3.select(this).call(d.brush).call(d.brush.event);
             }
         });
 
@@ -453,6 +456,7 @@ module.exports = function(root, styledData, layout, callbacks) {
     axisBrushEnter
         .selectAll('rect.extent')
         .attr('fill', 'url(#filterBarPattern)')
+        .filter(function(d) {return d.filter[0] === 0 && d.filter[1] === 1})
         .attr('y', -100); //  // zero-size rectangle pointer issue workaround
 
     axisBrushEnter
