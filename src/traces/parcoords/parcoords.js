@@ -64,9 +64,7 @@ function domainToUnitScale(values) {
         extent[0]--;
         extent[1]++;
     }
-    var a = 1 / (extent[1] - extent[0]);
-    var b = -a * extent[0];
-    return function(x) {return a * x + b;};
+    return d3.scale.linear().domain(extent);
 }
 
 function viewModel(lines, width, height, canvasPixelRatio, model) {
@@ -83,6 +81,7 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
     };
 
     viewModel.panels = model.dimensions.filter(visible).map(function(dimension, i) {
+        var domainToUnit = domainToUnitScale(dimension.values);
         return {
             key: dimension.id || (dimension.label + ' ' + Math.floor(1e6 * Math.random())),
             label: dimension.label,
@@ -92,13 +91,14 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
             originalXIndex: i,
             height: height,
             values: dimension.values,
-            paddedUnitValues: dimension.values.map(domainToUnitScale(dimension.values)).map(paddedUnitScale),
+            paddedUnitValues: dimension.values.map(domainToUnit).map(paddedUnitScale),
             xScale: xScale,
             x: xScale(i),
             canvasX: xScale(i) * canvasPixelRatio,
             unitScale: unitScale(height, lines.verticalpadding),
             domainScale: domainScale(height, lines.verticalpadding, lines.integerpadding, dimension),
             integerScale: integerScale(lines.integerpadding, dimension),
+            domainToUnitScale: domainToUnit,
             pieChartCheat: dimension.pieChartCheat,
             filter: [0, 1], // todo dimension.filter || (dimension.filter = [0, 1]),
             parent: viewModel
@@ -119,7 +119,7 @@ function styleExtentTexts(selection) {
         .style('user-select', 'none');
 }
 
-module.exports = function(root, styledData, layout) {
+module.exports = function(root, styledData, layout, callbacks) {
 
     var unitToColor = styledData.unitToColor;
 
@@ -488,11 +488,6 @@ module.exports = function(root, styledData, layout) {
         }
         var newExtent = reset ? [0, 1] : extent.slice();
         if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
-/*          // the 1st dimension is special: brushing on it changes the color projection
-            if(dimension.originalXIndex === 0) {
-                dimension.parent['focusLineLayer'].setColorDomain(newExtent);
-            }
-*/
             panels[dimension.xIndex].filter = newExtent;
             dimension.parent.focusLineLayer.render(panels, true);
             var filtersActive = someFiltersActive(dimension.parent);
@@ -510,9 +505,9 @@ module.exports = function(root, styledData, layout) {
     function axisBrushEnded(dimension) {
         var extent = dimension.brush.extent();
         var empty = extent[0] === extent[1];
+        var panels = dimension.parent.panels;
+        var f = panels[dimension.xIndex].filter;
         if(!empty && dimension.integer) {
-            var panels = dimension.parent.panels;
-            var f = panels[dimension.xIndex].filter;
             f[0] = ordinalScaleSnap(dimension.integerScale, f[0]);
             f[1] = ordinalScaleSnap(dimension.integerScale, f[1]);
             if(f[0] === f[1]) {
@@ -523,6 +518,24 @@ module.exports = function(root, styledData, layout) {
             dimension.parent.focusLineLayer.render(panels, true);
         }
         domainBrushing = false;
+        if(callbacks && callbacks.filterChangedCallback) {
+            callbacks.filterChangedCallback({
+                changedDimension: {
+                    key: dimension.key,
+                    label: dimension.label,
+                    domainFilter: f.map(dimension.domainToUnitScale.invert),
+                    fullDomain: f[0] === 0 && f[1] === 1
+                },
+                allDimensions: panels.map(function(p) {
+                    return {
+                        key: p.key,
+                        label: p.label,
+                        domainFilter: p.filter.map(p.domainToUnitScale.invert),
+                        fullDomain: p.filter[0] === 0 && p.filter[1] === 1
+                    };
+                })
+            });
+        };
     }
 
     return tweakables;
