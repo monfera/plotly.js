@@ -84,6 +84,14 @@ module.exports = {
             role: 'info',
             description: 'Hides the dimension when set to true.'
         },
+        initialdomain: {
+            valType: 'data_array',
+            role: 'info',
+            description: [
+                'The initial domain extent to which the filter on the dimension is constrained. Must be an array',
+                'of `[fromValue, toValue]` with finite numbers as elements.'
+            ].join(' ')
+        },
         values: {
             valType: 'data_array',
             role: 'info',

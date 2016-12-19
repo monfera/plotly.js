@@ -100,7 +100,7 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
             integerScale: integerScale(lines.integerpadding, dimension),
             domainToUnitScale: domainToUnit,
             pieChartCheat: dimension.pieChartCheat,
-            filter: [0, 1], // todo dimension.filter || (dimension.filter = [0, 1]),
+            filter: dimension.initialdomain ? dimension.initialdomain.map(domainToUnit) : [0, 1],
             parent: viewModel
         };
     });
