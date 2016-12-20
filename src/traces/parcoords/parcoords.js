@@ -12,6 +12,9 @@ var lineLayerMaker = require('./lines');
 var Lib = require('../../lib');
 var d3 = require('d3');
 
+var overdrag = 40;
+var legendWidth = 80;
+
 function keyFun(d) {return d.key;}
 
 function repeat(d) {return [d];}
@@ -65,6 +68,55 @@ function domainToUnitScale(values) {
         extent[1]++;
     }
     return d3.scale.linear().domain(extent);
+}
+
+function model(layout, d) {
+
+    var data = d.dimensions;
+
+    var canvasPixelRatio = d.lines.pixelratio;
+    var lines = Lib.extendDeep(d.lines, {
+        color: d.line.color.map(domainToUnitScale(d.line.color)),
+        canvasOverdrag: overdrag * canvasPixelRatio
+    });
+
+    var layoutWidth = layout.width * (d.domain.x[1] - d.domain.x[0]);
+    var layoutHeight = layout.height * (d.domain.y[1] - d.domain.y[0]);
+
+    var padding = d.padding || 80;
+    var translateX = (d.domain.x[0] || 0) * layout.width;
+    var translateY = (d.domain.y[0] || 0) * layout.height;
+    var width = layoutWidth - 2 * padding - legendWidth; // leavig room for the colorbar
+    var height = layoutHeight - 2 * padding;
+
+    var canvasWidth = width * canvasPixelRatio + 2 * lines.canvasOverdrag;
+    var canvasHeight = height * canvasPixelRatio;
+
+    var resizeHeight = d.filterbar.handleheight;
+    var brushVisibleWidth = d.filterbar.width;
+    var brushCaptureWidth = d.filterbar.capturewidth || Math.min(32, brushVisibleWidth + 16);
+
+    return [
+        {
+            key: Math.random(),
+            dimensions: data,
+            tickDistance: d.tickdistance,
+            unitToColor: d.unitToColor,
+            lines: lines,
+            translateX: translateX,
+            translateY: translateY,
+            padding: padding,
+            canvasWidth: canvasWidth,
+            canvasHeight: canvasHeight,
+            width: width,
+            height: height,
+            brushVisibleWidth: brushVisibleWidth,
+            brushCaptureWidth: brushCaptureWidth,
+            resizeHeight: resizeHeight,
+            canvasPixelRatio: canvasPixelRatio,
+            filterBar: d.filterbar
+        }
+    ];
 }
 
 function viewModel(model) {
@@ -128,58 +180,6 @@ function styleExtentTexts(selection) {
 
 module.exports = function(root, styledData, layout, callbacks) {
 
-    var overdrag = 40;
-    var legendWidth = 80;
-
-    function model(d) {
-
-        var data = d.dimensions;
-
-        var canvasPixelRatio = d.lines.pixelratio;
-        var lines = Lib.extendDeep(d.lines, {
-            color: d.line.color.map(domainToUnitScale(d.line.color)),
-            canvasOverdrag: overdrag * canvasPixelRatio
-        });
-
-        var layoutWidth = layout.width * (d.domain.x[1] - d.domain.x[0]);
-        var layoutHeight = layout.height * (d.domain.y[1] - d.domain.y[0]);
-
-        var padding = d.padding || 80;
-        var translateX = (d.domain.x[0] || 0) * layout.width;
-        var translateY = (d.domain.y[0] || 0) * layout.height;
-        var width = layoutWidth - 2 * padding - legendWidth; // leavig room for the colorbar
-        var height = layoutHeight - 2 * padding;
-
-        var canvasWidth = width * canvasPixelRatio + 2 * lines.canvasOverdrag;
-        var canvasHeight = height * canvasPixelRatio;
-
-        var resizeHeight = d.filterbar.handleheight;
-        var brushVisibleWidth = d.filterbar.width;
-        var brushCaptureWidth = d.filterbar.capturewidth || Math.min(32, brushVisibleWidth + 16);
-
-        return [
-            {
-                key: Math.random(),
-                dimensions: data,
-                tickDistance: d.tickdistance,
-                unitToColor: d.unitToColor,
-                lines: lines,
-                translateX: translateX,
-                translateY: translateY,
-                padding: padding,
-                canvasWidth: canvasWidth,
-                canvasHeight: canvasHeight,
-                width: width,
-                height: height,
-                brushVisibleWidth: brushVisibleWidth,
-                brushCaptureWidth: brushCaptureWidth,
-                resizeHeight: resizeHeight,
-                canvasPixelRatio: canvasPixelRatio,
-                filterBar: d.filterbar
-            }
-        ];
-    }
-
     function enterSvgDefs(root) {
         var defs = root.selectAll('defs')
             .data(repeat, keyFun);
@@ -215,7 +215,7 @@ module.exports = function(root, styledData, layout, callbacks) {
     }
 
     var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
-        .data(model(styledData), keyFun);
+        .data(model(layout, styledData), keyFun);
 
     parcoordsModel.enter()
         .append('div')
