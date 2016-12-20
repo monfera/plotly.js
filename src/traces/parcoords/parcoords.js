@@ -96,27 +96,25 @@ function model(layout, d) {
     var brushVisibleWidth = d.filterbar.width;
     var brushCaptureWidth = d.filterbar.capturewidth || Math.min(32, brushVisibleWidth + 16);
 
-    return [
-        {
-            key: Math.random(),
-            dimensions: data,
-            tickDistance: d.tickdistance,
-            unitToColor: d.unitToColor,
-            lines: lines,
-            translateX: translateX,
-            translateY: translateY,
-            padding: padding,
-            canvasWidth: canvasWidth,
-            canvasHeight: canvasHeight,
-            width: width,
-            height: height,
-            brushVisibleWidth: brushVisibleWidth,
-            brushCaptureWidth: brushCaptureWidth,
-            resizeHeight: resizeHeight,
-            canvasPixelRatio: canvasPixelRatio,
-            filterBar: d.filterbar
-        }
-    ];
+    return {
+        key: Math.random(),
+        dimensions: data,
+        tickDistance: d.tickdistance,
+        unitToColor: d.unitToColor,
+        lines: lines,
+        translateX: translateX,
+        translateY: translateY,
+        padding: padding,
+        canvasWidth: canvasWidth,
+        canvasHeight: canvasHeight,
+        width: width,
+        height: height,
+        brushVisibleWidth: brushVisibleWidth,
+        brushCaptureWidth: brushCaptureWidth,
+        resizeHeight: resizeHeight,
+        canvasPixelRatio: canvasPixelRatio,
+        filterBar: d.filterbar
+    };
 }
 
 function viewModel(model) {
@@ -215,7 +213,7 @@ module.exports = function(root, styledData, layout, callbacks) {
     }
 
     var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
-        .data(model(layout, styledData), keyFun);
+        .data([model(layout, styledData)], keyFun);
 
     parcoordsModel.enter()
         .append('div')
