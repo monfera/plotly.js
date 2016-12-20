@@ -77,7 +77,8 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
 
     var viewModel = {
         key: model.key,
-        xScale: xScale
+        xScale: xScale,
+        model: model
     };
 
     viewModel.panels = model.dimensions.filter(visible).map(function(dimension, i) {
@@ -133,12 +134,11 @@ module.exports = function(root, styledData, layout, callbacks) {
             {
                 key: Math.random(),
                 dimensions: data,
-                tickDistance: styledData.tickdistance
+                tickDistance: styledData.tickdistance,
+                unitToColor: styledData.unitToColor
             }
         ];
     }
-
-    var unitToColor = styledData.unitToColor;
 
     var coloringDomainToUnitScale = domainToUnitScale(styledData.line.color);
     var canvasPixelRatio = styledData.lines.pixelratio;
@@ -244,7 +244,7 @@ module.exports = function(root, styledData, layout, callbacks) {
 
     parcoordsLineLayer
         .each(function(d) {
-            var lineLayer = lineLayerMaker(this, lines, canvasWidth, canvasHeight, d.viewModel.panels, unitToColor, d.context);
+            var lineLayer = lineLayerMaker(this, lines, canvasWidth, canvasHeight, d.viewModel.panels, d.viewModel.model.unitToColor, d.context);
             d.viewModel[d.key] = lineLayer;
             tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true);});
             lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
