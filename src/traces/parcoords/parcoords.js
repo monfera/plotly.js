@@ -131,38 +131,38 @@ module.exports = function(root, styledData, layout, callbacks) {
     var overdrag = 40;
     var legendWidth = 80;
 
-    function model(styledData) {
+    function model(d) {
 
-        var data = styledData.dimensions;
+        var data = d.dimensions;
 
-        var canvasPixelRatio = styledData.lines.pixelratio;
-        var lines = Lib.extendDeep(styledData.lines, {
-            color: styledData.line.color.map(domainToUnitScale(styledData.line.color)),
+        var canvasPixelRatio = d.lines.pixelratio;
+        var lines = Lib.extendDeep(d.lines, {
+            color: d.line.color.map(domainToUnitScale(d.line.color)),
             canvasOverdrag: overdrag * canvasPixelRatio
         });
 
-        var layoutWidth = layout.width * (styledData.domain.x[1] - styledData.domain.x[0]);
-        var layoutHeight = layout.height * (styledData.domain.y[1] - styledData.domain.y[0]);
+        var layoutWidth = layout.width * (d.domain.x[1] - d.domain.x[0]);
+        var layoutHeight = layout.height * (d.domain.y[1] - d.domain.y[0]);
 
-        var padding = styledData.padding || 80;
-        var translateX = (styledData.domain.x[0] || 0) * layout.width;
-        var translateY = (styledData.domain.y[0] || 0) * layout.height;
+        var padding = d.padding || 80;
+        var translateX = (d.domain.x[0] || 0) * layout.width;
+        var translateY = (d.domain.y[0] || 0) * layout.height;
         var width = layoutWidth - 2 * padding - legendWidth; // leavig room for the colorbar
         var height = layoutHeight - 2 * padding;
 
         var canvasWidth = width * canvasPixelRatio + 2 * lines.canvasOverdrag;
         var canvasHeight = height * canvasPixelRatio;
 
-        var resizeHeight = styledData.filterbar.handleheight;
-        var brushVisibleWidth = styledData.filterbar.width;
-        var brushCaptureWidth = styledData.filterbar.capturewidth || Math.min(32, brushVisibleWidth + 16);
+        var resizeHeight = d.filterbar.handleheight;
+        var brushVisibleWidth = d.filterbar.width;
+        var brushCaptureWidth = d.filterbar.capturewidth || Math.min(32, brushVisibleWidth + 16);
 
         return [
             {
                 key: Math.random(),
                 dimensions: data,
-                tickDistance: styledData.tickdistance,
-                unitToColor: styledData.unitToColor,
+                tickDistance: d.tickdistance,
+                unitToColor: d.unitToColor,
                 lines: lines,
                 translateX: translateX,
                 translateY: translateY,
@@ -174,7 +174,8 @@ module.exports = function(root, styledData, layout, callbacks) {
                 brushVisibleWidth: brushVisibleWidth,
                 brushCaptureWidth: brushCaptureWidth,
                 resizeHeight: resizeHeight,
-                canvasPixelRatio: canvasPixelRatio
+                canvasPixelRatio: canvasPixelRatio,
+                filterBar: d.filterbar
             }
         ];
     }
@@ -206,11 +207,11 @@ module.exports = function(root, styledData, layout, callbacks) {
             .attr('width', function(d) {return d.model.brushVisibleWidth})
             .attr('height', function(d) {return d.model.height})
             .attr('x', function(d) {return d.model.brushVisibleWidth / 2;})
-            .attr('fill', styledData.filterbar.fillcolor)
-            .attr('fill-opacity', styledData.filterbar.fillopacity)
-            .attr('stroke', styledData.filterbar.strokecolor)
-            .attr('stroke-opacity', styledData.filterbar.strokeopacity)
-            .attr('stroke-width', styledData.filterbar.strokewidth);
+            .attr('fill', function(d) {return d.model.filterBar.fillcolor;})
+            .attr('fill-opacity', function(d) {return d.model.filterBar.fillopacity;})
+            .attr('stroke', function(d) {return d.model.filterBar.strokecolor;})
+            .attr('stroke-opacity', function(d) {return d.model.filterBar.strokeopacity;})
+            .attr('stroke-width', function(d) {return d.model.filterBar.strokewidth;});
     }
 
     var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
@@ -414,7 +415,7 @@ module.exports = function(root, styledData, layout, callbacks) {
     axisTitle.enter()
         .append('text')
         .classed('axisTitle', true)
-        .attr('transform', 'translate(0,' + -(styledData.filterbar.handleheight + 20) + ')')
+        .attr('transform', function(d) {return 'translate(0,' + -(d.model.filterBar.handleheight + 20) + ')';})
         .text(function(d) {return d.label;})
         .attr('text-anchor', 'middle')
         .style('font-family', 'sans-serif')
@@ -435,7 +436,7 @@ module.exports = function(root, styledData, layout, callbacks) {
     axisExtentTop.enter()
         .append('g')
         .classed('axisExtentTop', true)
-        .attr('transform', 'translate(' + 0 + ',' + -(styledData.filterbar.handleheight - 2) + ')');
+        .attr('transform', function(d) {return 'translate(' + 0 + ',' + -(d.model.filterBar.handleheight - 2) + ')';});
 
     var axisExtentTopText = axisExtentTop.selectAll('.axisExtentTopText')
         .data(repeat, keyFun);
@@ -457,7 +458,7 @@ module.exports = function(root, styledData, layout, callbacks) {
     axisExtentBottom.enter()
         .append('g')
         .classed('axisExtentBottom', true)
-        .attr('transform', function(d) {return 'translate(' + 0 + ',' + (d.model.height + styledData.filterbar.handleheight - 2) + ')';});
+        .attr('transform', function(d) {return 'translate(' + 0 + ',' + (d.model.height + d.model.filterBar.handleheight - 2) + ')';});
 
     var axisExtentBottomText = axisExtentBottom.selectAll('.axisExtentBottomText')
         .data(repeat, keyFun);
@@ -510,11 +511,11 @@ module.exports = function(root, styledData, layout, callbacks) {
 
     axisBrushEnter
         .selectAll('.resize.n rect')
-        .attr('y', function() {var d = this.parentElement.parentElement.__data__; return -d.model.resizeHeight + styledData.filterbar.handleoverlap;});
+        .attr('y', function() {var d = this.parentElement.parentElement.__data__; return -d.model.resizeHeight + d.model.filterBar.handleoverlap;});
 
     axisBrushEnter
         .selectAll('.resize.s rect')
-        .attr('y', -styledData.filterbar.handleoverlap);
+        .attr('y', function() {var d = this.parentElement.parentElement.__data__; return -d.model.filterBar.handleoverlap;});
 
     var justStarted = false;
     var contextShown = false;
