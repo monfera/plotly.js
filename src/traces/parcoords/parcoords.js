@@ -101,7 +101,8 @@ function viewModel(lines, width, height, canvasPixelRatio, model) {
             domainToUnitScale: domainToUnit,
             pieChartCheat: dimension.pieChartCheat,
             filter: dimension.constraintrange ? dimension.constraintrange.map(domainToUnit) : [0, 1],
-            parent: viewModel
+            parent: viewModel,
+            model: model
         };
     });
 
@@ -121,12 +122,25 @@ function styleExtentTexts(selection) {
 
 module.exports = function(root, styledData, layout, callbacks) {
 
+    var overdrag = 40;
+    var legendWidth = 80;
+
+    function model(styledData) {
+
+        var data = styledData.dimensions;
+
+        return [
+            {
+                key: Math.random(),
+                dimensions: data,
+                tickDistance: styledData.tickdistance
+            }
+        ];
+    }
+
     var unitToColor = styledData.unitToColor;
 
-    var data = styledData.dimensions;
-    var tickDistance = styledData.tickdistance;
     var coloringDomainToUnitScale = domainToUnitScale(styledData.line.color);
-    var overdrag = 40;
     var canvasPixelRatio = styledData.lines.pixelratio;
     var lines = Lib.extendDeep(styledData.lines, {
         color: styledData.line.color.map(coloringDomainToUnitScale),
@@ -136,7 +150,6 @@ module.exports = function(root, styledData, layout, callbacks) {
     var layoutWidth = layout.width * (styledData.domain.x[1] - styledData.domain.x[0]);
     var layoutHeight = layout.height * (styledData.domain.y[1] - styledData.domain.y[0]);
 
-    var legendWidth = 80;
     var padding = styledData.padding || 80;
     var translateX = (styledData.domain.x[0] || 0) * layout.width;
     var translateY = (styledData.domain.y[0] || 0) * layout.height;
@@ -185,7 +198,7 @@ module.exports = function(root, styledData, layout, callbacks) {
     }
 
     var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
-        .data([{key: Math.random(), dimensions: data}], keyFun);
+        .data(model(styledData), keyFun);
 
     parcoordsModel.enter()
         .append('div')
@@ -338,7 +351,7 @@ module.exports = function(root, styledData, layout, callbacks) {
         .append('g')
         .classed('axis', true)
         .each(function(d) {
-            var wantedTickCount = height / tickDistance;
+            var wantedTickCount = height / d.model.tickDistance;
             var scale = d.domainScale;
             var dom = scale.domain();
             d3.select(this)
