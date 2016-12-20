@@ -120,10 +120,11 @@ var mock = {
 };
 
 describe('parcoords', function() {
-    var mockCopy = Lib.extendDeep({}, mock),
+    var mockCopy,
         gd;
 
     beforeEach(function(done) {
+        mockCopy = Lib.extendDeep({}, mock),
         gd = createGraphDiv();
         Plotly.plot(gd, mockCopy.data, mockCopy.layout).then(done);
     });
@@ -168,6 +169,8 @@ describe('parcoords', function() {
     });
 
     it('Calling `Plotly.restyle` should amend the preexisting parcoords', function(done) {
+
+        expect(gd.data.length).toEqual(1);
 
         Plotly.restyle(gd, 'line.colorscale', 'Viridis').then(function() {
 
