@@ -192,7 +192,7 @@ module.exports = function(root, styledData, layout, callbacks) {
             .append('pattern')
             .attr('id', 'filterBarPattern')
             .attr('width', function(d) {return d.model.brushCaptureWidth;})
-            .attr('height', function(d) {return d.model.height})
+            .attr('height', function(d) {return d.model.height;})
             .attr('x', function(d) {return -d.model.brushVisibleWidth;})
             .attr('patternUnits', 'userSpaceOnUse');
 
@@ -202,8 +202,8 @@ module.exports = function(root, styledData, layout, callbacks) {
         filterBarPatternGlyph.enter()
             .append('rect')
             .attr('shape-rendering', 'crispEdges')
-            .attr('width', function(d) {return d.model.brushVisibleWidth})
-            .attr('height', function(d) {return d.model.height})
+            .attr('width', function(d) {return d.model.brushVisibleWidth;})
+            .attr('height', function(d) {return d.model.height;})
             .attr('x', function(d) {return d.model.brushVisibleWidth / 2;})
             .attr('fill', function(d) {return d.model.filterBar.fillcolor;})
             .attr('fill-opacity', function(d) {return d.model.filterBar.fillopacity;})
@@ -246,7 +246,7 @@ module.exports = function(root, styledData, layout, callbacks) {
         .style('transform', 'translate(' + (-overdrag) + 'px, 0)')
         .style('float', 'left')
         .style('clear', 'both')
-        .style('position', function(d, i) {return i > 0 ? 'absolute' : 'static'})
+        .style('position', function(d, i) {return i > 0 ? 'absolute' : 'static';})
         .style('left', 0)
         .style('padding', function(d) {return d.viewModel.model.padding + 'px';})
         .style('overflow', 'visible')
@@ -498,7 +498,7 @@ module.exports = function(root, styledData, layout, callbacks) {
     axisBrushEnter
         .selectAll('rect.extent')
         .attr('fill', 'url(#filterBarPattern)')
-        .filter(function(d) {return d.filter[0] === 0 && d.filter[1] === 1})
+        .filter(function(d) {return d.filter[0] === 0 && d.filter[1] === 1;})
         .attr('y', -100); //  // zero-size rectangle pointer issue workaround
 
     axisBrushEnter
@@ -581,7 +581,7 @@ module.exports = function(root, styledData, layout, callbacks) {
                     };
                 })
             });
-        };
+        }
     }
 
     return tweakables;

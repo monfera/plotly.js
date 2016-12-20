@@ -9,7 +9,6 @@
 'use strict';
 
 var createREGL = require('regl');
-var ndarray = require('ndarray');
 var glslify = require('glslify');
 var vertexShaderSource = glslify('./shaders/vertex.glsl');
 var fragmentShaderSource = glslify('./shaders/fragment.glsl');
@@ -19,7 +18,7 @@ var filterEpsilon = 1e-3; // don't change; otherwise filter may lose lines on do
 
 var gpuDimensionCount = 64;
 var sectionVertexCount = 2;
-var vec4NumberCount = 4
+var vec4NumberCount = 4;
 
 var dummyPixel = new Uint8Array(4);
 function ensureDraw(regl) {
@@ -120,8 +119,8 @@ function makeVecAttr(sampleCount, points, vecIndex) {
     var pointPairs = [];
 
     for(j = 0; j < sampleCount; j++) {
-        for (k = 0; k < sectionVertexCount; k++) {
-            for (i = 0; i < vec4NumberCount; i++) {
+        for(k = 0; k < sectionVertexCount; k++) {
+            for(i = 0; i < vec4NumberCount; i++) {
                 pointPairs.push(points[j * gpuDimensionCount + vecIndex * vec4NumberCount + i]);
                 if(vecIndex * vec4NumberCount + i === gpuDimensionCount - 1 && k % 2 === 0) {
                     pointPairs[pointPairs.length - 1] *= -1;
@@ -141,7 +140,7 @@ function makeAttributes(sampleCount, points) {
     var attributes = {};
     vectors.forEach(function(v, vecIndex) {
         attributes['p' + vecIndex.toString(16)] = v;
-    })
+    });
 
     return attributes;
 }
