@@ -140,10 +140,9 @@ module.exports = function(root, styledData, layout, callbacks) {
         ];
     }
 
-    var coloringDomainToUnitScale = domainToUnitScale(styledData.line.color);
     var canvasPixelRatio = styledData.lines.pixelratio;
     var lines = Lib.extendDeep(styledData.lines, {
-        color: styledData.line.color.map(coloringDomainToUnitScale),
+        color: styledData.line.color.map(domainToUnitScale(styledData.line.color)),
         canvasOverdrag: overdrag * canvasPixelRatio
     });
 
