@@ -183,5 +183,28 @@ fdescribe('parcoords', function() {
             done();
         });
 
-    })
+    });
+
+    fit('Calling `Plotly.restyle` should amend the preexisting parcoords', function(done) {
+
+        var newStyle = Lib.extendDeep({}, mockCopy.data[0].line);
+        newStyle.colorscale = 'Viridis';
+        newStyle.reversescale = false;
+
+        Plotly.restyle(gd, {line: newStyle}).then(function() {
+
+            expect(gd.data.length).toEqual(1);
+
+            expect(gd.data[0].line.colorscale).toEqual('Viridis');
+            expect(gd.data[0].line.reversescale).toEqual(false);
+            expect(gd.data[0].dimensions.length).toEqual(11);
+            expect(gd.data[0].line.cmin).toEqual(-4000);
+            expect(gd.data[0].dimensions[0].constraintrange).toBeDefined();
+            expect(gd.data[0].dimensions[0].constraintrange).toEqual([100000, 150000]);
+            expect(gd.data[0].dimensions[1].constraintrange).not.toBeDefined();
+
+            done();
+        });
+
+    });
 });
