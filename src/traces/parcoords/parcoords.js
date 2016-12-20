@@ -67,7 +67,12 @@ function domainToUnitScale(values) {
     return d3.scale.linear().domain(extent);
 }
 
-function viewModel(lines, width, height, canvasPixelRatio, model) {
+function viewModel(model) {
+
+    var lines = model.lines;
+    var width = model.width;
+    var height = model.height;
+    var canvasPixelRatio = model.canvasPixelRatio;
 
     var xScale = d3.scale.ordinal().domain(d3.range(model.dimensions.filter(visible).length)).rangePoints([0, width], 0);
 
@@ -130,37 +135,49 @@ module.exports = function(root, styledData, layout, callbacks) {
 
         var data = styledData.dimensions;
 
+        var canvasPixelRatio = styledData.lines.pixelratio;
+        var lines = Lib.extendDeep(styledData.lines, {
+            color: styledData.line.color.map(domainToUnitScale(styledData.line.color)),
+            canvasOverdrag: overdrag * canvasPixelRatio
+        });
+
+        var layoutWidth = layout.width * (styledData.domain.x[1] - styledData.domain.x[0]);
+        var layoutHeight = layout.height * (styledData.domain.y[1] - styledData.domain.y[0]);
+
+        var padding = styledData.padding || 80;
+        var translateX = (styledData.domain.x[0] || 0) * layout.width;
+        var translateY = (styledData.domain.y[0] || 0) * layout.height;
+        var width = layoutWidth - 2 * padding - legendWidth; // leavig room for the colorbar
+        var height = layoutHeight - 2 * padding;
+
+        var canvasWidth = width * canvasPixelRatio + 2 * lines.canvasOverdrag;
+        var canvasHeight = height * canvasPixelRatio;
+
+        var resizeHeight = styledData.filterbar.handleheight;
+        var brushVisibleWidth = styledData.filterbar.width;
+        var brushCaptureWidth = styledData.filterbar.capturewidth || Math.min(32, brushVisibleWidth + 16);
+
         return [
             {
                 key: Math.random(),
                 dimensions: data,
                 tickDistance: styledData.tickdistance,
-                unitToColor: styledData.unitToColor
+                unitToColor: styledData.unitToColor,
+                lines: lines,
+                translateX: translateX,
+                translateY: translateY,
+                padding: padding,
+                canvasWidth: canvasWidth,
+                canvasHeight: canvasHeight,
+                width: width,
+                height: height,
+                brushVisibleWidth: brushVisibleWidth,
+                brushCaptureWidth: brushCaptureWidth,
+                resizeHeight: resizeHeight,
+                canvasPixelRatio: canvasPixelRatio
             }
         ];
     }
-
-    var canvasPixelRatio = styledData.lines.pixelratio;
-    var lines = Lib.extendDeep(styledData.lines, {
-        color: styledData.line.color.map(domainToUnitScale(styledData.line.color)),
-        canvasOverdrag: overdrag * canvasPixelRatio
-    });
-
-    var layoutWidth = layout.width * (styledData.domain.x[1] - styledData.domain.x[0]);
-    var layoutHeight = layout.height * (styledData.domain.y[1] - styledData.domain.y[0]);
-
-    var padding = styledData.padding || 80;
-    var translateX = (styledData.domain.x[0] || 0) * layout.width;
-    var translateY = (styledData.domain.y[0] || 0) * layout.height;
-    var width = layoutWidth - 2 * padding - legendWidth; // leavig room for the colorbar
-    var height = layoutHeight - 2 * padding;
-
-    var canvasWidth = width * canvasPixelRatio + 2 * lines.canvasOverdrag;
-    var canvasHeight = height * canvasPixelRatio;
-
-    var resizeHeight = styledData.filterbar.handleheight;
-    var brushVisibleWidth = styledData.filterbar.width;
-    var brushCaptureWidth = styledData.filterbar.capturewidth || Math.min(32, brushVisibleWidth + 16);
 
     function enterSvgDefs(root) {
         var defs = root.selectAll('defs')
@@ -175,9 +192,9 @@ module.exports = function(root, styledData, layout, callbacks) {
         filterBarPattern.enter()
             .append('pattern')
             .attr('id', 'filterBarPattern')
-            .attr('width', brushCaptureWidth)
-            .attr('height', height)
-            .attr('x', -brushVisibleWidth)
+            .attr('width', function(d) {return d.model.brushCaptureWidth;})
+            .attr('height', function(d) {return d.model.height})
+            .attr('x', function(d) {return -d.model.brushVisibleWidth;})
             .attr('patternUnits', 'userSpaceOnUse');
 
         var filterBarPatternGlyph = filterBarPattern.selectAll('rect')
@@ -186,9 +203,9 @@ module.exports = function(root, styledData, layout, callbacks) {
         filterBarPatternGlyph.enter()
             .append('rect')
             .attr('shape-rendering', 'crispEdges')
-            .attr('width', brushVisibleWidth)
-            .attr('height', height)
-            .attr('x', brushVisibleWidth / 2)
+            .attr('width', function(d) {return d.model.brushVisibleWidth})
+            .attr('height', function(d) {return d.model.height})
+            .attr('x', function(d) {return d.model.brushVisibleWidth / 2;})
             .attr('fill', styledData.filterbar.fillcolor)
             .attr('fill-opacity', styledData.filterbar.fillopacity)
             .attr('stroke', styledData.filterbar.strokecolor)
@@ -202,16 +219,15 @@ module.exports = function(root, styledData, layout, callbacks) {
     parcoordsModel.enter()
         .append('div')
         .style('position', 'relative')
-        //.style('height', '500px')
         .classed('parcoordsModel', true);
 
     var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
-        .data(viewModel.bind(0, lines, width, height, canvasPixelRatio), keyFun);
+        .data(viewModel, keyFun);
 
     parcoordsViewModel.enter()
         .append('div')
         .classed('parcoordsViewModel', true)
-        .style('transform', 'translate(' + translateX + 'px,' + translateY + 'px)');
+        .style('transform', function(d) {return 'translate(' + d.model.translateX + 'px,' + d.model.translateY + 'px)';});
 
     var parcoordsLineLayer = parcoordsViewModel.selectAll('.parcoordsLineLayer')
         .data(function(vm) {
@@ -219,7 +235,8 @@ module.exports = function(root, styledData, layout, callbacks) {
                 return {
                     key: context ? 'contextLineLayer' : 'focusLineLayer',
                     context: context,
-                    viewModel: vm
+                    viewModel: vm,
+                    model: vm.model
                 };
             });
         }, keyFun);
@@ -232,18 +249,18 @@ module.exports = function(root, styledData, layout, callbacks) {
         .style('clear', 'both')
         .style('position', function(d, i) {return i > 0 ? 'absolute' : 'static'})
         .style('left', 0)
-        .style('padding', padding + 'px')
+        .style('padding', function(d) {return d.viewModel.model.padding + 'px';})
         .style('overflow', 'visible')
-        .attr('width', canvasWidth)
-        .attr('height', canvasHeight)
-        .style('width', (width + 2 * overdrag) + 'px')
-        .style('height', height + 'px');
+        .attr('width', function(d) {return d.viewModel.model.canvasWidth;})
+        .attr('height', function(d) {return d.viewModel.model.canvasHeight;})
+        .style('width', function(d) {return (d.viewModel.model.width + 2 * overdrag) + 'px';})
+        .style('height', function(d) {return d.viewModel.model.height + 'px';});
 
     var tweakables = {renderers: [], dimensions: []};
 
     parcoordsLineLayer
         .each(function(d) {
-            var lineLayer = lineLayerMaker(this, lines, canvasWidth, canvasHeight, d.viewModel.panels, d.viewModel.model.unitToColor, d.context);
+            var lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.panels, d.model.unitToColor, d.context);
             d.viewModel[d.key] = lineLayer;
             tweakables.renderers.push(function() {lineLayer.render(d.viewModel.panels, true);});
             lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
@@ -256,8 +273,8 @@ module.exports = function(root, styledData, layout, callbacks) {
         .append('svg')
         .classed('parcoordsControlOverlay', true)
         .attr('overflow', 'visible')
-        .attr('width', width + 2 * padding)
-        .attr('height', height + 2 * padding)
+        .attr('width', function(d) {return d.model.width + 2 * d.model.padding;})
+        .attr('height', function(d) {return d.model.height + 2 * d.model.padding;})
         .style('position', 'absolute')
         .style('left', 0)
         .style('overflow', 'visible')
@@ -269,7 +286,7 @@ module.exports = function(root, styledData, layout, callbacks) {
 
     parcoordsControlView.enter()
         .append('g')
-        .attr('transform', 'translate(' + padding + ',' + padding + ')')
+        .attr('transform', function(d) {return 'translate(' + d.model.padding + ',' + d.model.padding + ')';})
         .classed('parcoordsControlView', true);
 
     var clearFix = parcoordsViewModel.selectAll('.clearFix')
@@ -304,14 +321,14 @@ module.exports = function(root, styledData, layout, callbacks) {
                 if(domainBrushing) {
                     return;
                 }
-                d.x = Math.max(-overdrag, Math.min(width + overdrag, d3.event.x));
-                d.canvasX = d.x * canvasPixelRatio;
+                d.x = Math.max(-overdrag, Math.min(d.model.width + overdrag, d3.event.x));
+                d.canvasX = d.x * d.model.canvasPixelRatio;
                 panel
                     .sort(function(a, b) {return a.x - b.x;})
                     .each(function(dd, i) {
                         dd.xIndex = i;
                         dd.x = d === dd ? dd.x : dd.xScale(dd.xIndex);
-                        dd.canvasX = dd.x * canvasPixelRatio;
+                        dd.canvasX = dd.x * dd.model.canvasPixelRatio;
                     });
                 panel.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
@@ -325,7 +342,7 @@ module.exports = function(root, styledData, layout, callbacks) {
                     return;
                 }
                 d.x = d.xScale(d.xIndex);
-                d.canvasX = d.x * canvasPixelRatio;
+                d.canvasX = d.x * d.model.canvasPixelRatio;
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                 d.parent.contextLineLayer.render(d.parent.panels, false, !someFiltersActive(d.parent));
@@ -350,7 +367,7 @@ module.exports = function(root, styledData, layout, callbacks) {
         .append('g')
         .classed('axis', true)
         .each(function(d) {
-            var wantedTickCount = height / d.model.tickDistance;
+            var wantedTickCount = d.model.height / d.model.tickDistance;
             var scale = d.domainScale;
             var dom = scale.domain();
             d3.select(this)
@@ -440,7 +457,7 @@ module.exports = function(root, styledData, layout, callbacks) {
     axisExtentBottom.enter()
         .append('g')
         .classed('axisExtentBottom', true)
-        .attr('transform', 'translate(' + 0 + ',' + (height + styledData.filterbar.handleheight - 2) + ')');
+        .attr('transform', function(d) {return 'translate(' + 0 + ',' + (d.model.height + styledData.filterbar.handleheight - 2) + ')';});
 
     var axisExtentBottomText = axisExtentBottom.selectAll('.axisExtentBottomText')
         .data(repeat, keyFun);
@@ -476,8 +493,8 @@ module.exports = function(root, styledData, layout, callbacks) {
 
     axisBrushEnter
         .selectAll('rect')
-        .attr('x', -brushCaptureWidth / 2)
-        .attr('width', brushCaptureWidth);
+        .attr('x', function() {var d = this.parentElement.parentElement.__data__; return -d.model.brushCaptureWidth / 2;})
+        .attr('width', function() {var d = this.parentElement.parentElement.__data__; return d.model.brushCaptureWidth;});
 
     axisBrushEnter
         .selectAll('rect.extent')
@@ -487,13 +504,13 @@ module.exports = function(root, styledData, layout, callbacks) {
 
     axisBrushEnter
         .selectAll('.resize rect')
-        .attr('height', resizeHeight)
+        .attr('height', function() {var d = this.parentElement.parentElement.__data__; return d.model.resizeHeight;})
         .attr('opacity', 0)
         .style('visibility', 'visible');
 
     axisBrushEnter
         .selectAll('.resize.n rect')
-        .attr('y', -resizeHeight + styledData.filterbar.handleoverlap);
+        .attr('y', function() {var d = this.parentElement.parentElement.__data__; return -d.model.resizeHeight + styledData.filterbar.handleoverlap;});
 
     axisBrushEnter
         .selectAll('.resize.s rect')
