@@ -185,10 +185,12 @@ module.exports = function(root, styledData, layout, callbacks) {
     }
 
     var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
-        .data([{key: 0, dimensions: data}], keyFun);
+        .data([{key: Math.random(), dimensions: data}], keyFun);
 
     parcoordsModel.enter()
         .append('div')
+        .style('position', 'relative')
+        //.style('height', '500px')
         .classed('parcoordsModel', true);
 
     var parcoordsViewModel = parcoordsModel.selectAll('.parcoordsViewModel')
@@ -214,7 +216,10 @@ module.exports = function(root, styledData, layout, callbacks) {
         .append('canvas')
         .classed('parcoordsLineLayer', true)
         .style('transform', 'translate(' + (-overdrag) + 'px, 0)')
-        .style('position', 'absolute')
+        .style('float', 'left')
+        .style('clear', 'both')
+        .style('position', function(d, i) {return i > 0 ? 'absolute' : 'static'})
+        .style('left', 0)
         .style('padding', padding + 'px')
         .style('overflow', 'visible')
         .attr('width', canvasWidth)
@@ -242,6 +247,7 @@ module.exports = function(root, styledData, layout, callbacks) {
         .attr('width', width + 2 * padding)
         .attr('height', height + 2 * padding)
         .style('position', 'absolute')
+        .style('left', 0)
         .style('overflow', 'visible')
         .style('shape-rendering', 'crispEdges')
         .call(enterSvgDefs);
@@ -253,6 +259,14 @@ module.exports = function(root, styledData, layout, callbacks) {
         .append('g')
         .attr('transform', 'translate(' + padding + ',' + padding + ')')
         .classed('parcoordsControlView', true);
+
+    var clearFix = parcoordsViewModel.selectAll('.clearFix')
+        .data(repeat, keyFun);
+
+    clearFix.enter()
+        .append('br')
+        .classed('clearFix', true)
+        .style('clear', 'both');
 
     var panel = parcoordsControlView.selectAll('.panel')
         .data(function(vm) {return vm.panels;}, keyFun);

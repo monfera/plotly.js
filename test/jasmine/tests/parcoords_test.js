@@ -140,4 +140,32 @@ fdescribe('parcoords', function() {
         expect(gd.data[0].dimensions[1].constraintrange).not.toBeDefined();
 
     });
+
+    fit('should lead to unchanged results on a second, identical rendering with `Plotly.plot`', function(done) {
+
+        var reversedMockCopy = Lib.extendDeep({}, mockCopy);
+        reversedMockCopy.data[0].dimensions = reversedMockCopy.data[0].dimensions.slice().reverse();
+
+        Plotly.plot(gd, reversedMockCopy.data, reversedMockCopy.layout).then(function() {
+
+            expect(gd.data.length).toEqual(2);
+
+            expect(gd.data[0].dimensions.length).toEqual(11);
+            expect(gd.data[0].line.cmin).toEqual(-4000);
+            expect(gd.data[0].dimensions[0].constraintrange).toBeDefined();
+            expect(gd.data[0].dimensions[0].constraintrange).toEqual([100000, 150000]);
+            expect(gd.data[0].dimensions[1].constraintrange).not.toBeDefined();
+
+            expect(gd.data[1].dimensions.length).toEqual(11);
+            expect(gd.data[1].line.cmin).toEqual(-4000);
+            expect(gd.data[1].dimensions[10].constraintrange).toBeDefined();
+            expect(gd.data[1].dimensions[10].constraintrange).toEqual([100000, 150000]);
+            expect(gd.data[1].dimensions[1].constraintrange).not.toBeDefined();
+
+            done();
+        });
+
+    });
+
+
 });
