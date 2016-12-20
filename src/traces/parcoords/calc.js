@@ -75,6 +75,7 @@ module.exports = function calc(gd, trace) {
         tickdistance: trace.tickdistance,
         lines: trace.lines,
         line: trace.line,
+        padding: trace.padding,
         unitToColor: function(d) {
             return polylinearUnitScales.map(function(s) {
                 return s(cScale(d));

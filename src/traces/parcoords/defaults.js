@@ -77,6 +77,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     handleLineDefaults(traceIn, traceOut, defaultColor, layout, coerce);
 
     coerce('tickdistance');
+    coerce('padding');
 
     coerce('domain.x');
     coerce('domain.y');

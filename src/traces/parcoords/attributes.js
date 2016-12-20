@@ -112,6 +112,14 @@ module.exports = {
         description: 'The desired approximate tick distance (in pixels) between axis ticks on an axis.'
     },
 
+    padding: {
+        valType: 'number',
+        dflt: 80,
+        min: 0,
+        role: 'style',
+        description: 'The desired space for displaying axis labels and domain ranges around the actual parcoords.'
+    },
+
     line: extendFlat({},
         colorAttributes('line'),
         {

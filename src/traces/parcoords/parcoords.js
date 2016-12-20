@@ -70,7 +70,7 @@ function domainToUnitScale(values) {
     return d3.scale.linear().domain(extent);
 }
 
-function model(layout, d) {
+function model(layout, d, i) {
 
     var data = d.dimensions;
 
@@ -97,7 +97,7 @@ function model(layout, d) {
     var brushCaptureWidth = d.filterbar.capturewidth || Math.min(32, brushVisibleWidth + 16);
 
     return {
-        key: Math.random(),
+        key: i,
         dimensions: data,
         tickDistance: d.tickdistance,
         unitToColor: d.unitToColor,
