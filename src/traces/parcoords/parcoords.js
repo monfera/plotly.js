@@ -213,7 +213,7 @@ module.exports = function(root, styledData, layout, callbacks) {
     }
 
     var parcoordsModel = d3.select(root).selectAll('.parcoordsModel')
-        .data([model(layout, styledData)], keyFun);
+        .data(styledData.map(model.bind(0, layout)), keyFun);
 
     parcoordsModel.enter()
         .append('div')

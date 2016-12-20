@@ -22,7 +22,7 @@ data.unitToColor = require('./colors');
 */
 
 parcoords(div,
-    data, // .filter(function(d) {return true || !d.integer}).slice(0, Infinity),
+    [data, data], // .filter(function(d) {return true || !d.integer}).slice(0, Infinity),
     mock.layout
 );
 
