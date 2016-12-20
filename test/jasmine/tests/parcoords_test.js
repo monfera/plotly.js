@@ -141,7 +141,7 @@ fdescribe('parcoords', function() {
 
     });
 
-    fit('Calling `Plotly.plot` again should add the new parcoords', function(done) {
+    it('Calling `Plotly.plot` again should add the new parcoords', function(done) {
 
         var reversedMockCopy = Lib.extendDeep({}, mockCopy);
         reversedMockCopy.data[0].dimensions = reversedMockCopy.data[0].dimensions.slice().reverse();
@@ -167,5 +167,21 @@ fdescribe('parcoords', function() {
 
     });
 
+    it('Calling `Plotly.restyle` should amend the preexisting parcoords', function(done) {
 
+        Plotly.restyle(gd, 'line.colorscale', 'Viridis').then(function() {
+
+            expect(gd.data.length).toEqual(1);
+
+            expect(gd.data[0].line.colorscale).toEqual('Viridis');
+            expect(gd.data[0].dimensions.length).toEqual(11);
+            expect(gd.data[0].line.cmin).toEqual(-4000);
+            expect(gd.data[0].dimensions[0].constraintrange).toBeDefined();
+            expect(gd.data[0].dimensions[0].constraintrange).toEqual([100000, 150000]);
+            expect(gd.data[0].dimensions[1].constraintrange).not.toBeDefined();
+
+            done();
+        });
+
+    })
 });
