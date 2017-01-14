@@ -46,7 +46,6 @@ void main() {
     float x = 0.5 * sign(pf[3]) + 0.5;
     float prominence = abs(pf[3]);
     float depth = 1.0 - prominence;
-    float colorIndex = prominence;
 
     mat4 pA = mat4(p0, p1, p2, p3);
     mat4 pB = mat4(p4, p5, p6, p7);
@@ -78,6 +77,7 @@ void main() {
         1.0
     );
 
-    float clampedColorIndex = clamp((colorIndex - colorClamp[0]) / (colorClamp[1] - colorClamp[0]), 0.0, 1.0);
+    // visible coloring
+    float clampedColorIndex = clamp((prominence - colorClamp[0]) / (colorClamp[1] - colorClamp[0]), 0.0, 1.0);
     fragColor = texture2D(palette, vec2((clampedColorIndex * 255.0 + 0.5) / 256.0, 0.5));
 }

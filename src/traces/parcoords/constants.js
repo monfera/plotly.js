@@ -14,7 +14,7 @@ module.exports = {
     legendWidth: 80,
     verticalPadding: 2, // otherwise, horizontal lines on top or bottom are of lower width
     tickDistance: 50,
-    canvasPixelRatio: window.devicePixelRatio,
+    canvasPixelRatio: 1,
     blockLineCount: 5000,
     scatter: false,
     layers: ['contextLineLayer', 'focusLineLayer', 'pickLineLayer'],
