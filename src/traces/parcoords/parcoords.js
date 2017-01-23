@@ -128,9 +128,9 @@ function model(layout, d, i, a) {
         canvasOverdrag: c.overdrag * c.canvasPixelRatio
     });
 
-    var rowCount = a.length;
+    var groupCount = a.length;
     var layoutWidth = layout.width * (d.domain.x[1] - d.domain.x[0]);
-    var layoutHeight = layout.height * (d.domain.y[1] - d.domain.y[0]) / rowCount;
+    var layoutHeight = layout.height * (d.domain.y[1] - d.domain.y[0]) / groupCount;
 
     var pad = d.pad || {l: 80, r: 80, t: 80, b: 80};
     var width = layoutWidth - pad.l - pad.r - c.legendWidth; // leavig room for the colorbar
