@@ -339,7 +339,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
         };
     }
 
-    function renderGLParcoords(dimensions, panels, setChanged, clearOnly) {
+    function renderGLParcoords(panels, setChanged, clearOnly) {
 
         var I;
 
