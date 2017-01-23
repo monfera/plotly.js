@@ -358,15 +358,15 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
 */
 
         for(I = 0; I < panelCount; I++) {
-            var dimension = panels[I].dim1;
-            var i = dimension.originalXIndex;
-            var x = dimension.canvasX;
-            var nextDim = panels[I].dim2;
-            var ii = nextDim.originalXIndex;
-            var panelSizeX = nextDim.canvasX - x;
-            if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextDim.canvasX) {
-                previousAxisOrder[i] = [x, nextDim.canvasX];
-                var item = makeItem(i, ii, x, panelSizeX, dimension.originalXIndex, dimension.scatter, I, leftmost, rightmost);
+            var dim1 = panels[I].dim1;
+            var i = dim1.originalXIndex;
+            var x = dim1.canvasX;
+            var dim2 = panels[I].dim2;
+            var ii = dim2.originalXIndex;
+            var panelSizeX = dim2.canvasX - x;
+            if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== dim2.canvasX) {
+                previousAxisOrder[i] = [x, dim2.canvasX];
+                var item = makeItem(i, ii, x, panelSizeX, dim1.originalXIndex, dim1.scatter, I, leftmost, rightmost);
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blockLineCount : sampleCount, sampleCount, item);
             }
