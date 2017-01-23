@@ -213,6 +213,15 @@ function viewModel(model) {
         };
     });
 
+    viewModel.panels = viewModel.dimensions
+        .map(function(dim1, i, a) {
+            return {
+                dim1: dim1,
+                dim2: a[i + 1]
+            }
+        })
+        .slice(0, -1);
+
     return viewModel;
 }
 
@@ -351,10 +360,10 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         .style('height', function(d) {return d.viewModel.model.height + 'px';})
         .style('opacity', function(d) {return d.pick ? 0.01 : 1;})
         .each(function(d) {
-            d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.dimensions, d.model.unitToColor, d.context, d.pick);
+            d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.dimensions, d.viewModel.panels, d.model.unitToColor, d.context, d.pick);
             d.viewModel[d.key] = d.lineLayer;
-            tweakables.renderers.push(function() {d.lineLayer.render(d.viewModel.dimensions, true);});
-            d.lineLayer.render(d.viewModel.dimensions, !d.context, d.context && !someFiltersActive(d.viewModel));
+            tweakables.renderers.push(function() {d.lineLayer.render(d.viewModel.dimensions, d.viewModel.panels, true);});
+            d.lineLayer.render(d.viewModel.dimensions, d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
         });
 
     svg.style('background', 'rgba(255, 255, 255, 0)');
@@ -428,8 +437,8 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                 d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                 yAxis.each(function(d, i) {d.parent.dimensions[i] = d;});
-                d.parent.contextLineLayer.render(d.parent.dimensions, false, !someFiltersActive(d.parent));
-                d.parent.focusLineLayer.render(d.parent.dimensions);
+                d.parent.contextLineLayer.render(d.parent.dimensions, d.parent.panels, false, !someFiltersActive(d.parent));
+                d.parent.focusLineLayer.render(d.parent.dimensions, d.parent.panels);
             })
             .on('dragend', function(d) {
                 if(domainBrushing) {
@@ -442,9 +451,9 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                 d.canvasX = d.x * d.model.canvasPixelRatio;
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                d.parent.contextLineLayer.render(d.parent.dimensions, false, !someFiltersActive(d.parent));
-                d.parent.focusLineLayer.render(d.parent.dimensions);
-                d.parent.pickLineLayer.render(d.parent.dimensions, true);
+                d.parent.contextLineLayer.render(d.parent.dimensions, d.parent.panels, false, !someFiltersActive(d.parent));
+                d.parent.focusLineLayer.render(d.parent.dimensions, d.parent.panels);
+                d.parent.pickLineLayer.render(d.parent.dimensions, d.parent.panels, true);
                 linePickActive = true;
 
                 // Have updated order data on `gd.data` and raise `Plotly.restyle` event
@@ -662,7 +671,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
     function axisBrushMoved(dimension) {
         linePickActive = false;
         var extent = dimension.brush.extent();
-        var panels = dimension.parent.dimensions;
+        var dimensions = dimension.parent.dimensions;
         var filter = dimensions[dimension.xIndex].filter;
         var reset = justStarted && (extent[0] === extent[1]);
         if(reset) {
@@ -672,13 +681,13 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         var newExtent = reset ? [0, 1] : extent.slice();
         if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
             dimensions[dimension.xIndex].filter = newExtent;
-            dimension.parent.focusLineLayer.render(dimensions, true);
+            dimension.parent.focusLineLayer.render(dimensions, dimension.parent.panels, true);
             var filtersActive = someFiltersActive(dimension.parent);
             if(!contextShown && filtersActive) {
-                dimension.parent.contextLineLayer.render(dimensions, true);
+                dimension.parent.contextLineLayer.render(dimensions, dimension.parent.panels, true);
                 contextShown = true;
             } else if(contextShown && !filtersActive) {
-                dimension.parent.contextLineLayer.render(dimensions, true, true);
+                dimension.parent.contextLineLayer.render(dimensions, dimension.parent.panels, true, true);
                 contextShown = false;
             }
         }
@@ -698,9 +707,9 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                 f[1] = Math.min(1, f[1] + 0.05);
             }
             d3.select(this).transition().duration(150).call(dimension.brush.extent(f));
-            dimension.parent.focusLineLayer.render(dimensions, true);
+            dimension.parent.focusLineLayer.render(dimensions, dimension.parent.panels, true);
         }
-        dimension.parent.pickLineLayer.render(dimensions, true);
+        dimension.parent.pickLineLayer.render(dimensions, dimension.parent.panels, true);
         linePickActive = true;
         domainBrushing = 'ending';
         if(callbacks && callbacks.filterChanged) {

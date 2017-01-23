@@ -156,7 +156,11 @@ function makeAttributes(sampleCount, points) {
     return attributes;
 }
 
-module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDimensions, unitToColor, context, pick) {
+function valid(i, offset, panelCount) {
+    return i + offset <= panelCount;
+}
+
+module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDimensions, initialPanels, unitToColor, context, pick) {
 
     var renderState = {
         currentRafs: {},
@@ -177,7 +181,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
     var contextOpacity = Math.max(1 / 255, Math.pow(1 / color.length, 1 / 3));
     var overdrag = lines.canvasOverdrag;
 
-    var panelCount = dimensionCount - 1;
+    var panelCount = initialPanels.length;
 
     var points = makePoints(sampleCount, dimensionCount, initialDims, color);
     var attributes = makeAttributes(sampleCount, points);
@@ -287,72 +291,68 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
 
     var previousAxisOrder = [];
 
-    function renderGLParcoords(dimensions, setChanged, clearOnly) {
+    function makeItem(i, ii, x, panelSizeX, originalXIndex, scatter, I, leftmost, rightmost) {
+        var loHi, abcd, d, index;
+        var leftRight = [i, ii];
+
+        var dims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
+        var lims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
+
+        for(loHi = 0; loHi < 2; loHi++) {
+            index = leftRight[loHi];
+            for(abcd = 0; abcd < 4; abcd++) {
+                for(d = 0; d < 16; d++) {
+                    dims[loHi][abcd][d] = d + 16 * abcd === index ? 1 : 0;
+                    lims[loHi][abcd][d] = (!context && valid(d, 16 * abcd, panelCount) ? initialDims[d + 16 * abcd].filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
+                }
+            }
+        }
+
+        return {
+            key: originalXIndex,
+            resolution: [canvasWidth, canvasHeight],
+            viewBoxPosition: [x + overdrag, 0],
+            viewBoxSize: [panelSizeX, canvasPanelSizeY],
+
+            dim1A: dims[0][0],
+            dim1B: dims[0][1],
+            dim1C: dims[0][2],
+            dim1D: dims[0][3],
+            dim2A: dims[1][0],
+            dim2B: dims[1][1],
+            dim2C: dims[1][2],
+            dim2D: dims[1][3],
+
+            loA: lims[0][0],
+            loB: lims[0][1],
+            loC: lims[0][2],
+            loD: lims[0][3],
+            hiA: lims[1][0],
+            hiB: lims[1][1],
+            hiC: lims[1][2],
+            hiD: lims[1][3],
+
+            colorClamp: colorClamp,
+            scatter: scatter || 0,
+            scissorX: I === leftmost ? 0 : x + overdrag,
+            scissorWidth: (I === rightmost ? canvasWidth - x + overdrag : panelSizeX + 0.5) + (I === leftmost ? x + overdrag : 0)
+        };
+    }
+
+    function renderGLParcoords(dimensions, panels, setChanged, clearOnly) {
 
         var I;
 
-        function valid(i, offset) {
-            return i + offset < dimensions.length;
-        }
-
         var leftmost, rightmost, lowestX = Infinity, highestX = -Infinity;
         for(I = 0; I < panelCount; I++) {
-            if(dimensions[I].canvasX > highestX) {
+            if(panels[I].dim1.canvasX > highestX) {
                 highestX = dimensions[I].canvasX;
                 rightmost = I;
             }
-            if(dimensions[I].canvasX < lowestX) {
+            if(panels[I].dim1.canvasX < lowestX) {
                 lowestX = dimensions[I].canvasX;
                 leftmost = I;
             }
-        }
-
-        function makeItem(i, ii, x, panelSizeX, originalXIndex, scatter) {
-            var loHi, abcd, d, index;
-            var leftRight = [i, ii];
-
-            var dims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
-            var lims = [0, 1].map(function() {return [0, 1, 2, 3].map(function() {return new Float32Array(16);});});
-
-            for(loHi = 0; loHi < 2; loHi++) {
-                index = leftRight[loHi];
-                for(abcd = 0; abcd < 4; abcd++) {
-                    for(d = 0; d < 16; d++) {
-                        dims[loHi][abcd][d] = d + 16 * abcd === index ? 1 : 0;
-                        lims[loHi][abcd][d] = (!context && valid(d, 16 * abcd) ? initialDims[d + 16 * abcd].filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
-                    }
-                }
-            }
-
-            return {
-                key: originalXIndex,
-                resolution: [canvasWidth, canvasHeight],
-                viewBoxPosition: [x + overdrag, 0],
-                viewBoxSize: [panelSizeX, canvasPanelSizeY],
-
-                dim1A: dims[0][0],
-                dim1B: dims[0][1],
-                dim1C: dims[0][2],
-                dim1D: dims[0][3],
-                dim2A: dims[1][0],
-                dim2B: dims[1][1],
-                dim2C: dims[1][2],
-                dim2D: dims[1][3],
-
-                loA: lims[0][0],
-                loB: lims[0][1],
-                loC: lims[0][2],
-                loD: lims[0][3],
-                hiA: lims[1][0],
-                hiB: lims[1][1],
-                hiC: lims[1][2],
-                hiD: lims[1][3],
-
-                colorClamp: colorClamp,
-                scatter: scatter || 0,
-                scissorX: I === leftmost ? 0 : x + overdrag,
-                scissorWidth: (I === rightmost ? canvasWidth - x + overdrag : panelSizeX + 0.5) + (I === leftmost ? x + overdrag : 0)
-            };
         }
 
         for(I = 0; I < panelCount; I++) {
@@ -364,7 +364,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
             var panelSizeX = nextDim.canvasX - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextDim.canvasX) {
                 previousAxisOrder[i] = [x, nextDim.canvasX];
-                var item = makeItem(i, ii, x, panelSizeX, dimension.originalXIndex, dimension.scatter);
+                var item = makeItem(i, ii, x, panelSizeX, dimension.originalXIndex, dimension.scatter, I, leftmost, rightmost);
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blockLineCount : sampleCount, sampleCount, item);
             }
