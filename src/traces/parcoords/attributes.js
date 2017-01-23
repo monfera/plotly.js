@@ -49,6 +49,10 @@ module.exports = {
 
     dimensions: {
         _isLinkedToArray: 'dimension',
+        scatter: {
+            valType: 'any',
+            dflt: false
+        },
         label: {
             valType: 'string',
             role: 'info',

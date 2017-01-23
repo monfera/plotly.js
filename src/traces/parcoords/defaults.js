@@ -55,6 +55,7 @@ function dimensionsDefaults(traceIn, traceOut) {
         coerce('range');
         coerce('constraintrange');
         coerce('values');
+        coerce('scatter');
 
         dimensionOut._index = i;
         dimensionsOut.push(dimensionOut);

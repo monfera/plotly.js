@@ -36,6 +36,7 @@ module.exports = function calc(gd, trace) {
         cd.push({
             v: v,
             i: i,
+            scatter: vals[i].scatter || false,
             range: vals[i].range && vals[i].range.map(finite),
             constraintrange: vals[i].constraintrange && vals[i].constraintrange.map(finite),
             tickvals: vals[i].tickvals,

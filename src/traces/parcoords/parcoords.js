@@ -187,7 +187,7 @@ function viewModel(model) {
             tickvals: dimension.tickvals || false,
             ticktext: dimension.ticktext || false,
             ordinal: !!dimension.tickvals,
-            scatter: dimension.scatter,
+            scatter: dimension.scatter ? 1 : 0,
             xIndex: i,
             originalXIndex: i,
             height: height,
@@ -210,7 +210,7 @@ function viewModel(model) {
 }
 
 function lineLayerModel(vm) {
-    return ['contextLineLayer', 'focusLineLayer', 'pickLineLayer'].map(function(key) {
+    return [/*'contextLineLayer', */'focusLineLayer'/*, 'pickLineLayer'*/].map(function(key) {
         return {
             key: key,
             context: key === 'contextLineLayer',
