@@ -344,7 +344,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         .style('height', function(d) {return d.viewModel.model.height + 'px';})
         .style('opacity', function(d) {return d.pick ? 0.01 : 1;})
         .each(function(d) {
-            d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.panels, d.model.unitToColor, d.context, d.pick);
+            d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.panels, d.model.unitToColor, d.context, d.pick, d.model.key);
             d.viewModel[d.key] = d.lineLayer;
             tweakables.renderers.push(function() {d.lineLayer.render(d.viewModel.panels, true);});
             d.lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));

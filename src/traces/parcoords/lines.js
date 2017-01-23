@@ -156,7 +156,7 @@ function makeAttributes(sampleCount, points) {
     return attributes;
 }
 
-module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDimensions, unitToColor, context, pick) {
+module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDimensions, unitToColor, context, pick, rowNum) {
 
     var renderState = {
         currentRafs: {},
@@ -364,7 +364,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
             var panelSizeX = nextDim.canvasX - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextDim.canvasX) {
                 previousAxisOrder[i] = [x, nextDim.canvasX];
-                var item = makeItem(i, ii, x, panelSizeX, dimension.originalXIndex, dimension.scatter);
+                var item = makeItem(rowNum + 1, ii, x, panelSizeX, dimension.originalXIndex, dimension.scatter);
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blockLineCount : sampleCount, sampleCount, item);
             }
