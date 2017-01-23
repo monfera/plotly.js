@@ -120,6 +120,8 @@ function unitToColorScale(cscale, cmin, cmax, coloringArray) {
     };
 }
 
+var rowCount = 1;
+
 function model(layout, d, i, a) {
 
     var lines = Lib.extendDeep({}, d.line, {
@@ -129,15 +131,18 @@ function model(layout, d, i, a) {
     });
 
     var groupCount = a.length;
-    var layoutWidth = layout.width * (d.domain.x[1] - d.domain.x[0]);
-    var layoutHeight = layout.height * (d.domain.y[1] - d.domain.y[0]) / groupCount;
+    var groupWidth = layout.width * (d.domain.x[1] - d.domain.x[0]);
+    var groupHeight = layout.height * (d.domain.y[1] - d.domain.y[0]) / groupCount;
 
     var pad = d.pad || {l: 80, r: 80, t: 80, b: 80};
-    var width = layoutWidth - pad.l - pad.r - c.legendWidth; // leavig room for the colorbar
-    var height = layoutHeight - pad.t - pad.b;
+    var rowPad = pad; // for now, row padding is identical with (group) padding
+    var rowContentWidth = groupWidth - pad.l - pad.r - c.legendWidth; // leavig room for the colorbar
+    var rowHeight = groupHeight / rowCount - rowPad.t - rowPad.b;
 
     return {
         key: i,
+        rowCount: rowCount,
+        colCount: Math.ceil(d.dimensions.filter(visible).length / rowCount),
         _gdDimensions: d._gdDataItem.dimensions,
         _gdDimensionsOriginalOrder: d._gdDataItem.dimensions.slice(),
         dimensions: d.dimensions,
@@ -147,10 +152,10 @@ function model(layout, d, i, a) {
         translateX: (d.domain.x[0] || 0) * layout.width,
         translateY: (d.domain.y[0] || 0) * layout.height,
         pad: pad,
-        canvasWidth: width * c.canvasPixelRatio + 2 * lines.canvasOverdrag,
-        canvasHeight: height * c.canvasPixelRatio,
-        width: width,
-        height: height,
+        canvasWidth: rowContentWidth * c.canvasPixelRatio + 2 * lines.canvasOverdrag,
+        canvasHeight: rowHeight * c.canvasPixelRatio,
+        width: rowContentWidth,
+        height: rowHeight,
         canvasPixelRatio: c.canvasPixelRatio
     };
 }
@@ -162,7 +167,9 @@ function viewModel(model) {
     var dimensions = model.dimensions;
     var canvasPixelRatio = model.canvasPixelRatio;
 
-    var xScale = d3.scale.ordinal().domain(d3.range(dimensions.filter(visible).length)).rangePoints([0, width], 0);
+    var xScale = function(d) {
+        return width * d / model.colCount;
+    }
 
     var unitPad = c.verticalPadding / (height * canvasPixelRatio);
     var unitPadScale = (1 - 2 * unitPad);
