@@ -183,7 +183,7 @@ function viewModel(model) {
 
     var uniqueKeys = {};
 
-    viewModel.panels = dimensions.filter(visible).map(function(dimension, i) {
+    viewModel.dimensions = dimensions.filter(visible).map(function(dimension, i) {
         var domainToUnit = domainToUnitScale(dimension);
         var foundKey = uniqueKeys[dimension.label];
         uniqueKeys[dimension.label] = (foundKey ? 0 : foundKey) + 1;
@@ -351,10 +351,10 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         .style('height', function(d) {return d.viewModel.model.height + 'px';})
         .style('opacity', function(d) {return d.pick ? 0.01 : 1;})
         .each(function(d) {
-            d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.panels, d.model.unitToColor, d.context, d.pick);
+            d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.dimensions, d.model.unitToColor, d.context, d.pick);
             d.viewModel[d.key] = d.lineLayer;
-            tweakables.renderers.push(function() {d.lineLayer.render(d.viewModel.panels, true);});
-            d.lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
+            tweakables.renderers.push(function() {d.lineLayer.render(d.viewModel.dimensions, true);});
+            d.lineLayer.render(d.viewModel.dimensions, !d.context, d.context && !someFiltersActive(d.viewModel));
         });
 
     svg.style('background', 'rgba(255, 255, 255, 0)');
@@ -392,22 +392,22 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
     parcoordsControlView
         .attr('transform', function(d) {return 'translate(' + d.model.pad.l + ',' + d.model.pad.t + ')';});
 
-    var panel = parcoordsControlView.selectAll('.panel')
-        .data(function(vm) {return vm.panels;}, keyFun);
+    var yAxis = parcoordsControlView.selectAll('.yAxis')
+        .data(function(vm) {return vm.dimensions;}, keyFun);
 
     function someFiltersActive(view) {
-        return view.panels.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
+        return view.dimensions.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
     }
 
-    panel.enter()
+    yAxis.enter()
         .append('g')
-        .classed('panel', true)
+        .classed('yAxis', true)
         .each(function(d) {tweakables.dimensions.push(d);});
 
-    panel
+    yAxis
         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
 
-    panel
+    yAxis
         .call(d3.behavior.drag()
             .origin(function(d) {return d;})
             .on('drag', function(d) {
@@ -417,19 +417,19 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                 }
                 d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag, d3.event.x));
                 d.canvasX = d.x * d.model.canvasPixelRatio;
-                panel
+                yAxis
                     .sort(function(a, b) {return a.x - b.x;})
                     .each(function(dd, i) {
                         dd.xIndex = i;
                         dd.x = d === dd ? dd.x : dd.xScale(dd.xIndex);
                         dd.canvasX = dd.x * dd.model.canvasPixelRatio;
                     });
-                panel.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
+                yAxis.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                 d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
-                panel.each(function(d, i) {d.parent.panels[i] = d;});
-                d.parent.contextLineLayer.render(d.parent.panels, false, !someFiltersActive(d.parent));
-                d.parent.focusLineLayer.render(d.parent.panels);
+                yAxis.each(function(d, i) {d.parent.dimensions[i] = d;});
+                d.parent.contextLineLayer.render(d.parent.dimensions, false, !someFiltersActive(d.parent));
+                d.parent.focusLineLayer.render(d.parent.dimensions);
             })
             .on('dragend', function(d) {
                 if(domainBrushing) {
@@ -442,9 +442,9 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                 d.canvasX = d.x * d.model.canvasPixelRatio;
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                d.parent.contextLineLayer.render(d.parent.panels, false, !someFiltersActive(d.parent));
-                d.parent.focusLineLayer.render(d.parent.panels);
-                d.parent.pickLineLayer.render(d.parent.panels, true);
+                d.parent.contextLineLayer.render(d.parent.dimensions, false, !someFiltersActive(d.parent));
+                d.parent.focusLineLayer.render(d.parent.dimensions);
+                d.parent.pickLineLayer.render(d.parent.dimensions, true);
                 linePickActive = true;
 
                 // Have updated order data on `gd.data` and raise `Plotly.restyle` event
@@ -454,7 +454,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                     .filter(function(d) {return d.visible === void(0) || d.visible;});
                 function newIdx(dim) {
                     var origIndex = orig.indexOf(dim);
-                    var currentIndex = d.parent.panels.map(function(dd) {return dd.originalXIndex;}).indexOf(origIndex);
+                    var currentIndex = d.parent.dimensions.map(function(dd) {return dd.originalXIndex;}).indexOf(origIndex);
                     if(currentIndex === -1) {
                         // invisible dimensions go to the end, retaining their original order
                         currentIndex += orig.length;
@@ -470,10 +470,10 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
             })
         );
 
-    panel.exit()
+    yAxis.exit()
         .remove();
 
-    var axisOverlays = panel.selectAll('.axisOverlays')
+    var axisOverlays = yAxis.selectAll('.axisOverlays')
         .data(repeat, keyFun);
 
     axisOverlays.enter()
@@ -662,8 +662,8 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
     function axisBrushMoved(dimension) {
         linePickActive = false;
         var extent = dimension.brush.extent();
-        var panels = dimension.parent.panels;
-        var filter = panels[dimension.xIndex].filter;
+        var panels = dimension.parent.dimensions;
+        var filter = dimensions[dimension.xIndex].filter;
         var reset = justStarted && (extent[0] === extent[1]);
         if(reset) {
             dimension.brush.clear();
@@ -671,14 +671,14 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         }
         var newExtent = reset ? [0, 1] : extent.slice();
         if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
-            panels[dimension.xIndex].filter = newExtent;
-            dimension.parent.focusLineLayer.render(panels, true);
+            dimensions[dimension.xIndex].filter = newExtent;
+            dimension.parent.focusLineLayer.render(dimensions, true);
             var filtersActive = someFiltersActive(dimension.parent);
             if(!contextShown && filtersActive) {
-                dimension.parent.contextLineLayer.render(panels, true);
+                dimension.parent.contextLineLayer.render(dimensions, true);
                 contextShown = true;
             } else if(contextShown && !filtersActive) {
-                dimension.parent.contextLineLayer.render(panels, true, true);
+                dimension.parent.contextLineLayer.render(dimensions, true, true);
                 contextShown = false;
             }
         }
@@ -688,8 +688,8 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
     function axisBrushEnded(dimension) {
         var extent = dimension.brush.extent();
         var empty = extent[0] === extent[1];
-        var panels = dimension.parent.panels;
-        var f = panels[dimension.xIndex].filter;
+        var dimensions = dimension.parent.dimensions;
+        var f = dimensions[dimension.xIndex].filter;
         if(!empty && dimension.ordinal) {
             f[0] = ordinalScaleSnap(dimension.ordinalScale, f[0]);
             f[1] = ordinalScaleSnap(dimension.ordinalScale, f[1]);
@@ -698,9 +698,9 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                 f[1] = Math.min(1, f[1] + 0.05);
             }
             d3.select(this).transition().duration(150).call(dimension.brush.extent(f));
-            dimension.parent.focusLineLayer.render(panels, true);
+            dimension.parent.focusLineLayer.render(dimensions, true);
         }
-        dimension.parent.pickLineLayer.render(panels, true);
+        dimension.parent.pickLineLayer.render(dimensions, true);
         linePickActive = true;
         domainBrushing = 'ending';
         if(callbacks && callbacks.filterChanged) {
