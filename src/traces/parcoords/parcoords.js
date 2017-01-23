@@ -433,6 +433,13 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                         dd.x = d === dd ? dd.x : dd.xScale(dd.xIndex);
                         dd.canvasX = dd.x * dd.model.canvasPixelRatio;
                     });
+
+                var yAxes = yAxis.each(function(d) {return d;})[0].map(function(e) {return e.__data__;});
+                for(var p = 0; p < d.parent.panels.length; p++) {
+                    d.parent.panels[p].dim1 = yAxes[p];
+                    d.parent.panels[p].dim2 = yAxes[p + 1];
+                }
+
                 yAxis.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                 d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');

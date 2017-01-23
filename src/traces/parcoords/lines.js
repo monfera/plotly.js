@@ -344,6 +344,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
         var I;
 
         var leftmost, rightmost, lowestX = Infinity, highestX = -Infinity;
+/*
         for(I = 0; I < panelCount; I++) {
             if(panels[I].dim1.canvasX > highestX) {
                 highestX = dimensions[I].canvasX;
@@ -354,12 +355,13 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
                 leftmost = I;
             }
         }
+*/
 
         for(I = 0; I < panelCount; I++) {
-            var dimension = dimensions[I];
+            var dimension = panels[I].dim1;
             var i = dimension.originalXIndex;
             var x = dimension.canvasX;
-            var nextDim = dimensions[(I + 1) % dimensionCount];
+            var nextDim = panels[I].dim2;
             var ii = nextDim.originalXIndex;
             var panelSizeX = nextDim.canvasX - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== nextDim.canvasX) {
