@@ -358,10 +358,11 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
 */
 
         for(I = 0; I < panelCount; I++) {
-            var dim1 = panels[I].dim1;
+            var panel = panels[I];
+            var dim1 = panel.dim1;
             var i = dim1.crossfilterDimensionIndex;
             var x = dim1.canvasX;
-            var dim2 = panels[I].dim2;
+            var dim2 = panel.dim2;
             var ii = dim2.crossfilterDimensionIndex;
             var panelSizeX = dim2.canvasX - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== dim2.canvasX) {
