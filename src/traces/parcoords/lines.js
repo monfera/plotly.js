@@ -40,8 +40,7 @@ function clear(regl, x, y, width, height) {
     var gl = regl._gl;
     gl.enable(gl.SCISSOR_TEST);
     gl.scissor(x, y, width, height);
-    var r = 0.97 + 0.03 * Math.random();
-    //regl.clear({color: [r, r, r, 1], depth: 1}); // clearing is done in scissored panel only
+    //var r = 0.97 + 0.03 * Math.random(); regl.clear({color: [r, r, r, 1], depth: 1}); // clearing is done in scissored panel only
     regl.clear({color: [0, 0, 0, 0], depth: 1}); // clearing is done in scissored panel only
 }
 
@@ -347,18 +346,17 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
         var I;
 
         var leftmost, rightmost, lowestX = Infinity, highestX = -Infinity;
-/*
+
         for(I = 0; I < panelCount; I++) {
-            if(panels[I].dim1.canvasX > highestX) {
-                highestX = dimensions[I].canvasX;
+            if(panels[I].dim2.canvasX > highestX) {
+                highestX = panels[I].dim2.canvasX;
                 rightmost = I;
             }
             if(panels[I].dim1.canvasX < lowestX) {
-                lowestX = dimensions[I].canvasX;
+                lowestX = panels[I].dim1.canvasX;
                 leftmost = I;
             }
         }
-*/
 
         for(I = 0; I < panelCount; I++) {
             var panel = panels[I];
