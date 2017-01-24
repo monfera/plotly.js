@@ -65,7 +65,7 @@ void main() {
     vec2 scatterToggle = vec2(scatter, 1.0 - scatter);
 
     float y = dot(yy, dimensionToggle);
-    mat2 xy = mat2(viewBoxSize * yy + 0.5 * dimensionToggle, viewBoxSize * vec2(x, y));
+    mat2 xy = mat2(viewBoxSize * yy + dimensionToggle, viewBoxSize * vec2(x, y));
 
     vec2 viewBoxXY = viewBoxPosition + xy * scatterToggle;
 

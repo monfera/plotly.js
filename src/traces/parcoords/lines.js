@@ -64,6 +64,7 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
         item.count = sectionVertexCount * count;
         if(blockNumber === 0) {
             window.cancelAnimationFrame(renderState.currentRafs[rafKey]); // stop drawing possibly stale glyphs before clearing
+            delete renderState.currentRafs[rafKey];
             clear(regl, item.scissorX, item.scissorY, item.scissorWidth, item.viewBoxSize[1]);
         }
 
