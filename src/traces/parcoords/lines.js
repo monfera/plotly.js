@@ -365,8 +365,9 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
             var dim2 = panel.dim2;
             var ii = dim2.crossfilterDimensionIndex;
             var panelSizeX = panel.panelSizeX;
-            if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== dim2.canvasX) {
-                previousAxisOrder[i] = [x, dim2.canvasX];
+            var xTo = x + panelSizeX;
+            if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== xTo) {
+                previousAxisOrder[i] = [x, xTo];
                 var item = makeItem(i, ii, x, panelSizeX, dim1.crossfilterDimensionIndex, dim1.scatter, I, leftmost, rightmost);
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blockLineCount : sampleCount, sampleCount, item);
