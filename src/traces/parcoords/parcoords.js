@@ -213,17 +213,7 @@ function viewModel(model) {
         };
     });
 
-    viewModel.panels = viewModel.dimensions
-        .map(function(dim1, i, a) {
-            var dim2 = a[i + 1] || {};
-            return {
-                dim1: dim1,
-                dim2: dim2,
-                canvasX: dim1.canvasX,
-                panelSizeX: dim2.canvasX - dim1.canvasX
-            }
-        })
-        .slice(0, -1);
+    viewModel.panels = viewModel.dimensions.map(function() {return {}}).slice(0, -1);
 
     return viewModel;
 }
@@ -361,13 +351,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         .attr('height', function(d) {return d.viewModel.model.canvasHeight;})
         .style('width', function(d) {return (d.viewModel.model.width + 2 * c.overdrag) + 'px';})
         .style('height', function(d) {return d.viewModel.model.height + 'px';})
-        .style('opacity', function(d) {return d.pick ? 0.01 : 1;})
-        .each(function(d) {
-            d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.dimensions, d.viewModel.panels, d.model.unitToColor, d.context, d.pick);
-            d.viewModel[d.key] = d.lineLayer;
-            tweakables.renderers.push(function() {d.lineLayer.render(d.viewModel.panels, true);});
-            d.lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
-        });
+        .style('opacity', function(d) {return d.pick ? 0.01 : 1;});
 
     svg.style('background', 'rgba(255, 255, 255, 0)');
     var parcoordsControlOverlay = svg.selectAll('.parcoords')
@@ -426,6 +410,18 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         .append('g')
         .classed('yAxis', true)
         .each(function(d) {tweakables.dimensions.push(d);});
+
+    parcoordsControlView.each(function(vm) {
+        updatePanelLayout(yAxis, vm.panels);
+    });
+
+    parcoordsLineLayer
+        .each(function(d) {
+            d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.dimensions, d.viewModel.panels, d.model.unitToColor, d.context, d.pick);
+            d.viewModel[d.key] = d.lineLayer;
+            tweakables.renderers.push(function() {d.lineLayer.render(d.viewModel.panels, true);});
+            d.lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
+        });
 
     yAxis
         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
