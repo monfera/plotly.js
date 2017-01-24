@@ -213,7 +213,7 @@ function viewModel(model) {
         };
     });
 
-    viewModel.panels = viewModel.dimensions.map(function() {return {}}).slice(0, -1);
+    //viewModel.panels = viewModel.dimensions.map(function() {return {}}).slice(0, -1);
 
     return viewModel;
 }
@@ -396,10 +396,10 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
     }
 
     function updatePanelLayout(yAxis, vm) {
-        var panels = vm.panels;
+        var panels = vm.panels || (vm.panels = []);
         var yAxes = yAxis.each(function(d) {return d;})[0].map(function(e) {return e.__data__;});
-        for(var p = 0; p < panels.length; p++) {
-            var panel = panels[p];
+        for(var p = 0; p < yAxes.length - 1; p++) {
+            var panel = panels[p] || (panels[p] = {});
             var dim1 = yAxes[p];
             var dim2 = yAxes[p + 1];
             panel.dim1 = dim1;//yAxes[0];
