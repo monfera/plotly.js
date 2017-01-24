@@ -194,7 +194,7 @@ function viewModel(model) {
             tickvals: dimension.tickvals || false,
             ticktext: dimension.ticktext || false,
             ordinal: !!dimension.tickvals,
-            scatter: dimension.scatter,
+            scatter: c.scatter,
             xIndex: i,
             crossfilterDimensionIndex: i,
             height: height,
@@ -395,29 +395,32 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         return view.dimensions.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
     }
 
-    var splom = true;
-
     function updatePanelLayoutParcoords(yAxis, vm) {
         var panels = vm.panels || (vm.panels = []);
         var yAxes = yAxis.each(function(d) {return d;})[0].map(function(e) {return e.__data__;});
-        for(var p = 0; p < yAxes.length - 1; p++) {
-            var panel = panels[p] || (panels[p] = {});
-            var dim1 = yAxes[p];
-            var dim2 = yAxes[p + 1];
-            panel.dim1 = dim1;//yAxes[0];
-            panel.dim2 = dim2;
-            panel.canvasX = dim1.canvasX;
-            panel.panelSizeX = dim2.canvasX - dim1.canvasX;
-            panel.panelSizeY = 200;
-            panel.y = 100;
-            panel.canvasY = vm.model.canvasHeight - panel.y - panel.panelSizeY;
+        var panelCount = yAxes.length - 1;
+        var rowCount = 1;
+        for(var row = 0; row < rowCount; row++) {
+            for(var p = 0; p < panelCount; p++) {
+                var panel = panels[p + row * panelCount] || (panels[p + row * panelCount] = {});
+                var dim1 = yAxes[p];
+                var dim2 = yAxes[p + 1];
+                panel.dim1 = dim1;
+                panel.dim2 = dim2;
+                panel.canvasX = dim1.canvasX;
+                panel.panelSizeX = dim2.canvasX - dim1.canvasX;
+                panel.panelSizeY = vm.model.canvasHeight / rowCount;
+                panel.y = row * panel.panelSizeY;
+                panel.canvasY = vm.model.canvasHeight - panel.y - panel.panelSizeY;
+            }
         }
     }
 
-    function updatePanelLayoutSplom(yAxis, vm) {
+    function updatePanelLayoutScatter(yAxis, vm) {
         var panels = vm.panels || (vm.panels = []);
         var yAxes = yAxis.each(function(d) {return d;})[0].map(function(e) {return e.__data__;});
         var panelCount = yAxes.length - 1;
+        var rowCount = panelCount;
         for(var row = 0; row < panelCount; row++) {
             for(var p = 0; p < panelCount; p++) {
                 var panel = panels[p + row * panelCount] || (panels[p + row * panelCount] = {});
@@ -427,7 +430,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                 panel.dim2 = dim2;
                 panel.canvasX = dim1.canvasX;
                 panel.panelSizeX = dim2.canvasX - dim1.canvasX;
-                panel.panelSizeY = vm.model.canvasHeight / panelCount;
+                panel.panelSizeY = vm.model.canvasHeight / rowCount;
                 panel.y = row * panel.panelSizeY;
                 panel.canvasY = vm.model.canvasHeight - panel.y - panel.panelSizeY;
             }
@@ -435,7 +438,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
     }
 
     function updatePanelLayout(yAxis, vm) {
-        return (splom ? updatePanelLayoutSplom : updatePanelLayoutParcoords)(yAxis, vm);
+        return (c.scatter ? updatePanelLayoutScatter : updatePanelLayoutParcoords)(yAxis, vm);
     }
 
     yAxis.enter()
@@ -449,7 +452,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
 
     parcoordsLineLayer
         .each(function(d) {
-            d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.dimensions, d.viewModel.panels, d.model.unitToColor, d.context, d.pick);
+            d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.dimensions, d.viewModel.panels, d.model.unitToColor, d.context, d.pick, c.scatter);
             d.viewModel[d.key] = d.lineLayer;
             tweakables.renderers.push(function() {d.lineLayer.render(d.viewModel.panels, true);});
             d.lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));

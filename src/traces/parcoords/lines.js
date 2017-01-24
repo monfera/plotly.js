@@ -41,8 +41,8 @@ function clear(regl, x, y, width, height) {
     gl.enable(gl.SCISSOR_TEST);
     gl.scissor(x, y, width, height);
     var r = 0.97 + 0.03 * Math.random();
-    regl.clear({color: [r, r, r, 1], depth: 1}); // clearing is done in scissored panel only
-    //regl.clear({color: [0, 0, 0, 0], depth: 1}); // clearing is done in scissored panel only
+    //regl.clear({color: [r, r, r, 1], depth: 1}); // clearing is done in scissored panel only
+    regl.clear({color: [0, 0, 0, 0], depth: 1}); // clearing is done in scissored panel only
 }
 
 function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item) {
@@ -162,7 +162,7 @@ function valid(i, offset, panelCount) {
     return i + offset <= panelCount;
 }
 
-module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDimensions, initialPanels, unitToColor, context, pick) {
+module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDimensions, initialPanels, unitToColor, context, pick, scatter) {
 
     var renderState = {
         currentRafs: {},
@@ -334,7 +334,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
             hiD: lims[1][3],
 
             colorClamp: colorClamp,
-            scatter: scatter || 1,
+            scatter: scatter || 0,
             scissorX: I === leftmost ? 0 : x + overdrag,
             scissorWidth: (I === rightmost ? canvasWidth - x + overdrag : panelSizeX + 0.5) + (I === leftmost ? x + overdrag : 0),
             scissorY: y,
@@ -373,7 +373,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
             var xTo = x + panelSizeX;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== xTo) {
                 previousAxisOrder[i] = [x, xTo];
-                var item = makeItem(i, ii, x, y, panelSizeX, panelSizeY, dim1.crossfilterDimensionIndex, dim1.scatter, I, leftmost, rightmost);
+                var item = makeItem(i, ii, x, y, panelSizeX, panelSizeY, dim1.crossfilterDimensionIndex, scatter || dim1.scatter ? 1 : 0, I, leftmost, rightmost);
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blockLineCount : sampleCount, sampleCount, item);
             }
