@@ -219,7 +219,7 @@ function viewModel(model) {
 }
 
 function lineLayerModel(vm) {
-    return ['contextLineLayer', 'focusLineLayer', 'pickLineLayer'].map(function(key) {
+    return c.layers.map(function(key) {
         return {
             key: key,
             context: key === 'contextLineLayer',
@@ -465,6 +465,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         .call(d3.behavior.drag()
             .origin(function(d) {return d;})
             .on('drag', function(d) {
+                var p = d.parent;
                 linePickActive = false;
                 if(domainBrushing) {
                     return;
@@ -479,16 +480,17 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                         dd.canvasX = dd.x * dd.model.canvasPixelRatio;
                     });
 
-                updatePanelLayout(yAxis, d.parent);
+                updatePanelLayout(yAxis, p);
 
                 yAxis.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                 d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
-                yAxis.each(function(d, i) {d.parent.dimensions[i] = d;});
-                d.parent.contextLineLayer.render(d.parent.panels, false, !someFiltersActive(d.parent));
-                d.parent.focusLineLayer.render(d.parent.panels);
+                yAxis.each(function(d, i) {p.dimensions[i] = d;});
+                p.contextLineLayer && p.contextLineLayer.render(p.panels, false, !someFiltersActive(p));
+                p.focusLineLayer.render && p.focusLineLayer.render(p.panels);
             })
             .on('dragend', function(d) {
+                var p = d.parent;
                 if(domainBrushing) {
                     if(domainBrushing === 'ending') {
                         domainBrushing = false;
@@ -497,22 +499,22 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                 }
                 d.x = d.xScale(d.xIndex);
                 d.canvasX = d.x * d.model.canvasPixelRatio;
-                updatePanelLayout(yAxis, d.parent);
+                updatePanelLayout(yAxis, p);
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                d.parent.contextLineLayer.render(d.parent.panels, false, !someFiltersActive(d.parent));
-                d.parent.focusLineLayer.render(d.parent.panels);
-                d.parent.pickLineLayer.render(d.parent.panels, true);
+                p.contextLineLayer && p.contextLineLayer.render(p.panels, false, !someFiltersActive(p));
+                p.focusLineLayer && p.focusLineLayer.render(p.panels);
+                p.pickLineLayer && p.pickLineLayer.render(p.panels, true);
                 linePickActive = true;
 
                 // Have updated order data on `gd.data` and raise `Plotly.restyle` event
                 // without having to incur heavy UI blocking due to an actual `Plotly.restyle` call
 
-                var orig = d.parent.model._gdDimensionsOriginalOrder
+                var orig =p.model._gdDimensionsOriginalOrder
                     .filter(function(d) {return d.visible === void(0) || d.visible;});
                 function newIdx(dim) {
                     var origIndex = orig.indexOf(dim);
-                    var currentIndex = d.parent.dimensions.map(function(dd) {return dd.crossfilterDimensionIndex;}).indexOf(origIndex);
+                    var currentIndex = p.dimensions.map(function(dd) {return dd.crossfilterDimensionIndex;}).indexOf(origIndex);
                     if(currentIndex === -1) {
                         // invisible dimensions go to the end, retaining their original order
                         currentIndex += orig.length;
@@ -719,8 +721,9 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
 
     function axisBrushMoved(dimension) {
         linePickActive = false;
+        var p = dimension.parent;
         var extent = dimension.brush.extent();
-        var dimensions = dimension.parent.dimensions;
+        var dimensions = p.dimensions;
         var filter = dimensions[dimension.xIndex].filter;
         var reset = justStarted && (extent[0] === extent[1]);
         if(reset) {
@@ -730,13 +733,13 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         var newExtent = reset ? [0, 1] : extent.slice();
         if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
             dimensions[dimension.xIndex].filter = newExtent;
-            dimension.parent.focusLineLayer.render(dimension.parent.panels, true);
-            var filtersActive = someFiltersActive(dimension.parent);
+            p.focusLineLayer && p.focusLineLayer.render(p.panels, true);
+            var filtersActive = someFiltersActive(p);
             if(!contextShown && filtersActive) {
-                dimension.parent.contextLineLayer.render(dimension.parent.panels, true);
+                p.contextLineLayer && p.contextLineLayer.render(p.panels, true);
                 contextShown = true;
             } else if(contextShown && !filtersActive) {
-                dimension.parent.contextLineLayer.render(dimension.parent.panels, true, true);
+                p.contextLineLayer && p.contextLineLayer.render(p.panels, true, true);
                 contextShown = false;
             }
         }
@@ -744,9 +747,10 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
     }
 
     function axisBrushEnded(dimension) {
+        var p = dimension.parent;
         var extent = dimension.brush.extent();
         var empty = extent[0] === extent[1];
-        var dimensions = dimension.parent.dimensions;
+        var dimensions = p.dimensions;
         var f = dimensions[dimension.xIndex].filter;
         if(!empty && dimension.ordinal) {
             f[0] = ordinalScaleSnap(dimension.ordinalScale, f[0]);
@@ -756,16 +760,16 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                 f[1] = Math.min(1, f[1] + 0.05);
             }
             d3.select(this).transition().duration(150).call(dimension.brush.extent(f));
-            dimension.parent.focusLineLayer.render(dimension.parent.panels, true);
+            p.focusLineLayer.render(p.panels, true);
         }
-        dimension.parent.pickLineLayer.render(dimension.parent.panels, true);
+        p.pickLineLayer && p.pickLineLayer.render(p.panels, true);
         linePickActive = true;
         domainBrushing = 'ending';
         if(callbacks && callbacks.filterChanged) {
             var invScale = dimension.domainToUnitScale.invert;
 
             // update gd.data as if a Plotly.restyle were fired
-            var gdDimension = dimension.parent.model._gdDimensionsOriginalOrder[dimension.crossfilterDimensionIndex];
+            var gdDimension = p.model._gdDimensionsOriginalOrder[dimension.crossfilterDimensionIndex];
             var gdConstraintRange = gdDimension.constraintrange;
             if(!gdConstraintRange || gdConstraintRange.length !== 2) {
                 gdConstraintRange = gdDimension.constraintrange = [];

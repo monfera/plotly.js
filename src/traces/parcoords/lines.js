@@ -314,6 +314,8 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
             resolution: [canvasWidth, canvasHeight],
             viewBoxPosition: [x + overdrag, y],
             viewBoxSize: [panelSizeX, canvasPanelSizeY],
+            i: i,
+            ii: ii,
 
             dim1A: dims[0][0],
             dim1B: dims[0][1],
