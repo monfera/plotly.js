@@ -395,7 +395,9 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         return view.dimensions.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
     }
 
-    function updatePanelLayout(yAxis, vm) {
+    var splom = true;
+
+    function updatePanelLayoutParcoords(yAxis, vm) {
         var panels = vm.panels || (vm.panels = []);
         var yAxes = yAxis.each(function(d) {return d;})[0].map(function(e) {return e.__data__;});
         for(var p = 0; p < yAxes.length - 1; p++) {
@@ -410,6 +412,30 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
             panel.y = 100;
             panel.canvasY = vm.model.canvasHeight - panel.y - panel.panelSizeY;
         }
+    }
+
+    function updatePanelLayoutSplom(yAxis, vm) {
+        var panels = vm.panels || (vm.panels = []);
+        var yAxes = yAxis.each(function(d) {return d;})[0].map(function(e) {return e.__data__;});
+        var panelCount = yAxes.length - 1;
+        for(var row = 0; row < panelCount; row++) {
+            for(var p = 0; p < panelCount; p++) {
+                var panel = panels[p + row * panelCount] || (panels[p + row * panelCount] = {});
+                var dim1 = yAxes[p];
+                var dim2 = yAxes[p + 1];
+                panel.dim1 = yAxes[row + 1];
+                panel.dim2 = dim2;
+                panel.canvasX = dim1.canvasX;
+                panel.panelSizeX = dim2.canvasX - dim1.canvasX;
+                panel.panelSizeY = vm.model.canvasHeight / panelCount;
+                panel.y = row * panel.panelSizeY;
+                panel.canvasY = vm.model.canvasHeight - panel.y - panel.panelSizeY;
+            }
+        }
+    }
+
+    function updatePanelLayout(yAxis, vm) {
+        return (splom ? updatePanelLayoutSplom : updatePanelLayoutParcoords)(yAxis, vm);
     }
 
     yAxis.enter()

@@ -40,8 +40,9 @@ function clear(regl, x, y, width, height) {
     var gl = regl._gl;
     gl.enable(gl.SCISSOR_TEST);
     gl.scissor(x, y, width, height);
-    regl.clear({color: [0.9 + 0.15 * Math.random(), 0.9 + 0.1 * Math.random(), 0.9 + 0.1 * Math.random(), 0.9 + 0.1 * Math.random()], depth: 1}); // clearing is done in scissored panel only
-//    regl.clear({color: [0, 0, 0, 0], depth: 1}); // clearing is done in scissored panel only
+    var r = 0.97 + 0.03 * Math.random();
+    regl.clear({color: [r, r, r, 1], depth: 1}); // clearing is done in scissored panel only
+    //regl.clear({color: [0, 0, 0, 0], depth: 1}); // clearing is done in scissored panel only
 }
 
 function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item) {
@@ -301,8 +302,9 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
             index = leftRight[loHi];
             for(abcd = 0; abcd < 4; abcd++) {
                 for(d = 0; d < 16; d++) {
+                    var dimP = d + 16 * abcd;
                     dims[loHi][abcd][d] = d + 16 * abcd === index ? 1 : 0;
-                    lims[loHi][abcd][d] = (!context && valid(d, 16 * abcd, panelCount) ? initialDims[d + 16 * abcd].filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
+                    lims[loHi][abcd][d] = (!context && valid(d, 16 * abcd, panelCount) ? initialDims[dimP === 0 ? 0 : 1 + ((dimP - 1) % (initialDims.length - 1))].filter[loHi] : loHi) + (2 * loHi - 1) * filterEpsilon;
                 }
             }
         }
@@ -369,9 +371,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
             var panelSizeX = panel.panelSizeX;
             var panelSizeY = panel.panelSizeY;
             var xTo = x + panelSizeX;
-            console.log(setChanged)
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== xTo) {
-                //if(!setChanged && !context && !pick) debugger;
                 previousAxisOrder[i] = [x, xTo];
                 var item = makeItem(i, ii, x, y, panelSizeX, panelSizeY, dim1.crossfilterDimensionIndex, dim1.scatter, I, leftmost, rightmost);
                 renderState.clearOnly = clearOnly;
