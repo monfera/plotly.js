@@ -46,14 +46,6 @@ function clear(regl, x, y, width, height) {
 
 function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item) {
 
-    var blockNumber = 0;
-    var rafKey = item.key;
-
-    if(!renderState.drawCompleted) {
-        ensureDraw(regl);
-        renderState.drawCompleted = true;
-    }
-
     function render(blockNumber) {
 
         var count;
@@ -82,6 +74,14 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
         }
 
         renderState.drawCompleted = false;
+    }
+
+    var blockNumber = 0;
+    var rafKey = item.key;
+
+    if(!renderState.drawCompleted) {
+        ensureDraw(regl);
+        renderState.drawCompleted = true;
     }
 
     render(blockNumber);
