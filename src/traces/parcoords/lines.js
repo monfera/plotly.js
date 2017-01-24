@@ -40,7 +40,8 @@ function clear(regl, x, y, width, height) {
     var gl = regl._gl;
     gl.enable(gl.SCISSOR_TEST);
     gl.scissor(x, y, width, height);
-    regl.clear({color: [0, 0, 0, 0], depth: 1}); // clearing is done in scissored panel only
+    regl.clear({color: [0.9 + 0.15 * Math.random(), 0.9 + 0.1 * Math.random(), 0.9 + 0.1 * Math.random(), 0.9 + 0.1 * Math.random()], depth: 1}); // clearing is done in scissored panel only
+//    regl.clear({color: [0, 0, 0, 0], depth: 1}); // clearing is done in scissored panel only
 }
 
 function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item) {
@@ -63,7 +64,7 @@ function renderBlock(regl, glAes, renderState, blockLineCount, sampleCount, item
         item.count = sectionVertexCount * count;
         if(blockNumber === 0) {
             window.cancelAnimationFrame(renderState.currentRafs[rafKey]); // stop drawing possibly stale glyphs before clearing
-            clear(regl, item.scissorX, 0, item.scissorWidth, item.viewBoxSize[1]);
+            clear(regl, item.scissorX, item.scissorY, item.scissorWidth, item.viewBoxSize[1]);
         }
 
         if(renderState.clearOnly) {
@@ -175,8 +176,6 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
 
     var focusAlphaBlending = context;
 
-    var canvasPanelSizeY = canvasHeight;
-
     var color = pick ? lines.color.map(function(_, i) {return i / lines.color.length;}) : lines.color;
     var contextOpacity = Math.max(1 / 255, Math.pow(1 / color.length, 1 / 3));
     var overdrag = lines.canvasOverdrag;
@@ -239,9 +238,9 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
             enable: true,
             box: {
                 x: regl.prop('scissorX'),
-                y: 0,
+                y: regl.prop('scissorY'),
                 width: regl.prop('scissorWidth'),
-                height: canvasPanelSizeY
+                height: regl.prop('scissorHeight')
             }
         },
 
@@ -291,7 +290,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
 
     var previousAxisOrder = [];
 
-    function makeItem(i, ii, x, panelSizeX, crossfilterDimensionIndex, scatter, I, leftmost, rightmost) {
+    function makeItem(i, ii, x, y, panelSizeX, canvasPanelSizeY, crossfilterDimensionIndex, scatter, I, leftmost, rightmost) {
         var loHi, abcd, d, index;
         var leftRight = [i, ii];
 
@@ -311,7 +310,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
         return {
             key: crossfilterDimensionIndex,
             resolution: [canvasWidth, canvasHeight],
-            viewBoxPosition: [x + overdrag, 0],
+            viewBoxPosition: [x + overdrag, y],
             viewBoxSize: [panelSizeX, canvasPanelSizeY],
 
             dim1A: dims[0][0],
@@ -333,9 +332,11 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
             hiD: lims[1][3],
 
             colorClamp: colorClamp,
-            scatter: scatter || 0,
+            scatter: scatter || 1,
             scissorX: I === leftmost ? 0 : x + overdrag,
-            scissorWidth: (I === rightmost ? canvasWidth - x + overdrag : panelSizeX + 0.5) + (I === leftmost ? x + overdrag : 0)
+            scissorWidth: (I === rightmost ? canvasWidth - x + overdrag : panelSizeX + 0.5) + (I === leftmost ? x + overdrag : 0),
+            scissorY: y,
+            scissorHeight: canvasPanelSizeY
         };
     }
 
@@ -362,13 +363,17 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
             var dim1 = panel.dim1;
             var i = dim1.crossfilterDimensionIndex;
             var x = panel.canvasX;
+            var y = panel.canvasY;
             var dim2 = panel.dim2;
             var ii = dim2.crossfilterDimensionIndex;
             var panelSizeX = panel.panelSizeX;
+            var panelSizeY = panel.panelSizeY;
             var xTo = x + panelSizeX;
+            console.log(setChanged)
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== xTo) {
+                //if(!setChanged && !context && !pick) debugger;
                 previousAxisOrder[i] = [x, xTo];
-                var item = makeItem(i, ii, x, panelSizeX, dim1.crossfilterDimensionIndex, dim1.scatter, I, leftmost, rightmost);
+                var item = makeItem(i, ii, x, y, panelSizeX, panelSizeY, dim1.crossfilterDimensionIndex, dim1.scatter, I, leftmost, rightmost);
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blockLineCount : sampleCount, sampleCount, item);
             }
