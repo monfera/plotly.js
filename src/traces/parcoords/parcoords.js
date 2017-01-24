@@ -399,10 +399,12 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         var yAxes = yAxis.each(function(d) {return d;})[0].map(function(e) {return e.__data__;});
         for(var p = 0; p < panels.length; p++) {
             var panel = panels[p];
-            panel.dim1 = yAxes[p];
-            panel.dim2 = yAxes[p + 1];
-            panel.canvasX = panel.dim1.canvasX;
-            panel.panelSizeX = panel.dim2.canvasX - panel.dim1.canvasX;
+            var dim1 = yAxes[p];
+            var dim2 = yAxes[p + 1];
+            panel.dim1 = dim1;
+            panel.dim2 = dim1;
+            panel.canvasX = dim1.canvasX;
+            panel.panelSizeX = dim2.canvasX - dim1.canvasX;
         }
     }
 
