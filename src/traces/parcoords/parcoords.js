@@ -215,9 +215,12 @@ function viewModel(model) {
 
     viewModel.panels = viewModel.dimensions
         .map(function(dim1, i, a) {
+            var dim2 = a[i + 1] || {};
             return {
                 dim1: dim1,
-                dim2: a[i + 1]
+                dim2: dim2,
+                canvasX: dim1.canvasX,
+                panelSizeX: dim2.canvasX - dim1.canvasX
             }
         })
         .slice(0, -1);
@@ -408,6 +411,17 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
         return view.dimensions.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
     }
 
+    function updatePanelLayout(yAxis, d) {
+        var yAxes = yAxis.each(function(d) {return d;})[0].map(function(e) {return e.__data__;});
+        for(var p = 0; p < d.parent.panels.length; p++) {
+            var panel = d.parent.panels[p];
+            panel.dim1 = yAxes[p];
+            panel.dim2 = yAxes[p + 1];
+            panel.canvasX = panel.dim1.canvasX;
+            panel.panelSizeX = panel.dim2.canvasX - panel.dim1.canvasX;
+        }
+    }
+
     yAxis.enter()
         .append('g')
         .classed('yAxis', true)
@@ -434,11 +448,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                         dd.canvasX = dd.x * dd.model.canvasPixelRatio;
                     });
 
-                var yAxes = yAxis.each(function(d) {return d;})[0].map(function(e) {return e.__data__;});
-                for(var p = 0; p < d.parent.panels.length; p++) {
-                    d.parent.panels[p].dim1 = yAxes[p];
-                    d.parent.panels[p].dim2 = yAxes[p + 1];
-                }
+                updatePanelLayout(yAxis, d);
 
                 yAxis.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
@@ -456,6 +466,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                 }
                 d.x = d.xScale(d.xIndex);
                 d.canvasX = d.x * d.model.canvasPixelRatio;
+                updatePanelLayout(yAxis, d);
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                 d.parent.contextLineLayer.render(d.parent.panels, false, !someFiltersActive(d.parent));
