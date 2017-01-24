@@ -291,7 +291,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
 
     var previousAxisOrder = [];
 
-    function makeItem(i, ii, x, panelSizeX, originalXIndex, scatter, I, leftmost, rightmost) {
+    function makeItem(i, ii, x, panelSizeX, crossfilterDimensionIndex, scatter, I, leftmost, rightmost) {
         var loHi, abcd, d, index;
         var leftRight = [i, ii];
 
@@ -309,7 +309,7 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
         }
 
         return {
-            key: originalXIndex,
+            key: crossfilterDimensionIndex,
             resolution: [canvasWidth, canvasHeight],
             viewBoxPosition: [x + overdrag, 0],
             viewBoxSize: [panelSizeX, canvasPanelSizeY],
@@ -359,14 +359,14 @@ module.exports = function(canvasGL, lines, canvasWidth, canvasHeight, initialDim
 
         for(I = 0; I < panelCount; I++) {
             var dim1 = panels[I].dim1;
-            var i = dim1.originalXIndex;
+            var i = dim1.crossfilterDimensionIndex;
             var x = dim1.canvasX;
             var dim2 = panels[I].dim2;
-            var ii = dim2.originalXIndex;
+            var ii = dim2.crossfilterDimensionIndex;
             var panelSizeX = dim2.canvasX - x;
             if(setChanged || !previousAxisOrder[i] || previousAxisOrder[i][0] !== x || previousAxisOrder[i][1] !== dim2.canvasX) {
                 previousAxisOrder[i] = [x, dim2.canvasX];
-                var item = makeItem(i, ii, x, panelSizeX, dim1.originalXIndex, dim1.scatter, I, leftmost, rightmost);
+                var item = makeItem(i, ii, x, panelSizeX, dim1.crossfilterDimensionIndex, dim1.scatter, I, leftmost, rightmost);
                 renderState.clearOnly = clearOnly;
                 renderBlock(regl, glAes, renderState, setChanged ? lines.blockLineCount : sampleCount, sampleCount, item);
             }

@@ -196,7 +196,7 @@ function viewModel(model) {
             ordinal: !!dimension.tickvals,
             scatter: dimension.scatter,
             xIndex: i,
-            originalXIndex: i,
+            crossfilterDimensionIndex: i,
             height: height,
             values: dimension.values,
             paddedUnitValues: dimension.values.map(domainToUnit).map(paddedUnitScale),
@@ -470,7 +470,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
                     .filter(function(d) {return d.visible === void(0) || d.visible;});
                 function newIdx(dim) {
                     var origIndex = orig.indexOf(dim);
-                    var currentIndex = d.parent.dimensions.map(function(dd) {return dd.originalXIndex;}).indexOf(origIndex);
+                    var currentIndex = d.parent.dimensions.map(function(dd) {return dd.crossfilterDimensionIndex;}).indexOf(origIndex);
                     if(currentIndex === -1) {
                         // invisible dimensions go to the end, retaining their original order
                         currentIndex += orig.length;
@@ -723,7 +723,7 @@ module.exports = function(gd, root, svg, styledData, layout, callbacks) {
             var invScale = dimension.domainToUnitScale.invert;
 
             // update gd.data as if a Plotly.restyle were fired
-            var gdDimension = dimension.parent.model._gdDimensionsOriginalOrder[dimension.originalXIndex];
+            var gdDimension = dimension.parent.model._gdDimensionsOriginalOrder[dimension.crossfilterDimensionIndex];
             var gdConstraintRange = gdDimension.constraintrange;
             if(!gdConstraintRange || gdConstraintRange.length !== 2) {
                 gdConstraintRange = gdDimension.constraintrange = [];
