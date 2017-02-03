@@ -38,7 +38,13 @@ exports.clean = function(newFullData, newFullLayout, oldFullData, oldFullLayout)
 
 exports.toSVG = function(gd) {
 
-    function canvasToImage(canvas) {
+    var imageRoot = gd._fullLayout._glimages;
+    var root = d3.selectAll('.svg-container');
+    var canvases = root.filter(function(d, i) {return i === 0;})
+        .selectAll('.parcoords-lines.context, .parcoords-lines.focus');
+
+    function canvasToImage() {
+        var canvas = this;
         var rect = canvas.getBoundingClientRect();
         var parentRect = canvas.parentElement.getBoundingClientRect();
         var canvasStyle = window.getComputedStyle(canvas, null);
@@ -50,7 +56,10 @@ exports.toSVG = function(gd) {
             xmlns: xmlnsNamespaces.svg,
             'xlink:href': imageData,
             x: canvasContentOriginX,
-            y: canvasContentOriginY
+            y: canvasContentOriginY,
+            width: parseFloat(canvasStyle.getPropertyValue('width')),
+            height: parseFloat(canvasStyle.getPropertyValue('height')),
+            preserveAspectRatio: 'none'
         });
     }
 
