@@ -40,10 +40,10 @@ exports.toSVG = function(gd) {
 
     function canvasToImage(canvas) {
         var rect = canvas.getBoundingClientRect();
-        var compStyle = window.getComputedStyle(canvas, null);
-        var canvasContentOriginX = parseFloat(compStyle.getPropertyValue('padding-left')) + rect.left;
-        var canvasContentOriginY = parseFloat(compStyle.getPropertyValue('padding-top')) + rect.top;
-
+        var parentRect = canvas.parentElement.getBoundingClientRect();
+        var canvasStyle = window.getComputedStyle(canvas, null);
+        var canvasContentOriginX = parseFloat(canvasStyle.getPropertyValue('padding-left')) + (rect.left - parentRect.left);
+        var canvasContentOriginY = parseFloat(canvasStyle.getPropertyValue('padding-top')) + (rect.top - parentRect.top);
         var imageData = canvas.toDataURL('image/png');
         var image = gd._fullLayout._glimages.append('svg:image');
         image.attr({
