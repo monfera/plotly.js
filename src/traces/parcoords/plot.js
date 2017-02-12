@@ -9,21 +9,19 @@
 'use strict';
 
 var parcoords = require('./parcoords');
-var Lib = require('../../lib');
 
 module.exports = function plot(gd, cdparcoords) {
-
-    var gdDimensions = {};
-    var gdDimensionsOriginalOrder = {};
 
     var fullLayout = gd._fullLayout;
     var svg = fullLayout._paper;
     var root = fullLayout._paperdiv;
-    var data = cdparcoords.map(function(d, i) {
-        var item = Lib.extendDeep(d[0]);
+
+    var gdDimensions = {};
+    var gdDimensionsOriginalOrder = {};
+
+    cdparcoords.forEach(function(d, i) {
         gdDimensions[i] = gd.data[i].dimensions;
         gdDimensionsOriginalOrder[i] = gd.data[i].dimensions.slice();
-        return item;
     });
 
     var filterChanged = function(i, originalDimensionIndex, newRange) {
@@ -82,7 +80,7 @@ module.exports = function plot(gd, cdparcoords) {
     parcoords(
         root,
         svg,
-        data,
+        cdparcoords.map(function(d) {return d[0];}),
         {
             width: fullLayout.width,
             height: fullLayout.height,
