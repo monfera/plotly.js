@@ -14,22 +14,6 @@ var Lib = require('../../lib');
 
 
 module.exports = function calc(gd, trace) {
-    var inputDimensions = trace.dimensions,
-        dimensions = [];
-    for(var i = 0; i < inputDimensions.length; i++) {
-
-        dimensions.push({
-            range: inputDimensions[i].range,
-            constraintrange: inputDimensions[i].constraintrange,
-            tickvals: inputDimensions[i].tickvals,
-            ticktext: inputDimensions[i].ticktext,
-            tickformat: inputDimensions[i].tickformat,
-            visible: inputDimensions[i].visible,
-            label: inputDimensions[i].label,
-            values: inputDimensions[i].values
-        });
-    }
-
     var cs = !!trace.line.colorscale && Lib.isArray(trace.line.color);
     var color = cs ? trace.line.color : Array.apply(0, Array(trace.dimensions.reduce(function(p, n) {return Math.max(p, n.values.length);}, 0))).map(function() {return 0.5;});
     var cscale = cs ? trace.line.colorscale : [[0, trace.line.color], [1, trace.line.color]];
@@ -43,7 +27,7 @@ module.exports = function calc(gd, trace) {
 
     return [{
         domain: trace.domain,
-        dimensions: dimensions,
+        dimensions: trace.dimensions,
         line: trace.line
     }];
 };

@@ -14,7 +14,7 @@ var hasColorscale = require('../../components/colorscale/has_colorscale');
 var colorscaleDefaults = require('../../components/colorscale/defaults');
 var maxDimensionCount = require('./constants').maxDimensionCount;
 
-var handleLineDefaults = function lineDefaults(traceIn, traceOut, defaultColor, layout, coerce) {
+function handleLineDefaults(traceIn, traceOut, defaultColor, layout, coerce) {
 
     coerce('line.color', defaultColor);
     coerce('line.colorscale');
@@ -25,7 +25,7 @@ var handleLineDefaults = function lineDefaults(traceIn, traceOut, defaultColor, 
     else {
         coerce('line.color', defaultColor);
     }
-};
+}
 
 function dimensionsDefaults(traceIn, traceOut) {
     var dimensionsIn = traceIn.dimensions || [],
