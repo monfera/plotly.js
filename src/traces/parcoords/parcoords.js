@@ -217,7 +217,7 @@ function styleExtentTexts(selection) {
         .classed('axisExtentText', true)
         .attr('text-anchor', 'middle')
         .style('font-weight', 100)
-        .style('font-size', 'x-small')
+        .style('font-size', '10px')
         .style('cursor', 'default')
         .style('user-select', 'none');
 }
@@ -557,7 +557,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     axisEnter
         .selectAll('text')
         .style('font-weight', 100)
-        .style('font-size', 'x-small')
+        .style('font-size', '10px')
         .style('fill', 'black')
         .style('fill-opacity', 1)
         .style('stroke', 'none')

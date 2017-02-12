@@ -8,6 +8,7 @@
 
 'use strict';
 
+var d3 = require('d3');
 var Plots = require('../../plots/plots');
 var parcoordsPlot = require('./plot');
 var xmlnsNamespaces = require('../../constants/xmlns_namespaces');
@@ -52,7 +53,8 @@ exports.toSVG = function(gd) {
         var canvasContentOriginX = parseFloat(canvasStyle.getPropertyValue('padding-left')) + (rect.left - parentRect.left) + canvasOffset[0];
         var canvasContentOriginY = parseFloat(canvasStyle.getPropertyValue('padding-top')) + (rect.top - parentRect.top) + canvasOffset[1];
         var imageData = canvas.toDataURL('image/png');
-        var image = gd._fullLayout._glimages.append('svg:image');
+        var image = imageRoot.append('svg:image');
+
         image.attr({
             xmlns: xmlnsNamespaces.svg,
             'xlink:href': imageData,
@@ -64,7 +66,15 @@ exports.toSVG = function(gd) {
         });
     }
 
-    var canvases = document.querySelectorAll('.parcoords-lines.context, .parcoords-lines.focus');
+    imageRoot.selectAll('*').remove();
+    canvases.each(canvasToImage);
 
-    canvases.forEach(canvasToImage);
+    // Chrome / Safari bug workaround - browser apparently loses connection to the defined pattern
+    // Without the workaround, these browsers 'lose' the filter brush styling (color etc.) after a snapshot
+    // on a subsequent interaction.
+    // Firefox works fine without this workaround
+    window.setTimeout(function() {
+        d3.selectAll('#filterBarPattern')
+            .attr('id', 'filterBarPattern');
+    }, 0);
 };
