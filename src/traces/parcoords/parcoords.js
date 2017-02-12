@@ -523,7 +523,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     var axis = axisOverlays.selectAll('.axis')
         .data(repeat, keyFun);
 
-    var axisEnter = axis.enter()
+    axis.enter()
         .append('g')
         .classed('axis', true);
 
@@ -546,14 +546,14 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .scale(scale));
         });
 
-    axisEnter
+    axis
         .selectAll('.domain, .tick')
         .attr('fill', 'none')
         .attr('stroke', 'black')
         .attr('stroke-opacity', 0.25)
         .attr('stroke-width', '1px');
 
-    axisEnter
+    axis
         .selectAll('text')
         .style('font-weight', 100)
         .style('font-size', '10px')
