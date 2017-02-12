@@ -283,7 +283,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     parcoordsLineLayers
         .style('transform', function(d, i) {
             var translateY = i * (d.model.height + d.model.pad.t + d.model.pad.b);
-            return 'translate(' + d.model.translateX + 'px,' + (d.model.translateY + translateY) + 'px)';
+            return 'translate(' + (d.model.translateX - c.overdrag) + 'px,' + (d.model.translateY + translateY) + 'px)';
         });
 
     var parcoordsLineLayer = parcoordsLineLayers.selectAll('.parcoords-lines')
@@ -297,7 +297,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .append('canvas')
         .attr('class', function(d) {return 'parcoords-lines ' + (d.context ? 'context' : d.pick ? 'pick' : 'focus');})
         .style('box-sizing', 'content-box')
-        .style('transform', 'translate(' + (-c.overdrag) + 'px, 0)')
         .style('float', 'left')
         .style('clear', 'both')
         .style('left', 0)
