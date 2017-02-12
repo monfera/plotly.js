@@ -541,9 +541,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .outerTickSize(2)
                     .ticks(wantedTickCount, d.tickFormat) // works for continuous scales only...
                     .tickValues(d.ordinal ? // and this works for ordinal scales
-                        sdom.filter(function(d, i) {return !(i % Math.round((sdom.length / wantedTickCount)));})
-                            .map(function(d, i) {return texts && texts[i] || d;}) :
+                        sdom.map(function(d, i) {return texts && texts[i] || d;}) :
                         null)
+                    .tickFormat(d.ordinal ? function(d) {return d;} : null)
                     .scale(scale));
         });
 
