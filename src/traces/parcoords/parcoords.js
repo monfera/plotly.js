@@ -114,7 +114,7 @@ function unwrap(d) {
     return d[0]; // plotly data structure convention
 }
 
-function model(layout, d, i, a) {
+function model(layout, d, i) {
     var trace = unwrap(d).trace,
         line = trace.line,
         domain = trace.domain,
@@ -126,9 +126,8 @@ function model(layout, d, i, a) {
         canvasOverdrag: c.overdrag * c.canvasPixelRatio
     });
 
-    var groupCount = a.length;
     var groupWidth = layout.width * (domain.x[1] - domain.x[0]);
-    var groupHeight = layout.height * (domain.y[1] - domain.y[0]) / groupCount;
+    var groupHeight = layout.height * (domain.y[1] - domain.y[0]);
 
     var pad = layout.margin || {l: 80, r: 80, t: 100, b: 80};
     var rowPad = pad;
@@ -289,9 +288,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .style('box-sizing', 'content-box');
 
     parcoordsLineLayers
-        .style('transform', function(d, i) {
-            var translateY = i * (d.model.height + d.model.pad.t + d.model.pad.b);
-            return 'translate(' + (d.model.translateX - c.overdrag) + 'px,' + (d.model.translateY + translateY) + 'px)';
+        .style('transform', function(d) {
+            return 'translate(' + (d.model.translateX - c.overdrag) + 'px,' + d.model.translateY + 'px)';
         });
 
     var parcoordsLineLayer = parcoordsLineLayers.selectAll('.parcoords-lines')
@@ -316,9 +314,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 var event = d3.event;
                 var cw = this.width;
                 var ch = this.height;
-                var translateY = d.model.key * (d.model.height + d.model.pad.t + d.model.pad.b) + d.model.translateY;
                 var x = event.layerX - d.model.pad.l + c.overdrag - d.model.translateX;
-                var y = event.layerY - d.model.pad.t - translateY;
+                var y = event.layerY - d.model.pad.t - d.model.translateY;
                 if(x < 0 || y < 0 || x >= cw || y >= ch) {
                     return;
                 }
@@ -377,9 +374,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     parcoordsControlOverlay
         .attr('width', function(d) {return d.model.width + d.model.pad.l + d.model.pad.r;})
         .attr('height', function(d) {return d.model.height + d.model.pad.t + d.model.pad.b;})
-        .attr('transform', function(d, i) {
-            var translateY = d.model.translateY + i * (d.model.height + d.model.pad.t + d.model.pad.b);
-            return 'translate(' + d.model.translateX + ',' + translateY + ')';
+        .attr('transform', function(d) {
+            return 'translate(' + d.model.translateX + ',' + d.model.translateY + ')';
         });
 
     var parcoordsControlView = parcoordsControlOverlay.selectAll('.parcoordsControlView')
