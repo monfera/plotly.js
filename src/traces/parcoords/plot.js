@@ -95,7 +95,7 @@ module.exports = function plot(gd, cdparcoords) {
     parcoords(
         root,
         svg,
-        cdparcoords.map(function(d) {return d[0];}),
+        cdparcoords,
         {
             width: fullLayout.width,
             height: fullLayout.height,

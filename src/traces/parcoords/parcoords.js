@@ -270,6 +270,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     }
 
     var vm = styledData
+        .map(function(d) {return d[0];}) // plotly data structure convention
         .filter(function(d) { return d.trace.visible; })
         .map(model.bind(0, layout))
         .map(viewModel);
