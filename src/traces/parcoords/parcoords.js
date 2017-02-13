@@ -347,13 +347,13 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     parcoordsLineLayer
         .style('padding', function(d) {
-            var p = d.viewModel.model.pad;
+            var p = d.model.pad;
             return p.t + 'px ' + p.r + 'px ' + p.b + 'px ' + p.l + 'px';
         })
-        .attr('width', function(d) {return d.viewModel.model.canvasWidth;})
-        .attr('height', function(d) {return d.viewModel.model.canvasHeight;})
-        .style('width', function(d) {return (d.viewModel.model.width + 2 * c.overdrag) + 'px';})
-        .style('height', function(d) {return d.viewModel.model.height + 'px';})
+        .attr('width', function(d) {return d.model.canvasWidth;})
+        .attr('height', function(d) {return d.model.canvasHeight;})
+        .style('width', function(d) {return (d.model.width + 2 * c.overdrag) + 'px';})
+        .style('height', function(d) {return d.model.height + 'px';})
         .style('opacity', function(d) {return d.pick ? 0.01 : 1;});
 
     svg.style('background', 'rgba(255, 255, 255, 0)');
