@@ -110,8 +110,12 @@ function unitToColorScale(cscale) {
     };
 }
 
+function unwrap(d) {
+    return d[0]; // plotly data structure convention
+}
+
 function model(layout, d, i, a) {
-    var trace = d.trace,
+    var trace = unwrap(d).trace,
         line = trace.line,
         domain = trace.domain,
         dimensions = trace.dimensions;
@@ -270,8 +274,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     }
 
     var vm = styledData
-        .map(function(d) {return d[0];}) // plotly data structure convention
-        .filter(function(d) { return d.trace.visible; })
+        .filter(function(d) { return unwrap(d).trace.visible; })
         .map(model.bind(0, layout))
         .map(viewModel);
 
