@@ -53,11 +53,13 @@ module.exports = function plot(gd, cdparcoords) {
         // Have updated order data on `gd.data` and raise `Plotly.restyle` event
         // without having to incur heavy UI blocking due to an actual `Plotly.restyle` call
 
+        function visible(dimension) {return !('visible' in dimension) || dimension.visible;}
+
         function newIdx(visibleIndices, orig, dim) {
             var origIndex = orig.indexOf(dim);
             var currentIndex = visibleIndices.indexOf(origIndex);
             if(currentIndex === -1) {
-                // invisible dimensions go to the end, retaining their original order
+                // invisible dimensions initially go to the end
                 currentIndex += orig.length;
             }
             return currentIndex;
@@ -71,8 +73,21 @@ module.exports = function plot(gd, cdparcoords) {
             };
         }
 
-        var orig = sorter(gdDimensionsOriginalOrder[i].filter(function(d) {return d.visible === void(0) || d.visible;}));
+        // drag&drop sorting of the visible dimensions
+        var orig = sorter(gdDimensionsOriginalOrder[i].filter(visible));
         gdDimensions[i].sort(orig);
+
+        // invisible dimensions are not interpreted in the context of drag&drop sorting as an invisible dimension
+        // cannot be dragged; they're interspersed into their original positions by this subsequent merging step
+        gdDimensionsOriginalOrder[i].filter(function(d) {return !visible(d);})
+             .sort(function(d) {
+                 // subsequent splicing to be done left to right, otherwise indices may be incorrect
+                 return gdDimensionsOriginalOrder[i].indexOf(d);
+             })
+            .forEach(function(d) {
+                gdDimensions[i].splice(gdDimensions[i].indexOf(d), 1); // remove from the end
+                gdDimensions[i].splice(gdDimensionsOriginalOrder[i].indexOf(d), 0, d); // insert at original index
+            });
 
         gd.emit('plotly_restyle');
     };
