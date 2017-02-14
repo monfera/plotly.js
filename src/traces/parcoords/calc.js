@@ -25,9 +25,5 @@ module.exports = function calc(gd, trace) {
         calcColorscale(trace, trace.line.color, 'line', 'c');
     }
 
-    return [{
-        domain: trace.domain,
-        dimensions: trace.dimensions,
-        line: trace.line
-    }];
+    return [{}];
 };
