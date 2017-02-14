@@ -667,19 +667,19 @@ describe('parcoords', function() {
 
             expect(tester.get()).toBe(false);
 
-            mouseEvent('mousemove', 853, 254);
-            mouseEvent('mouseover', 853, 254);
+            mouseEvent('mousemove', 853, 248);
+            mouseEvent('mouseover', 853, 248);
 
             window.setTimeout(function() {
 
-                expect(tester.get().hover.curveNumber).toBe(4);
+                expect(tester.get().hover && tester.get().hover.curveNumber).toBe(4);
 
                 mouseEvent('mousemove', 800, 240);
                 mouseEvent('mouseover', 800, 240);
 
                 window.setTimeout(function() {
 
-                    expect(tester.get().unhover.curveNumber).toBe(null);
+                    expect(tester.get().unhover && tester.get().unhover.curveNumber).toBe(null);
                     done();
                 }, 20);
 

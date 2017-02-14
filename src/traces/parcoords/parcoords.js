@@ -118,7 +118,8 @@ function model(layout, d, i) {
     var trace = unwrap(d).trace,
         line = trace.line,
         domain = trace.domain,
-        dimensions = trace.dimensions;
+        dimensions = trace.dimensions,
+        width = layout.width - (line.showscale ? c.legendWidth : 0); // leavig room for the colorbar
 
     var lines = Lib.extendDeep({}, line, {
         color: line.color.map(domainToUnitScale({values: line.color, range: [line.cmin, line.cmax]})),
@@ -126,12 +127,12 @@ function model(layout, d, i) {
         canvasOverdrag: c.overdrag * c.canvasPixelRatio
     });
 
-    var groupWidth = layout.width * (domain.x[1] - domain.x[0]);
+    var groupWidth = width * (domain.x[1] - domain.x[0]);
     var groupHeight = layout.height * (domain.y[1] - domain.y[0]);
 
     var pad = layout.margin || {l: 80, r: 80, t: 100, b: 80};
     var rowPad = pad;
-    var rowContentWidth = groupWidth - pad.l - pad.r - (line.showscale ? c.legendWidth : 0); // leavig room for the colorbar
+    var rowContentWidth = groupWidth - pad.l - pad.r;
     var rowHeight = groupHeight - rowPad.t - rowPad.b;
 
     return {
@@ -141,7 +142,7 @@ function model(layout, d, i) {
         tickDistance: c.tickDistance,
         unitToColor: unitToColorScale(line.colorscale),
         lines: lines,
-        translateX: domain.x[0] * layout.width,
+        translateX: domain.x[0] * width,
         translateY: layout.height - domain.y[1] * layout.height,
         pad: pad,
         canvasWidth: rowContentWidth * c.canvasPixelRatio + 2 * lines.canvasOverdrag,
