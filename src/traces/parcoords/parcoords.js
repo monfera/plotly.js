@@ -189,6 +189,7 @@ function viewModel(model) {
             scatter: c.scatter || dimension.scatter,
             xIndex: i,
             crossfilterDimensionIndex: i,
+            visibleIndex: dimension._index,
             height: height,
             values: dimension.values,
             paddedUnitValues: dimension.values.map(domainToUnit).map(paddedUnitScale),
@@ -756,9 +757,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             var invScale = dimension.domainToUnitScale.invert;
 
             // update gd.data as if a Plotly.restyle were fired
-            var originalDimensionIndex = dimension.crossfilterDimensionIndex;
             var newRange = f.map(invScale);
-            callbacks.filterChanged(p.key, originalDimensionIndex, newRange);
+            callbacks.filterChanged(p.key, dimension.visibleIndex, newRange);
         }
     }
 

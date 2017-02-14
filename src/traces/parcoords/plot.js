@@ -31,6 +31,7 @@ module.exports = function plot(gd, cdparcoords) {
 
         var gdDimension = gdDimensionsOriginalOrder[i][originalDimensionIndex];
         var gdConstraintRange = gdDimension.constraintrange;
+
         if(!gdConstraintRange || gdConstraintRange.length !== 2) {
             gdConstraintRange = gdDimension.constraintrange = [];
         }
