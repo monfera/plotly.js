@@ -526,6 +526,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .append('g')
         .classed('axisOverlays', true);
 
+    axisOverlays.selectAll('.axis').remove();
+
     var axis = axisOverlays.selectAll('.axis')
         .data(repeat, keyFun);
 
