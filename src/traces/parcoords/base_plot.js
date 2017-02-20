@@ -12,6 +12,7 @@ var d3 = require('d3');
 var Plots = require('../../plots/plots');
 var parcoordsPlot = require('./plot');
 var xmlnsNamespaces = require('../../constants/xmlns_namespaces');
+var c = require('./constants');
 
 exports.name = 'parcoords';
 
@@ -42,24 +43,20 @@ exports.toSVG = function(gd) {
     var canvases = root.filter(function(d, i) {return i === 0;})
         .selectAll('.parcoords-lines.context, .parcoords-lines.focus');
 
-    function canvasToImage() {
+    function canvasToImage(d) {
         var canvas = this;
-        var canvasStyle = window.getComputedStyle(canvas, null);
-        var parentStyle = window.getComputedStyle(canvas.parentElement, null);
-        var canvasOffset = parentStyle.getPropertyValue('transform').split(')')[0].split(',').slice(-2)
-            .map(function(s) {return parseFloat(s);});
-        var canvasContentOriginX = parseFloat(canvasStyle.getPropertyValue('padding-left')) + canvasOffset[0];
-        var canvasContentOriginY = parseFloat(canvasStyle.getPropertyValue('padding-top')) + canvasOffset[1];
         var imageData = canvas.toDataURL('image/png');
         var image = imageRoot.append('svg:image');
+        var size = gd._fullLayout._size;
+        var domain = gd._fullData[d.model.key].domain;
 
         image.attr({
             xmlns: xmlnsNamespaces.svg,
             'xlink:href': imageData,
-            x: canvasContentOriginX,
-            y: canvasContentOriginY,
-            width: parseFloat(canvasStyle.getPropertyValue('width')),
-            height: parseFloat(canvasStyle.getPropertyValue('height')),
+            x: size.l + size.w * domain.x[0] - c.overdrag,
+            y: size.t + size.h * (1 - domain.y[1]),
+            width: (domain.x[1] - domain.x[0]) * size.w + 2 * c.overdrag,
+            height: (domain.y[1] - domain.y[0]) * size.h,
             preserveAspectRatio: 'none'
         });
     }

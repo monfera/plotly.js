@@ -119,7 +119,7 @@ function model(layout, d, i) {
         line = trace.line,
         domain = trace.domain,
         dimensions = trace.dimensions,
-        width = layout.width - (line.showscale ? c.legendWidth : 0); // leavig room for the colorbar
+        width = layout.width;
 
     var lines = Lib.extendDeep({}, line, {
         color: line.color.map(domainToUnitScale({values: line.color, range: [line.cmin, line.cmax]})),
@@ -131,9 +131,8 @@ function model(layout, d, i) {
     var groupHeight = layout.height * (domain.y[1] - domain.y[0]);
 
     var pad = layout.margin || {l: 80, r: 80, t: 100, b: 80};
-    var rowPad = pad;
-    var rowContentWidth = groupWidth - pad.l - pad.r;
-    var rowHeight = groupHeight - rowPad.t - rowPad.b;
+    var rowContentWidth = groupWidth;
+    var rowHeight = groupHeight;
 
     return {
         key: i,

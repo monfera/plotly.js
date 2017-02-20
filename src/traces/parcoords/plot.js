@@ -19,6 +19,8 @@ module.exports = function plot(gd, cdparcoords) {
     var gdDimensions = {};
     var gdDimensionsOriginalOrder = {};
 
+    var size = fullLayout._size;
+
     cdparcoords.forEach(function(d, i) {
         gdDimensions[i] = gd.data[i].dimensions;
         gdDimensionsOriginalOrder[i] = gd.data[i].dimensions.slice();
@@ -98,9 +100,14 @@ module.exports = function plot(gd, cdparcoords) {
         svg,
         cdparcoords,
         {
-            width: fullLayout.width,
-            height: fullLayout.height,
-            margin: fullLayout.margin
+            width: size.w,
+            height: size.h,
+            margin: {
+                t: size.t,
+                r: size.r,
+                b: size.b,
+                l: size.l
+            }
         },
         {
             filterChanged: filterChanged,
