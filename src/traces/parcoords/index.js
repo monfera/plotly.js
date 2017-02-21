@@ -23,7 +23,7 @@ Parcoords.categories = ['gl'];
 Parcoords.meta = {
     description: [
         'Parallel coordinates for multidimensional exploratory data analysis.',
-        'The samples are in `data`.',
+        'The samples are specified in `dimensions`.',
         'The colors are set in `line.color`.'
     ].join(' ')
 };

@@ -24,13 +24,11 @@
 
     "dimensions": [
       {
-        "id": "Block height",
         "constraintrange": [200, 700],
         "label": "Block height",
         "values": [321, 534, 542, 674, 31, 674, 124, 246, 456, 743]
       },
       {
-        "id": "Block width",
         "label": "Block width",
         "range": [0, 700000],
         "values": [268630, 489543, 379086, 600000, 489543, 268630, 600000, 379086, 268630, 489543]
