@@ -315,8 +315,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 var event = d3.event;
                 var cw = this.width;
                 var ch = this.height;
-                var x = event.layerX - d.model.pad.l + c.overdrag - d.model.translateX;
-                var y = event.layerY - d.model.pad.t - d.model.translateY;
+                var x = event.layerX + c.overdrag - d.model.translateX;
+                var y = event.layerY - d.model.translateY;
                 if(x < 0 || y < 0 || x >= cw || y >= ch) {
                     return;
                 }
@@ -344,7 +344,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         });
 
     parcoordsLineLayer
-        .style('padding', function(d) {
+        .style('margin', function(d) {
             var p = d.model.pad;
             return p.t + 'px ' + p.r + 'px ' + p.b + 'px ' + p.l + 'px';
         })
