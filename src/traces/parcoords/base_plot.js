@@ -40,7 +40,7 @@ exports.toSVG = function(gd) {
 
     var imageRoot = gd._fullLayout._glimages;
     var root = d3.selectAll('.svg-container');
-    var canvases = root.filter(function(d, i) {return i === 0;})
+    var canvases = root.filter(function(d, i) {return i === root.size() - 1;})
         .selectAll('.parcoords-lines.context, .parcoords-lines.focus');
 
     function canvasToImage(d) {
