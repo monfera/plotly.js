@@ -457,7 +457,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.dimensions, d.viewModel.panels, d.model.unitToColor, d.context, d.pick, c.scatter);
             d.viewModel[d.key] = d.lineLayer;
             tweakables.renderers.push(function() {d.lineLayer.render(d.viewModel.panels, true);});
-            d.lineLayer.render(d.viewModel.panels, !d.context, d.context && !someFiltersActive(d.viewModel));
+            d.lineLayer.render(d.viewModel.panels, !d.context);
         });
 
     yAxis
