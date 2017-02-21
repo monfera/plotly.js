@@ -71,5 +71,5 @@ exports.toSVG = function(gd) {
     window.setTimeout(function() {
         d3.selectAll('#filterBarPattern')
             .attr('id', 'filterBarPattern');
-    }, 0);
+    }, 60);
 };
