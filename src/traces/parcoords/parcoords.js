@@ -315,8 +315,10 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 var event = d3.event;
                 var cw = this.width;
                 var ch = this.height;
-                var x = event.layerX + c.overdrag - d.model.translateX;
-                var y = event.layerY - d.model.translateY;
+                var pointer = d3.mouse(this);
+                var x = pointer[0];
+                var y = pointer[1];
+
                 if(x < 0 || y < 0 || x >= cw || y >= ch) {
                     return;
                 }
