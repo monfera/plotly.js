@@ -303,7 +303,7 @@ fx.hover = function(gd, evt, subplot) {
 // The actual implementation is here:
 
 function hover(gd, evt, subplot) {
-    if(subplot === 'pie') {
+    if(['pie', 'sankey'].indexOf(subplot) !== -1) {
         gd.emit('plotly_hover', {
             points: [evt]
         });
