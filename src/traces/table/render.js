@@ -277,29 +277,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .map(model.bind(0, layout))
         .map(viewModel);
 
-    root.selectAll('.table-line-layers').remove();
-
-    var tableLineLayers = root.selectAll('.table-line-layers')
-        .data(vm, keyFun);
-
-    tableLineLayers.enter()
-        .insert('div', '.' + svg.attr('class').split(' ').join(' .')) // not hardcoding .main-svg
-        .classed('table-line-layers', true)
-        .style('box-sizing', 'content-box');
-
-    tableLineLayers
-        .style('transform', function(d) {
-            return 'translate(' + (d.model.translateX - c.overdrag) + 'px,' + d.model.translateY + 'px)';
-        });
-
-    var tableLineLayer = tableLineLayers.selectAll('.table-lines')
-        .data(lineLayerModel, keyFun);
-
-    var tweakables = {renderers: [], dimensions: []};
-
-    var lastHovered = null;
-
-
     svg.style('background', 'rgba(255, 255, 255, 0)');
     var tableControlOverlay = svg.selectAll('.table')
         .data(vm, keyFun);
@@ -391,8 +368,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     yColumn.enter()
         .append('g')
-        .classed('yColumn', true)
-        .each(function(d) {tweakables.dimensions.push(d);});
+        .classed('yColumn', true);
 
     tableControlView.each(function(vm) {
         updatePanelLayout(yColumn, vm);
