@@ -231,7 +231,7 @@ function lineLayerModel(vm) {
 
 function styleExtentTexts(selection) {
     selection
-        .classed('axisExtentText', true)
+        .classed('columnExtentText', true)
         .attr('text-anchor', 'middle')
         .style('cursor', 'default')
         .style('user-select', 'none');
@@ -399,16 +399,16 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     tableControlView
         .attr('transform', function(d) {return 'translate(' + d.model.pad.l + ',' + d.model.pad.t + ')';});
 
-    var yAxis = tableControlView.selectAll('.yAxis')
+    var yColumn = tableControlView.selectAll('.yColumn')
         .data(function(vm) {return vm.dimensions;}, keyFun);
 
     function someFiltersActive(view) {
         return view.dimensions.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
     }
 
-    function updatePanelLayouttable(yAxis, vm) {
+    function updatePanelLayouttable(yColumn, vm) {
         var panels = vm.panels || (vm.panels = []);
-        var yAxes = yAxis.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
+        var yAxes = yColumn.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
         var panelCount = yAxes.length - 1;
         var rowCount = 1;
         for(var row = 0; row < rowCount; row++) {
@@ -427,9 +427,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         }
     }
 
-    function updatePanelLayoutScatter(yAxis, vm) {
+    function updatePanelLayoutScatter(yColumn, vm) {
         var panels = vm.panels || (vm.panels = []);
-        var yAxes = yAxis.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
+        var yAxes = yColumn.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
         var panelCount = yAxes.length - 1;
         var rowCount = panelCount;
         for(var row = 0; row < panelCount; row++) {
@@ -448,17 +448,17 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         }
     }
 
-    function updatePanelLayout(yAxis, vm) {
-        return (c.scatter ? updatePanelLayoutScatter : updatePanelLayouttable)(yAxis, vm);
+    function updatePanelLayout(yColumn, vm) {
+        return (c.scatter ? updatePanelLayoutScatter : updatePanelLayouttable)(yColumn, vm);
     }
 
-    yAxis.enter()
+    yColumn.enter()
         .append('g')
-        .classed('yAxis', true)
+        .classed('yColumn', true)
         .each(function(d) {tweakables.dimensions.push(d);});
 
     tableControlView.each(function(vm) {
-        updatePanelLayout(yAxis, vm);
+        updatePanelLayout(yColumn, vm);
     });
 
     tableLineLayer
@@ -469,10 +469,10 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             d.lineLayer.render(d.viewModel.panels, !d.context);
         });
 
-    yAxis
+    yColumn
         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
 
-    yAxis
+    yColumn
         .call(d3.behavior.drag()
             .origin(function(d) {return d;})
             .on('drag', function(d) {
@@ -483,7 +483,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 }
                 d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag, d3.event.x));
                 d.canvasX = d.x * d.model.canvasPixelRatio;
-                yAxis
+                yColumn
                     .sort(function(a, b) {return a.x - b.x;})
                     .each(function(dd, i) {
                         dd.xIndex = i;
@@ -491,12 +491,12 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         dd.canvasX = dd.x * dd.model.canvasPixelRatio;
                     });
 
-                updatePanelLayout(yAxis, p);
+                updatePanelLayout(yColumn, p);
 
-                yAxis.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
+                yColumn.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                 d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
-                yAxis.each(function(dd, i, ii) {if(ii === d.parent.key) p.dimensions[i] = dd;});
+                yColumn.each(function(dd, i, ii) {if(ii === d.parent.key) p.dimensions[i] = dd;});
                 p.contextLineLayer && p.contextLineLayer.render(p.panels, false, !someFiltersActive(p));
                 p.focusLineLayer.render && p.focusLineLayer.render(p.panels);
             })
@@ -510,7 +510,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 }
                 d.x = d.xScale(d.xIndex);
                 d.canvasX = d.x * d.model.canvasPixelRatio;
-                updatePanelLayout(yAxis, p);
+                updatePanelLayout(yColumn, p);
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                 p.contextLineLayer && p.contextLineLayer.render(p.panels, false, !someFiltersActive(p));
@@ -524,26 +524,26 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             })
         );
 
-    yAxis.exit()
+    yColumn.exit()
         .remove();
 
-    var axisOverlays = yAxis.selectAll('.axisOverlays')
+    var columnOverlays = yColumn.selectAll('.columnOverlays')
         .data(repeat, keyFun);
 
-    axisOverlays.enter()
+    columnOverlays.enter()
         .append('g')
-        .classed('axisOverlays', true);
+        .classed('columnOverlays', true);
 
-    axisOverlays.selectAll('.axis').remove();
+    columnOverlays.selectAll('.column').remove();
 
-    var axis = axisOverlays.selectAll('.axis')
+    var column = columnOverlays.selectAll('.column')
         .data(repeat, keyFun);
 
-    axis.enter()
+    column.enter()
         .append('g')
-        .classed('axis', true);
+        .classed('column', true);
 
-    axis
+    column
         .each(function(d) {
             var wantedTickCount = d.model.height / d.model.tickDistance;
             var scale = d.domainScale;
@@ -560,117 +560,117 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         null)
                     .tickFormat(d.ordinal ? function(d) {return d;} : null)
                     .scale(scale));
-            Drawing.font(axis.selectAll('text'), d.model.tickFont);
+            Drawing.font(column.selectAll('text'), d.model.tickFont);
         });
 
-    axis
+    column
         .selectAll('.domain, .tick>line')
         .attr('fill', 'none')
         .attr('stroke', 'black')
         .attr('stroke-opacity', 0.25)
         .attr('stroke-width', '1px');
 
-    axis
+    column
         .selectAll('text')
         .style('text-shadow', '1px 1px 1px #fff, -1px -1px 1px #fff, 1px -1px 1px #fff, -1px 1px 1px #fff')
         .style('cursor', 'default')
         .style('user-select', 'none');
 
-    var axisHeading = axisOverlays.selectAll('.axisHeading')
+    var columnHeading = columnOverlays.selectAll('.columnHeading')
         .data(repeat, keyFun);
 
-    axisHeading.enter()
+    columnHeading.enter()
         .append('g')
-        .classed('axisHeading', true);
+        .classed('columnHeading', true);
 
-    var axisTitle = axisHeading.selectAll('.axisTitle')
+    var columnTitle = columnHeading.selectAll('.columnTitle')
         .data(repeat, keyFun);
 
-    axisTitle.enter()
+    columnTitle.enter()
         .append('text')
-        .classed('axisTitle', true)
+        .classed('columnTitle', true)
         .attr('text-anchor', 'middle')
         .style('cursor', 'ew-resize')
         .style('user-select', 'none')
         .style('pointer-events', 'auto');
 
-    axisTitle
-        .attr('transform', 'translate(0,' + -c.axisTitleOffset + ')')
+    columnTitle
+        .attr('transform', 'translate(0,' + -c.columnTitleOffset + ')')
         .text(function(d) {return d.label;})
-        .each(function(d) {Drawing.font(axisTitle, d.model.labelFont);});
+        .each(function(d) {Drawing.font(columnTitle, d.model.labelFont);});
 
-    var axisExtent = axisOverlays.selectAll('.axisExtent')
+    var columnExtent = columnOverlays.selectAll('.columnExtent')
         .data(repeat, keyFun);
 
-    axisExtent.enter()
+    columnExtent.enter()
         .append('g')
-        .classed('axisExtent', true);
+        .classed('columnExtent', true);
 
-    var axisExtentTop = axisExtent.selectAll('.axisExtentTop')
+    var columnExtentTop = columnExtent.selectAll('.columnExtentTop')
         .data(repeat, keyFun);
 
-    axisExtentTop.enter()
+    columnExtentTop.enter()
         .append('g')
-        .classed('axisExtentTop', true);
+        .classed('columnExtentTop', true);
 
-    axisExtentTop
-        .attr('transform', 'translate(' + 0 + ',' + -c.axisExtentOffset + ')');
+    columnExtentTop
+        .attr('transform', 'translate(' + 0 + ',' + -c.columnExtentOffset + ')');
 
-    var axisExtentTopText = axisExtentTop.selectAll('.axisExtentTopText')
+    var columnExtentTopText = columnExtentTop.selectAll('.columnExtentTopText')
         .data(repeat, keyFun);
 
     function formatExtreme(d) {
         return d.ordinal ? function() {return '';} : d3.format(d.tickFormat);
     }
 
-    axisExtentTopText.enter()
+    columnExtentTopText.enter()
         .append('text')
-        .classed('axisExtentTopText', true)
+        .classed('columnExtentTopText', true)
         .attr('alignment-baseline', 'after-edge')
         .call(styleExtentTexts);
 
-    axisExtentTopText
+    columnExtentTopText
         .text(function(d) {return formatExtreme(d)(d.domainScale.domain().slice(-1)[0]);})
-        .each(function(d) {Drawing.font(axisExtentTopText, d.model.rangeFont);});
+        .each(function(d) {Drawing.font(columnExtentTopText, d.model.rangeFont);});
 
-    var axisExtentBottom = axisExtent.selectAll('.axisExtentBottom')
+    var columnExtentBottom = columnExtent.selectAll('.columnExtentBottom')
         .data(repeat, keyFun);
 
-    axisExtentBottom.enter()
+    columnExtentBottom.enter()
         .append('g')
-        .classed('axisExtentBottom', true);
+        .classed('columnExtentBottom', true);
 
-    axisExtentBottom
-        .attr('transform', function(d) {return 'translate(' + 0 + ',' + (d.model.height + c.axisExtentOffset) + ')';});
+    columnExtentBottom
+        .attr('transform', function(d) {return 'translate(' + 0 + ',' + (d.model.height + c.columnExtentOffset) + ')';});
 
-    var axisExtentBottomText = axisExtentBottom.selectAll('.axisExtentBottomText')
+    var columnExtentBottomText = columnExtentBottom.selectAll('.columnExtentBottomText')
         .data(repeat, keyFun);
 
-    axisExtentBottomText.enter()
+    columnExtentBottomText.enter()
         .append('text')
-        .classed('axisExtentBottomText', true)
+        .classed('columnExtentBottomText', true)
         .attr('alignment-baseline', 'before-edge')
         .call(styleExtentTexts);
 
-    axisExtentBottomText
+    columnExtentBottomText
         .text(function(d) {return formatExtreme(d)(d.domainScale.domain()[0]);})
-        .each(function(d) {Drawing.font(axisExtentBottomText, d.model.rangeFont);});
+        .each(function(d) {Drawing.font(columnExtentBottomText, d.model.rangeFont);});
 
-    var axisBrush = axisOverlays.selectAll('.axisBrush')
+    var columnBrush = columnOverlays.selectAll('.columnBrush')
         .data(repeat, keyFun);
 
-    var axisBrushEnter = axisBrush.enter()
+    var columnBrushEnter = columnBrush.enter()
         .append('g')
-        .classed('axisBrush', true);
+        .classed('columnBrush', true);
 
-    axisBrush
+    columnBrush
         .each(function(d) {
             if(!d.brush) {
                 d.brush = d3.svg.brush()
                     .y(d.unitScale)
-                    .on('brushstart', axisBrushStarted)
-                    .on('brush', axisBrushMoved)
-                    .on('brushend', axisBrushEnded);
+                    .on('brushstart', columnBrushStarted)
+                    .on('brush', columnBrushMoved)
+                    .on('brushend', columnBrushEnded);
                 if(d.filter[0] !== 0 || d.filter[1] !== 1) {
                     d.brush.extent(d.filter);
                 }
@@ -678,30 +678,30 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             }
         });
 
-    axisBrushEnter
+    columnBrushEnter
         .selectAll('rect')
         .attr('x', -c.bar.capturewidth / 2)
         .attr('width', c.bar.capturewidth);
 
-    axisBrushEnter
+    columnBrushEnter
         .selectAll('rect.extent')
         .attr('fill', 'url(#filterBarPattern)')
         .style('cursor', 'ns-resize')
         .filter(function(d) {return d.filter[0] === 0 && d.filter[1] === 1;})
         .attr('y', -100); //  // zero-size rectangle pointer issue workaround
 
-    axisBrushEnter
+    columnBrushEnter
         .selectAll('.resize rect')
         .attr('height', c.bar.handleheight)
         .attr('opacity', 0)
         .style('visibility', 'visible');
 
-    axisBrushEnter
+    columnBrushEnter
         .selectAll('.resize.n rect')
         .style('cursor', 'n-resize')
         .attr('y', c.bar.handleoverlap - c.bar.handleheight);
 
-    axisBrushEnter
+    columnBrushEnter
         .selectAll('.resize.s rect')
         .style('cursor', 's-resize')
         .attr('y', c.bar.handleoverlap);
@@ -709,12 +709,12 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     var justStarted = false;
     var contextShown = false;
 
-    function axisBrushStarted() {
+    function columnBrushStarted() {
         justStarted = true;
         domainBrushing = true;
     }
 
-    function axisBrushMoved(dimension) {
+    function columnBrushMoved(dimension) {
         linePickActive = false;
         var p = dimension.parent;
         var extent = dimension.brush.extent();
@@ -741,7 +741,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         justStarted = false;
     }
 
-    function axisBrushEnded(dimension) {
+    function columnBrushEnded(dimension) {
         var p = dimension.parent;
         var extent = dimension.brush.extent();
         var empty = extent[0] === extent[1];
