@@ -429,7 +429,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     columnTitle.enter()
         .append('text')
         .classed('columnTitle', true)
-        .attr('text-anchor', 'middle')
+        .attr('text-anchor', 'end')
         .style('cursor', 'ew-resize')
         .style('user-select', 'none')
         .style('pointer-events', 'auto');
