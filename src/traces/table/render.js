@@ -54,7 +54,7 @@ function dimensionExtent(dimension) {
 
 function ordinalScaleSnap(scale, v) {
     var i, a, prevDiff, prevValue, diff;
-    for(i = 0, a = scale.range(), prevDiff = Infinity, prevValue = a[0], diff; i < a.length; i++) {
+    for(i = 0, a = scale.range(), prevDiff = Infinity, prevValue = a[0], diff = null; i < a.length; i++) {
         if((diff = Math.abs(a[i] - v)) > prevDiff) {
             return prevValue;
         }
