@@ -237,6 +237,14 @@ function styleExtentTexts(selection) {
         .style('user-select', 'none');
 }
 
+function styleCellTexts(selection) {
+    selection
+        .classed('columnExtentText', true)
+        .attr('text-anchor', 'middle')
+        .style('cursor', 'default')
+        .style('user-select', 'none');
+}
+
 module.exports = function(root, svg, styledData, layout, callbacks) {
 
     var domainBrushing = false;
@@ -632,6 +640,40 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     columnExtentTopText
         .text(function(d) {return formatExtreme(d)(d.domainScale.domain().slice(-1)[0]);})
         .each(function(d) {Drawing.font(columnExtentTopText, d.model.rangeFont);});
+
+    var columnCells = columnOverlays.selectAll('.columnCells')
+        .data(repeat, keyFun);
+
+    columnCells.enter()
+        .append('g')
+        .classed('columnCells', true);
+
+    var columnCell = columnCells.selectAll('.columnCell')
+        .data(repeat, keyFun);
+
+    columnCell.enter()
+        .append('g')
+        .classed('columnCell', true);
+
+    columnCell
+        .attr('transform', 'translate(' + 0 + ',' + 0 + ')');
+
+    var columnCellText = columnCell.selectAll('.columnCellText')
+        .data(repeat, keyFun);
+
+    function formatCell(d) {
+        return d.ordinal ? function() {return '';} : d3.format(d.tickFormat);
+    }
+
+    columnCellText.enter()
+        .append('text')
+        .classed('columnCellText', true)
+        .attr('alignment-baseline', 'after-edge')
+        .call(styleCellTexts);
+
+    columnCellText
+        .text(function(d) {return formatCell(d)(d.domainScale.domain().slice(-1)[0]);})
+        .each(function(d) {Drawing.font(columnCellText, d.model.rangeFont);});
 
     var columnExtentBottom = columnExtent.selectAll('.columnExtentBottom')
         .data(repeat, keyFun);
