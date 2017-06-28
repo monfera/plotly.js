@@ -2,7 +2,7 @@ var Plotly = require('@lib/index');
 var Lib = require('@src/lib');
 var d3 = require('d3');
 var Plots = require('@src/plots/plots');
-var Parcoords = require('@src/traces/table');
+var Table = require('@src/traces/table');
 var attributes = require('@src/traces/table/attributes');
 
 var createGraphDiv = require('../assets/create_graph_div');
@@ -10,25 +10,25 @@ var destroyGraphDiv = require('../assets/destroy_graph_div');
 var mouseEvent = require('../assets/mouse_event');
 
 // mock with two dimensions (one panel); special case, e.g. left and right panel is obv. the same
-var mock2 = require('@mocks/gl2d_parcoords_2.json');
+var mock2 = require('@mocks/table_2.json');
 
 // mock with one dimension (zero panels); special case, as no panel can be rendered
-var mock1 = require('@mocks/gl2d_parcoords_1.json');
+var mock1 = require('@mocks/table_1.json');
 
 // mock with zero dimensions; special case, as no dimension can be rendered
 var mock0 = Lib.extendDeep({}, mock1);
 mock0.data[0].dimensions = [];
 
-var mock = require('@mocks/gl2d_parcoords_large.json');
+var mock = require('@mocks/table_large.json');
 
 var lineStart = 30;
 var lineCount = 10;
 
-describe('parcoords initialization tests', function() {
+describe('table initialization tests', function() {
 
     'use strict';
 
-    describe('parcoords global defaults', function() {
+    describe('table global defaults', function() {
 
         it('should not coerce trace opacity', function() {
             var gd = Lib.extendDeep({}, mock1);
@@ -60,14 +60,14 @@ describe('parcoords initialization tests', function() {
         });
     });
 
-    describe('parcoords defaults', function() {
+    describe('table defaults', function() {
 
         function _supply(traceIn) {
             var traceOut = { visible: true },
                 defaultColor = '#444',
                 layout = { font: Plots.layoutAttributes.font };
 
-            Parcoords.supplyDefaults(traceIn, traceOut, defaultColor, layout);
+            Table.supplyDefaults(traceIn, traceOut, defaultColor, layout);
 
             return traceOut;
         }
@@ -164,7 +164,7 @@ describe('parcoords initialization tests', function() {
         });
     });
 
-    describe('parcoords calc', function() {
+    describe('table calc', function() {
 
         function _calc(trace) {
             var gd = { data: [trace] };
@@ -172,11 +172,11 @@ describe('parcoords initialization tests', function() {
             Plots.supplyDefaults(gd);
 
             var fullTrace = gd._fullData[0];
-            Parcoords.calc(gd, fullTrace);
+            Table.calc(gd, fullTrace);
             return fullTrace;
         }
 
-        var base = { type: 'parcoords' };
+        var base = { type: 'table' };
 
         it('\'colorscale\' should assume a default value if the \'color\' array is specified', function() {
 
@@ -241,7 +241,7 @@ describe('parcoords initialization tests', function() {
     });
 });
 
-describe('@noCI parcoords', function() {
+describe('@noCI table', function() {
 
     beforeAll(function() {
         mock.data[0].dimensions.forEach(function(d) {
@@ -558,7 +558,7 @@ describe('@noCI parcoords', function() {
 
         });
 
-        it('Calling `Plotly.plot` again should add the new parcoords', function(done) {
+        it('Calling `Plotly.plot` again should add the new table', function(done) {
 
             var reversedMockCopy = Lib.extendDeep({}, mockCopy);
             reversedMockCopy.data[0].dimensions = reversedMockCopy.data[0].dimensions.slice().reverse();
@@ -588,7 +588,7 @@ describe('@noCI parcoords', function() {
 
         });
 
-        it('Calling `Plotly.restyle` with a string path should amend the preexisting parcoords', function(done) {
+        it('Calling `Plotly.restyle` with a string path should amend the preexisting table', function(done) {
 
             expect(gd.data.length).toEqual(1);
 
@@ -633,7 +633,7 @@ describe('@noCI parcoords', function() {
                 .then(done);
         });
 
-        it('Calling `Plotly.restyle` with an object should amend the preexisting parcoords', function(done) {
+        it('Calling `Plotly.restyle` with an object should amend the preexisting table', function(done) {
 
             var newStyle = Lib.extendDeep({}, mockCopy.data[0].line);
             newStyle.colorscale = 'Viridis';
@@ -730,7 +730,7 @@ describe('@noCI parcoords', function() {
 
         });
 
-        it('Calling `Plotly.relayout` with string should amend the preexisting parcoords', function(done) {
+        it('Calling `Plotly.relayout` with string should amend the preexisting table', function(done) {
 
             expect(gd.layout.width).toEqual(1184);
 
@@ -751,7 +751,7 @@ describe('@noCI parcoords', function() {
 
         });
 
-        it('Calling `Plotly.relayout`with object should amend the preexisting parcoords', function(done) {
+        it('Calling `Plotly.relayout`with object should amend the preexisting table', function(done) {
 
             expect(gd.layout.width).toEqual(1184);
 
@@ -788,7 +788,7 @@ describe('@noCI parcoords', function() {
                 expect(gd.data.length).toEqual(1);
 
                 Plotly.deleteTraces(gd, 0).then(function() {
-                    expect(d3.selectAll('.parcoords-line-layers').node()).toEqual(null);
+                    expect(d3.selectAll('.table-line-layers').node()).toEqual(null);
                     expect(gd.data.length).toEqual(0);
                     done();
                 });
@@ -815,13 +815,13 @@ describe('@noCI parcoords', function() {
                     return Plotly.deleteTraces(gd, [0]);
                 })
                 .then(function() {
-                    expect(document.querySelectorAll('.parcoords-line-layers').length).toEqual(1);
+                    expect(document.querySelectorAll('.table-line-layers').length).toEqual(1);
                     expect(document.querySelectorAll('.yAxis').length).toEqual(7);
                     expect(gd.data.length).toEqual(1);
                     return Plotly.deleteTraces(gd, 0);
                 })
                 .then(function() {
-                    expect(document.querySelectorAll('.parcoords-line-layers').length).toEqual(0);
+                    expect(document.querySelectorAll('.table-line-layers').length).toEqual(0);
                     expect(document.querySelectorAll('.yAxis').length).toEqual(0);
                     expect(gd.data.length).toEqual(0);
                     done();
@@ -845,7 +845,7 @@ describe('@noCI parcoords', function() {
 
             restyleDimension('values', 1, [[]])()
                 .then(function() {
-                    d3.selectAll('.parcoords-lines').each(function(d) {
+                    d3.selectAll('.table-lines').each(function(d) {
                         var imageArray = d.lineLayer.readPixels(0, 0, d.model.canvasWidth, d.model.canvasHeight);
                         var foundPixel = false;
                         var i = 0;
@@ -860,7 +860,7 @@ describe('@noCI parcoords', function() {
 
         describe('Having two datasets', function() {
 
-            it('Two subsequent calls to Plotly.plot should create two parcoords rows', function(done) {
+            it('Two subsequent calls to Plotly.plot should create two table rows', function(done) {
 
                 var gd = createGraphDiv();
                 var mockCopy = Lib.extendDeep({}, mock);
@@ -869,13 +869,13 @@ describe('@noCI parcoords', function() {
                 mockCopy2.data[0].domain = {x: [0.55, 1]};
                 mockCopy2.data[0].dimensions.splice(3, 4);
 
-                expect(document.querySelectorAll('.parcoords-line-layers').length).toEqual(0);
+                expect(document.querySelectorAll('.table-line-layers').length).toEqual(0);
 
                 Plotly.plot(gd, mockCopy)
                     .then(function() {
 
                         expect(1).toEqual(1);
-                        expect(document.querySelectorAll('.parcoords-line-layers').length).toEqual(1);
+                        expect(document.querySelectorAll('.table-line-layers').length).toEqual(1);
                         expect(gd.data.length).toEqual(1);
 
                         return Plotly.plot(gd, mockCopy2);
@@ -883,14 +883,14 @@ describe('@noCI parcoords', function() {
                     .then(function() {
 
                         expect(1).toEqual(1);
-                        expect(document.querySelectorAll('.parcoords-line-layers').length).toEqual(2);
+                        expect(document.querySelectorAll('.table-line-layers').length).toEqual(2);
                         expect(gd.data.length).toEqual(2);
 
                         done();
                     });
             });
 
-            it('Plotly.addTraces should add a new parcoords row', function(done) {
+            it('Plotly.addTraces should add a new table row', function(done) {
 
                 var gd = createGraphDiv();
                 var mockCopy = Lib.extendDeep({}, mock);
@@ -899,19 +899,19 @@ describe('@noCI parcoords', function() {
                 mockCopy2.data[0].domain = {y: [0.65, 1]};
                 mockCopy2.data[0].dimensions.splice(3, 4);
 
-                expect(document.querySelectorAll('.parcoords-line-layers').length).toEqual(0);
+                expect(document.querySelectorAll('.table-line-layers').length).toEqual(0);
 
                 Plotly.plot(gd, mockCopy)
                     .then(function() {
 
-                        expect(document.querySelectorAll('.parcoords-line-layers').length).toEqual(1);
+                        expect(document.querySelectorAll('.table-line-layers').length).toEqual(1);
                         expect(gd.data.length).toEqual(1);
 
                         return Plotly.addTraces(gd, [mockCopy2.data[0]]);
                     })
                     .then(function() {
 
-                        expect(document.querySelectorAll('.parcoords-line-layers').length).toEqual(2);
+                        expect(document.querySelectorAll('.table-line-layers').length).toEqual(2);
                         expect(gd.data.length).toEqual(2);
 
                         done();
@@ -919,7 +919,7 @@ describe('@noCI parcoords', function() {
 
             });
 
-            it('Plotly.restyle should update the existing parcoords row', function(done) {
+            it('Plotly.restyle should update the existing table row', function(done) {
 
                 var gd = createGraphDiv();
                 var mockCopy = Lib.extendDeep({}, mock);
@@ -945,12 +945,12 @@ describe('@noCI parcoords', function() {
                 mockCopy2.data[0].dimensions[2].tickvals = [0, 1, 2, 2.5, 3];
                 mockCopy2.data[0].dimensions[2].values = mockCopy2.data[0].dimensions[2].values.map(numberUpdater);
 
-                expect(document.querySelectorAll('.parcoords-line-layers').length).toEqual(0);
+                expect(document.querySelectorAll('.table-line-layers').length).toEqual(0);
 
                 Plotly.plot(gd, mockCopy)
                     .then(function() {
 
-                        expect(document.querySelectorAll('.parcoords-line-layers').length).toEqual(1);
+                        expect(document.querySelectorAll('.table-line-layers').length).toEqual(1);
                         expect(gd.data.length).toEqual(1);
 
                         return Plotly.restyle(gd, {
@@ -960,7 +960,7 @@ describe('@noCI parcoords', function() {
                     })
                     .then(function() {
 
-                        expect(document.querySelectorAll('.parcoords-line-layers').length).toEqual(1);
+                        expect(document.querySelectorAll('.table-line-layers').length).toEqual(1);
                         expect(gd.data.length).toEqual(1);
 
                         done();
