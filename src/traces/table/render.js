@@ -229,14 +229,6 @@ function lineLayerModel(vm) {
     });
 }
 
-function styleExtentTexts(selection) {
-    selection
-        .classed('columnExtentText', true)
-        .attr('text-anchor', 'middle')
-        .style('cursor', 'default')
-        .style('user-select', 'none');
-}
-
 module.exports = function(root, svg, styledData, layout, callbacks) {
 
     var domainBrushing = false;
@@ -544,26 +536,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('column', true);
 
     column
-        .each(function(d) {
-            var wantedTickCount = d.model.height / d.model.tickDistance;
-            var scale = d.domainScale;
-            var sdom = scale.domain();
-            var texts = d.ticktext;
-            d3.select(this)
-                .call(d3.svg.axis()
-                    .orient('left')
-                    .tickSize(4)
-                    .outerTickSize(2)
-                    .ticks(wantedTickCount, d.tickFormat) // works for continuous scales only...
-                    .tickValues(d.ordinal ? // and this works for ordinal scales
-                        sdom.map(function(d, i) {return texts && texts[i] || d;}) :
-                        null)
-                    .tickFormat(d.ordinal ? function(d) {return d;} : null)
-                    .scale(scale));
-            Drawing.font(column.selectAll('text'), d.model.tickFont);
-        });
-
-    column
         .selectAll('.domain, .tick>line')
         .attr('fill', 'none')
         .attr('stroke', 'black')
@@ -599,40 +571,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .text(function(d) {return d.label;})
         .each(function(d) {Drawing.font(columnTitle, d.model.labelFont);});
 
-    var columnExtent = columnOverlays.selectAll('.columnExtent')
-        .data(repeat, keyFun);
-
-    columnExtent.enter()
-        .append('g')
-        .classed('columnExtent', true);
-
-    var columnExtentTop = columnExtent.selectAll('.columnExtentTop')
-        .data(repeat, keyFun);
-
-    columnExtentTop.enter()
-        .append('g')
-        .classed('columnExtentTop', true);
-
-    columnExtentTop
-        .attr('transform', 'translate(' + 0 + ',' + -c.columnExtentOffset + ')');
-
-    var columnExtentTopText = columnExtentTop.selectAll('.columnExtentTopText')
-        .data(repeat, keyFun);
-
-    function formatExtreme(d) {
-        return d.ordinal ? function() {return '';} : d3.format(d.tickFormat);
-    }
-
-    columnExtentTopText.enter()
-        .append('text')
-        .classed('columnExtentTopText', true)
-        .attr('alignment-baseline', 'after-edge')
-        .call(styleExtentTexts);
-
-    columnExtentTopText
-        .text(function(d) {return formatExtreme(d)(d.domainScale.domain().slice(-1)[0]);})
-        .each(function(d) {Drawing.font(columnExtentTopText, d.model.rangeFont);});
-
     var columnCells = columnOverlays.selectAll('.columnCells')
         .data(repeat, keyFun);
 
@@ -666,29 +604,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     columnCellText
         .text(function(d) {return d.value;})
         .each(function(d) {Drawing.font(columnCellText, d.model.rangeFont);});
-
-    var columnExtentBottom = columnExtent.selectAll('.columnExtentBottom')
-        .data(repeat, keyFun);
-
-    columnExtentBottom.enter()
-        .append('g')
-        .classed('columnExtentBottom', true);
-
-    columnExtentBottom
-        .attr('transform', function(d) {return 'translate(' + 0 + ',' + (d.model.height + c.columnExtentOffset) + ')';});
-
-    var columnExtentBottomText = columnExtentBottom.selectAll('.columnExtentBottomText')
-        .data(repeat, keyFun);
-
-    columnExtentBottomText.enter()
-        .append('text')
-        .classed('columnExtentBottomText', true)
-        .attr('alignment-baseline', 'before-edge')
-        .call(styleExtentTexts);
-
-    columnExtentBottomText
-        .text(function(d) {return formatExtreme(d)(d.domainScale.domain()[0]);})
-        .each(function(d) {Drawing.font(columnExtentBottomText, d.model.rangeFont);});
 
     var columnBrush = columnOverlays.selectAll('.columnBrush')
         .data(repeat, keyFun);
