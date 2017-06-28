@@ -18,7 +18,7 @@
     "line": {
       "showscale": true,
       "reversescale": true,
-      "colorscale": "Jet",
+      "colorscale": "Viridis",
       "valueformat": ",.2r",
       "cmin": -4000,
       "cmax": -100
