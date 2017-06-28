@@ -8,7 +8,7 @@
 
 'use strict';
 
-var table = require('./parcoords');
+var table = require('./render');
 
 module.exports = function plot(gd, cdTable) {
 
