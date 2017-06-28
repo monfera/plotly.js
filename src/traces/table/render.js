@@ -8,7 +8,6 @@
 
 'use strict';
 
-var lineLayerMaker = require('./lines');
 var c = require('./constants');
 var Lib = require('../../lib');
 var d3 = require('d3');
@@ -234,44 +233,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     var domainBrushing = false;
     var linePickActive = true;
 
-    function enterSvgDefs(root) {
-        var defs = root.selectAll('defs')
-            .data(repeat, keyFun);
-
-        defs.enter()
-            .append('defs');
-
-        var filterBarPattern = defs.selectAll('#filterBarPattern')
-            .data(repeat, keyFun);
-
-        filterBarPattern.enter()
-            .append('pattern')
-            .attr('id', 'filterBarPattern')
-            .attr('patternUnits', 'userSpaceOnUse');
-
-        filterBarPattern
-            .attr('x', -c.bar.width)
-            .attr('width', c.bar.capturewidth)
-            .attr('height', function(d) {return d.model.height;});
-
-        var filterBarPatternGlyph = filterBarPattern.selectAll('rect')
-            .data(repeat, keyFun);
-
-        filterBarPatternGlyph.enter()
-            .append('rect')
-            .attr('shape-rendering', 'crispEdges');
-
-        filterBarPatternGlyph
-            .attr('height', function(d) {return d.model.height;})
-            .attr('width', c.bar.width)
-            .attr('x', c.bar.width / 2)
-            .attr('fill', c.bar.fillcolor)
-            .attr('fill-opacity', c.bar.fillopacity)
-            .attr('stroke', c.bar.strokecolor)
-            .attr('stroke-opacity', c.bar.strokeopacity)
-            .attr('stroke-width', c.bar.strokewidth);
-    }
-
     var vm = styledData
         .filter(function(d) { return unwrap(d).trace.visible; })
         .map(model.bind(0, layout))
@@ -292,8 +253,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .style('left', 0)
         .style('overflow', 'visible')
         .style('shape-rendering', 'crispEdges')
-        .style('pointer-events', 'none')
-        .call(enterSvgDefs);
+        .style('pointer-events', 'none');
 
     tableControlOverlay
         .attr('width', function(d) {return d.model.width + d.model.pad.l + d.model.pad.r;})
