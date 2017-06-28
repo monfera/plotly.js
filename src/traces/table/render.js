@@ -192,6 +192,7 @@ function viewModel(model) {
             valueFormat: dimension.valueformat,
             tickvals: dimension.tickvals,
             ticktext: dimension.ticktext,
+            font: dimension.font,
             ordinal: !!dimension.tickvals,
             scatter: c.scatter || dimension.scatter,
             xIndex: i,
@@ -446,6 +447,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .append('g')
         .classed('columnCells', true);
 
+    columnCells.each(function(d) {Drawing.font(d3.select(this), d.font);});
+
     var columnCell = columnCells.selectAll('.columnCell')
         .data(function(d) {return d.values.map(function(v, i) {return {key: i, dimension: d, model: d.model, value: v};});}, keyFun);
 
@@ -466,6 +469,5 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('text-anchor', 'end');
 
     columnCellText
-        .text(function(d) {return d3.format(d.dimension.valueFormat)(d.value);})
-        .each(function(d) {Drawing.font(columnCellText, d.model.rangeFont);});
+        .text(function(d) {return d3.format(d.dimension.valueFormat)(d.value);});
 };

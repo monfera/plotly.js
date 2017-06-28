@@ -27,7 +27,7 @@ function handleLineDefaults(traceIn, traceOut, defaultColor, layout, coerce) {
     }
 }
 
-function dimensionsDefaults(traceIn, traceOut) {
+function dimensionsDefaults(traceIn, traceOut, fontDflt) {
     var dimensionsIn = traceIn.dimensions || [],
         dimensionsOut = traceOut.dimensions = [];
 
@@ -60,7 +60,7 @@ function dimensionsDefaults(traceIn, traceOut) {
             coerce('ticktext');
             coerce('valueformat');
             coerce('range');
-            coerce('constraintrange');
+            Lib.coerceFont(coerce, 'font', fontDflt);
 
             commonLength = Math.min(commonLength, dimensionOut.values.length);
         }
@@ -86,7 +86,15 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
         return Lib.coerce(traceIn, traceOut, attributes, attr, dflt);
     }
 
-    var dimensions = dimensionsDefaults(traceIn, traceOut);
+    // make default font size 10px,
+    // scale linearly with global font size
+    var fontDflt = {
+        family: layout.font.family,
+        size: Math.round(layout.font.size * (10 / 12)),
+        color: layout.font.color
+    };
+
+    var dimensions = dimensionsDefaults(traceIn, traceOut, fontDflt);
 
     handleLineDefaults(traceIn, traceOut, defaultColor, layout, coerce);
 
@@ -97,15 +105,5 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
         traceOut.visible = false;
     }
 
-    // make default font size 10px,
-    // scale linearly with global font size
-    var fontDflt = {
-        family: layout.font.family,
-        size: Math.round(layout.font.size * (10 / 12)),
-        color: layout.font.color
-    };
-
     Lib.coerceFont(coerce, 'labelfont', fontDflt);
-    Lib.coerceFont(coerce, 'tickfont', fontDflt);
-    Lib.coerceFont(coerce, 'rangefont', fontDflt);
 };

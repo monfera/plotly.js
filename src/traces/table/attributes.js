@@ -51,12 +51,6 @@ module.exports = {
     labelfont: extendFlat({}, fontAttrs, {
         description: 'Sets the font for the `dimension` labels.'
     }),
-    tickfont: extendFlat({}, fontAttrs, {
-        description: 'Sets the font for the `dimension` tick values.'
-    }),
-    rangefont: extendFlat({}, fontAttrs, {
-        description: 'Sets the font for the `dimension` range values.'
-    }),
 
     dimensions: {
         _isLinkedToArray: 'dimension',
@@ -67,6 +61,9 @@ module.exports = {
         },
         tickvals: axesAttrs.tickvals,
         ticktext: axesAttrs.ticktext,
+        font: extendFlat({}, fontAttrs, {
+            description: 'Sets the font for the `dimension` values.'
+        }),
         valueformat: {
             valType: 'string',
             dflt: '3s',
@@ -91,20 +88,8 @@ module.exports = {
                 {valType: 'number'}
             ],
             description: [
-                'The domain range that represents the full, shown axis extent. Defaults to the `values` extent.',
+                'The domain range for the purpose of coloring. Defaults to the `values` extent.',
                 'Must be an array of `[fromValue, toValue]` with finite numbers as elements.'
-            ].join(' ')
-        },
-        constraintrange: {
-            valType: 'info_array',
-            role: 'info',
-            items: [
-                {valType: 'number'},
-                {valType: 'number'}
-            ],
-            description: [
-                'The domain range to which the filter on the dimension is constrained. Must be an array',
-                'of `[fromValue, toValue]` with finite numbers as elements.'
             ].join(' ')
         },
         values: {
