@@ -9,14 +9,8 @@
 'use strict';
 
 module.exports = {
-    maxDimensionCount: 60, // this cannot be increased without WebGL code refactoring
+    maxDimensionCount: 60,
     overdrag: 45,
-    verticalPadding: 2, // otherwise, horizontal lines on top or bottom are of lower width
-    tickDistance: 50,
-    canvasPixelRatio: 1,
-    blockLineCount: 5000,
-    scatter: false,
-    layers: ['contextLineLayer', 'focusLineLayer', 'pickLineLayer'],
     columnTitleOffset: 28,
     columnExtentOffset: 10,
     bar: {
