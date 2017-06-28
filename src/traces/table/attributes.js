@@ -69,7 +69,7 @@ module.exports = {
         ticktext: axesAttrs.ticktext,
         tickformat: {
             valType: 'string',
-            dflt: '3s',
+            dflt: ',',
             role: 'style',
             description: [
                 'Sets the tick label formatting rule using d3 formatting mini-language',

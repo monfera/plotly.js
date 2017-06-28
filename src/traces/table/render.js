@@ -447,7 +447,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('columnCells', true);
 
     var columnCell = columnCells.selectAll('.columnCell')
-        .data(function(d) {return d.values.map(function(v, i) {return {key: i, model: d.model, value: v};});}, keyFun);
+        .data(function(d) {return d.values.map(function(v, i) {return {key: i, dimension: d, model: d.model, value: v};});}, keyFun);
 
     columnCell.enter()
         .append('g')
@@ -459,10 +459,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     var columnCellText = columnCell.selectAll('.columnCellText')
         .data(repeat, keyFun);
 
-    function formatCell(d) {
-        return d.ordinal ? function() {return '';} : d3.format(d.tickFormat);
-    }
-
     columnCellText.enter()
         .append('text')
         .classed('columnCellText', true)
@@ -470,6 +466,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('text-anchor', 'end');
 
     columnCellText
-        .text(function(d) {return d.value;})
+        .text(function(d) {return d3.format(d.dimension.tickFormat)(d.value);})
         .each(function(d) {Drawing.font(columnCellText, d.model.rangeFont);});
 };
