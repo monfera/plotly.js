@@ -14,7 +14,6 @@ var Lib = require('../../lib');
 var d3 = require('d3');
 var Drawing = require('../../components/drawing');
 
-
 function keyFun(d) {return d.key;}
 
 function repeat(d) {return [d];}
@@ -286,31 +285,31 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .map(model.bind(0, layout))
         .map(viewModel);
 
-    root.selectAll('.parcoords-line-layers').remove();
+    root.selectAll('.table-line-layers').remove();
 
-    var parcoordsLineLayers = root.selectAll('.parcoords-line-layers')
+    var tableLineLayers = root.selectAll('.table-line-layers')
         .data(vm, keyFun);
 
-    parcoordsLineLayers.enter()
+    tableLineLayers.enter()
         .insert('div', '.' + svg.attr('class').split(' ').join(' .')) // not hardcoding .main-svg
-        .classed('parcoords-line-layers', true)
+        .classed('table-line-layers', true)
         .style('box-sizing', 'content-box');
 
-    parcoordsLineLayers
+    tableLineLayers
         .style('transform', function(d) {
             return 'translate(' + (d.model.translateX - c.overdrag) + 'px,' + d.model.translateY + 'px)';
         });
 
-    var parcoordsLineLayer = parcoordsLineLayers.selectAll('.parcoords-lines')
+    var tableLineLayer = tableLineLayers.selectAll('.table-lines')
         .data(lineLayerModel, keyFun);
 
     var tweakables = {renderers: [], dimensions: []};
 
     var lastHovered = null;
 
-    parcoordsLineLayer.enter()
+    tableLineLayer.enter()
         .append('canvas')
-        .attr('class', function(d) {return 'parcoords-lines ' + (d.context ? 'context' : d.pick ? 'pick' : 'focus');})
+        .attr('class', function(d) {return 'table-lines ' + (d.context ? 'context' : d.pick ? 'pick' : 'focus');})
         .style('box-sizing', 'content-box')
         .style('float', 'left')
         .style('clear', 'both')
@@ -353,7 +352,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             }
         });
 
-    parcoordsLineLayer
+    tableLineLayer
         .style('margin', function(d) {
             var p = d.model.pad;
             return p.t + 'px ' + p.r + 'px ' + p.b + 'px ' + p.l + 'px';
@@ -365,14 +364,14 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .style('opacity', function(d) {return d.pick ? 0.01 : 1;});
 
     svg.style('background', 'rgba(255, 255, 255, 0)');
-    var parcoordsControlOverlay = svg.selectAll('.parcoords')
+    var tableControlOverlay = svg.selectAll('.table')
         .data(vm, keyFun);
 
-    parcoordsControlOverlay.exit().remove();
+    tableControlOverlay.exit().remove();
 
-    parcoordsControlOverlay.enter()
+    tableControlOverlay.enter()
         .append('g')
-        .classed('parcoords', true)
+        .classed('table', true)
         .attr('overflow', 'visible')
         .style('box-sizing', 'content-box')
         .style('position', 'absolute')
@@ -382,32 +381,32 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .style('pointer-events', 'none')
         .call(enterSvgDefs);
 
-    parcoordsControlOverlay
+    tableControlOverlay
         .attr('width', function(d) {return d.model.width + d.model.pad.l + d.model.pad.r;})
         .attr('height', function(d) {return d.model.height + d.model.pad.t + d.model.pad.b;})
         .attr('transform', function(d) {
             return 'translate(' + d.model.translateX + ',' + d.model.translateY + ')';
         });
 
-    var parcoordsControlView = parcoordsControlOverlay.selectAll('.parcoordsControlView')
+    var tableControlView = tableControlOverlay.selectAll('.tableControlView')
         .data(repeat, keyFun);
 
-    parcoordsControlView.enter()
+    tableControlView.enter()
         .append('g')
-        .classed('parcoordsControlView', true)
+        .classed('tableControlView', true)
         .style('box-sizing', 'content-box');
 
-    parcoordsControlView
+    tableControlView
         .attr('transform', function(d) {return 'translate(' + d.model.pad.l + ',' + d.model.pad.t + ')';});
 
-    var yAxis = parcoordsControlView.selectAll('.yAxis')
+    var yAxis = tableControlView.selectAll('.yAxis')
         .data(function(vm) {return vm.dimensions;}, keyFun);
 
     function someFiltersActive(view) {
         return view.dimensions.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
     }
 
-    function updatePanelLayoutParcoords(yAxis, vm) {
+    function updatePanelLayouttable(yAxis, vm) {
         var panels = vm.panels || (vm.panels = []);
         var yAxes = yAxis.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
         var panelCount = yAxes.length - 1;
@@ -450,7 +449,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     }
 
     function updatePanelLayout(yAxis, vm) {
-        return (c.scatter ? updatePanelLayoutScatter : updatePanelLayoutParcoords)(yAxis, vm);
+        return (c.scatter ? updatePanelLayoutScatter : updatePanelLayouttable)(yAxis, vm);
     }
 
     yAxis.enter()
@@ -458,11 +457,11 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('yAxis', true)
         .each(function(d) {tweakables.dimensions.push(d);});
 
-    parcoordsControlView.each(function(vm) {
+    tableControlView.each(function(vm) {
         updatePanelLayout(yAxis, vm);
     });
 
-    parcoordsLineLayer
+    tableLineLayer
         .each(function(d) {
             d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.dimensions, d.viewModel.panels, d.model.unitToColor, d.context, d.pick, c.scatter);
             d.viewModel[d.key] = d.lineLayer;
