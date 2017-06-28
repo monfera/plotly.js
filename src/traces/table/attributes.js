@@ -29,7 +29,7 @@ module.exports = {
             ],
             dflt: [0, 1],
             description: [
-                'Sets the horizontal domain of this `parcoords` trace',
+                'Sets the horizontal domain of this `table` trace',
                 '(in plot fraction).'
             ].join(' ')
         },
@@ -42,7 +42,7 @@ module.exports = {
             ],
             dflt: [0, 1],
             description: [
-                'Sets the vertical domain of this `parcoords` trace',
+                'Sets the vertical domain of this `table` trace',
                 '(in plot fraction).'
             ].join(' ')
         }
@@ -117,13 +117,13 @@ module.exports = {
                 'will be truncated). Each value must be a finite number.'
             ].join(' ')
         },
-        description: 'The dimensions (variables) of the parallel coordinates chart. 2..60 dimensions are supported.'
+        description: 'The dimensions (variables) of the table view.'
     },
 
     line: extendFlat({},
 
-        // the default autocolorscale isn't quite usable for parcoords due to context ambiguity around 0 (grey, off-white)
-        // autocolorscale therefore defaults to false too, to avoid being overridden by the  blue-white-red autocolor palette
+        // the default autocolorscale is set to Viridis - autocolorscale therefore defaults to false too,
+        // to avoid being overridden by the blue-white-red autocolor palette
         extendDeep(
             {},
             colorAttributes('line'),
@@ -145,7 +145,7 @@ module.exports = {
                             'In case `colorscale` is unspecified or `autocolorscale` is true, the default ',
                             'palette will be chosen according to whether numbers in the `color` array are',
                             'all positive, all negative or mixed.',
-                            'The default value is false, so that `parcoords` colorscale can default to `Viridis`.'
+                            'The default value is false, so that `table` colorscale can default to `Viridis`.'
                         ].join(' ')
                     }
                 )

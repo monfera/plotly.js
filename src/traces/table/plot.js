@@ -8,9 +8,9 @@
 
 'use strict';
 
-var parcoords = require('./parcoords');
+var table = require('./parcoords');
 
-module.exports = function plot(gd, cdparcoords) {
+module.exports = function plot(gd, cdTable) {
 
     var fullLayout = gd._fullLayout;
     var svg = fullLayout._paper;
@@ -21,7 +21,7 @@ module.exports = function plot(gd, cdparcoords) {
 
     var size = fullLayout._size;
 
-    cdparcoords.forEach(function(d, i) {
+    cdTable.forEach(function(d, i) {
         gdDimensions[i] = gd.data[i].dimensions;
         gdDimensionsOriginalOrder[i] = gd.data[i].dimensions.slice();
     });
@@ -95,10 +95,10 @@ module.exports = function plot(gd, cdparcoords) {
         gd.emit('plotly_restyle');
     };
 
-    parcoords(
+    table(
         root,
         svg,
-        cdparcoords,
+        cdTable,
         {
             width: size.w,
             height: size.h,

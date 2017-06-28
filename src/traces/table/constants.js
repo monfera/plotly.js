@@ -8,7 +8,6 @@
 
 'use strict';
 
-
 module.exports = {
     maxDimensionCount: 60, // this cannot be increased without WebGL code refactoring
     overdrag: 45,

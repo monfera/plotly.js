@@ -12,7 +12,6 @@ var hasColorscale = require('../../components/colorscale/has_colorscale');
 var calcColorscale = require('../../components/colorscale/calc');
 var Lib = require('../../lib');
 
-
 module.exports = function calc(gd, trace) {
     var cs = !!trace.line.colorscale && Lib.isArray(trace.line.color);
     var color = cs ? trace.line.color : Array.apply(0, Array(trace.dimensions.reduce(function(p, n) {return Math.max(p, n.values.length);}, 0))).map(function() {return 0.5;});

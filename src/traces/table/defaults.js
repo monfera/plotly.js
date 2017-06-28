@@ -35,7 +35,7 @@ function dimensionsDefaults(traceIn, traceOut) {
     var commonLength = Infinity;
 
     if(dimensionsIn.length > maxDimensionCount) {
-        Lib.log('parcoords traces support up to ' + maxDimensionCount + ' dimensions at the moment');
+        Lib.log('table views support up to ' + maxDimensionCount + ' dimensions at the moment');
         dimensionsIn.splice(maxDimensionCount);
     }
 

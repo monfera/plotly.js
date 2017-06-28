@@ -24,10 +24,10 @@ exports.plot = function(gd) {
 };
 
 exports.clean = function(newFullData, newFullLayout, oldFullData, oldFullLayout) {
-    var hadParcoords = (oldFullLayout._has && oldFullLayout._has('table'));
-    var hasParcoords = (newFullLayout._has && newFullLayout._has('table'));
+    var hadTable = (oldFullLayout._has && oldFullLayout._has('table'));
+    var hasTable = (newFullLayout._has && newFullLayout._has('table'));
 
-    if(hadParcoords && !hasParcoords) {
+    if(hadTable && !hasTable) {
         oldFullLayout._paperdiv.selectAll('.parcoords-line-layers').remove();
         oldFullLayout._paperdiv.selectAll('.parcoords-line-layers').remove();
         oldFullLayout._paperdiv.selectAll('.parcoords').remove();
