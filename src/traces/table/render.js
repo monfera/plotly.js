@@ -237,14 +237,6 @@ function styleExtentTexts(selection) {
         .style('user-select', 'none');
 }
 
-function styleCellTexts(selection) {
-    selection
-        .classed('columnExtentText', true)
-        .attr('text-anchor', 'middle')
-        .style('cursor', 'default')
-        .style('user-select', 'none');
-}
-
 module.exports = function(root, svg, styledData, layout, callbacks) {
 
     var domainBrushing = false;
@@ -649,14 +641,14 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('columnCells', true);
 
     var columnCell = columnCells.selectAll('.columnCell')
-        .data(repeat, keyFun);
+        .data(function(d) {return d.values.map(function(v, i) {return {key: i, model: d.model, value: v};});}, keyFun);
 
     columnCell.enter()
         .append('g')
         .classed('columnCell', true);
 
     columnCell
-        .attr('transform', 'translate(' + 0 + ',' + 0 + ')');
+        .attr('transform', function(d, i) {return 'translate(' + 0 + ',' + i * 20 + ')';});
 
     var columnCellText = columnCell.selectAll('.columnCellText')
         .data(repeat, keyFun);
@@ -668,11 +660,11 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     columnCellText.enter()
         .append('text')
         .classed('columnCellText', true)
-        .attr('alignment-baseline', 'after-edge')
-        .call(styleCellTexts);
+        .attr('alignment-baseline', 'middle')
+        .attr('text-anchor', 'end');
 
     columnCellText
-        .text(function(d) {return formatCell(d)(d.domainScale.domain().slice(-1)[0]);})
+        .text(function(d) {return d.value;})
         .each(function(d) {Drawing.font(columnCellText, d.model.rangeFont);});
 
     var columnExtentBottom = columnExtent.selectAll('.columnExtentBottom')
