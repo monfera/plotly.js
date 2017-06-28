@@ -299,61 +299,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     var lastHovered = null;
 
-    tableLineLayer.enter()
-        .append('canvas')
-        .attr('class', function(d) {return 'table-lines ' + (d.context ? 'context' : d.pick ? 'pick' : 'focus');})
-        .style('box-sizing', 'content-box')
-        .style('float', 'left')
-        .style('clear', 'both')
-        .style('left', 0)
-        .style('overflow', 'visible')
-        .style('position', function(d, i) {return i > 0 ? 'absolute' : 'absolute';})
-        .filter(function(d) {return d.pick;})
-        .on('mousemove', function(d) {
-            if(linePickActive && d.lineLayer && callbacks && callbacks.hover) {
-                var event = d3.event;
-                var cw = this.width;
-                var ch = this.height;
-                var pointer = d3.mouse(this);
-                var x = pointer[0];
-                var y = pointer[1];
-
-                if(x < 0 || y < 0 || x >= cw || y >= ch) {
-                    return;
-                }
-                var pixel = d.lineLayer.readPixel(x, ch - 1 - y);
-                var found = pixel[3] !== 0;
-                // inverse of the calcPickColor in `lines.js`; detailed comment there
-                var curveNumber = found ? pixel[2] + 256 * (pixel[1] + 256 * pixel[0]) : null;
-                var eventData = {
-                    x: x,
-                    y: y,
-                    clientX: event.clientX,
-                    clientY: event.clientY,
-                    dataIndex: d.model.key,
-                    curveNumber: curveNumber
-                };
-                if(curveNumber !== lastHovered) { // don't unnecessarily repeat the same hit (or miss)
-                    if(found) {
-                        callbacks.hover(eventData);
-                    } else if(callbacks.unhover) {
-                        callbacks.unhover(eventData);
-                    }
-                    lastHovered = curveNumber;
-                }
-            }
-        });
-
-    tableLineLayer
-        .style('margin', function(d) {
-            var p = d.model.pad;
-            return p.t + 'px ' + p.r + 'px ' + p.b + 'px ' + p.l + 'px';
-        })
-        .attr('width', function(d) {return d.model.canvasWidth;})
-        .attr('height', function(d) {return d.model.canvasHeight;})
-        .style('width', function(d) {return (d.model.width + 2 * c.overdrag) + 'px';})
-        .style('height', function(d) {return d.model.height + 'px';})
-        .style('opacity', function(d) {return d.pick ? 0.01 : 1;});
 
     svg.style('background', 'rgba(255, 255, 255, 0)');
     var tableControlOverlay = svg.selectAll('.table')
@@ -453,14 +398,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         updatePanelLayout(yColumn, vm);
     });
 
-    tableLineLayer
-        .each(function(d) {
-            d.lineLayer = lineLayerMaker(this, d.model.lines, d.model.canvasWidth, d.model.canvasHeight, d.viewModel.dimensions, d.viewModel.panels, d.model.unitToColor, d.context, d.pick, c.scatter);
-            d.viewModel[d.key] = d.lineLayer;
-            tweakables.renderers.push(function() {d.lineLayer.render(d.viewModel.panels, true);});
-            d.lineLayer.render(d.viewModel.panels, !d.context);
-        });
-
     yColumn
         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
 
@@ -489,8 +426,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                 d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                 yColumn.each(function(dd, i, ii) {if(ii === d.parent.key) p.dimensions[i] = dd;});
-                p.contextLineLayer && p.contextLineLayer.render(p.panels, false, !someFiltersActive(p));
-                p.focusLineLayer.render && p.focusLineLayer.render(p.panels);
             })
             .on('dragend', function(d) {
                 var p = d.parent;
@@ -505,9 +440,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 updatePanelLayout(yColumn, p);
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                p.contextLineLayer && p.contextLineLayer.render(p.panels, false, !someFiltersActive(p));
-                p.focusLineLayer && p.focusLineLayer.render(p.panels);
-                p.pickLineLayer && p.pickLineLayer.render(p.panels, true);
                 linePickActive = true;
 
                 if(callbacks && callbacks.axesMoved) {
