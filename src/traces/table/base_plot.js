@@ -10,22 +10,22 @@
 
 var d3 = require('d3');
 var Plots = require('../../plots/plots');
-var parcoordsPlot = require('./plot');
+var tablePlot = require('./plot');
 var xmlnsNamespaces = require('../../constants/xmlns_namespaces');
 var c = require('./constants');
 
-exports.name = 'parcoords';
+exports.name = 'table';
 
 exports.attr = 'type';
 
 exports.plot = function(gd) {
-    var calcData = Plots.getSubplotCalcData(gd.calcdata, 'parcoords', 'parcoords');
-    if(calcData.length) parcoordsPlot(gd, calcData);
+    var calcData = Plots.getSubplotCalcData(gd.calcdata, 'table', 'table');
+    if(calcData.length) tablePlot(gd, calcData);
 };
 
 exports.clean = function(newFullData, newFullLayout, oldFullData, oldFullLayout) {
-    var hadParcoords = (oldFullLayout._has && oldFullLayout._has('parcoords'));
-    var hasParcoords = (newFullLayout._has && newFullLayout._has('parcoords'));
+    var hadParcoords = (oldFullLayout._has && oldFullLayout._has('table'));
+    var hasParcoords = (newFullLayout._has && newFullLayout._has('table'));
 
     if(hadParcoords && !hasParcoords) {
         oldFullLayout._paperdiv.selectAll('.parcoords-line-layers').remove();

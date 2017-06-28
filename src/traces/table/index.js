@@ -8,24 +8,24 @@
 
 'use strict';
 
-var Parcoords = {};
+var Table = {};
 
-Parcoords.attributes = require('./attributes');
-Parcoords.supplyDefaults = require('./defaults');
-Parcoords.calc = require('./calc');
-Parcoords.plot = require('./plot');
-Parcoords.colorbar = require('./colorbar');
+Table.attributes = require('./attributes');
+Table.supplyDefaults = require('./defaults');
+Table.calc = require('./calc');
+Table.plot = require('./plot');
+Table.colorbar = require('./colorbar');
 
-Parcoords.moduleType = 'trace';
-Parcoords.name = 'table';
-Parcoords.basePlotModule = require('./base_plot');
-Parcoords.categories = [];
-Parcoords.meta = {
+Table.moduleType = 'trace';
+Table.name = 'table';
+Table.basePlotModule = require('./base_plot');
+Table.categories = [];
+Table.meta = {
     description: [
-        'Parallel coordinates for multidimensional exploratory data analysis.',
+        'Table view for multidimensional exploratory data analysis.',
         'The samples are specified in `dimensions`.',
         'The colors are set in `line.color`.'
     ].join(' ')
 };
 
-module.exports = Parcoords;
+module.exports = Table;
