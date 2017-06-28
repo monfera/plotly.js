@@ -469,5 +469,14 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('text-anchor', 'end');
 
     columnCellText
-        .text(function(d) {return d3.format(d.dimension.valueFormat)(d.value);});
+        .text(function(d) {
+            const starSchema = d.dimension.ticktext && d.dimension.tickvals
+            if(starSchema) {
+                var lookup = {}
+                for(var i = 0; i < d.dimension.ticktext.length; i++) {
+                    lookup[d.dimension.tickvals[i]] = d.dimension.ticktext[i]
+                }
+            }
+            return starSchema ? lookup[d.value] : d3.format(d.dimension.valueFormat)(d.value);
+        });
 };
