@@ -189,7 +189,7 @@ function viewModel(model) {
         return {
             key: key,
             label: dimension.label,
-            tickFormat: dimension.tickformat,
+            valueFormat: dimension.valueformat,
             tickvals: dimension.tickvals,
             ticktext: dimension.ticktext,
             ordinal: !!dimension.tickvals,
@@ -466,6 +466,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('text-anchor', 'end');
 
     columnCellText
-        .text(function(d) {return d3.format(d.dimension.tickFormat)(d.value);})
+        .text(function(d) {return d3.format(d.dimension.valueFormat)(d.value);})
         .each(function(d) {Drawing.font(columnCellText, d.model.rangeFont);});
 };

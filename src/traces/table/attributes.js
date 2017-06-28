@@ -67,7 +67,7 @@ module.exports = {
         },
         tickvals: axesAttrs.tickvals,
         ticktext: axesAttrs.ticktext,
-        tickformat: {
+        valueformat: {
             valType: 'string',
             dflt: ',',
             role: 'style',

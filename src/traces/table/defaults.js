@@ -58,7 +58,7 @@ function dimensionsDefaults(traceIn, traceOut) {
             coerce('label');
             coerce('tickvals');
             coerce('ticktext');
-            coerce('tickformat');
+            coerce('valueformat');
             coerce('range');
             coerce('constraintrange');
 
