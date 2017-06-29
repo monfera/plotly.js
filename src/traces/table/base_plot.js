@@ -11,8 +11,6 @@
 var d3 = require('d3');
 var Plots = require('../../plots/plots');
 var tablePlot = require('./plot');
-var xmlnsNamespaces = require('../../constants/xmlns_namespaces');
-var c = require('./constants');
 
 exports.name = 'table';
 

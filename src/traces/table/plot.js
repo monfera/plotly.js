@@ -26,23 +26,6 @@ module.exports = function plot(gd, cdTable) {
         gdDimensionsOriginalOrder[i] = gd.data[i].dimensions.slice();
     });
 
-    var filterChanged = function(i, originalDimensionIndex, newRange) {
-
-        // Have updated `constraintrange` data on `gd.data` and raise `Plotly.restyle` event
-        // without having to incur heavy UI blocking due to an actual `Plotly.restyle` call
-
-        var gdDimension = gdDimensionsOriginalOrder[i][originalDimensionIndex];
-        var gdConstraintRange = gdDimension.constraintrange;
-
-        if(!gdConstraintRange || gdConstraintRange.length !== 2) {
-            gdConstraintRange = gdDimension.constraintrange = [];
-        }
-        gdConstraintRange[0] = newRange[0];
-        gdConstraintRange[1] = newRange[1];
-
-        gd.emit('plotly_restyle');
-    };
-
     var hover = function(eventData) {
         gd.emit('plotly_hover', eventData);
     };
@@ -51,7 +34,7 @@ module.exports = function plot(gd, cdTable) {
         gd.emit('plotly_unhover', eventData);
     };
 
-    var axesMoved = function(i, visibleIndices) {
+    var columnMoved = function(i, visibleIndices) {
 
         // Have updated order data on `gd.data` and raise `Plotly.restyle` event
         // without having to incur heavy UI blocking due to an actual `Plotly.restyle` call
@@ -110,9 +93,8 @@ module.exports = function plot(gd, cdTable) {
             }
         },
         {
-            filterChanged: filterChanged,
             hover: hover,
             unhover: unhover,
-            axesMoved: axesMoved
+            columnMoved: columnMoved
         });
 };

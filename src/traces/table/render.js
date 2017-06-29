@@ -122,9 +122,7 @@ function model(layout, d, i) {
         domain = trace.domain,
         dimensions = trace.dimensions,
         width = layout.width,
-        labelFont = trace.labelfont,
-        tickFont = trace.tickfont,
-        rangeFont = trace.rangefont;
+        labelFont = trace.labelfont;
 
     var lines = Lib.extendDeep({}, line, {
         color: lineColor.map(domainToUnitScale({values: lineColor, range: [line.cmin, line.cmax]})),
@@ -147,8 +145,6 @@ function model(layout, d, i) {
         unitToColor: unitToColorScale(cscale),
         lines: lines,
         labelFont: labelFont,
-        tickFont: tickFont,
-        rangeFont: rangeFont,
         translateX: domain.x[0] * width,
         translateY: layout.height - domain.y[1] * layout.height,
         pad: pad,
@@ -208,7 +204,7 @@ function viewModel(model) {
             domainScale: domainScale(height, c.verticalPadding, dimension),
             ordinalScale: ordinalScale(dimension),
             domainToUnitScale: domainToUnit,
-            filter: dimension.constraintrange ? dimension.constraintrange.map(domainToUnit) : [0, 1],
+            filter: [0, 1],
             parent: viewModel,
             model: model
         };
@@ -277,20 +273,16 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     var yColumn = tableControlView.selectAll('.yColumn')
         .data(function(vm) {return vm.dimensions;}, keyFun);
 
-    function someFiltersActive(view) {
-        return view.dimensions.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
-    }
-
     function updatePanelLayouttable(yColumn, vm) {
         var panels = vm.panels || (vm.panels = []);
-        var yAxes = yColumn.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
-        var panelCount = yAxes.length - 1;
+        var yColumns = yColumn.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
+        var panelCount = yColumns.length - 1;
         var rowCount = 1;
         for(var row = 0; row < rowCount; row++) {
             for(var p = 0; p < panelCount; p++) {
                 var panel = panels[p + row * panelCount] || (panels[p + row * panelCount] = {});
-                var dim1 = yAxes[p];
-                var dim2 = yAxes[p + 1];
+                var dim1 = yColumns[p];
+                var dim2 = yColumns[p + 1];
                 panel.dim1 = dim1;
                 panel.dim2 = dim2;
                 panel.canvasX = dim1.canvasX;
@@ -304,15 +296,15 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     function updatePanelLayoutScatter(yColumn, vm) {
         var panels = vm.panels || (vm.panels = []);
-        var yAxes = yColumn.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
-        var panelCount = yAxes.length - 1;
+        var yColumns = yColumn.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
+        var panelCount = yColumns.length - 1;
         var rowCount = panelCount;
         for(var row = 0; row < panelCount; row++) {
             for(var p = 0; p < panelCount; p++) {
                 var panel = panels[p + row * panelCount] || (panels[p + row * panelCount] = {});
-                var dim1 = yAxes[p];
-                var dim2 = yAxes[p + 1];
-                panel.dim1 = yAxes[row + 1];
+                var dim1 = yColumns[p];
+                var dim2 = yColumns[p + 1];
+                panel.dim1 = yColumns[row + 1];
                 panel.dim2 = dim2;
                 panel.canvasX = dim1.canvasX;
                 panel.panelSizeX = dim2.canvasX - dim1.canvasX;
@@ -379,8 +371,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                 linePickActive = true;
 
-                if(callbacks && callbacks.axesMoved) {
-                    callbacks.axesMoved(p.key, p.dimensions.map(function(dd) {return dd.crossfilterDimensionIndex;}));
+                if(callbacks && callbacks.columnsMoved) {
+                    callbacks.columnsMoved(p.key, p.dimensions.map(function(dd) {return dd.crossfilterDimensionIndex;}));
                 }
             })
         );
