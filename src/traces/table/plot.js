@@ -22,8 +22,8 @@ module.exports = function plot(gd, cdTable) {
     var size = fullLayout._size;
 
     cdTable.forEach(function(d, i) {
-        gdDimensions[i] = gd.data[i].dimensions;
-        gdDimensionsOriginalOrder[i] = gd.data[i].dimensions.slice();
+        gdDimensions[i] = gd.data[i].labels;
+        gdDimensionsOriginalOrder[i] = gd.data[i].labels.slice();
     });
 
     var hover = function(eventData) {
@@ -60,7 +60,7 @@ module.exports = function plot(gd, cdTable) {
         }
 
         // drag&drop sorting of the visible dimensions
-        var orig = sorter(gdDimensionsOriginalOrder[i].filter(visible));
+        var orig = sorter(gdDimensionsOriginalOrder[i].filter(function(d, i) {return }));
         gdDimensions[i].sort(orig);
 
         // invisible dimensions are not interpreted in the context of drag&drop sorting as an invisible dimension

@@ -28,7 +28,6 @@ function model(layout, d, i) {
     var cd0 = unwrap(d),
         trace = cd0.trace,
         domain = trace.domain,
-        dimensions = trace.dimensions,
         width = layout.width,
         font = trace.font,
         labelFont = trace.labelfont,
@@ -46,8 +45,7 @@ function model(layout, d, i) {
 
     return {
         key: i,
-        colCount: visible.filter(function(bool) {return bool;}).length,
-        dimensions: dimensions,
+        colCount: visible.filter(function identity(bool) {return bool;}).length,
         tickDistance: c.tickDistance,
         font: font,
         labelFont: labelFont,
@@ -78,7 +76,7 @@ function viewModel(model) {
 
     var uniqueKeys = {};
 
-    viewModel.dimensions = model.visible.filter(function(bool) {return bool;}).map(function(dimension, i) {
+    viewModel.dimensions = model.visible.filter(function identity(bool) {return bool;}).map(function(dimension, i) {
         var label = model.labels[i];
         var foundKey = uniqueKeys[label];
         uniqueKeys[label] = (foundKey || 0) + 1;

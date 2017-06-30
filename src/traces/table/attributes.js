@@ -92,59 +92,6 @@ module.exports = {
         description: 'Shows the column when set to `true` (the default). Hides the column for `false`.'
     },
 
-    dimensions: {
-        _isLinkedToArray: 'dimension',
-        label: {
-            valType: 'string',
-            role: 'info',
-            description: 'The shown name of the dimension.'
-        },
-        tickvals: axesAttrs.tickvals,
-        ticktext: axesAttrs.ticktext,
-        font: extendFlat({}, fontAttrs, {
-            description: 'Sets the font for the `dimension` values.'
-        }),
-        valueformat: {
-            valType: 'string',
-            dflt: '3s',
-            role: 'style',
-            description: [
-                'Sets the tick label formatting rule using d3 formatting mini-language',
-                'which is similar to those of Python. See',
-                'https://github.com/d3/d3-format/blob/master/README.md#locale_format'
-            ].join(' ')
-        },
-        visible: {
-            valType: 'boolean',
-            dflt: true,
-            role: 'info',
-            description: 'Shows the dimension when set to `true` (the default). Hides the dimension for `false`.'
-        },
-        range: {
-            valType: 'info_array',
-            role: 'info',
-            items: [
-                {valType: 'number'},
-                {valType: 'number'}
-            ],
-            description: [
-                'The domain range for the purpose of coloring. Defaults to the `values` extent.',
-                'Must be an array of `[fromValue, toValue]` with finite numbers as elements.'
-            ].join(' ')
-        },
-        values: {
-            valType: 'data_array',
-            role: 'info',
-            dflt: [],
-            description: [
-                'Dimension values. `values[n]` represents the value of the `n`th point in the dataset,',
-                'therefore the `values` vector for all dimensions must be the same (longer vectors',
-                'will be truncated). Each value must be a finite number.'
-            ].join(' ')
-        },
-        description: 'The dimensions (variables) of the table view.'
-    },
-
     line: extendFlat({},
 
         // the default autocolorscale is set to Viridis - autocolorscale therefore defaults to false too,

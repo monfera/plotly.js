@@ -67,7 +67,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
         return Lib.coerce(traceIn, traceOut, attributes, attr, dflt);
     }
 
-    var dimensions = dimensionsDefaults(traceIn, traceOut);
+    //var dimensions = dimensionsDefaults(traceIn, traceOut);
 
     handleLineDefaults(traceIn, traceOut, defaultColor, layout, coerce);
 
@@ -85,7 +85,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('valueformat');
     coerce('visible');
 
-    if(!Array.isArray(dimensions) || !dimensions.length) {
+    if(!traceOut.visible.some(function identity(bool) {return bool;})) {
         traceOut.visible = false;
     }
 
