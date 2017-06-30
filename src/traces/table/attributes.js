@@ -85,6 +85,13 @@ module.exports = {
         ]
     },
 
+    visible: {
+        valType: 'data_array',
+        dflt: [],
+        role: 'info',
+        description: 'Shows the column when set to `true` (the default). Hides the column for `false`.'
+    },
+
     dimensions: {
         _isLinkedToArray: 'dimension',
         label: {

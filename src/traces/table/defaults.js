@@ -46,8 +46,6 @@ function dimensionsDefaults(traceIn, traceOut) {
             continue;
         }
 
-        var visible = coerce('visible');
-
         dimensionOut._index = i;
         dimensionsOut.push(dimensionOut);
     }
@@ -85,6 +83,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('labels');
     coerce('values');
     coerce('valueformat');
+    coerce('visible');
 
     if(!Array.isArray(dimensions) || !dimensions.length) {
         traceOut.visible = false;

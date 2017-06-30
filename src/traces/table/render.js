@@ -20,29 +20,6 @@ function visible(dimension) {return !('visible' in dimension) || dimension.visib
 
 function unitScale(height, padding) {return d3.scale.linear().range([height - padding, padding]);}
 
-function unitToColorScale(cscale) {
-
-    var colorStops = cscale.map(function(d) {return d[0];});
-    var colorStrings = cscale.map(function(d) {return d[1];});
-    var colorTuples = colorStrings.map(function(c) {return d3.rgb(c);});
-    var prop = function(n) {return function(o) {return o[n];};};
-
-    // We can't use d3 color interpolation as we may have non-uniform color palette raster
-    // (various color stop distances).
-    var polylinearUnitScales = 'rgb'.split('').map(function(key) {
-        return d3.scale.linear()
-            .clamp(true)
-            .domain(colorStops)
-            .range(colorTuples.map(prop(key)));
-    });
-
-    return function(d) {
-        return polylinearUnitScales.map(function(s) {
-            return s(d);
-        });
-    };
-}
-
 function unwrap(d) {
     return d[0]; // plotly data structure convention
 }
@@ -50,7 +27,6 @@ function unwrap(d) {
 function model(layout, d, i) {
     var cd0 = unwrap(d),
         trace = cd0.trace,
-        cscale = cd0.cscale,
         domain = trace.domain,
         dimensions = trace.dimensions,
         width = layout.width,
@@ -58,7 +34,8 @@ function model(layout, d, i) {
         labelFont = trace.labelfont,
         labels = trace.labels,
         valueFormat = trace.valueformat,
-        values = trace.values;
+        values = trace.values,
+        visible = trace.visible;
 
     var groupWidth = Math.floor(width * (domain.x[1] - domain.x[0]));
     var groupHeight = Math.floor(layout.height * (domain.y[1] - domain.y[0]));
@@ -69,10 +46,9 @@ function model(layout, d, i) {
 
     return {
         key: i,
-        colCount: dimensions.filter(visible).length,
+        colCount: visible.filter(function(bool) {return bool;}).length,
         dimensions: dimensions,
         tickDistance: c.tickDistance,
-        unitToColor: unitToColorScale(cscale),
         font: font,
         labelFont: labelFont,
         translateX: domain.x[0] * width,
@@ -82,6 +58,7 @@ function model(layout, d, i) {
         height: rowHeight,
         labels: labels,
         valueFormat: valueFormat,
+        visible: visible,
         values: values
     };
 }
@@ -90,7 +67,6 @@ function viewModel(model) {
 
     var width = model.width;
     var height = model.height;
-    var dimensions = model.dimensions;
 
     var xScale = function(d) {return width * d / Math.max(1, model.colCount - 1);};
 
@@ -102,21 +78,16 @@ function viewModel(model) {
 
     var uniqueKeys = {};
 
-    viewModel.dimensions = dimensions.filter(visible).map(function(dimension, i) {
-        var foundKey = uniqueKeys[dimension.label];
-        uniqueKeys[dimension.label] = (foundKey || 0) + 1;
-        var key = dimension.label + (foundKey ? '__' + foundKey : '');
+    viewModel.dimensions = model.visible.filter(function(bool) {return bool;}).map(function(dimension, i) {
+        var label = model.labels[i];
+        var foundKey = uniqueKeys[label];
+        uniqueKeys[label] = (foundKey || 0) + 1;
+        var key = label + (foundKey ? '__' + foundKey : '');
         return {
             key: key,
-            label: model.labels[i],
-            tickvals: dimension.tickvals,
-            ticktext: dimension.ticktext,
-            font: dimension.font,
-            ordinal: !!dimension.tickvals,
-            scatter: c.scatter || dimension.scatter,
+            label: label,
             xIndex: i,
             crossfilterDimensionIndex: i,
-            visibleIndex: dimension._index,
             height: height,
             values: model.values[i].slice(0, 10),
             xScale: xScale,

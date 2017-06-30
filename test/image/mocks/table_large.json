@@ -72,6 +72,7 @@
         null,
         null
     ],
+    "visible": [true, true, true, true, true, true, true, true, true, false],
     "dimensions": [
       {
       },
@@ -80,10 +81,6 @@
       {
       },
       {
-        "visible": true,
-      },
-      {
-        "visible": true,
       },
       {
       },
@@ -94,7 +91,8 @@
       {
       },
       {
-        "visible": false
+      },
+      {
       }
     ]
   }]
