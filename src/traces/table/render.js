@@ -70,13 +70,10 @@ function model(layout, d, i) {
         dimensions: dimensions,
         tickDistance: c.tickDistance,
         unitToColor: unitToColorScale(cscale),
-        //lines: lines,
         labelFont: labelFont,
         translateX: domain.x[0] * width,
         translateY: layout.height - domain.y[1] * layout.height,
         pad: pad,
-        //canvasWidth: rowContentWidth * c.canvasPixelRatio + 2 * lines.canvasOverdrag,
-        //canvasHeight: rowHeight * c.canvasPixelRatio,
         width: rowContentWidth,
         height: rowHeight,
         canvasPixelRatio: c.canvasPixelRatio,
@@ -102,8 +99,6 @@ function viewModel(model) {
     var uniqueKeys = {};
 
     viewModel.dimensions = dimensions.filter(visible).map(function(dimension, i) {
-        //debugger
-        //var domainToUnit = domainToUnitScale(dimension);
         var foundKey = uniqueKeys[dimension.label];
         uniqueKeys[dimension.label] = (foundKey || 0) + 1;
         var key = dimension.label + (foundKey ? '__' + foundKey : '');
@@ -121,14 +116,10 @@ function viewModel(model) {
             visibleIndex: dimension._index,
             height: height,
             values: model.values[i],
-            //paddedUnitValues: dimension.values.map(domainToUnit).map(paddedUnitScale),
             xScale: xScale,
             x: xScale(i),
             canvasX: xScale(i) * canvasPixelRatio,
             unitScale: unitScale(height, c.verticalPadding),
-            //domainScale: domainScale(height, c.verticalPadding, dimension),
-            //ordinalScale: ordinalScale(dimension),
-            //domainToUnitScale: domainToUnit,
             filter: [0, 1],
             parent: viewModel,
             model: model
