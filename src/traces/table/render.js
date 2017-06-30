@@ -9,7 +9,6 @@
 'use strict';
 
 var c = require('./constants');
-var Lib = require('../../lib');
 var d3 = require('d3');
 var Drawing = require('../../components/drawing');
 
@@ -19,72 +18,7 @@ function repeat(d) {return [d];}
 
 function visible(dimension) {return !('visible' in dimension) || dimension.visible;}
 
-function dimensionExtent(dimension) {
-
-    var lo = dimension.range ? dimension.range[0] : d3.min(dimension.values);
-    var hi = dimension.range ? dimension.range[1] : d3.max(dimension.values);
-
-    if(isNaN(lo) || !isFinite(lo)) {
-        lo = 0;
-    }
-
-    if(isNaN(hi) || !isFinite(hi)) {
-        hi = 0;
-    }
-
-    // avoid a degenerate (zero-width) domain
-    if(lo === hi) {
-        if(lo === void(0)) {
-            lo = 0;
-            hi = 1;
-        } else if(lo === 0) {
-            // no use to multiplying zero, so add/subtract in this case
-            lo -= 1;
-            hi += 1;
-        } else {
-            // this keeps the range in the order of magnitude of the data
-            lo *= 0.9;
-            hi *= 1.1;
-        }
-    }
-
-    return [lo, hi];
-}
-
-function ordinalScaleSnap(scale, v) {
-    var i, a, prevDiff, prevValue, diff;
-    for(i = 0, a = scale.range(), prevDiff = Infinity, prevValue = a[0], diff = null; i < a.length; i++) {
-        if((diff = Math.abs(a[i] - v)) > prevDiff) {
-            return prevValue;
-        }
-        prevDiff = diff;
-        prevValue = a[i];
-    }
-    return a[a.length - 1];
-}
-
-function domainScale(height, padding, dimension) {
-    var extent = dimensionExtent(dimension);
-    return dimension.tickvals ?
-        d3.scale.ordinal()
-            .domain(dimension.tickvals)
-            .range(dimension.tickvals
-                .map(function(d) {return (d - extent[0]) / (extent[1] - extent[0]);})
-                .map(function(d) {return (height - padding + d * (padding - (height - padding)));})) :
-        d3.scale.linear()
-            .domain(extent)
-            .range([height - padding, padding]);
-}
-
 function unitScale(height, padding) {return d3.scale.linear().range([height - padding, padding]);}
-function domainToUnitScale(dimension) {return d3.scale.linear().domain(dimensionExtent(dimension));}
-
-function ordinalScale(dimension) {
-    var extent = dimensionExtent(dimension);
-    return dimension.tickvals && d3.scale.ordinal()
-            .domain(dimension.tickvals)
-            .range(dimension.tickvals.map(function(d) {return (d - extent[0]) / (extent[1] - extent[0]);}));
-}
 
 function unitToColorScale(cscale) {
 
@@ -116,22 +50,12 @@ function unwrap(d) {
 function model(layout, d, i) {
     var cd0 = unwrap(d),
         trace = cd0.trace,
-        lineColor = cd0.lineColor,
         cscale = cd0.cscale,
-        line = trace.line,
         domain = trace.domain,
         dimensions = trace.dimensions,
         width = layout.width,
         labelFont = trace.labelfont,
         values = trace.values;
-
-/*
-    var lines = Lib.extendDeep({}, line, {
-        color: lineColor.map(domainToUnitScale({values: lineColor, range: [line.cmin, line.cmax]})),
-        blockLineCount: c.blockLineCount,
-        canvasOverdrag: c.overdrag * c.canvasPixelRatio
-    });
-*/
 
     var groupWidth = Math.floor(width * (domain.x[1] - domain.x[0]));
     var groupHeight = Math.floor(layout.height * (domain.y[1] - domain.y[0]));
@@ -168,10 +92,6 @@ function viewModel(model) {
     var canvasPixelRatio = model.canvasPixelRatio;
 
     var xScale = function(d) {return width * d / Math.max(1, model.colCount - 1);};
-
-    var unitPad = c.verticalPadding / (height * canvasPixelRatio);
-    var unitPadScale = (1 - 2 * unitPad);
-    var paddedUnitScale = function(d) {return unitPad + unitPadScale * d;};
 
     var viewModel = {
         key: model.key,
@@ -216,18 +136,6 @@ function viewModel(model) {
     });
 
     return viewModel;
-}
-
-function lineLayerModel(vm) {
-    return c.layers.map(function(key) {
-        return {
-            key: key,
-            context: key === 'contextLineLayer',
-            pick: key === 'pickLineLayer',
-            viewModel: vm,
-            model: vm.model
-        };
-    });
 }
 
 module.exports = function(root, svg, styledData, layout, callbacks) {
