@@ -67,6 +67,24 @@ module.exports = {
         ].join(' ')
     },
 
+    labels: {
+        valType: 'data_array',
+        role: 'info',
+        dflt: [],
+        description: 'The shown name of the columns.'
+    },
+
+    valueformat: {
+        valType: 'data_array',
+        role: 'info',
+        dflt: [],
+        description: [
+            'Sets the cell value formatting rule using d3 formatting mini-language',
+            'which is similar to those of Python. See',
+            'https://github.com/d3/d3-format/blob/master/README.md#locale_format'
+        ]
+    },
+
     dimensions: {
         _isLinkedToArray: 'dimension',
         label: {

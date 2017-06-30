@@ -46,16 +46,7 @@ function dimensionsDefaults(traceIn, traceOut) {
             continue;
         }
 
-        //var values = coerce('values');
         var visible = coerce('visible');
-
-        if(visible) {
-            coerce('label');
-            coerce('tickvals');
-            coerce('ticktext');
-            coerce('valueformat');
-            coerce('range');
-        }
 
         dimensionOut._index = i;
         dimensionsOut.push(dimensionOut);
@@ -91,7 +82,9 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('domain.x');
     coerce('domain.y');
 
+    coerce('labels');
     coerce('values');
+    coerce('valueformat');
 
     if(!Array.isArray(dimensions) || !dimensions.length) {
         traceOut.visible = false;

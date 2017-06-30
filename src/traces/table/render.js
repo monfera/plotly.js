@@ -56,6 +56,8 @@ function model(layout, d, i) {
         width = layout.width,
         font = trace.font,
         labelFont = trace.labelfont,
+        labels = trace.labels,
+        valueFormat = trace.valueformat,
         values = trace.values;
 
     var groupWidth = Math.floor(width * (domain.x[1] - domain.x[0]));
@@ -78,6 +80,8 @@ function model(layout, d, i) {
         pad: pad,
         width: rowContentWidth,
         height: rowHeight,
+        labels: labels,
+        valueFormat: valueFormat,
         values: values
     };
 }
@@ -104,8 +108,7 @@ function viewModel(model) {
         var key = dimension.label + (foundKey ? '__' + foundKey : '');
         return {
             key: key,
-            label: dimension.label,
-            valueFormat: dimension.valueformat,
+            label: model.labels[i],
             tickvals: dimension.tickvals,
             ticktext: dimension.ticktext,
             font: dimension.font,
@@ -121,6 +124,7 @@ function viewModel(model) {
             unitScale: unitScale(height, c.verticalPadding),
             filter: [0, 1],
             parent: viewModel,
+            valueFormat:  model.valueFormat[i],
             model: model
         };
     });
@@ -311,13 +315,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     columnCellText
         .each(function(d) {Drawing.font(d3.select(this), d.model.font);})
         .text(function(d) {
-            const starSchema = d.dimension.ticktext && d.dimension.tickvals
-            if(starSchema) {
-                var lookup = {}
-                for(var i = 0; i < d.dimension.ticktext.length; i++) {
-                    lookup[d.dimension.tickvals[i]] = d.dimension.ticktext[i]
-                }
-            }
-            return starSchema ? d.value : d3.format(d.dimension.valueFormat)(d.value);
+            return d.dimension.valueFormat ? d3.format(d.dimension.valueFormat)(d.value) : d.value;
         });
 };
