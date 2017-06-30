@@ -76,7 +76,6 @@ function model(layout, d, i) {
         pad: pad,
         width: rowContentWidth,
         height: rowHeight,
-        canvasPixelRatio: c.canvasPixelRatio,
         values: values
     };
 }
@@ -86,7 +85,6 @@ function viewModel(model) {
     var width = model.width;
     var height = model.height;
     var dimensions = model.dimensions;
-    var canvasPixelRatio = model.canvasPixelRatio;
 
     var xScale = function(d) {return width * d / Math.max(1, model.colCount - 1);};
 
@@ -118,7 +116,6 @@ function viewModel(model) {
             values: model.values[i],
             xScale: xScale,
             x: xScale(i),
-            canvasX: xScale(i) * canvasPixelRatio,
             unitScale: unitScale(height, c.verticalPadding),
             filter: [0, 1],
             parent: viewModel,
@@ -177,59 +174,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     var yColumn = tableControlView.selectAll('.yColumn')
         .data(function(vm) {return vm.dimensions;}, keyFun);
 
-    function updatePanelLayouttable(yColumn, vm) {
-        var panels = vm.panels || (vm.panels = []);
-        var yColumns = yColumn.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
-        var panelCount = yColumns.length - 1;
-        var rowCount = 1;
-        for(var row = 0; row < rowCount; row++) {
-            for(var p = 0; p < panelCount; p++) {
-                var panel = panels[p + row * panelCount] || (panels[p + row * panelCount] = {});
-                var dim1 = yColumns[p];
-                var dim2 = yColumns[p + 1];
-                panel.dim1 = dim1;
-                panel.dim2 = dim2;
-                panel.canvasX = dim1.canvasX;
-                panel.panelSizeX = dim2.canvasX - dim1.canvasX;
-                panel.panelSizeY = vm.model.canvasHeight / rowCount;
-                panel.y = row * panel.panelSizeY;
-                panel.canvasY = vm.model.canvasHeight - panel.y - panel.panelSizeY;
-            }
-        }
-    }
-
-    function updatePanelLayoutScatter(yColumn, vm) {
-        var panels = vm.panels || (vm.panels = []);
-        var yColumns = yColumn.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
-        var panelCount = yColumns.length - 1;
-        var rowCount = panelCount;
-        for(var row = 0; row < panelCount; row++) {
-            for(var p = 0; p < panelCount; p++) {
-                var panel = panels[p + row * panelCount] || (panels[p + row * panelCount] = {});
-                var dim1 = yColumns[p];
-                var dim2 = yColumns[p + 1];
-                panel.dim1 = yColumns[row + 1];
-                panel.dim2 = dim2;
-                panel.canvasX = dim1.canvasX;
-                panel.panelSizeX = dim2.canvasX - dim1.canvasX;
-                panel.panelSizeY = vm.model.canvasHeight / rowCount;
-                panel.y = row * panel.panelSizeY;
-                panel.canvasY = vm.model.canvasHeight - panel.y - panel.panelSizeY;
-            }
-        }
-    }
-
-    function updatePanelLayout(yColumn, vm) {
-        return (c.scatter ? updatePanelLayoutScatter : updatePanelLayouttable)(yColumn, vm);
-    }
-
     yColumn.enter()
         .append('g')
         .classed('yColumn', true);
-
-    tableControlView.each(function(vm) {
-        updatePanelLayout(yColumn, vm);
-    });
 
     yColumn
         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
@@ -244,16 +191,12 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     return;
                 }
                 d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag, d3.event.x));
-                d.canvasX = d.x * d.model.canvasPixelRatio;
                 yColumn
                     .sort(function(a, b) {return a.x - b.x;})
                     .each(function(dd, i) {
                         dd.xIndex = i;
                         dd.x = d === dd ? dd.x : dd.xScale(dd.xIndex);
-                        dd.canvasX = dd.x * dd.model.canvasPixelRatio;
                     });
-
-                updatePanelLayout(yColumn, p);
 
                 yColumn.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
@@ -269,8 +212,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     return;
                 }
                 d.x = d.xScale(d.xIndex);
-                d.canvasX = d.x * d.model.canvasPixelRatio;
-                updatePanelLayout(yColumn, p);
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                 linePickActive = true;
