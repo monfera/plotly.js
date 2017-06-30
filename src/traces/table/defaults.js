@@ -82,11 +82,9 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     handleLineDefaults(traceIn, traceOut, defaultColor, layout, coerce);
 
-    // make default font size 10px,
-    // scale linearly with global font size
     var fontDflt = {
         family: layout.font.family,
-        size: Math.round(layout.font.size * (10 / 12)),
+        size: layout.font.size,
         color: layout.font.color
     };
 
