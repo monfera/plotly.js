@@ -52,6 +52,17 @@ module.exports = {
         description: 'Sets the font for the `dimension` labels.'
     }),
 
+    values: {
+        valType: 'data_array',
+        role: 'info',
+        dflt: [],
+        description: [
+            'Dimension values. `values[n]` represents the value of the `n`th point in the dataset,',
+            'therefore the `values` vector for all dimensions must be the same (longer vectors',
+            'will be truncated). Each value must be a finite number.'
+        ].join(' ')
+    },
+
     dimensions: {
         _isLinkedToArray: 'dimension',
         label: {

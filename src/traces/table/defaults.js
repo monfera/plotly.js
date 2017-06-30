@@ -46,8 +46,8 @@ function dimensionsDefaults(traceIn, traceOut, fontDflt) {
             continue;
         }
 
-        var values = coerce('values');
-        var visible = coerce('visible', values.length > 0);
+        //var values = coerce('values');
+        var visible = coerce('visible');
 
         if(visible) {
             coerce('label');
@@ -57,7 +57,7 @@ function dimensionsDefaults(traceIn, traceOut, fontDflt) {
             coerce('range');
             Lib.coerceFont(coerce, 'font', fontDflt);
 
-            commonLength = Math.min(commonLength, dimensionOut.values.length);
+           // commonLength = Math.min(commonLength, dimensionOut.values.length);
         }
 
         dimensionOut._index = i;
@@ -95,6 +95,8 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     coerce('domain.x');
     coerce('domain.y');
+
+    coerce('values');
 
     if(!Array.isArray(dimensions) || !dimensions.length) {
         traceOut.visible = false;

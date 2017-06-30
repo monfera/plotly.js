@@ -122,13 +122,16 @@ function model(layout, d, i) {
         domain = trace.domain,
         dimensions = trace.dimensions,
         width = layout.width,
-        labelFont = trace.labelfont;
+        labelFont = trace.labelfont,
+        values = trace.values;
 
+/*
     var lines = Lib.extendDeep({}, line, {
         color: lineColor.map(domainToUnitScale({values: lineColor, range: [line.cmin, line.cmax]})),
         blockLineCount: c.blockLineCount,
         canvasOverdrag: c.overdrag * c.canvasPixelRatio
     });
+*/
 
     var groupWidth = Math.floor(width * (domain.x[1] - domain.x[0]));
     var groupHeight = Math.floor(layout.height * (domain.y[1] - domain.y[0]));
@@ -143,16 +146,17 @@ function model(layout, d, i) {
         dimensions: dimensions,
         tickDistance: c.tickDistance,
         unitToColor: unitToColorScale(cscale),
-        lines: lines,
+        //lines: lines,
         labelFont: labelFont,
         translateX: domain.x[0] * width,
         translateY: layout.height - domain.y[1] * layout.height,
         pad: pad,
-        canvasWidth: rowContentWidth * c.canvasPixelRatio + 2 * lines.canvasOverdrag,
-        canvasHeight: rowHeight * c.canvasPixelRatio,
+        //canvasWidth: rowContentWidth * c.canvasPixelRatio + 2 * lines.canvasOverdrag,
+        //canvasHeight: rowHeight * c.canvasPixelRatio,
         width: rowContentWidth,
         height: rowHeight,
-        canvasPixelRatio: c.canvasPixelRatio
+        canvasPixelRatio: c.canvasPixelRatio,
+        values: values
     };
 }
 
@@ -178,7 +182,8 @@ function viewModel(model) {
     var uniqueKeys = {};
 
     viewModel.dimensions = dimensions.filter(visible).map(function(dimension, i) {
-        var domainToUnit = domainToUnitScale(dimension);
+        //debugger
+        //var domainToUnit = domainToUnitScale(dimension);
         var foundKey = uniqueKeys[dimension.label];
         uniqueKeys[dimension.label] = (foundKey || 0) + 1;
         var key = dimension.label + (foundKey ? '__' + foundKey : '');
@@ -195,15 +200,15 @@ function viewModel(model) {
             crossfilterDimensionIndex: i,
             visibleIndex: dimension._index,
             height: height,
-            values: dimension.values,
-            paddedUnitValues: dimension.values.map(domainToUnit).map(paddedUnitScale),
+            values: model.values[i],
+            //paddedUnitValues: dimension.values.map(domainToUnit).map(paddedUnitScale),
             xScale: xScale,
             x: xScale(i),
             canvasX: xScale(i) * canvasPixelRatio,
             unitScale: unitScale(height, c.verticalPadding),
-            domainScale: domainScale(height, c.verticalPadding, dimension),
-            ordinalScale: ordinalScale(dimension),
-            domainToUnitScale: domainToUnit,
+            //domainScale: domainScale(height, c.verticalPadding, dimension),
+            //ordinalScale: ordinalScale(dimension),
+            //domainToUnitScale: domainToUnit,
             filter: [0, 1],
             parent: viewModel,
             model: model
@@ -469,6 +474,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     lookup[d.dimension.tickvals[i]] = d.dimension.ticktext[i]
                 }
             }
-            return starSchema ? lookup[d.value] : d3.format(d.dimension.valueFormat)(d.value);
+            return starSchema ? d.value : d3.format(d.dimension.valueFormat)(d.value);
         });
 };
