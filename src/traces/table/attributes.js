@@ -48,6 +48,10 @@ module.exports = {
         }
     },
 
+    font: extendFlat({}, fontAttrs, {
+        description: 'Sets the font for the cells.'
+    }),
+
     labelfont: extendFlat({}, fontAttrs, {
         description: 'Sets the font for the `dimension` labels.'
     }),

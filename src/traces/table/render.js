@@ -54,6 +54,7 @@ function model(layout, d, i) {
         domain = trace.domain,
         dimensions = trace.dimensions,
         width = layout.width,
+        font = trace.font,
         labelFont = trace.labelfont,
         values = trace.values;
 
@@ -70,6 +71,7 @@ function model(layout, d, i) {
         dimensions: dimensions,
         tickDistance: c.tickDistance,
         unitToColor: unitToColorScale(cscale),
+        font: font,
         labelFont: labelFont,
         translateX: domain.x[0] * width,
         translateY: layout.height - domain.y[1] * layout.height,
@@ -113,7 +115,7 @@ function viewModel(model) {
             crossfilterDimensionIndex: i,
             visibleIndex: dimension._index,
             height: height,
-            values: model.values[i],
+            values: model.values[i].slice(0, 10),
             xScale: xScale,
             x: xScale(i),
             unitScale: unitScale(height, c.verticalPadding),
@@ -294,7 +296,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('columnCell', true);
 
     columnCell
-        .attr('transform', function(d, i) {return 'translate(' + 0 + ',' + i * 20 + ')';});
+        .attr('transform', function(d, i) {return 'translate(' + 0 + ',' + i * 20 + ')';})
+        .each(function(d) {Drawing.font(d3.select(this), d.model.font);});;
 
     var columnCellText = columnCell.selectAll('.columnCellText')
         .data(repeat, keyFun);
@@ -306,6 +309,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('text-anchor', 'end');
 
     columnCellText
+        .each(function(d) {Drawing.font(d3.select(this), d.model.font);})
         .text(function(d) {
             const starSchema = d.dimension.ticktext && d.dimension.tickvals
             if(starSchema) {
