@@ -229,19 +229,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .append('g')
         .classed('column', true);
 
-    column
-        .selectAll('.domain, .tick>line')
-        .attr('fill', 'none')
-        .attr('stroke', 'black')
-        .attr('stroke-opacity', 0.25)
-        .attr('stroke-width', '1px');
-
-    column
-        .selectAll('text')
-        .style('text-shadow', '1px 1px 1px #fff, -1px -1px 1px #fff, 1px -1px 1px #fff, -1px 1px 1px #fff')
-        .style('cursor', 'default')
-        .style('user-select', 'none');
-
     var columnHeading = columnOverlays.selectAll('.columnHeading')
         .data(repeat, keyFun);
 

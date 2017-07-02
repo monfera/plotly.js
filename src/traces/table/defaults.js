@@ -14,52 +14,12 @@ var hasColorscale = require('../../components/colorscale/has_colorscale');
 var colorscaleDefaults = require('../../components/colorscale/defaults');
 var maxDimensionCount = require('./constants').maxDimensionCount;
 
-function handleLineDefaults(traceIn, traceOut, defaultColor, layout, coerce) {
+function handleFillDefaults(traceIn, traceOut, defaultColor, layout, coerce) {
 
-    if(hasColorscale(traceIn, 'line')) {
-        coerce('line.colorscale');
-        colorscaleDefaults(traceIn, traceOut, layout, coerce, {prefix: 'line.', cLetter: 'c'});
+    if(hasColorscale(traceIn, 'fill')) {
+        coerce('fill.colorscale');
+        colorscaleDefaults(traceIn, traceOut, layout, coerce, {prefix: 'fill.', cLetter: 'c'});
     }
-}
-
-function dimensionsDefaults(traceIn, traceOut) {
-    var dimensionsIn = traceIn.dimensions || [],
-        dimensionsOut = traceOut.dimensions = [];
-
-    var dimensionIn, dimensionOut, i;
-    var commonLength = Infinity;
-
-    if(dimensionsIn.length > maxDimensionCount) {
-        Lib.log('table views support up to ' + maxDimensionCount + ' dimensions at the moment');
-        dimensionsIn.splice(maxDimensionCount);
-    }
-
-    function coerce(attr, dflt) {
-        return Lib.coerce(dimensionIn, dimensionOut, attributes.dimensions, attr, dflt);
-    }
-
-    for(i = 0; i < dimensionsIn.length; i++) {
-        dimensionIn = dimensionsIn[i];
-        dimensionOut = {};
-
-        if(!Lib.isPlainObject(dimensionIn)) {
-            continue;
-        }
-
-        dimensionOut._index = i;
-        dimensionsOut.push(dimensionOut);
-    }
-
-    if(isFinite(commonLength)) {
-        for(i = 0; i < dimensionsOut.length; i++) {
-            dimensionOut = dimensionsOut[i];
-            if(dimensionOut.visible && dimensionOut.values.length > commonLength) {
-                dimensionOut.values = dimensionOut.values.slice(0, commonLength);
-            }
-        }
-    }
-
-    return dimensionsOut;
 }
 
 module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout) {
@@ -69,7 +29,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     //var dimensions = dimensionsDefaults(traceIn, traceOut);
 
-    handleLineDefaults(traceIn, traceOut, defaultColor, layout, coerce);
+    handleFillDefaults(traceIn, traceOut, defaultColor, layout, coerce);
 
     var fontDflt = {
         family: layout.font.family,

@@ -120,7 +120,7 @@ module.exports = {
         description: 'Shows the column when set to `true` (the default). Hides the column for `false`.'
     },
 
-    line: extendFlat({},
+    fill: extendFlat({},
 
         // the default autocolorscale is set to Viridis - autocolorscale therefore defaults to false too,
         // to avoid being overridden by the blue-white-red autocolor palette
