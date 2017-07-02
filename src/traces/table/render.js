@@ -272,9 +272,10 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('transform', function(d, i) {return 'translate(' + 0 + ',' + i * 20 + ')';})
         .each(function(d, i) {
             var spec = d.model.font;
+            const colspec = spec.color[Math.min(d.dimension.crossfilterDimensionIndex, spec.color.length - 1)]
             var font = {
                 size: spec.size,
-                color: spec.color[d.dimension.crossfilterDimensionIndex][i],
+                color: colspec[Math.min(i, colspec.length - 1)],
                 family: spec.family
             };
             Drawing.font(d3.select(this), font);
