@@ -101,6 +101,19 @@ function viewModel(model) {
     return viewModel;
 }
 
+function gridPick(spec, col, row) {
+    if(Array.isArray(spec)) {
+        const colorColumn = spec[Math.min(col, spec.length - 1)];
+        if(Array.isArray(colorColumn)) {
+            return colorColumn[Math.min(row, colorColumn.length - 1)];
+        } else {
+            return colorColumn;
+        }
+    } else {
+        return spec;
+    }
+}
+
 module.exports = function(root, svg, styledData, layout, callbacks) {
 
     var domainBrushing = false;
@@ -272,11 +285,11 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('transform', function(d, i) {return 'translate(' + 0 + ',' + i * 20 + ')';})
         .each(function(d, i) {
             var spec = d.model.font;
-            const colspec = spec.color[Math.min(d.dimension.crossfilterDimensionIndex, spec.color.length - 1)]
+            var col = d.dimension.crossfilterDimensionIndex;
             var font = {
-                size: spec.size,
-                color: colspec[Math.min(i, colspec.length - 1)],
-                family: spec.family
+                size: gridPick(spec.size, col, i),
+                color: gridPick(spec.color, col, i),
+                family: gridPick(spec.family, col, i)
             };
             Drawing.font(d3.select(this), font);
         });
