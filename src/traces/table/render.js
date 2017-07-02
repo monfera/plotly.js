@@ -270,7 +270,15 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     columnCell
         .attr('transform', function(d, i) {return 'translate(' + 0 + ',' + i * 20 + ')';})
-        .each(function(d) {Drawing.font(d3.select(this), d.model.font);});;
+        .each(function(d, i) {
+            var spec = d.model.font;
+            var font = {
+                size: spec.size,
+                color: spec.color[d.dimension.crossfilterDimensionIndex][i],
+                family: spec.family
+            };
+            Drawing.font(d3.select(this), font);
+        });
 
     var columnCellText = columnCell.selectAll('.columnCellText')
         .data(repeat, keyFun);
@@ -282,7 +290,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('text-anchor', 'end');
 
     columnCellText
-        .each(function(d) {Drawing.font(d3.select(this), d.model.font);})
+        //.each(function(d) {Drawing.font(d3.select(this), d.model.font);})
         .text(function(d) {
             return d.dimension.valueFormat ? d3.format(d.dimension.valueFormat)(d.value) : d.value;
         });
