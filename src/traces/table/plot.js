@@ -35,7 +35,7 @@ module.exports = function plot(gd, cdTable) {
     };
 
     var columnMoved = function(i, indices) {
-        
+
         function newIdx(indices, orig, dim) {
             var origIndex = orig.indexOf(dim);
             var currentIndex = indices.indexOf(origIndex);
@@ -54,18 +54,8 @@ module.exports = function plot(gd, cdTable) {
         }
 
         // drag&drop sorting of the columns
-        var orig = sorter(gdColumnsOriginalOrder[i].filter(function(d, i) {return }));
+        var orig = sorter(gdColumnsOriginalOrder[i].slice());
         gdColumns[i].sort(orig);
-
-        gdColumnsOriginalOrder[i].slice()
-             .sort(function(d) {
-                 // subsequent splicing to be done left to right, otherwise indices may be incorrect
-                 return gdColumnsOriginalOrder[i].indexOf(d);
-             })
-            .forEach(function(d) {
-                gdColumns[i].splice(gdColumns[i].indexOf(d), 1); // remove from the end
-                gdColumns[i].splice(gdColumnsOriginalOrder[i].indexOf(d), 0, d); // insert at original index
-            });
 
         gd.emit('plotly_restyle');
     };

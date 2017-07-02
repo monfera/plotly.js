@@ -199,8 +199,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                 linePickActive = true;
 
-                if(callbacks && callbacks.columnsMoved) {
-                    callbacks.columnsMoved(p.key, p.dimensions.map(function(dd) {return dd.crossfilterDimensionIndex;}));
+                if(callbacks && callbacks.columnMoved) {
+                    callbacks.columnMoved(p.key, p.dimensions.map(function(dd) {return dd.crossfilterDimensionIndex;}));
                 }
             })
         );
