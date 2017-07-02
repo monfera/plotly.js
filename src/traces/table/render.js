@@ -16,8 +16,6 @@ function keyFun(d) {return d.key;}
 
 function repeat(d) {return [d];}
 
-function visible(dimension) {return !('visible' in dimension) || dimension.visible;}
-
 function unitScale(height, padding) {return d3.scale.linear().range([height - padding, padding]);}
 
 function unwrap(d) {
@@ -33,8 +31,7 @@ function model(layout, d, i) {
         labelFont = trace.labelfont,
         labels = trace.labels,
         valueFormat = trace.valueformat,
-        values = trace.values,
-        visible = trace.visible;
+        values = trace.values;
 
     var groupWidth = Math.floor(width * (domain.x[1] - domain.x[0]));
     var groupHeight = Math.floor(layout.height * (domain.y[1] - domain.y[0]));
@@ -45,7 +42,7 @@ function model(layout, d, i) {
 
     return {
         key: i,
-        colCount: visible.filter(function identity(bool) {return bool;}).length,
+        colCount: values.length,
         tickDistance: c.tickDistance,
         font: font,
         labelFont: labelFont,
@@ -56,7 +53,6 @@ function model(layout, d, i) {
         height: rowHeight,
         labels: labels,
         valueFormat: valueFormat,
-        visible: visible,
         values: values
     };
 }
@@ -76,7 +72,7 @@ function viewModel(model) {
 
     var uniqueKeys = {};
 
-    viewModel.dimensions = model.visible.filter(function identity(bool) {return bool;}).map(function(dimension, i) {
+    viewModel.dimensions = model.values.map(function(dimension, i) {
         var label = model.labels[i];
         var foundKey = uniqueKeys[label];
         uniqueKeys[label] = (foundKey || 0) + 1;
@@ -120,7 +116,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     var linePickActive = true;
 
     var vm = styledData
-        .filter(function(d) { return unwrap(d).trace.visible; })
         .map(model.bind(0, layout))
         .map(viewModel);
 

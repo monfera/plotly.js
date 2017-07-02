@@ -27,8 +27,6 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
         return Lib.coerce(traceIn, traceOut, attributes, attr, dflt);
     }
 
-    //var dimensions = dimensionsDefaults(traceIn, traceOut);
-
     handleFillDefaults(traceIn, traceOut, defaultColor, layout, coerce);
 
     var fontDflt = {
@@ -43,11 +41,6 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('labels');
     coerce('values');
     coerce('valueformat');
-    coerce('visible');
-
-    if(!traceOut.visible.some(function identity(bool) {return bool;})) {
-        traceOut.visible = false;
-    }
 
     Lib.coerceFont(coerce, 'labelfont', fontDflt);
     Lib.coerceFont(coerce, 'font', fontDflt);

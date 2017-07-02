@@ -113,13 +113,6 @@ module.exports = {
         ]
     },
 
-    visible: {
-        valType: 'data_array',
-        dflt: [],
-        role: 'info',
-        description: 'Shows the column when set to `true` (the default). Hides the column for `false`.'
-    },
-
     fill: extendFlat({},
 
         // the default autocolorscale is set to Viridis - autocolorscale therefore defaults to false too,
