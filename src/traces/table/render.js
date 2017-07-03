@@ -297,15 +297,15 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             Drawing.font(d3.select(this), font);
         });
 
-    var columnCellText = columnCell.selectAll('.columnCellText')
+    var cellText = columnCell.selectAll('.cellText')
         .data(repeat, keyFun);
 
-    columnCellText.enter()
+    cellText.enter()
         .append('text')
-        .classed('columnCellText', true)
+        .classed('cellText', true)
         .attr('text-anchor', 'end');
 
-    columnCellText
+    cellText
         .text(function(d) {
             return d.dimension.valueFormat ? d3.format(d.dimension.valueFormat)(d.value) : d.value;
         });
