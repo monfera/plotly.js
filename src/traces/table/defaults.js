@@ -42,6 +42,8 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('labels');
     coerce('values');
     coerce('valueformat');
+    coerce('prefix');
+    coerce('suffix');
 
     coerce('width');
     coerce('align');

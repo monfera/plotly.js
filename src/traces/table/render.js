@@ -32,6 +32,8 @@ function model(layout, d, i) {
         labels = trace.labels,
         valueFormat = trace.valueformat,
         values = trace.values,
+        prefix = trace.prefix,
+        suffix = trace.suffix,
         columnWidths = trace.width,
         fill = trace.fill,
         line = trace.line,
@@ -70,6 +72,8 @@ function model(layout, d, i) {
         labels: labels,
         valueFormat: valueFormat,
         values: values,
+        prefix: prefix,
+        suffix: suffix,
         columnWidths: columnWidths,
         fill: fill,
         line: line,
@@ -360,7 +364,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     cellText
         .text(function(d) {
-            return d.dimension.valueFormat ? d3.format(d.dimension.valueFormat)(d.value) : d.value;
+            var prefix = gridPick(d.model.prefix, d.dimension.crossfilterDimensionIndex, d.rowNumber);
+            var suffix = gridPick(d.model.suffix, d.dimension.crossfilterDimensionIndex, d.rowNumber);
+            return prefix + (d.dimension.valueFormat ? d3.format(d.dimension.valueFormat)(d.value) : d.value) + suffix;
         })
         .each(function(d) {Drawing.font(d3.select(this), d.font);});
 };

@@ -126,11 +126,28 @@ module.exports = {
         ]
     },
 
+    prefix: {
+        valType: 'string',
+        arrayOk: true,
+        dflt: null,
+        role: 'style',
+        description: 'Prefix for cell values.'
+    },
+
+    suffix: {
+        valType: 'string',
+        arrayOk: true,
+        dflt: null,
+        role: 'style',
+        description: 'Suffix for cell values.'
+    },
+
     width: {
         valType: 'number',
         arrayOk: true,
         dflt: null,
-        role: 'style'
+        role: 'style',
+        description: 'The width of cells.'
     },
 
     align: extendFlat({}, annAttrs.align, {arrayOk: true}),
