@@ -35,6 +35,7 @@ function model(layout, d, i) {
         prefix = trace.prefix,
         suffix = trace.suffix,
         columnWidths = trace.width,
+        cellHeights = trace.height,
         fill = trace.fill,
         line = trace.line,
         align = trace.align,
@@ -75,6 +76,7 @@ function model(layout, d, i) {
         prefix: prefix,
         suffix: suffix,
         columnWidths: columnWidths,
+        cellHeights: cellHeights,
         fill: fill,
         line: line,
         align: align,
@@ -279,7 +281,10 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     columnTitle
         .attr('transform', 'translate(0,' + -c.columnTitleOffset + ')')
         .text(function(d) {return d.label;})
-        .each(function(d) {Drawing.font(columnTitle, d.model.labelFont);});
+        .each(function(d) {
+            Drawing.font(columnTitle, d.model.labelFont);
+            d.rowPitch = gridPick(d.model.cellHeights, d.crossfilterDimensionIndex, 0);
+        });
 
     var columnCells = columnOverlays.selectAll('.columnCells')
         .data(repeat, keyFun);
@@ -296,7 +301,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('columnCell', true);
 
     columnCell
-        .attr('transform', function(d, i) {return 'translate(' + 0 + ',' + i * rowPitch + ')';})
+        .attr('transform', function(d, i) {
+            return 'translate(' + 0 + ',' + (i + 1) * d.dimension.rowPitch + ')';
+        })
         .each(function(d, i) {
             var spec = d.model.font;
             var col = d.dimension.crossfilterDimensionIndex;
@@ -310,6 +317,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             d.rowNumber = i;
             d.align = gridPick(d.model.align, d.dimension.crossfilterDimensionIndex, i);
             d.valign = gridPick(d.model.valign, d.dimension.crossfilterDimensionIndex, i);
+            d.font = font;
         });
 
     var cellRect = columnCell.selectAll('.cellRect')
@@ -322,9 +330,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     var cellBorderWidth = 0.5;
 
     cellRect
-        .attr('width', function(d) {return d.dimension.columnWidth - cellBorderWidth})
-        .attr('height', rowPitch - cellBorderWidth)
-        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(rowPitch - cellPad)) + ')'})
+        .attr('width', function(d) {return d.dimension.columnWidth - cellBorderWidth;})
+        .attr('height', function(d) {return d.dimension.rowPitch - cellBorderWidth;})
+        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.dimension.rowPitch - cellPad)) + ')'})
         .attr('stroke', function(d) {
             return gridPick(d.model.line.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
         })
@@ -337,19 +345,23 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     var cellText = columnCell.selectAll('.cellText')
         .data(repeat, keyFun);
 
+    const fontSize = 12;
+
     cellText.enter()
         .append('text')
         .classed('cellText', true)
         .attr('transform', function(d) {
+            var rowPitch = d.dimension.rowPitch;
+            var fontSize = d.font.size;
             var xOffset = ({
                 center: d.dimension.columnWidth / 2,
                 right: d.dimension.columnWidth - cellPad,
                 left: cellPad
             })[d.align];
             var yOffset = ({
-                top: -8,
-                center: -4,
-                bottom: 0
+                top: -rowPitch + fontSize + cellPad,
+                center: -rowPitch / 2 + fontSize / 2 + cellPad / 2,
+                bottom: -cellPad
             })[d.valign];
             return 'translate(' + xOffset + ' ' + yOffset + ')';
         })

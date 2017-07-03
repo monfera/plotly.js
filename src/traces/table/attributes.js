@@ -150,6 +150,14 @@ module.exports = {
         description: 'The width of cells.'
     },
 
+    height: {
+        valType: 'number',
+        arrayOk: true,
+        dflt: null,
+        role: 'style',
+        description: 'The height of cells.'
+    },
+
     align: extendFlat({}, annAttrs.align, {arrayOk: true}),
     valign: extendFlat({}, annAttrs.valign, {arrayOk: true}),
 

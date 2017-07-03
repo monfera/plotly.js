@@ -46,6 +46,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('suffix');
 
     coerce('width');
+    coerce('height');
     coerce('align');
     coerce('valign');
 
