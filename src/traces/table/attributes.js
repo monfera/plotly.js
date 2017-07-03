@@ -113,6 +113,13 @@ module.exports = {
         ]
     },
 
+    width: {
+        valType: 'number',
+        arrayOk: true,
+        dflt: null,
+        role: 'style'
+    },
+
     fill: extendFlat({},
 
         // the default autocolorscale is set to Viridis - autocolorscale therefore defaults to false too,

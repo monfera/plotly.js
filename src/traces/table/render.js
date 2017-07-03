@@ -31,10 +31,22 @@ function model(layout, d, i) {
         labelFont = trace.labelfont,
         labels = trace.labels,
         valueFormat = trace.valueformat,
-        values = trace.values;
+        values = trace.values,
+        columnWidths = trace.width;
+
+    var colCount = labels.length;
 
     var groupWidth = Math.floor(width * (domain.x[1] - domain.x[0]));
     var groupHeight = Math.floor(layout.height * (domain.y[1] - domain.y[0]));
+
+    columnWidths = labels.map(function(d, i) {
+        //if(!Array.isArray(columnWidths)) debugger
+        return Array.isArray(columnWidths) ?
+            columnWidths[Math.min(i, columnWidths.length - 1)] :
+            isFinite(columnWidths) && columnWidths !== null ?
+                columnWidths :
+                groupWidth / (colCount - 1); // todo revise -1 which comes from pre-column era
+    });
 
     var pad = layout.margin || {l: 80, r: 80, t: 100, b: 80};
     var rowContentWidth = groupWidth;
@@ -42,7 +54,7 @@ function model(layout, d, i) {
 
     return {
         key: i,
-        colCount: values.length,
+        colCount: colCount,
         tickDistance: c.tickDistance,
         font: font,
         labelFont: labelFont,
@@ -53,7 +65,8 @@ function model(layout, d, i) {
         height: rowHeight,
         labels: labels,
         valueFormat: valueFormat,
-        values: values
+        values: values,
+        columnWidths: columnWidths
     };
 }
 
@@ -63,10 +76,13 @@ function viewModel(model) {
     var height = model.height;
 
     var xScale = function(d) {return width * d / Math.max(1, model.colCount - 1);};
+    var newXScale = function (d) {
+        return d.parent.dimensions.reduce(function(prev, next) {return next.xIndex /*- 1*/ < d.xIndex /*&& next.xIndex !== 0*/ ? prev + next.columnWidth : prev}, 0);
+    }
 
     var viewModel = {
         key: model.key,
-        xScale: xScale,
+        //xScale: xScale,
         model: model
     };
 
@@ -84,14 +100,20 @@ function viewModel(model) {
             crossfilterDimensionIndex: i,
             height: height,
             values: model.values[i].slice(0, 10),
-            xScale: xScale,
-            x: xScale(i),
+            //xScale: xScale,
+            newXScale: newXScale,
+            x: undefined, // see below
             unitScale: unitScale(height, c.verticalPadding),
             filter: [0, 1],
             parent: viewModel,
             valueFormat:  model.valueFormat[i],
-            model: model
+            model: model,
+            columnWidth: model.columnWidths[i]
         };
+    });
+
+    viewModel.dimensions.forEach(function(dim) {
+        dim.x = newXScale(dim);
     });
 
     return viewModel;
@@ -162,7 +184,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('yColumn', true);
 
     yColumn
-        .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
+        .attr('transform', function(d) {return 'translate(' + d.newXScale(d) + ', 0)';});
 
     yColumn
         .call(d3.behavior.drag()
@@ -178,11 +200,11 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .sort(function(a, b) {return a.x - b.x;})
                     .each(function(dd, i) {
                         dd.xIndex = i;
-                        dd.x = d === dd ? dd.x : dd.xScale(dd.xIndex);
+                        dd.x = d === dd ? dd.x : dd.newXScale(dd);
                     });
 
                 yColumn.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
-                    .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
+                    .attr('transform', function(d) {return 'translate(' + d.newXScale(d) + ', 0)';});
                 d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                 yColumn.each(function(dd, i, ii) {if(ii === d.parent.key) p.dimensions[i] = dd;});
             })
@@ -194,7 +216,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     }
                     return;
                 }
-                d.x = d.xScale(d.xIndex);
+                //debugger // d.parent.dimensions[0].columnWidth
+                d.x = d.newXScale(d);  //d.xScale(d.xIndex);
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                 linePickActive = true;
@@ -286,7 +309,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('text-anchor', 'end');
 
     columnCellText
-        //.each(function(d) {Drawing.font(d3.select(this), d.model.font);})
         .text(function(d) {
             return d.dimension.valueFormat ? d3.format(d.dimension.valueFormat)(d.value) : d.value;
         });
