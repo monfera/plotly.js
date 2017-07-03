@@ -169,7 +169,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .style('left', 0)
         .style('overflow', 'visible')
         .style('shape-rendering', 'crispEdges')
-        .style('pointer-events', 'none');
+        .style('pointer-events', 'all'); // todo restore 'none'
 
     tableControlOverlay
         .attr('width', function(d) {return d.model.width + d.model.pad.l + d.model.pad.r;})
@@ -372,7 +372,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         });
 
     cellText
-        .text(function(d) {
+        .html(function(d) {
             var prefix = gridPick(d.model.prefix, d.dimension.crossfilterDimensionIndex, d.rowNumber);
             var suffix = gridPick(d.model.suffix, d.dimension.crossfilterDimensionIndex, d.rowNumber);
             return prefix + (d.dimension.valueFormat ? d3.format(d.dimension.valueFormat)(d.value) : d.value) + suffix;
