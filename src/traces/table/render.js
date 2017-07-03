@@ -317,6 +317,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             d.rowNumber = i;
             d.align = gridPick(d.model.align, d.dimension.crossfilterDimensionIndex, i);
             d.valign = gridPick(d.model.valign, d.dimension.crossfilterDimensionIndex, i);
+            d.cellBorderWidth = gridPick(d.model.line.width, d.dimension.crossfilterDimensionIndex, i)
             d.font = font;
         });
 
@@ -327,16 +328,14 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .append('rect')
         .classed('cellRect', true);
 
-    var cellBorderWidth = 0.5;
-
     cellRect
-        .attr('width', function(d) {return d.dimension.columnWidth - cellBorderWidth;})
-        .attr('height', function(d) {return d.dimension.rowPitch - cellBorderWidth;})
+        .attr('width', function(d) {return d.dimension.columnWidth - d.cellBorderWidth;})
+        .attr('height', function(d) {return d.dimension.rowPitch - d.cellBorderWidth;})
         .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.dimension.rowPitch - cellPad)) + ')'})
         .attr('stroke', function(d) {
             return gridPick(d.model.line.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
         })
-        .attr('stroke-width', cellBorderWidth)
+        .attr('stroke-width', function(d) {return d.cellBorderWidth;})
         .attr('stroke-opacity', 1)
         .attr('fill', function(d) {
             return gridPick(d.model.fill.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
@@ -344,8 +343,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     var cellText = columnCell.selectAll('.cellText')
         .data(repeat, keyFun);
-
-    const fontSize = 12;
 
     cellText.enter()
         .append('text')

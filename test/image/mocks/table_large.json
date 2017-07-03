@@ -25,7 +25,7 @@
         "align": ["right", "center", "center", "right", "right", "right", "left", "right"],
         "valign": ["top", "bottom", "center"],
 
-        "prefix": ["", "", "", "", "US ", ""],
+        "prefix": ["", "", "", "", "U<br>S<br> ", ""],
         "suffix": ["m", ""],
 
         "font": {
@@ -46,7 +46,7 @@
             "color": [
                 ["grey"]
             ],
-            "width": 2
+            "width": 0.5
         },
 
         "type": "table",
