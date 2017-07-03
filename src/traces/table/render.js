@@ -32,7 +32,8 @@ function model(layout, d, i) {
         labels = trace.labels,
         valueFormat = trace.valueformat,
         values = trace.values,
-        columnWidths = trace.width;
+        columnWidths = trace.width,
+        line = trace.line;
 
     var colCount = labels.length;
 
@@ -66,7 +67,8 @@ function model(layout, d, i) {
         labels: labels,
         valueFormat: valueFormat,
         values: values,
-        columnWidths: columnWidths
+        columnWidths: columnWidths,
+        line: line
     };
 }
 
@@ -155,7 +157,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .style('left', 0)
         .style('overflow', 'visible')
         .style('shape-rendering', 'crispEdges')
-        .style('pointer-events', 'auto');
+        .style('pointer-events', 'none');
 
     tableControlOverlay
         .attr('width', function(d) {return d.model.width + d.model.pad.l + d.model.pad.r;})
@@ -206,6 +208,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .attr('transform', function(d) {return 'translate(' + d.newXScale(d) + ', 0)';});
                 d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                 yColumn.each(function(dd, i, ii) {if(ii === d.parent.key) p.dimensions[i] = dd;});
+                this.parentNode.appendChild(this)
             })
             .on('dragend', function(d) {
                 var p = d.parent;
@@ -260,8 +263,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('columnTitle', true)
         .attr('text-anchor', 'start')
         .style('cursor', 'ew-resize')
-        //.style('user-select', 'none')
-        //.style('pointer-events', 'auto');
+        .style('user-select', 'none')
+        .style('pointer-events', 'auto');
 
     columnTitle
         .attr('transform', 'translate(0,' + -c.columnTitleOffset + ')')
@@ -274,8 +277,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     columnCells.enter()
         .append('g')
         .classed('columnCells', true);
-
-    columnCells.each(function(d) {Drawing.font(d3.select(this), d.font);});
 
     var columnCell = columnCells.selectAll('.columnCell')
         .data(function(d) {return d.values.map(function(v, i) {return {key: i, dimension: d, model: d.model, value: v};});}, keyFun);
@@ -295,7 +296,31 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 family: gridPick(spec.family, col, i)
             };
             Drawing.font(d3.select(this), font);
+            d.rowNumber = i;
         });
+
+    var cellRect = columnCell.selectAll('.cellRect')
+        .data(repeat, keyFun);
+
+    cellRect.enter()
+        .append('rect')
+        .classed('cellRect', true)
+        .attr('fill-opacity', 0.1)
+        .attr('fill', function(d) {
+            return gridPick(d.model.line.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
+        });
+
+    var cellBorderWidth = 0.5;
+
+    cellRect
+        .attr('width', function(d) {return d.dimension.columnWidth - cellBorderWidth})
+        .attr('height', rowPitch - cellBorderWidth)
+        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(rowPitch - cellPad)) + ')'})
+        .attr('stroke', function(d) {
+            return gridPick(d.model.line.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
+        })
+        .attr('stroke-width', cellBorderWidth)
+        .attr('stroke-opacity', 1);
 
     var cellText = columnCell.selectAll('.cellText')
         .data(repeat, keyFun);
@@ -308,20 +333,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     cellText
         .text(function(d) {
             return d.dimension.valueFormat ? d3.format(d.dimension.valueFormat)(d.value) : d.value;
-        });
-
-    var cellRect = columnCell.selectAll('.cellRect')
-        .data(repeat, keyFun);
-
-    cellRect.enter()
-        .append('rect')
-        .attr('fill-opacity', 0.2)
-        .classed('cellRect', true);
-
-    cellRect
-        .attr('width', function(d) {return d.dimension.columnWidth})
-        .attr('height', rowPitch)
-        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(rowPitch - cellPad)) + ')'})
-        .attr('stroke', 'grey')
-        .attr('stroke-width', 1);
+        })
+        .each(function(d) {Drawing.font(d3.select(this), d.font);});
 };
