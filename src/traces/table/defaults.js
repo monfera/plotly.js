@@ -44,6 +44,9 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     coerce('width');
 
+    coerce('line.width');
+    coerce('line.color');
+
     Lib.coerceFont(coerce, 'labelfont', fontDflt);
     Lib.coerceFont(coerce, 'font', fontDflt);
 };

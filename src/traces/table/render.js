@@ -70,19 +70,20 @@ function model(layout, d, i) {
     };
 }
 
+var rowPitch = 20;
+var cellPad = 3;
+
 function viewModel(model) {
 
     var width = model.width;
     var height = model.height;
 
-    var xScale = function(d) {return width * d / Math.max(1, model.colCount - 1);};
     var newXScale = function (d) {
-        return d.parent.dimensions.reduce(function(prev, next) {return next.xIndex /*- 1*/ < d.xIndex /*&& next.xIndex !== 0*/ ? prev + next.columnWidth : prev}, 0);
+        return d.parent.dimensions.reduce(function(prev, next) {return next.xIndex - 1 < d.xIndex ? prev + next.columnWidth : prev}, 0);
     }
 
     var viewModel = {
         key: model.key,
-        //xScale: xScale,
         model: model
     };
 
@@ -100,7 +101,6 @@ function viewModel(model) {
             crossfilterDimensionIndex: i,
             height: height,
             values: model.values[i].slice(0, 10),
-            //xScale: xScale,
             newXScale: newXScale,
             x: undefined, // see below
             unitScale: unitScale(height, c.verticalPadding),
@@ -115,7 +115,6 @@ function viewModel(model) {
     viewModel.dimensions.forEach(function(dim) {
         dim.x = newXScale(dim);
     });
-
     return viewModel;
 }
 
@@ -216,8 +215,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     }
                     return;
                 }
-                //debugger // d.parent.dimensions[0].columnWidth
-                d.x = d.newXScale(d);  //d.xScale(d.xIndex);
+                d.x = d.newXScale(d);
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                 linePickActive = true;
@@ -287,7 +285,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('columnCell', true);
 
     columnCell
-        .attr('transform', function(d, i) {return 'translate(' + 0 + ',' + i * 20 + ')';})
+        .attr('transform', function(d, i) {return 'translate(' + 0 + ',' + i * rowPitch + ')';})
         .each(function(d, i) {
             var spec = d.model.font;
             var col = d.dimension.crossfilterDimensionIndex;
@@ -305,11 +303,25 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     columnCellText.enter()
         .append('text')
         .classed('columnCellText', true)
-        .attr('alignment-baseline', 'middle')
         .attr('text-anchor', 'end');
 
     columnCellText
         .text(function(d) {
             return d.dimension.valueFormat ? d3.format(d.dimension.valueFormat)(d.value) : d.value;
         });
+
+    var cellRect = columnCell.selectAll('.cellRect')
+        .data(repeat, keyFun);
+
+    cellRect.enter()
+        .append('rect')
+        .attr('fill-opacity', 0.2)
+        .classed('cellRect', true);
+
+    cellRect
+        .attr('width', function(d) {return d.dimension.columnWidth})
+        .attr('height', rowPitch)
+        .attr('transform', function(d) {return 'translate(' + (-(d.dimension.columnWidth - cellPad)) + ' ' + (-(rowPitch - cellPad)) + ')'})
+        .attr('stroke', 'grey')
+        .attr('stroke-width', 1);
 };

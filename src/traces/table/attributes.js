@@ -47,6 +47,19 @@ module.exports = {
         }
     },
 
+    line: {
+        width: {
+            valType: 'number',
+            arrayOk: true,
+            role: 'style'
+        },
+        color: {
+            valType: 'color',
+            arrayOk: true,
+            role: 'style'
+        }
+    },
+
     font: {
         family: {
             valType: 'string',
@@ -70,8 +83,7 @@ module.exports = {
         size: {
             valType: 'number',
             arrayOk: true,
-            role: 'style',
-            min: 1
+            role: 'style'
         },
         color: {
             valType: 'color',
