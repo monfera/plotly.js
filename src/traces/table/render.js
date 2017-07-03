@@ -79,7 +79,7 @@ function viewModel(model) {
     var height = model.height;
 
     var newXScale = function (d) {
-        return d.parent.dimensions.reduce(function(prev, next) {return next.xIndex - 1 < d.xIndex ? prev + next.columnWidth : prev}, 0);
+        return d.parent.dimensions.reduce(function(prev, next) {return next.xIndex < d.xIndex ? prev + next.columnWidth : prev}, 0);
     }
 
     var viewModel = {
@@ -155,7 +155,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .style('left', 0)
         .style('overflow', 'visible')
         .style('shape-rendering', 'crispEdges')
-        .style('pointer-events', 'none');
+        .style('pointer-events', 'auto');
 
     tableControlOverlay
         .attr('width', function(d) {return d.model.width + d.model.pad.l + d.model.pad.r;})
@@ -258,10 +258,10 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     columnTitle.enter()
         .append('text')
         .classed('columnTitle', true)
-        .attr('text-anchor', 'end')
+        .attr('text-anchor', 'start')
         .style('cursor', 'ew-resize')
-        .style('user-select', 'none')
-        .style('pointer-events', 'auto');
+        //.style('user-select', 'none')
+        //.style('pointer-events', 'auto');
 
     columnTitle
         .attr('transform', 'translate(0,' + -c.columnTitleOffset + ')')
@@ -303,7 +303,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     cellText.enter()
         .append('text')
         .classed('cellText', true)
-        .attr('text-anchor', 'end');
+        .attr('text-anchor', 'start');
 
     cellText
         .text(function(d) {
@@ -321,7 +321,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     cellRect
         .attr('width', function(d) {return d.dimension.columnWidth})
         .attr('height', rowPitch)
-        .attr('transform', function(d) {return 'translate(' + (-(d.dimension.columnWidth - cellPad)) + ' ' + (-(rowPitch - cellPad)) + ')'})
+        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(rowPitch - cellPad)) + ')'})
         .attr('stroke', 'grey')
         .attr('stroke-width', 1);
 };

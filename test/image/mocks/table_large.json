@@ -8,15 +8,14 @@
       "size": 2,
       "family": "sans-serif"
     },
-    "margin": {"t": 106, "r": 70, "b": 54, "l": 90}
+    "margin": {"t": 106, "r": 60, "b": 54, "l": 60}
   },
 
   "data": [{
 
-    "fontOld": {
-      "color": "magenta",
-      "size": 10,
-      "family": "sans-serif"
+    "domain": {
+        "x": [0.05, 0.95],
+        "y": [0.05, 0.85]
     },
 
     "width": [110, 60, 90, 90, 50, 70, 80, 60, 100, 70],
