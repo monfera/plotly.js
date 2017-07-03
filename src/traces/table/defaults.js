@@ -16,6 +16,7 @@ var maxDimensionCount = require('./constants').maxDimensionCount;
 
 function handleFillDefaults(traceIn, traceOut, defaultColor, layout, coerce) {
 
+    coerce('fill.color');
     if(hasColorscale(traceIn, 'fill')) {
         coerce('fill.colorscale');
         colorscaleDefaults(traceIn, traceOut, layout, coerce, {prefix: 'fill.', cLetter: 'c'});

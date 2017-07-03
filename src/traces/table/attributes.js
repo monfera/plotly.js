@@ -138,8 +138,12 @@ module.exports = {
         // to avoid being overridden by the blue-white-red autocolor palette
         extendDeep(
             {},
-            colorAttributes('line'),
+            colorAttributes('fill'),
             {
+                color: extendDeep(
+                    {},
+                    colorAttributes('fill').color
+                ),
                 colorscale: extendDeep(
                     {},
                     colorAttributes('line').colorscale,
@@ -147,7 +151,7 @@ module.exports = {
                 ),
                 autocolorscale: extendDeep(
                     {},
-                    colorAttributes('line').autocolorscale,
+                    colorAttributes('fill').autocolorscale,
                     {
                         dflt: false,
                         description: [

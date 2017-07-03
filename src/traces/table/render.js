@@ -33,6 +33,7 @@ function model(layout, d, i) {
         valueFormat = trace.valueformat,
         values = trace.values,
         columnWidths = trace.width,
+        fill = trace.fill,
         line = trace.line;
 
     var colCount = labels.length;
@@ -68,6 +69,7 @@ function model(layout, d, i) {
         valueFormat: valueFormat,
         values: values,
         columnWidths: columnWidths,
+        fill: fill,
         line: line
     };
 }
@@ -304,11 +306,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     cellRect.enter()
         .append('rect')
-        .classed('cellRect', true)
-        .attr('fill-opacity', 0.1)
-        .attr('fill', function(d) {
-            return gridPick(d.model.line.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
-        });
+        .classed('cellRect', true);
 
     var cellBorderWidth = 0.5;
 
@@ -320,7 +318,10 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             return gridPick(d.model.line.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
         })
         .attr('stroke-width', cellBorderWidth)
-        .attr('stroke-opacity', 1);
+        .attr('stroke-opacity', 1)
+        .attr('fill', function(d) {
+            return gridPick(d.model.fill.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
+        });
 
     var cellText = columnCell.selectAll('.cellText')
         .data(repeat, keyFun);
