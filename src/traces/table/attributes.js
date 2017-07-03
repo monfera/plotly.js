@@ -11,6 +11,7 @@
 var colorAttributes = require('../../components/colorscale/color_attributes');
 var colorbarAttrs = require('../../components/colorbar/attributes');
 var colorscales = require('../../components/colorscale/scales');
+var annAttrs = require('../../components/annotations/attributes');
 var fontAttrs = require('../../plots/font_attributes');
 
 var extendDeep = require('../../lib/extend').extendDeep;
@@ -131,6 +132,9 @@ module.exports = {
         dflt: null,
         role: 'style'
     },
+
+    align: extendFlat({}, annAttrs.align, {arrayOk: true}),
+    valign: extendFlat({}, annAttrs.valign, {arrayOk: true}),
 
     fill: extendFlat({},
 

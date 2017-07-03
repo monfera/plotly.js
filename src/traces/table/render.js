@@ -34,7 +34,9 @@ function model(layout, d, i) {
         values = trace.values,
         columnWidths = trace.width,
         fill = trace.fill,
-        line = trace.line;
+        line = trace.line,
+        align = trace.align,
+        valign = trace.valign;
 
     var colCount = labels.length;
 
@@ -70,7 +72,9 @@ function model(layout, d, i) {
         values: values,
         columnWidths: columnWidths,
         fill: fill,
-        line: line
+        line: line,
+        align: align,
+        valign: valign
     };
 }
 
@@ -298,7 +302,10 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 family: gridPick(spec.family, col, i)
             };
             Drawing.font(d3.select(this), font);
+
             d.rowNumber = i;
+            d.align = gridPick(d.model.align, d.dimension.crossfilterDimensionIndex, i);
+            d.valign = gridPick(d.model.valign, d.dimension.crossfilterDimensionIndex, i);
         });
 
     var cellRect = columnCell.selectAll('.cellRect')
@@ -329,7 +336,27 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     cellText.enter()
         .append('text')
         .classed('cellText', true)
-        .attr('text-anchor', 'start');
+        .attr('transform', function(d) {
+            var xOffset = ({
+                center: d.dimension.columnWidth / 2,
+                right: d.dimension.columnWidth - cellPad,
+                left: cellPad
+            })[d.align];
+            var yOffset = ({
+                top: -8,
+                center: -4,
+                bottom: 0
+            })[d.valign];
+            return 'translate(' + xOffset + ' ' + yOffset + ')';
+        })
+        .attr('text-anchor', function(d) {
+            switch(d.align) {
+                case 'left': return 'start';
+                case 'right': return 'end';
+                case 'center': return 'middle';
+                default: return null
+            }
+        });
 
     cellText
         .text(function(d) {

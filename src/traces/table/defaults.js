@@ -44,6 +44,8 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('valueformat');
 
     coerce('width');
+    coerce('align');
+    coerce('valign');
 
     coerce('line.width');
     coerce('line.color');
