@@ -10,25 +10,11 @@
 
 var Lib = require('../../lib');
 var attributes = require('./attributes');
-var hasColorscale = require('../../components/colorscale/has_colorscale');
-var colorscaleDefaults = require('../../components/colorscale/defaults');
-var maxDimensionCount = require('./constants').maxDimensionCount;
-
-function handleFillDefaults(traceIn, traceOut, defaultColor, layout, coerce) {
-
-    coerce('fill.color');
-    if(hasColorscale(traceIn, 'fill')) {
-        coerce('fill.colorscale');
-        colorscaleDefaults(traceIn, traceOut, layout, coerce, {prefix: 'fill.', cLetter: 'c'});
-    }
-}
 
 module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout) {
     function coerce(attr, dflt) {
         return Lib.coerce(traceIn, traceOut, attributes, attr, dflt);
     }
-
-    handleFillDefaults(traceIn, traceOut, defaultColor, layout, coerce);
 
     var fontDflt = {
         family: layout.font.family,
@@ -52,6 +38,8 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     coerce('line.width');
     coerce('line.color');
+
+    coerce('fill.color');
 
     Lib.coerceFont(coerce, 'labelfont', fontDflt);
     Lib.coerceFont(coerce, 'font', fontDflt);

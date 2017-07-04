@@ -8,13 +8,9 @@
 
 'use strict';
 
-var colorAttributes = require('../../components/colorscale/color_attributes');
-var colorbarAttrs = require('../../components/colorbar/attributes');
-var colorscales = require('../../components/colorscale/scales');
 var annAttrs = require('../../components/annotations/attributes');
 var fontAttrs = require('../../plots/font_attributes');
 
-var extendDeep = require('../../lib/extend').extendDeep;
 var extendFlat = require('../../lib/extend').extendFlat;
 
 module.exports = {
@@ -161,54 +157,15 @@ module.exports = {
     align: extendFlat({}, annAttrs.align, {arrayOk: true}),
     valign: extendFlat({}, annAttrs.valign, {arrayOk: true}),
 
-    fill: extendFlat({},
-
-        // the default autocolorscale is set to Viridis - autocolorscale therefore defaults to false too,
-        // to avoid being overridden by the blue-white-red autocolor palette
-        extendDeep(
-            {},
-            colorAttributes('fill'),
-            {
-                color: extendDeep(
-                    {},
-                    colorAttributes('fill').color
-                ),
-                colorscale: extendDeep(
-                    {},
-                    colorAttributes('line').colorscale,
-                    {dflt: colorscales.Viridis}
-                ),
-                autocolorscale: extendDeep(
-                    {},
-                    colorAttributes('fill').autocolorscale,
-                    {
-                        dflt: false,
-                        description: [
-                            'Has an effect only if line.color` is set to a numerical array.',
-                            'Determines whether the colorscale is a default palette (`autocolorscale: true`)',
-                            'or the palette determined by `line.colorscale`.',
-                            'In case `colorscale` is unspecified or `autocolorscale` is true, the default ',
-                            'palette will be chosen according to whether numbers in the `color` array are',
-                            'all positive, all negative or mixed.',
-                            'The default value is false, so that `table` colorscale can default to `Viridis`.'
-                        ].join(' ')
-                    }
-                )
-
-            }
-        ),
-
-        {
-            showscale: {
-                valType: 'boolean',
-                role: 'info',
-                dflt: false,
-                description: [
-                    'Has an effect only if `line.color` is set to a numerical array.',
-                    'Determines whether or not a colorbar is displayed.'
-                ].join(' ')
-            },
-            colorbar: colorbarAttrs
+    fill: {
+        color: {
+            valType: 'color',
+            arrayOk: true,
+            role: 'style',
+            description: [
+                'Sets the cell fill color. It accepts either a specific color',
+                ' or an array of colors.'
+            ].join('')
         }
-    )
+    }
 };

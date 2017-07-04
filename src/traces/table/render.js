@@ -134,11 +134,11 @@ function viewModel(model) {
 
 function gridPick(spec, col, row) {
     if(Array.isArray(spec)) {
-        const colorColumn = spec[Math.min(col, spec.length - 1)];
-        if(Array.isArray(colorColumn)) {
-            return colorColumn[Math.min(row, colorColumn.length - 1)];
+        const column = spec[Math.min(col, spec.length - 1)];
+        if(Array.isArray(column)) {
+            return column[Math.min(row, column.length - 1)];
         } else {
-            return colorColumn;
+            return column;
         }
     } else {
         return spec;
