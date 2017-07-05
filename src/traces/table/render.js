@@ -258,15 +258,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .append('g')
         .classed('columnOverlays', true);
 
-    columnOverlays.selectAll('.column').remove();
-
-    var column = columnOverlays.selectAll('.column')
-        .data(repeat, keyFun);
-
-    column.enter()
-        .append('g')
-        .classed('column', true);
-
     var columnHeading = columnOverlays.selectAll('.columnHeading')
         .data(repeat, keyFun);
 

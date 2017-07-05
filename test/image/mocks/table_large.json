@@ -1,7 +1,7 @@
 {
     "layout": {
         "width": 684,
-        "height": 400,
+        "height": 800,
         "title": "Widget parameters and cost",
         "font": {
             "color": "blue",
@@ -22,7 +22,7 @@
         "height": 30,
 
 
-        "align": ["right", "center", "center", "right", "right", "right", "left", "right"],
+        "align": ["center", "center", "center", "right", "right", "right", "left", "right"],
         "valign": ["top", "bottom", "center"],
 
         "prefix": ["", "", "", "", "U<br>S<br> ", ""],
