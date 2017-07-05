@@ -334,46 +334,72 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             return gridPick(d.model.line.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
         })
         .attr('stroke-width', function(d) {return d.cellBorderWidth;})
-        .attr('stroke-opacity', 1)
         .attr('fill', function(d) {
             return gridPick(d.model.fill.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
         });
+
+    var cellLine = columnCell.selectAll('.cellLine')
+        .data(repeat, keyFun);
+
+    cellLine.enter()
+        .append('path')
+        .classed('cellLine', true);
+
+    cellLine
+        .attr('id', function(d) {return 'textpath' + d.dimension.xIndex;})
+        .attr('d', function(d) {
+            var x1 = 0;
+            var x2 = d.dimension.columnWidth;
+            var y = d.dimension.rowPitch;
+            return d3.svg.line()([[x1, y], [x2, y]]);
+        })
+        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.dimension.rowPitch - c.cellPad)) + ')'});
 
     var cellText = columnCell.selectAll('.cellText')
         .data(repeat, keyFun);
 
     cellText.enter()
         .append('text')
-        .classed('cellText', true)
-        .attr('transform', function(d) {
-            var rowPitch = d.dimension.rowPitch;
-            var fontSize = d.font.size;
-            var xOffset = ({
-                center: d.dimension.columnWidth / 2,
-                right: d.dimension.columnWidth - c.cellPad,
-                left: c.cellPad
-            })[d.align];
-            var yOffset = ({
-                top: -rowPitch + fontSize + c.cellPad,
-                center: -rowPitch / 2 + fontSize / 2 + c.cellPad / 2,
-                bottom: -c.cellPad
-            })[d.valign];
-            return 'translate(' + xOffset + ' ' + yOffset + ')';
-        })
-        .attr('text-anchor', function(d) {
-            switch(d.align) {
-                case 'left': return 'start';
-                case 'right': return 'end';
-                case 'center': return 'middle';
-                default: return null
-            }
-        });
+        .classed('cellText', true);
 
     cellText
-        .html(function(d) {
+        .attr('dy', function(d) {
+            var rowPitch = d.dimension.rowPitch;
+            var fontSize = d.font.size;
+            return ({
+                top: -rowPitch + fontSize,
+                center: -rowPitch / 2 + fontSize * 0.37 + c.cellPad / 2,
+                bottom: -c.cellPad
+            })[d.valign];
+        })
+        .each(function(d) {Drawing.font(d3.select(this), d.font);});
+
+    var textPath = cellText.selectAll('.textPath')
+        .data(repeat, keyFun);
+
+    textPath.enter()
+        .append('textPath')
+        .classed('textPath', true);
+
+    textPath
+        .attr('xlink:href', function(d) {return '#textpath' + d.dimension.xIndex;})
+        .attr('text-anchor', function(d) {
+            return ({
+                left: 'start',
+                right: 'end',
+                center: 'middle'
+            })[d.align];
+        })
+        .attr('startOffset', function(d) {
+            return ({
+                left: c.cellPad,
+                right: d.dimension.columnWidth - c.cellPad,
+                center: '50%'
+            })[d.align];
+        })
+        .text(function(d) {
             var prefix = gridPick(d.model.prefix, d.dimension.crossfilterDimensionIndex, d.rowNumber);
             var suffix = gridPick(d.model.suffix, d.dimension.crossfilterDimensionIndex, d.rowNumber);
             return prefix + (d.dimension.valueFormat ? d3.format(d.dimension.valueFormat)(d.value) : d.value) + suffix;
-        })
-        .each(function(d) {Drawing.font(d3.select(this), d.font);});
+        });
 };
