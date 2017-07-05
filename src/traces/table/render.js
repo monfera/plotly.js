@@ -47,13 +47,13 @@ function model(layout, d, i) {
     var groupHeight = Math.floor(layout.height * (domain.y[1] - domain.y[0]));
 
     columnWidths = labels.map(function(d, i) {
-        //if(!Array.isArray(columnWidths)) debugger
         return Array.isArray(columnWidths) ?
             columnWidths[Math.min(i, columnWidths.length - 1)] :
-            isFinite(columnWidths) && columnWidths !== null ?
-                columnWidths :
-                groupWidth / (colCount - 1); // todo revise -1 which comes from pre-column era
+            isFinite(columnWidths) && columnWidths !== null ? columnWidths : 1;
     });
+
+    var totalColumnWidths = columnWidths.reduce(function(p, n) {return p + n;}, 0);
+    columnWidths = columnWidths.map(function(d) {return d / totalColumnWidths * groupWidth;});
 
     var pad = layout.margin || {l: 80, r: 80, t: 100, b: 80};
     var rowContentWidth = groupWidth;
@@ -83,9 +83,6 @@ function model(layout, d, i) {
         valign: valign
     };
 }
-
-var rowPitch = 20;
-var cellPad = 3;
 
 function viewModel(model) {
 
@@ -208,7 +205,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 if(domainBrushing) {
                     return;
                 }
-                d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag, d3.event.x));
+                d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag - d.columnWidth, d3.event.x));
                 yColumn
                     .sort(function(a, b) {return a.x + a.columnWidth / 2 - b.x - b.columnWidth / 2;})
                     .each(function(dd, i) {
@@ -341,7 +338,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     cellRect
         .attr('width', function(d) {return d.dimension.columnWidth - d.cellBorderWidth;})
         .attr('height', function(d) {return d.dimension.rowPitch - d.cellBorderWidth;})
-        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.dimension.rowPitch - cellPad)) + ')'})
+        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.dimension.rowPitch - c.cellPad)) + ')'})
         .attr('stroke', function(d) {
             return gridPick(d.model.line.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
         })
@@ -362,13 +359,13 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             var fontSize = d.font.size;
             var xOffset = ({
                 center: d.dimension.columnWidth / 2,
-                right: d.dimension.columnWidth - cellPad,
-                left: cellPad
+                right: d.dimension.columnWidth - c.cellPad,
+                left: c.cellPad
             })[d.align];
             var yOffset = ({
-                top: -rowPitch + fontSize + cellPad,
-                center: -rowPitch / 2 + fontSize / 2 + cellPad / 2,
-                bottom: -cellPad
+                top: -rowPitch + fontSize + c.cellPad,
+                center: -rowPitch / 2 + fontSize / 2 + c.cellPad / 2,
+                bottom: -c.cellPad
             })[d.valign];
             return 'translate(' + xOffset + ' ' + yOffset + ')';
         })
