@@ -210,15 +210,22 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 }
                 d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag, d3.event.x));
                 yColumn
-                    .sort(function(a, b) {return a.x - b.x;})
+                    .sort(function(a, b) {return a.x + a.columnWidth / 2 - b.x - b.columnWidth / 2;})
                     .each(function(dd, i) {
                         dd.xIndex = i;
                         dd.x = d === dd ? dd.x : dd.newXScale(dd);
                     });
 
                 yColumn.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
+                    .transition()
+                    .ease(c.transitionEase)
+                    .duration(c.transitionDuration)
                     .attr('transform', function(d) {return 'translate(' + d.newXScale(d) + ', 0)';});
-                d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
+                d3.select(this)
+                    .transition()
+                    .ease(c.transitionEase)
+                    .duration(c.transitionDuration)
+                    .attr('transform', 'translate(' + d.x + ', -5)');
                 yColumn.each(function(dd, i, ii) {if(ii === d.parent.key) p.dimensions[i] = dd;});
                 this.parentNode.appendChild(this)
             })
@@ -232,6 +239,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 }
                 d.x = d.newXScale(d);
                 d3.select(this)
+                    .transition()
+                    .ease(c.releaseTransitionEase, 1, .5)
+                    .duration(c.releaseTransitionDuration)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                 linePickActive = true;
 

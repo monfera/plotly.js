@@ -13,6 +13,10 @@ module.exports = {
     overdrag: 45,
     columnTitleOffset: 28,
     columnExtentOffset: 10,
+    transitionEase: 'cubic-out',
+    transitionDuration: 100,
+    releaseTransitionEase: 'elastic',
+    releaseTransitionDuration: 300,
     bar: {
         width: 4, // Visible width of the filter bar
         capturewidth: 10, // Mouse-sensitive width for interaction (Fitts law)
