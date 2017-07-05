@@ -38,8 +38,8 @@ function model(layout, d, i) {
         cellHeights = trace.height,
         fill = trace.fill,
         line = trace.line,
-        align = trace.align,
-        valign = trace.valign;
+        align = trace.cells.align,
+        valign = trace.cells.valign;
 
     var colCount = labels.length;
 

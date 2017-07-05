@@ -33,8 +33,8 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     coerce('width');
     coerce('height');
-    coerce('align');
-    coerce('valign');
+    coerce('cells.align');
+    coerce('cells.valign');
 
     coerce('line.width');
     coerce('line.color');

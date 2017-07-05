@@ -154,8 +154,10 @@ module.exports = {
         description: 'The height of cells.'
     },
 
-    align: extendFlat({}, annAttrs.align, {arrayOk: true}),
-    valign: extendFlat({}, annAttrs.valign, {arrayOk: true}),
+    cells: {
+        align: extendFlat({}, annAttrs.align, {arrayOk: true}),
+        valign: extendFlat({}, annAttrs.valign, {arrayOk: true})
+    },
 
     fill: {
         color: {
