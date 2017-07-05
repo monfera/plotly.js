@@ -44,65 +44,9 @@ module.exports = {
         }
     },
 
-    line: {
-        width: {
-            valType: 'number',
-            arrayOk: true,
-            role: 'style'
-        },
-        color: {
-            valType: 'color',
-            arrayOk: true,
-            role: 'style'
-        }
-    },
-
-    font: {
-        family: {
-            valType: 'string',
-            arrayOk: true,
-            role: 'style',
-            noBlank: true,
-            strict: true,
-            description: [
-                'HTML font family - the typeface that will be applied by the web browser.',
-                'The web browser will only be able to apply a font if it is available on the system',
-                'which it operates. Provide multiple font families, separated by commas, to indicate',
-                'the preference in which to apply fonts if they aren\'t available on the system.',
-                'The plotly service (at https://plot.ly or on-premise) generates images on a server,',
-                'where only a select number of',
-                'fonts are installed and supported.',
-                'These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*,',
-                '*Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*,',
-                '*PT Sans Narrow*, *Raleway*, *Times New Roman*.'
-            ].join(' ')
-        },
-        size: {
-            valType: 'number',
-            arrayOk: true,
-            role: 'style'
-        },
-        color: {
-            valType: 'color',
-            arrayOk: true,
-            role: 'style'
-        }
-    },
-
     labelfont: extendFlat({}, fontAttrs, {
         description: 'Sets the font for the `dimension` labels.'
     }),
-
-    values: {
-        valType: 'data_array',
-        role: 'info',
-        dflt: [],
-        description: [
-            'Dimension values. `values[n]` represents the value of the `n`th point in the dataset,',
-            'therefore the `values` vector for all dimensions must be the same (longer vectors',
-            'will be truncated). Each value must be a finite number.'
-        ].join(' ')
-    },
 
     labels: {
         valType: 'data_array',
@@ -111,34 +55,7 @@ module.exports = {
         description: 'The shown name of the columns.'
     },
 
-    valueformat: {
-        valType: 'data_array',
-        role: 'info',
-        dflt: [],
-        description: [
-            'Sets the cell value formatting rule using d3 formatting mini-language',
-            'which is similar to those of Python. See',
-            'https://github.com/d3/d3-format/blob/master/README.md#locale_format'
-        ]
-    },
-
-    prefix: {
-        valType: 'string',
-        arrayOk: true,
-        dflt: null,
-        role: 'style',
-        description: 'Prefix for cell values.'
-    },
-
-    suffix: {
-        valType: 'string',
-        arrayOk: true,
-        dflt: null,
-        role: 'style',
-        description: 'Suffix for cell values.'
-    },
-
-    width: {
+    columnwidth: {
         valType: 'number',
         arrayOk: true,
         dflt: null,
@@ -146,28 +63,112 @@ module.exports = {
         description: 'The width of cells.'
     },
 
-    height: {
-        valType: 'number',
-        arrayOk: true,
-        dflt: null,
-        role: 'style',
-        description: 'The height of cells.'
-    },
-
     cells: {
-        align: extendFlat({}, annAttrs.align, {arrayOk: true}),
-        valign: extendFlat({}, annAttrs.valign, {arrayOk: true})
-    },
 
-    fill: {
-        color: {
-            valType: 'color',
-            arrayOk: true,
-            role: 'style',
+        values: {
+            valType: 'data_array',
+            role: 'info',
+            dflt: [],
             description: [
-                'Sets the cell fill color. It accepts either a specific color',
-                ' or an array of colors.'
-            ].join('')
+                'Dimension values. `values[n]` represents the value of the `n`th point in the dataset,',
+                'therefore the `values` vector for all dimensions must be the same (longer vectors',
+                'will be truncated). Each value must be a finite number.'
+            ].join(' ')
+        },
+
+        format: {
+            valType: 'data_array',
+            role: 'info',
+            dflt: [],
+            description: [
+                'Sets the cell value formatting rule using d3 formatting mini-language',
+                'which is similar to those of Python. See',
+                'https://github.com/d3/d3-format/blob/master/README.md#locale_format'
+            ]
+        },
+
+        prefix: {
+            valType: 'string',
+            arrayOk: true,
+            dflt: null,
+            role: 'style',
+            description: 'Prefix for cell values.'
+        },
+
+        suffix: {
+            valType: 'string',
+            arrayOk: true,
+            dflt: null,
+            role: 'style',
+            description: 'Suffix for cell values.'
+        },
+
+        height: {
+            valType: 'number',
+            arrayOk: true,
+            dflt: null,
+            role: 'style',
+            description: 'The height of cells.'
+        },
+
+        align: extendFlat({}, annAttrs.align, {arrayOk: true}),
+        valign: extendFlat({}, annAttrs.valign, {arrayOk: true}),
+
+        line: {
+            width: {
+                valType: 'number',
+                arrayOk: true,
+                role: 'style'
+            },
+            color: {
+                valType: 'color',
+                arrayOk: true,
+                role: 'style'
+            }
+        },
+
+        fill: {
+            color: {
+                valType: 'color',
+                arrayOk: true,
+                role: 'style',
+                description: [
+                    'Sets the cell fill color. It accepts either a specific color',
+                    ' or an array of colors.'
+                ].join('')
+            }
+        },
+
+        font: {
+            family: {
+                valType: 'string',
+                arrayOk: true,
+                role: 'style',
+                noBlank: true,
+                strict: true,
+                description: [
+                    'HTML font family - the typeface that will be applied by the web browser.',
+                    'The web browser will only be able to apply a font if it is available on the system',
+                    'which it operates. Provide multiple font families, separated by commas, to indicate',
+                    'the preference in which to apply fonts if they aren\'t available on the system.',
+                    'The plotly service (at https://plot.ly or on-premise) generates images on a server,',
+                    'where only a select number of',
+                    'fonts are installed and supported.',
+                    'These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*,',
+                    '*Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*,',
+                    '*PT Sans Narrow*, *Raleway*, *Times New Roman*.'
+                ].join(' ')
+            },
+            size: {
+                valType: 'number',
+                arrayOk: true,
+                role: 'style'
+            },
+            color: {
+                valType: 'color',
+                arrayOk: true,
+                role: 'style'
+            }
         }
     }
 };
