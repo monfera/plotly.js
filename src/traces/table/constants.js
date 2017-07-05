@@ -11,7 +11,7 @@
 module.exports = {
     maxDimensionCount: 60,
     overdrag: 45,
-    cellPad: 3,
+    cellPad: 4,
     columnTitleOffset: 28,
     columnExtentOffset: 10,
     transitionEase: 'cubic-out',

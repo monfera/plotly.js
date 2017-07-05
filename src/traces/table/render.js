@@ -117,7 +117,6 @@ function viewModel(model) {
             unitScale: unitScale(height, c.verticalPadding),
             filter: [0, 1],
             parent: viewModel,
-            valueFormat:  model.valueFormat[i],
             model: model,
             columnWidth: model.columnWidths[i]
         };
@@ -368,7 +367,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             var fontSize = d.font.size;
             return ({
                 top: -rowPitch + fontSize,
-                center: -rowPitch / 2 + fontSize * 0.37 + c.cellPad / 2,
+                center: -rowPitch / 2 + fontSize * 0.3 + c.cellPad / 2,
                 bottom: -c.cellPad
             })[d.valign];
         })
@@ -398,8 +397,11 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             })[d.align];
         })
         .text(function(d) {
-            var prefix = gridPick(d.model.prefix, d.dimension.crossfilterDimensionIndex, d.rowNumber);
-            var suffix = gridPick(d.model.suffix, d.dimension.crossfilterDimensionIndex, d.rowNumber);
-            return prefix + (d.dimension.valueFormat ? d3.format(d.dimension.valueFormat)(d.value) : d.value) + suffix;
+            var dim = d.dimension.crossfilterDimensionIndex;
+            var row = d.rowNumber;
+            var prefix = gridPick(d.model.prefix, dim, row);
+            var suffix = gridPick(d.model.suffix, dim, row);
+            var valueFormat = gridPick(d.model.valueFormat, dim, row);
+            return prefix + (valueFormat ? d3.format(valueFormat)(d.value) : d.value) + suffix;
         });
 };
