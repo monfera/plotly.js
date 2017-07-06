@@ -120,7 +120,6 @@ function viewModel(model) {
             key: key,
             label: label,
             xIndex: i,
-            crossfilterColumnIndex: i,
             height: height,
             newXScale: newXScale,
             x: undefined, // initialized below
@@ -253,7 +252,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 linePickActive = true;
 
                 if(callbacks && callbacks.columnMoved) {
-                    callbacks.columnMoved(p.key, p.columns.map(function(dd) {return dd.crossfilterColumnIndex;}));
+                    callbacks.columnMoved(p.key, p.columns.map(function(dd) {return dd.xIndex;}));
                 }
             })
         );
@@ -336,7 +335,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         })
         .each(function(d, i) {
             var spec = d.model.cells.font;
-            var col = d.column.crossfilterColumnIndex;
+            var col = d.column.xIndex;
             var font = {
                 size: gridPick(spec.size, col, i),
                 color: gridPick(spec.color, col, i),
@@ -345,9 +344,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             Drawing.font(d3.select(this), font);
 
             d.rowNumber = i;
-            d.align = gridPick(d.model.cells.align, d.column.crossfilterColumnIndex, i);
-            d.valign = gridPick(d.model.cells.valign, d.column.crossfilterColumnIndex, i);
-            d.cellBorderWidth = gridPick(d.model.cells.lineWidth, d.column.crossfilterColumnIndex, i)
+            d.align = gridPick(d.model.cells.align, d.column.xIndex, i);
+            d.valign = gridPick(d.model.cells.valign, d.column.xIndex, i);
+            d.cellBorderWidth = gridPick(d.model.cells.lineWidth, d.column.xIndex, i)
             d.font = font;
         });
 
@@ -363,11 +362,11 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('height', function(d) {return d.column.rowPitch - d.cellBorderWidth;})
         .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.column.rowPitch - c.cellPad)) + ')'})
         .attr('stroke', function(d) {
-            return gridPick(d.model.cells.lineColor, d.column.crossfilterColumnIndex, d.rowNumber);
+            return gridPick(d.model.cells.lineColor, d.column.xIndex, d.rowNumber);
         })
         .attr('stroke-width', function(d) {return d.cellBorderWidth;})
         .attr('fill', function(d) {
-            return gridPick(d.model.cells.fillColor, d.column.crossfilterColumnIndex, d.rowNumber);
+            return gridPick(d.model.cells.fillColor, d.column.xIndex, d.rowNumber);
         });
 
     var cellLine = columnCell.selectAll('.cellLine')
@@ -430,7 +429,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             })[d.align];
         })
         .text(function(d) {
-            var dim = d.column.crossfilterColumnIndex;
+            var dim = d.column.xIndex;
             var row = d.rowNumber;
             var prefix = gridPick(d.model.cells.prefix, dim, row) || '';
             var suffix = gridPick(d.model.cells.suffix, dim, row) || '';
