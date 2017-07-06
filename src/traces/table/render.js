@@ -99,11 +99,10 @@ function model(layout, d, i) {
 
 function viewModel(model) {
 
-    var width = model.width;
     var height = model.height;
 
     var newXScale = function (d) {
-        return d.parent.dimensions.reduce(function(prev, next) {return next.xIndex < d.xIndex ? prev + next.columnWidth : prev}, 0);
+        return d.parent.columns.reduce(function(prev, next) {return next.xIndex < d.xIndex ? prev + next.columnWidth : prev}, 0);
     }
 
     var viewModel = {
@@ -113,7 +112,7 @@ function viewModel(model) {
 
     var uniqueKeys = {};
 
-    viewModel.dimensions = model.headerCells.values.map(function(label, i) {
+    viewModel.columns = model.headerCells.values.map(function(label, i) {
         var foundKey = uniqueKeys[label];
         uniqueKeys[label] = (foundKey || 0) + 1;
         var key = label + (foundKey ? '__' + foundKey : '');
@@ -121,7 +120,7 @@ function viewModel(model) {
             key: key,
             label: label,
             xIndex: i,
-            crossfilterDimensionIndex: i,
+            crossfilterColumnIndex: i,
             height: height,
             newXScale: newXScale,
             x: undefined, // initialized below
@@ -134,7 +133,7 @@ function viewModel(model) {
         };
     });
 
-    viewModel.dimensions.forEach(function(dim) {
+    viewModel.columns.forEach(function(dim) {
         dim.x = newXScale(dim);
     });
     return viewModel;
@@ -198,7 +197,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('transform', function(d) {return 'translate(' + d.model.pad.l + ',' + d.model.pad.t + ')';});
 
     var yColumn = tableControlView.selectAll('.yColumn')
-        .data(function(vm) {return vm.dimensions;}, keyFun);
+        .data(function(vm) {return vm.columns;}, keyFun);
 
     yColumn.enter()
         .append('g')
@@ -234,7 +233,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .ease(c.transitionEase)
                     .duration(c.transitionDuration)
                     .attr('transform', 'translate(' + d.x + ', -5)');
-                yColumn.each(function(dd, i, ii) {if(ii === d.parent.key) p.dimensions[i] = dd;});
+                yColumn.each(function(dd, i, ii) {if(ii === d.parent.key) p.columns[i] = dd;});
                 this.parentNode.appendChild(this);
             })
             .on('dragend', function(d) {
@@ -254,7 +253,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 linePickActive = true;
 
                 if(callbacks && callbacks.columnMoved) {
-                    callbacks.columnMoved(p.key, p.dimensions.map(function(dd) {return dd.crossfilterDimensionIndex;}));
+                    callbacks.columnMoved(p.key, p.columns.map(function(dd) {return dd.crossfilterColumnIndex;}));
                 }
             })
         );
@@ -325,7 +324,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .remove();
 
     var columnCell = columnCells.selectAll('.columnCell')
-        .data(function(d) {return d.values.map(function(v, i) {return {key: i, dimension: d, model: d.model, value: v};});}, keyFun);
+        .data(function(d) {return d.values.map(function(v, i) {return {key: i, column: d, model: d.model, value: v};});}, keyFun);
 
     columnCell.enter()
         .append('g')
@@ -333,11 +332,11 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     columnCell
         .attr('transform', function(d, i) {
-            return 'translate(' + 0 + ',' + i * d.dimension.rowPitch + ')';
+            return 'translate(' + 0 + ',' + i * d.column.rowPitch + ')';
         })
         .each(function(d, i) {
             var spec = d.model.cells.font;
-            var col = d.dimension.crossfilterDimensionIndex;
+            var col = d.column.crossfilterColumnIndex;
             var font = {
                 size: gridPick(spec.size, col, i),
                 color: gridPick(spec.color, col, i),
@@ -346,9 +345,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             Drawing.font(d3.select(this), font);
 
             d.rowNumber = i;
-            d.align = gridPick(d.model.cells.align, d.dimension.crossfilterDimensionIndex, i);
-            d.valign = gridPick(d.model.cells.valign, d.dimension.crossfilterDimensionIndex, i);
-            d.cellBorderWidth = gridPick(d.model.cells.lineWidth, d.dimension.crossfilterDimensionIndex, i)
+            d.align = gridPick(d.model.cells.align, d.column.crossfilterColumnIndex, i);
+            d.valign = gridPick(d.model.cells.valign, d.column.crossfilterColumnIndex, i);
+            d.cellBorderWidth = gridPick(d.model.cells.lineWidth, d.column.crossfilterColumnIndex, i)
             d.font = font;
         });
 
@@ -360,15 +359,15 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('cellRect', true);
 
     cellRect
-        .attr('width', function(d) {return d.dimension.columnWidth - d.cellBorderWidth;})
-        .attr('height', function(d) {return d.dimension.rowPitch - d.cellBorderWidth;})
-        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.dimension.rowPitch - c.cellPad)) + ')'})
+        .attr('width', function(d) {return d.column.columnWidth - d.cellBorderWidth;})
+        .attr('height', function(d) {return d.column.rowPitch - d.cellBorderWidth;})
+        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.column.rowPitch - c.cellPad)) + ')'})
         .attr('stroke', function(d) {
-            return gridPick(d.model.cells.lineColor, d.dimension.crossfilterDimensionIndex, d.rowNumber);
+            return gridPick(d.model.cells.lineColor, d.column.crossfilterColumnIndex, d.rowNumber);
         })
         .attr('stroke-width', function(d) {return d.cellBorderWidth;})
         .attr('fill', function(d) {
-            return gridPick(d.model.cells.fillColor, d.dimension.crossfilterDimensionIndex, d.rowNumber);
+            return gridPick(d.model.cells.fillColor, d.column.crossfilterColumnIndex, d.rowNumber);
         });
 
     var cellLine = columnCell.selectAll('.cellLine')
@@ -379,14 +378,14 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('cellLine', true);
 
     cellLine
-        .attr('id', function(d) {return 'textpath' + d.dimension.xIndex;})
+        .attr('id', function(d) {return 'textpath' + d.column.xIndex;})
         .attr('d', function(d) {
             var x1 = 0;
-            var x2 = d.dimension.columnWidth;
-            var y = d.dimension.rowPitch;
+            var x2 = d.column.columnWidth;
+            var y = d.column.rowPitch;
             return d3.svg.line()([[x1, y], [x2, y]]);
         })
-        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.dimension.rowPitch - c.cellPad)) + ')'});
+        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.column.rowPitch - c.cellPad)) + ')'});
 
     var cellText = columnCell.selectAll('.cellText')
         .data(repeat, keyFun);
@@ -397,7 +396,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     cellText
         .attr('dy', function(d) {
-            var rowPitch = d.dimension.rowPitch;
+            var rowPitch = d.column.rowPitch;
             var fontSize = d.font.size;
             return ({
                 top: -rowPitch + fontSize,
@@ -415,7 +414,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('textPath', true);
 
     textPath
-        .attr('xlink:href', function(d) {return '#textpath' + d.dimension.xIndex;})
+        .attr('xlink:href', function(d) {return '#textpath' + d.column.xIndex;})
         .attr('text-anchor', function(d) {
             return ({
                 left: 'start',
@@ -426,12 +425,12 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('startOffset', function(d) {
             return ({
                 left: c.cellPad,
-                right: d.dimension.columnWidth - c.cellPad,
+                right: d.column.columnWidth - c.cellPad,
                 center: '50%'
             })[d.align];
         })
         .text(function(d) {
-            var dim = d.dimension.crossfilterDimensionIndex;
+            var dim = d.column.crossfilterColumnIndex;
             var row = d.rowNumber;
             var prefix = gridPick(d.model.cells.prefix, dim, row) || '';
             var suffix = gridPick(d.model.cells.suffix, dim, row) || '';
