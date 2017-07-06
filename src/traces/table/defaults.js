@@ -36,13 +36,20 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('cells.prefix');
     coerce('cells.suffix');
     coerce('cells.height');
-
     coerce('cells.line.width');
     coerce('cells.line.color');
-
     coerce('cells.fill.color');
-
     Lib.coerceFont(coerce, 'cells.font', fontDflt);
 
-    Lib.coerceFont(coerce, 'labelfont', fontDflt);
+    coerce('header.values');
+    coerce('header.format');
+    coerce('header.align');
+    coerce('header.valign');
+    coerce('header.prefix');
+    coerce('header.suffix');
+    coerce('header.height');
+    coerce('header.line.width');
+    coerce('header.line.color');
+    coerce('header.fill.color');
+    Lib.coerceFont(coerce, 'header.font', fontDflt);
 };

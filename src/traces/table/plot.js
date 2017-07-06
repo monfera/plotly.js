@@ -22,8 +22,8 @@ module.exports = function plot(gd, cdTable) {
     var size = fullLayout._size;
 
     cdTable.forEach(function(d, i) {
-        gdColumns[i] = gd.data[i].labels;
-        gdColumnsOriginalOrder[i] = gd.data[i].labels.slice();
+        gdColumns[i] = gd.data[i].header.values.map(function(d) {return d[0];});
+        gdColumnsOriginalOrder[i] = gdColumns[i].slice();
     });
 
     var hover = function(eventData) {

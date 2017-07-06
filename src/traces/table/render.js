@@ -27,26 +27,15 @@ function model(layout, d, i) {
         trace = cd0.trace,
         domain = trace.domain,
         width = layout.width,
-        font = trace.cells.font,
-        labelFont = trace.labelfont,
         labels = trace.labels,
-        valueFormat = trace.cells.format,
-        values = trace.cells.values,
-        prefix = trace.cells.prefix,
-        suffix = trace.cells.suffix,
-        columnWidths = trace.columnwidth,
-        cellHeights = trace.cells.height,
-        fill = trace.cells.fill,
-        line = trace.cells.line,
-        align = trace.cells.align,
-        valign = trace.cells.valign;
+        columnWidths = trace.columnwidth;
 
     var colCount = labels.length;
 
     var groupWidth = Math.floor(width * (domain.x[1] - domain.x[0]));
     var groupHeight = Math.floor(layout.height * (domain.y[1] - domain.y[0]));
 
-    columnWidths = labels.map(function(d, i) {
+    columnWidths = trace.header.values.map(function(d, i) {
         return Array.isArray(columnWidths) ?
             columnWidths[Math.min(i, columnWidths.length - 1)] :
             isFinite(columnWidths) && columnWidths !== null ? columnWidths : 1;
@@ -71,28 +60,28 @@ function model(layout, d, i) {
         columnWidths: columnWidths,
 
         cells: {
-            values: values,
-            valueFormat: valueFormat,
-            prefix: prefix,
-            suffix: suffix,
-            cellHeights: cellHeights,
-            align: align,
-            valign: valign,
-            font: font,
-            fillColor: fill.color,
-            lineWidth: line.width,
-            lineColor: line.color
+            values: trace.cells.values,
+            valueFormat: trace.cells.format,
+            prefix: trace.cells.prefix,
+            suffix: trace.cells.suffix,
+            cellHeights: trace.cells.height,
+            align: trace.cells.align,
+            valign: trace.cells.valign,
+            font: trace.cells.font,
+            fillColor: trace.cells.fill.color,
+            lineWidth: trace.cells.line.width,
+            lineColor: trace.cells.line.color
         },
 
         headerCells: {
-            values: labels.map(repeat),
-            align: align,
-            valign: valign,
-            font: labelFont,
-            cellHeights: cellHeights,
-            fillColor: fill.color,
-            lineWidth: line.width,
-            lineColor: line.color
+            values: trace.header.values.map(repeat),
+            align: trace.header.align,
+            valign: trace.header.valign,
+            font: trace.header.font,
+            cellHeights: trace.cells.height,
+            fillColor: trace.header.fill.color,
+            lineWidth: trace.header.line.width,
+            lineColor: trace.header.line.color
         }
     };
 }
