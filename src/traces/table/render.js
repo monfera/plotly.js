@@ -71,16 +71,19 @@ function model(layout, d, i) {
         width: rowContentWidth,
         height: rowHeight,
         labels: labels,
-        valueFormat: valueFormat,
-        values: values,
-        prefix: prefix,
-        suffix: suffix,
         columnWidths: columnWidths,
-        cellHeights: cellHeights,
-        fill: fill,
-        line: line,
-        align: align,
-        valign: valign
+
+        cells: {
+            values: values,
+            valueFormat: valueFormat,
+            prefix: prefix,
+            suffix: suffix,
+            cellHeights: cellHeights,
+            align: align,
+            valign: valign,
+            fill: fill,
+            line: line
+        }
     };
 }
 
@@ -100,7 +103,7 @@ function viewModel(model) {
 
     var uniqueKeys = {};
 
-    viewModel.dimensions = model.values.map(function(dimension, i) {
+    viewModel.dimensions = model.labels.map(function(dimension, i) {
         var label = model.labels[i];
         var foundKey = uniqueKeys[label];
         uniqueKeys[label] = (foundKey || 0) + 1;
@@ -111,7 +114,7 @@ function viewModel(model) {
             xIndex: i,
             crossfilterDimensionIndex: i,
             height: height,
-            values: model.values[i].slice(0, 10),
+            values: model.cells.values[i],
             newXScale: newXScale,
             x: undefined, // see below
             unitScale: unitScale(height, c.verticalPadding),
@@ -223,7 +226,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .duration(c.transitionDuration)
                     .attr('transform', 'translate(' + d.x + ', -5)');
                 yColumn.each(function(dd, i, ii) {if(ii === d.parent.key) p.dimensions[i] = dd;});
-                this.parentNode.appendChild(this)
+                this.parentNode.appendChild(this);
             })
             .on('dragend', function(d) {
                 var p = d.parent;
@@ -280,15 +283,25 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .text(function(d) {return d.label;})
         .each(function(d) {
             Drawing.font(columnTitle, d.model.labelFont);
-            d.rowPitch = gridPick(d.model.cellHeights, d.crossfilterDimensionIndex, 0);
+            d.rowPitch = gridPick(d.model.cells.cellHeights, d.crossfilterDimensionIndex, 0);
         });
 
-    var columnCells = columnOverlays.selectAll('.columnCells')
+    var columnBlock = columnOverlays.selectAll('.columnBlock')
+        .data(repeat, keyFun);
+
+    columnBlock.enter()
+        .append('g')
+        .classed('columnBlock', true);
+
+    var columnCells = columnBlock.selectAll('.columnCells')
         .data(repeat, keyFun);
 
     columnCells.enter()
         .append('g')
         .classed('columnCells', true);
+
+    columnCells.exit()
+        .remove();
 
     var columnCell = columnCells.selectAll('.columnCell')
         .data(function(d) {return d.values.map(function(v, i) {return {key: i, dimension: d, model: d.model, value: v};});}, keyFun);
@@ -312,9 +325,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             Drawing.font(d3.select(this), font);
 
             d.rowNumber = i;
-            d.align = gridPick(d.model.align, d.dimension.crossfilterDimensionIndex, i);
-            d.valign = gridPick(d.model.valign, d.dimension.crossfilterDimensionIndex, i);
-            d.cellBorderWidth = gridPick(d.model.line.width, d.dimension.crossfilterDimensionIndex, i)
+            d.align = gridPick(d.model.cells.align, d.dimension.crossfilterDimensionIndex, i);
+            d.valign = gridPick(d.model.cells.valign, d.dimension.crossfilterDimensionIndex, i);
+            d.cellBorderWidth = gridPick(d.model.cells.line.width, d.dimension.crossfilterDimensionIndex, i)
             d.font = font;
         });
 
@@ -330,11 +343,11 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('height', function(d) {return d.dimension.rowPitch - d.cellBorderWidth;})
         .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.dimension.rowPitch - c.cellPad)) + ')'})
         .attr('stroke', function(d) {
-            return gridPick(d.model.line.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
+            return gridPick(d.model.cells.line.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
         })
         .attr('stroke-width', function(d) {return d.cellBorderWidth;})
         .attr('fill', function(d) {
-            return gridPick(d.model.fill.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
+            return gridPick(d.model.cells.fill.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
         });
 
     var cellLine = columnCell.selectAll('.cellLine')
@@ -399,9 +412,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .text(function(d) {
             var dim = d.dimension.crossfilterDimensionIndex;
             var row = d.rowNumber;
-            var prefix = gridPick(d.model.prefix, dim, row);
-            var suffix = gridPick(d.model.suffix, dim, row);
-            var valueFormat = gridPick(d.model.valueFormat, dim, row);
+            var prefix = gridPick(d.model.cells.prefix, dim, row);
+            var suffix = gridPick(d.model.cells.suffix, dim, row);
+            var valueFormat = gridPick(d.model.cells.valueFormat, dim, row);
             return prefix + (valueFormat ? d3.format(valueFormat)(d.value) : d.value) + suffix;
         });
 };
