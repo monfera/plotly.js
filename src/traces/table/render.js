@@ -63,13 +63,11 @@ function model(layout, d, i) {
         key: i,
         colCount: colCount,
         tickDistance: c.tickDistance,
-        labelFont: labelFont,
         translateX: domain.x[0] * width,
         translateY: layout.height - domain.y[1] * layout.height,
         pad: pad,
         width: rowContentWidth,
         height: rowHeight,
-        labels: labels,
         columnWidths: columnWidths,
 
         cells: {
@@ -81,6 +79,17 @@ function model(layout, d, i) {
             align: align,
             valign: valign,
             font: font,
+            fillColor: fill.color,
+            lineWidth: line.width,
+            lineColor: line.color
+        },
+
+        headerCells: {
+            values: labels.map(repeat),
+            align: align,
+            valign: valign,
+            font: labelFont,
+            cellHeights: cellHeights,
             fillColor: fill.color,
             lineWidth: line.width,
             lineColor: line.color
@@ -104,8 +113,7 @@ function viewModel(model) {
 
     var uniqueKeys = {};
 
-    viewModel.dimensions = model.labels.map(function(dimension, i) {
-        var label = model.labels[i];
+    viewModel.dimensions = model.headerCells.values.map(function(label, i) {
         var foundKey = uniqueKeys[label];
         uniqueKeys[label] = (foundKey || 0) + 1;
         var key = label + (foundKey ? '__' + foundKey : '');
@@ -269,18 +277,13 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 {
                     key: 'header',
                     yOffset: 0,
-                    values: [d.model.labels[d.xIndex]],
+                    values: d.model.headerCells.values[d.xIndex],
                     dragHandle: true,
                     model: Object.assign(
                         {},
                         d.model,
                         {
-                            cells: {
-                                values: [d.model.labels[d.xIndex]],
-                                font: d.model.labelFont,
-                                lineWidth: 0,
-                                fillColor: 'none'
-                            }
+                            cells: d.model.headerCells
                         }
                     )
                 }
@@ -291,12 +294,13 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 d,
                 {
                     key: 'cells',
-                    yOffset: 40,
+                    yOffset: d.rowPitch,
                     dragHandle: false,
                     values: d.model.cells.values[d.xIndex],
                     model: d.model
                 }
             );
+
             return [blockDataHeader, blockDataCells];
         }, keyFun);
 
