@@ -235,7 +235,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 d.x = d.newXScale(d);
                 d3.select(this)
                     .transition()
-                    .ease(c.releaseTransitionEase, 1, .5)
+                    .ease(c.releaseTransitionEase, 1, .75)
                     .duration(c.releaseTransitionDuration)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
                 linePickActive = true;
@@ -276,19 +276,20 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 }
             );
 
-            var blockDataCells = Object.assign(
-                {},
-                d,
-                {
-                    key: 'cells',
-                    yOffset: d.rowPitch,
-                    dragHandle: false,
-                    values: d.model.cells.values[d.xIndex],
-                    model: d.model
-                }
-            );
-
-            return [blockDataHeader, blockDataCells];
+            return [
+                blockDataHeader,
+                Object.assign(
+                    {},
+                    d,
+                    {
+                        key: 'cells',
+                        yOffset: d.rowPitch,
+                        dragHandle: false,
+                        values: d.model.cells.values[d.xIndex],
+                        model: d.model
+                    }
+                )
+            ];
         }, keyFun);
 
     columnBlock.enter()
@@ -388,7 +389,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             var fontSize = d.font.size;
             return ({
                 top: -rowPitch + fontSize,
-                center: -rowPitch / 2 + fontSize * 0.3 + c.cellPad / 2,
+                middle: -rowPitch / 2 + fontSize * 0.2 + c.cellPad / 2,
                 bottom: -c.cellPad
             })[d.valign];
         })
