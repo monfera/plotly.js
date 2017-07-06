@@ -121,6 +121,7 @@ function viewModel(model) {
             filter: [0, 1],
             parent: viewModel,
             model: model,
+            rowPitch: model.cells.cellHeights,
             columnWidth: model.columnWidths[i]
         };
     });
@@ -154,12 +155,12 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .map(viewModel);
 
     svg.style('background', 'rgba(255, 255, 255, 0)');
-    var tableControlOverlay = svg.selectAll('.table')
+    var table = svg.selectAll('.table')
         .data(vm, keyFun);
 
-    tableControlOverlay.exit().remove();
+    table.exit().remove();
 
-    tableControlOverlay.enter()
+    table.enter()
         .append('g')
         .classed('table', true)
         .attr('overflow', 'visible')
@@ -170,14 +171,14 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .style('shape-rendering', 'crispEdges')
         .style('pointer-events', 'all'); // todo restore 'none'
 
-    tableControlOverlay
+    table
         .attr('width', function(d) {return d.model.width + d.model.pad.l + d.model.pad.r;})
         .attr('height', function(d) {return d.model.height + d.model.pad.t + d.model.pad.b;})
         .attr('transform', function(d) {
             return 'translate(' + d.model.translateX + ',' + d.model.translateY + ')';
         });
 
-    var tableControlView = tableControlOverlay.selectAll('.tableControlView')
+    var tableControlView = table.selectAll('.tableControlView')
         .data(repeat, keyFun);
 
     tableControlView.enter()
@@ -259,32 +260,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     columnOverlays.enter()
         .append('g')
         .classed('columnOverlays', true);
-
-    var columnHeading = columnOverlays.selectAll('.columnHeading')
-        .data(repeat, keyFun);
-
-    columnHeading.enter()
-        .append('g')
-        .classed('columnHeading', true);
-
-    var columnTitle = columnHeading.selectAll('.columnTitle')
-        .data(repeat, keyFun);
-
-    columnTitle.enter()
-        .append('text')
-        .classed('columnTitle', true)
-        .attr('text-anchor', 'start')
-        .style('cursor', 'ew-resize')
-        .style('user-select', 'none')
-        .style('pointer-events', 'auto');
-
-    columnTitle
-        .attr('transform', 'translate(0,' + -c.columnTitleOffset + ')')
-        .text(function(d) {return d.label;})
-        .each(function(d) {
-            Drawing.font(columnTitle, d.model.labelFont);
-            d.rowPitch = gridPick(d.model.cells.cellHeights, 0, 0); // fixme generalize to rows
-        });
 
     var columnBlock = columnOverlays.selectAll('.columnBlock')
         .data(function(d) {
