@@ -53,7 +53,7 @@
             "prefix": ["", "", "", "", "US ", ""],
             "suffix": ["m", ""],
 
-            "height": 30,
+            "height": 4,
 
             "align": ["center", "center", "center", "right", "right", "right", "left", "right"],
             "valign": ["top", "bottom", "center"],
@@ -122,7 +122,7 @@
             "prefix": ["", "", "", "", "US ", ""],
             "suffix": ["m", ""],
 
-            "height": [20, 30],
+            "height": 20,
 
             "align": ["center", "center", "center", "right", "right", "right", "left", "right"],
             "valign": ["top", "bottom", "center"],

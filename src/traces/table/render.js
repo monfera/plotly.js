@@ -63,7 +63,6 @@ function model(layout, d, i) {
         key: i,
         colCount: colCount,
         tickDistance: c.tickDistance,
-        font: font,
         labelFont: labelFont,
         translateX: domain.x[0] * width,
         translateY: layout.height - domain.y[1] * layout.height,
@@ -81,8 +80,10 @@ function model(layout, d, i) {
             cellHeights: cellHeights,
             align: align,
             valign: valign,
-            fill: fill,
-            line: line
+            font: font,
+            fillColor: fill.color,
+            lineWidth: line.width,
+            lineColor: line.color
         }
     };
 }
@@ -114,9 +115,8 @@ function viewModel(model) {
             xIndex: i,
             crossfilterDimensionIndex: i,
             height: height,
-            values: model.cells.values[i],
             newXScale: newXScale,
-            x: undefined, // see below
+            x: undefined, // initialized below
             unitScale: unitScale(height, c.verticalPadding),
             filter: [0, 1],
             parent: viewModel,
@@ -283,15 +283,57 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .text(function(d) {return d.label;})
         .each(function(d) {
             Drawing.font(columnTitle, d.model.labelFont);
-            d.rowPitch = gridPick(d.model.cells.cellHeights, d.crossfilterDimensionIndex, 0);
+            d.rowPitch = gridPick(d.model.cells.cellHeights, 0, 0); // fixme generalize to rows
         });
 
     var columnBlock = columnOverlays.selectAll('.columnBlock')
-        .data(repeat, keyFun);
+        .data(function(d) {
+            var blockDataHeader = Object.assign(
+                {},
+                d,
+                {
+                    key: 'header',
+                    yOffset: 0,
+                    values: [d.model.labels[d.xIndex]],
+                    dragHandle: true,
+                    model: Object.assign(
+                        {},
+                        d.model,
+                        {
+                            cells: {
+                                values: [d.model.labels[d.xIndex]],
+                                font: d.model.labelFont,
+                                lineWidth: 0,
+                                fillColor: 'none'
+                            }
+                        }
+                    )
+                }
+            );
+
+            var blockDataCells = Object.assign(
+                {},
+                d,
+                {
+                    key: 'cells',
+                    yOffset: 40,
+                    dragHandle: false,
+                    values: d.model.cells.values[d.xIndex],
+                    model: d.model
+                }
+            );
+            return [blockDataHeader, blockDataCells];
+        }, keyFun);
 
     columnBlock.enter()
         .append('g')
         .classed('columnBlock', true);
+
+    columnBlock
+        .attr('transform', function(d) {return 'translate(0 ' + d.yOffset + ')';})
+        .style('cursor', function(d) {return d.dragHandle ? 'ew-resize' : null;})
+        //.style('user-select', 'none')
+        //.style('pointer-events', 'auto');
 
     var columnCells = columnBlock.selectAll('.columnCells')
         .data(repeat, keyFun);
@@ -312,10 +354,10 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     columnCell
         .attr('transform', function(d, i) {
-            return 'translate(' + 0 + ',' + (i + 1) * d.dimension.rowPitch + ')';
+            return 'translate(' + 0 + ',' + i * d.dimension.rowPitch + ')';
         })
         .each(function(d, i) {
-            var spec = d.model.font;
+            var spec = d.model.cells.font;
             var col = d.dimension.crossfilterDimensionIndex;
             var font = {
                 size: gridPick(spec.size, col, i),
@@ -327,7 +369,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             d.rowNumber = i;
             d.align = gridPick(d.model.cells.align, d.dimension.crossfilterDimensionIndex, i);
             d.valign = gridPick(d.model.cells.valign, d.dimension.crossfilterDimensionIndex, i);
-            d.cellBorderWidth = gridPick(d.model.cells.line.width, d.dimension.crossfilterDimensionIndex, i)
+            d.cellBorderWidth = gridPick(d.model.cells.lineWidth, d.dimension.crossfilterDimensionIndex, i)
             d.font = font;
         });
 
@@ -343,11 +385,11 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('height', function(d) {return d.dimension.rowPitch - d.cellBorderWidth;})
         .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.dimension.rowPitch - c.cellPad)) + ')'})
         .attr('stroke', function(d) {
-            return gridPick(d.model.cells.line.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
+            return gridPick(d.model.cells.lineColor, d.dimension.crossfilterDimensionIndex, d.rowNumber);
         })
         .attr('stroke-width', function(d) {return d.cellBorderWidth;})
         .attr('fill', function(d) {
-            return gridPick(d.model.cells.fill.color, d.dimension.crossfilterDimensionIndex, d.rowNumber);
+            return gridPick(d.model.cells.fillColor, d.dimension.crossfilterDimensionIndex, d.rowNumber);
         });
 
     var cellLine = columnCell.selectAll('.cellLine')
@@ -412,8 +454,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .text(function(d) {
             var dim = d.dimension.crossfilterDimensionIndex;
             var row = d.rowNumber;
-            var prefix = gridPick(d.model.cells.prefix, dim, row);
-            var suffix = gridPick(d.model.cells.suffix, dim, row);
+            var prefix = gridPick(d.model.cells.prefix, dim, row) || '';
+            var suffix = gridPick(d.model.cells.suffix, dim, row) || '';
             var valueFormat = gridPick(d.model.cells.valueFormat, dim, row);
             return prefix + (valueFormat ? d3.format(valueFormat)(d.value) : d.value) + suffix;
         });
