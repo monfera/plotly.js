@@ -37,43 +37,22 @@
                 ["RF block"]
             ],
 
-            "format": [
-                ".2s",
-                "#0x",
-                null,
-                ",.2f",
-                "$,",
-                "_>5",
-                ",.1%",
-                null,
-                null,
-                null
-            ],
-
-            "prefix": ["", "", "", "", "US ", ""],
-            "suffix": ["m", ""],
-
-            "height": 4,
-
             "align": ["center", "center", "center", "right", "right", "right", "left", "right"],
             "valign": ["top", "bottom", "center"],
 
             "line": {
-                "color": [
-                    ["white"]
-                ],
-                "width": 0.5
+                "color": ["white", "white", "red", "white"],
+                "width": [0, 0, 0.5]
             },
 
             "fill": {
-                "color": "lightgrey"
+                "color": ["black", "lightgrey"]
             },
 
             "font": {
                 "family": "PT Sans Narrow",
                 "size": 16,
-                "weight": "bold",
-                "color": "grey"
+                "color": ["white", "grey"]
             }
         },
 
