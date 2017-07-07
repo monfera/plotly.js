@@ -207,7 +207,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 return d;
             })
             .on('drag', function(d) {
-                var p = d.parent;
                 d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag - d.columnWidth, d3.event.x));
                 var newOrder = yColumn.data().slice().sort(function(a, b) {return a.x + a.columnWidth / 2 - b.x - b.columnWidth / 2;});
                 newOrder.forEach(function(dd, i) {
@@ -223,7 +222,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 d3.select(this)
                     .transition().duration(0) // this just cancels the easeColumn easing in .origin
                     .attr('transform', 'translate(' + d.x + ', -5)');
-                yColumn.each(function(dd, i, ii) {if(ii === d.parent.key) p.columns[i] = dd;});
             })
             .on('dragend', function(d) {
                 var p = d.parent;
