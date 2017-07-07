@@ -203,17 +203,17 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .call(d3.behavior.drag()
             .origin(function(d) {
                 easeColumn(this, d, -5);
+                this.parentNode.appendChild(this);
                 return d;
             })
             .on('drag', function(d) {
                 var p = d.parent;
                 d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag - d.columnWidth, d3.event.x));
-                yColumn
-                    .sort(function(a, b) {return a.x + a.columnWidth / 2 - b.x - b.columnWidth / 2;})
-                    .each(function(dd, i) {
-                        dd.xIndex = i;
-                        dd.x = d === dd ? dd.x : dd.newXScale(dd);
-                    });
+                var newOrder = yColumn.data().slice().sort(function(a, b) {return a.x + a.columnWidth / 2 - b.x - b.columnWidth / 2;});
+                newOrder.forEach(function(dd, i) {
+                    dd.xIndex = i;
+                    dd.x = d === dd ? dd.x : dd.newXScale(dd);
+                })
 
                 yColumn.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
                     .transition()
@@ -224,7 +224,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .transition().duration(0) // this just cancels the easeColumn easing in .origin
                     .attr('transform', 'translate(' + d.x + ', -5)');
                 yColumn.each(function(dd, i, ii) {if(ii === d.parent.key) p.columns[i] = dd;});
-                this.parentNode.appendChild(this);
             })
             .on('dragend', function(d) {
                 var p = d.parent;
