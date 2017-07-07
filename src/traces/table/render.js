@@ -191,9 +191,20 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     yColumn
         .attr('transform', function(d) {return 'translate(' + d.newXScale(d) + ', 0)';});
 
+    function easeColumn(elem, d, y) {
+        d3.select(elem)
+            .transition()
+            .ease(c.releaseTransitionEase, 1, .75)
+            .duration(c.releaseTransitionDuration)
+            .attr('transform', 'translate(' + d.x + ' ' + y + ')');
+    }
+
     yColumn
         .call(d3.behavior.drag()
-            .origin(function(d) {return d;})
+            .origin(function(d) {
+                easeColumn(this, d, -5);
+                return d;
+            })
             .on('drag', function(d) {
                 var p = d.parent;
                 d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag - d.columnWidth, d3.event.x));
@@ -210,9 +221,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .duration(c.transitionDuration)
                     .attr('transform', function(d) {return 'translate(' + d.newXScale(d) + ', 0)';});
                 d3.select(this)
-                    .transition()
-                    .ease(c.transitionEase)
-                    .duration(c.transitionDuration)
+                    .transition().duration(0) // this just cancels the easeColumn easing in .origin
                     .attr('transform', 'translate(' + d.x + ', -5)');
                 yColumn.each(function(dd, i, ii) {if(ii === d.parent.key) p.columns[i] = dd;});
                 this.parentNode.appendChild(this);
@@ -220,12 +229,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             .on('dragend', function(d) {
                 var p = d.parent;
                 d.x = d.newXScale(d);
-                d3.select(this)
-                    .transition()
-                    .ease(c.releaseTransitionEase, 1, .75)
-                    .duration(c.releaseTransitionDuration)
-                    .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-
+                easeColumn(this, d, 0);
                 if(callbacks && callbacks.columnMoved) {
                     callbacks.columnMoved(p.key, p.columns.map(function(dd) {return dd.xIndex;}));
                 }
@@ -282,21 +286,32 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .append('g')
         .classed('columnBlock', true);
 
+    var cellsColumnBlock = columnBlock.filter(function(d) {return d.key === 'cells';});
+
     columnBlock
         .attr('transform', function(d) {return 'translate(0 ' + d.yOffset + ')';})
-        .style('cursor', function(d) {return d.dragHandle ? 'ew-resize' : null;})
+        .style('cursor', function(d) {return d.dragHandle ? 'ew-resize' : 'ns-resize';})
         //.style('user-select', 'none')
         //.style('pointer-events', 'auto')
-        .filter(function(d) {return d.key === 'cells';})
+
+    cellsColumnBlock
         .call(d3.behavior.drag()
-            .origin(function(d) {console.log('startted');d3.event.stopPropagation(); return d;})
+            .origin(function(d) {
+                d3.event.stopPropagation();
+                var gpd = this.parentElement.parentElement.parentElement.__data__;
+                if(gpd.scrollY === undefined) {
+                    gpd.scrollY = d.yOffset;
+                }
+                return d;
+            })
             .on('drag', function(d) {
-                var p = d.parent;
-                d.dy = d3.event.dy;
-                console.log('block drag', d.dy)
+                var gpd = this.parentElement.parentElement.parentElement.__data__;
+                gpd.scrollY += d3.event.dy;
+                cellsColumnBlock
+                    .attr('transform', 'translate(0 ' + gpd.scrollY + ')');
+
             })
             .on('dragend', function(d) {
-                console.log('dragend')
             })
         );
 
