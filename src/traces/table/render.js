@@ -272,8 +272,21 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     {},
                     d,
                     {
-                        key: 'cells',
+                        key: 'cells1',
+                        type: 'cells',
                         yOffset: d.rowPitch,
+                        dragHandle: false,
+                        values: d.model.cells.values[d.xIndex],
+                        model: d.model
+                    }
+                ),
+                Object.assign(
+                    {},
+                    d,
+                    {
+                        key: 'cells2',
+                        type: 'cells',
+                        yOffset: d.rowPitch + 500,
                         dragHandle: false,
                         values: d.model.cells.values[d.xIndex],
                         model: d.model
@@ -286,7 +299,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .append('g')
         .classed('columnBlock', true);
 
-    var cellsColumnBlock = columnBlock.filter(function(d) {return d.key === 'cells';});
+    var cellsColumnBlock = columnBlock.filter(function(d) {return d.type === 'cells';});
 
     columnBlock
         .attr('transform', function(d) {return 'translate(0 ' + d.yOffset + ')';})
@@ -300,7 +313,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 d3.event.stopPropagation();
                 var gpd = this.parentElement.parentElement.parentElement.__data__;
                 if(gpd.scrollY === undefined) {
-                    gpd.scrollY = d.yOffset;
+                    gpd.scrollY = 0;
                 }
                 return d;
             })
@@ -308,8 +321,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 var gpd = this.parentElement.parentElement.parentElement.__data__;
                 gpd.scrollY += d3.event.dy;
                 cellsColumnBlock
-                    .attr('transform', 'translate(0 ' + gpd.scrollY + ')');
-
+                    .attr('transform', function(d) {return 'translate(0 ' + (gpd.scrollY + d.yOffset) + ')';});
             })
             .on('dragend', function(d) {
             })
