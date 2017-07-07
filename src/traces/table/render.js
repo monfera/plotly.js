@@ -208,7 +208,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             })
             .on('drag', function(d) {
                 d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag - d.columnWidth, d3.event.x));
-                var newOrder = yColumn.data().slice().sort(function(a, b) {return a.x + a.columnWidth / 2 - b.x - b.columnWidth / 2;});
+                var newOrder = yColumn.data().sort(function(a, b) {return a.x + a.columnWidth / 2 - b.x - b.columnWidth / 2;});
                 newOrder.forEach(function(dd, i) {
                     dd.xIndex = i;
                     dd.x = d === dd ? dd.x : dd.newXScale(dd);
@@ -221,7 +221,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .attr('transform', function(d) {return 'translate(' + d.x + ' 0)';});
                 d3.select(this)
                     .transition().duration(0) // this just cancels the easeColumn easing in .origin
-                    .attr('transform', 'translate(' + d.x + ', -5)');
+                    .attr('transform', 'translate(' + d.x + ' -5)');
             })
             .on('dragend', function(d) {
                 var p = d.parent;
