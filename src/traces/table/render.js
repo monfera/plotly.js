@@ -142,9 +142,6 @@ function gridPick(spec, col, row) {
 
 module.exports = function(root, svg, styledData, layout, callbacks) {
 
-    var domainBrushing = false;
-    var linePickActive = true;
-
     var vm = styledData
         .map(model.bind(0, layout))
         .map(viewModel);
@@ -199,10 +196,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             .origin(function(d) {return d;})
             .on('drag', function(d) {
                 var p = d.parent;
-                linePickActive = false;
-                if(domainBrushing) {
-                    return;
-                }
                 d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag - d.columnWidth, d3.event.x));
                 yColumn
                     .sort(function(a, b) {return a.x + a.columnWidth / 2 - b.x - b.columnWidth / 2;})
@@ -226,19 +219,12 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             })
             .on('dragend', function(d) {
                 var p = d.parent;
-                if(domainBrushing) {
-                    if(domainBrushing === 'ending') {
-                        domainBrushing = false;
-                    }
-                    return;
-                }
                 d.x = d.newXScale(d);
                 d3.select(this)
                     .transition()
                     .ease(c.releaseTransitionEase, 1, .75)
                     .duration(c.releaseTransitionDuration)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                linePickActive = true;
 
                 if(callbacks && callbacks.columnMoved) {
                     callbacks.columnMoved(p.key, p.columns.map(function(dd) {return dd.xIndex;}));
