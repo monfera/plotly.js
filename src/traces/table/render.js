@@ -286,7 +286,19 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('transform', function(d) {return 'translate(0 ' + d.yOffset + ')';})
         .style('cursor', function(d) {return d.dragHandle ? 'ew-resize' : null;})
         //.style('user-select', 'none')
-        //.style('pointer-events', 'auto');
+        //.style('pointer-events', 'auto')
+        .filter(function(d) {return d.key === 'cells';})
+        .call(d3.behavior.drag()
+            .origin(function(d) {console.log('startted');d3.event.stopPropagation(); return d;})
+            .on('drag', function(d) {
+                var p = d.parent;
+                d.dy = d3.event.dy;
+                console.log('block drag', d.dy)
+            })
+            .on('dragend', function(d) {
+                console.log('dragend')
+            })
+        );
 
     var columnCells = columnBlock.selectAll('.columnCells')
         .data(repeat, keyFun);
