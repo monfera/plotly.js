@@ -214,11 +214,11 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     dd.x = d === dd ? dd.x : dd.newXScale(dd);
                 })
 
-                yColumn.filter(function(dd) {return Math.abs(d.xIndex - dd.xIndex) !== 0;})
+                yColumn.filter(function(dd) {return d !== dd;})
                     .transition()
                     .ease(c.transitionEase)
                     .duration(c.transitionDuration)
-                    .attr('transform', function(d) {return 'translate(' + d.newXScale(d) + ', 0)';});
+                    .attr('transform', function(d) {return 'translate(' + d.x + ' 0)';});
                 d3.select(this)
                     .transition().duration(0) // this just cancels the easeColumn easing in .origin
                     .attr('transform', 'translate(' + d.x + ', -5)');
