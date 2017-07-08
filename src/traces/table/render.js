@@ -317,11 +317,22 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             .on('drag', function(d) {
                 var gpd = this.parentElement.parentElement.parentElement.__data__;
                 gpd.scrollY += d3.event.dy;
+                var anchorChanged = false;
                 cellsColumnBlock
                     .attr('transform', function(d) {
-                        var value = (gpd.scrollY  % 500) + d.yOffset;
+                        var offset = gpd.scrollY  % 500;
+                        var anchor = gpd.scrollY - offset;
+                        var value = offset + d.yOffset;
+                        if(anchor !== d.anchor) {
+                            anchorChanged = true;
+                        }
+                        d.anchor = anchor;
                         return 'translate(0 ' + value + ')';
                     });
+                if(anchorChanged) {
+                    console.log('anchor changed');
+                    anchorChanged = false;
+                }
             })
             .on('dragend', function(d) {
             })
