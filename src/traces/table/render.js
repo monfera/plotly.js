@@ -324,19 +324,31 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         var anchor = gpd.scrollY - offset;
                         var value = offset + d.yOffset;
                         if(anchor !== d.anchor) {
-                            anchorChanged = true;
+                            anchorChanged = {};
+                            anchorChanged[d.key] = true;
                         }
                         d.anchor = anchor;
                         return 'translate(0 ' + value + ')';
                     });
                 if(anchorChanged) {
-                    console.log('anchor changed');
+                    console.log('anchor changed ', anchorChanged);
+                    Object.keys(anchorChanged).forEach(function(k) {
+                        renderColumnBlocks(columnBlock.filter(function(d) {return d.key === k;}));
+                    })
                     anchorChanged = false;
                 }
             })
             .on('dragend', function(d) {
             })
         );
+
+    renderColumnBlocks(columnBlock);
+};
+
+function renderColumnBlocks(columnBlock) {
+
+    // this is performance critical code as scrolling calls it on every revolver switch
+    console.log('rendering columnBlocks', columnBlock)
 
     var columnCells = columnBlock.selectAll('.columnCells')
         .data(repeat, keyFun);
@@ -462,4 +474,4 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             var valueFormat = gridPick(d.model.cells.valueFormat, dim, row);
             return prefix + (valueFormat ? d3.format(valueFormat)(d.value) : d.value) + suffix;
         });
-};
+}
