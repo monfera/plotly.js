@@ -264,7 +264,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             );
 
             return [
-                blockDataHeader,
                 Object.assign(
                     {},
                     d,
@@ -288,7 +287,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         values: d.model.cells.values[d.xIndex],
                         model: d.model
                     }
-                )
+                ),
+                blockDataHeader
             ];
         }, keyFun);
 
@@ -301,7 +301,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     columnBlock
         .attr('transform', function(d) {return 'translate(0 ' + d.yOffset + ')';})
         .style('cursor', function(d) {return d.dragHandle ? 'ew-resize' : 'ns-resize';})
-        //.style('user-select', 'none')
+        .style('user-select', 'none');
         //.style('pointer-events', 'auto')
 
     cellsColumnBlock
@@ -318,7 +318,10 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 var gpd = this.parentElement.parentElement.parentElement.__data__;
                 gpd.scrollY += d3.event.dy;
                 cellsColumnBlock
-                    .attr('transform', function(d) {return 'translate(0 ' + (gpd.scrollY + d.yOffset) + ')';});
+                    .attr('transform', function(d) {
+                        var value = (gpd.scrollY  % 500) + d.yOffset;
+                        return 'translate(0 ' + value + ')';
+                    });
             })
             .on('dragend', function(d) {
             })
