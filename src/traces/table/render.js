@@ -90,7 +90,7 @@ function viewModel(model) {
 
     var height = model.height;
 
-    var newXScale = function (d) {
+    var xScale = function (d) {
         return d.parent.columns.reduce(function(prev, next) {return next.xIndex < d.xIndex ? prev + next.columnWidth : prev}, 0);
     }
 
@@ -110,7 +110,7 @@ function viewModel(model) {
             label: label,
             xIndex: i,
             height: height,
-            newXScale: newXScale,
+            xScale: xScale,
             x: undefined, // initialized below
             unitScale: unitScale(height, c.verticalPadding),
             filter: [0, 1],
@@ -122,7 +122,7 @@ function viewModel(model) {
     });
 
     viewModel.columns.forEach(function(dim) {
-        dim.x = newXScale(dim);
+        dim.x = xScale(dim);
     });
     return viewModel;
 }
@@ -189,7 +189,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('yColumn', true);
 
     yColumn
-        .attr('transform', function(d) {return 'translate(' + d.newXScale(d) + ', 0)';});
+        .attr('transform', function(d) {return 'translate(' + d.xScale(d) + ', 0)';});
 
     function easeColumn(elem, d, y) {
         d3.select(elem)
@@ -211,7 +211,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 var newOrder = yColumn.data().sort(function(a, b) {return a.x + a.columnWidth / 2 - b.x - b.columnWidth / 2;});
                 newOrder.forEach(function(dd, i) {
                     dd.xIndex = i;
-                    dd.x = d === dd ? dd.x : dd.newXScale(dd);
+                    dd.x = d === dd ? dd.x : dd.xScale(dd);
                 })
 
                 yColumn.filter(function(dd) {return d !== dd;})
@@ -225,7 +225,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             })
             .on('dragend', function(d) {
                 var p = d.parent;
-                d.x = d.newXScale(d);
+                d.x = d.xScale(d);
                 easeColumn(this, d, 0);
                 if(callbacks && callbacks.columnMoved) {
                     callbacks.columnMoved(p.key, p.columns.map(function(dd) {return dd.xIndex;}));
@@ -236,14 +236,29 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     yColumn.exit()
         .remove();
 
-    var columnOverlays = yColumn.selectAll('.columnOverlays')
+    var columnBoundary = yColumn.selectAll('.columnBoundary')
         .data(repeat, keyFun);
 
-    columnOverlays.enter()
+    columnBoundary.enter()
         .append('g')
-        .classed('columnOverlays', true);
+        .classed('columnBoundary', true);
 
-    var columnBlock = columnOverlays.selectAll('.columnBlock')
+    var columnBoundaryRect = yColumn.selectAll('.columnBoundaryRect')
+        .data(repeat, keyFun);
+
+    columnBoundaryRect.enter()
+        .append('rect')
+        .classed('columnBoundaryRect', true);
+
+    columnBoundaryRect
+        .attr('width', function(d) {return d.columnWidth;})
+        .attr('height', function(d) {
+            return d.height;})
+        .attr('y', function(d) {return -d.model.headerCells.cellHeights;})
+        .attr('fill', 'none')
+        .attr('stroke', 'red');
+
+    var columnBlock = yColumn.selectAll('.columnBlock')
         .data(function(d) {
             var blockDataHeader = Object.assign(
                 {},
