@@ -195,6 +195,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     }
 
     yColumn
+        .attr('clip-path', function(d) {return 'url(#columnBoundaryClippath_' + d.xIndex + ')';})
         .call(d3.behavior.drag()
             .origin(function(d) {
                 easeColumn(this, d, -5);
@@ -238,22 +239,31 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .append('g')
         .classed('columnBoundary', true);
 
-    function clipRectSize(selection) {
-        selection
-            .attr('width', function(d) {return d.columnWidth;})
-            .attr('height', function(d) {return d.height + c.uplift;})
-            .attr('fill', 'none')
-            .attr('stroke', 'red');
-    }
+    var columnBoundaryClippath = yColumn.selectAll('.columnBoundaryClippath')
+        .data(repeat, keyFun);
 
-    var columnBoundaryRect = yColumn.selectAll('.columnBoundaryRect')
+    // SVG spec doesn't mandate wrapping into a <defs> and doesn't seem to cause a speed difference
+    columnBoundaryClippath.enter()
+        .append('clipPath')
+        .classed('columnBoundaryClippath', true);
+
+    columnBoundaryClippath
+        .attr('id', function(d) {return 'columnBoundaryClippath_' + d.xIndex;});
+
+    var columnBoundaryRect = columnBoundaryClippath.selectAll('.columnBoundaryRect')
         .data(repeat, keyFun);
 
     columnBoundaryRect.enter()
         .append('rect')
         .classed('columnBoundaryRect', true);
 
-    columnBoundaryRect.call(clipRectSize);
+    columnBoundaryRect
+        .attr('y', function(d) {return -21})
+        .attr('width', function(d) {return d.columnWidth;})
+        .attr('height', function(d) {return d.height + c.uplift + 21;})
+        .attr('visible', 'none')
+        .attr('fill', 'none')
+        .attr('stroke', 'none');
 
     var columnBlock = yColumn.selectAll('.columnBlock')
         .data(function(d) {
