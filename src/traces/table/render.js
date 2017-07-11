@@ -198,7 +198,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('clip-path', function(d) {return 'url(#columnBoundaryClippath_' + d.xIndex + ')';})
         .call(d3.behavior.drag()
             .origin(function(d) {
-                easeColumn(this, d, -5);
+                easeColumn(this, d, -c.uplift);
                 this.parentNode.appendChild(this);
                 return d;
             })
@@ -258,9 +258,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('columnBoundaryRect', true);
 
     columnBoundaryRect
-        .attr('y', function(d) {return -d.model.headerCells.cellHeights + c.uplift;})
+        .attr('y', function(d) {return -d.model.headerCells.cellHeights + 0*c.uplift;})
         .attr('width', function(d) {return d.columnWidth;})
-        .attr('height', function(d) {return d.height + d.model.headerCells.cellHeights + c.uplift;})
+        .attr('height', function(d) {return d.height + d.model.headerCells.cellHeights + 0*c.uplift;})
         .attr('visible', 'none')
         .attr('fill', 'none')
         .attr('stroke', 'none');
