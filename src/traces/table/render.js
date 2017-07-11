@@ -16,8 +16,6 @@ function keyFun(d) {return d.key;}
 
 function repeat(d) {return [d];}
 
-function unitScale(height, padding) {return d3.scale.linear().range([height - padding, padding]);}
-
 function unwrap(d) {
     return d[0]; // plotly data structure convention
 }
@@ -51,7 +49,6 @@ function model(layout, d, i) {
     return {
         key: i,
         colCount: colCount,
-        tickDistance: c.tickDistance,
         translateX: domain.x[0] * width,
         translateY: layout.height - domain.y[1] * layout.height,
         pad: pad,
@@ -112,8 +109,6 @@ function viewModel(model) {
             height: height,
             xScale: xScale,
             x: undefined, // initialized below
-            unitScale: unitScale(height, c.verticalPadding),
-            filter: [0, 1],
             parent: viewModel,
             model: model,
             rowPitch: model.cells.cellHeights,
@@ -121,8 +116,8 @@ function viewModel(model) {
         };
     });
 
-    viewModel.columns.forEach(function(dim) {
-        dim.x = xScale(dim);
+    viewModel.columns.forEach(function(col) {
+        col.x = xScale(col);
     });
     return viewModel;
 }
@@ -221,7 +216,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .attr('transform', function(d) {return 'translate(' + d.x + ' 0)';});
                 d3.select(this)
                     .transition().duration(0) // this just cancels the easeColumn easing in .origin
-                    .attr('transform', 'translate(' + d.x + ' -5)');
+                    .attr('transform', 'translate(' + d.x + ' -' + c.uplift + ' )');
             })
             .on('dragend', function(d) {
                 var p = d.parent;
@@ -243,6 +238,14 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .append('g')
         .classed('columnBoundary', true);
 
+    function clipRectSize(selection) {
+        selection
+            .attr('width', function(d) {return d.columnWidth;})
+            .attr('height', function(d) {return d.height + c.uplift;})
+            .attr('fill', 'none')
+            .attr('stroke', 'red');
+    }
+
     var columnBoundaryRect = yColumn.selectAll('.columnBoundaryRect')
         .data(repeat, keyFun);
 
@@ -250,13 +253,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .append('rect')
         .classed('columnBoundaryRect', true);
 
-    columnBoundaryRect
-        .attr('width', function(d) {return d.columnWidth;})
-        .attr('height', function(d) {
-            return d.height;})
-        .attr('y', function(d) {return -d.model.headerCells.cellHeights;})
-        .attr('fill', 'none')
-        .attr('stroke', 'red');
+    columnBoundaryRect.call(clipRectSize);
 
     var columnBlock = yColumn.selectAll('.columnBlock')
         .data(function(d) {
@@ -329,7 +326,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 }
                 return d;
             })
-            .on('drag', function(d) {
+            .on('drag', function() {
                 var gpd = this.parentElement.parentElement.parentElement.__data__;
                 gpd.scrollY += d3.event.dy;
                 var anchorChanged = false;
@@ -482,11 +479,11 @@ function renderColumnBlocks(columnBlock) {
             })[d.align];
         })
         .text(function(d) {
-            var dim = d.column.xIndex;
+            var col = d.column.xIndex;
             var row = d.rowNumber;
-            var prefix = gridPick(d.model.cells.prefix, dim, row) || '';
-            var suffix = gridPick(d.model.cells.suffix, dim, row) || '';
-            var valueFormat = gridPick(d.model.cells.valueFormat, dim, row);
+            var prefix = gridPick(d.model.cells.prefix, col, row) || '';
+            var suffix = gridPick(d.model.cells.suffix, col, row) || '';
+            var valueFormat = gridPick(d.model.cells.valueFormat, col, row);
             return prefix + (valueFormat ? d3.format(valueFormat)(d.value) : d.value) + suffix;
         });
 }
