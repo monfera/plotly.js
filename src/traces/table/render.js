@@ -423,11 +423,11 @@ function renderColumnBlocks(columnBlock) {
     cellRect
         .attr('width', function(d) {return d.column.columnWidth - d.cellBorderWidth;})
         .attr('height', function(d) {return d.column.rowPtch - d.cellBorderWidth;})
-        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.column.rowPtch - c.cellPad)) + ')'})
+        .attr('transform', function(d) {return 'translate(0 -' + d.column.rowPtch + ')'})
+        .attr('stroke-width', function(d) {return d.cellBorderWidth;})
         .attr('stroke', function(d) {
             return gridPick(d.model.cells.lineColor, d.column.xIndex, d.rowNumber);
         })
-        .attr('stroke-width', function(d) {return d.cellBorderWidth;})
         .attr('fill', function(d) {
             return gridPick(d.model.cells.fillColor, d.column.xIndex, d.rowNumber);
         });
@@ -447,7 +447,7 @@ function renderColumnBlocks(columnBlock) {
             var y = d.column.rowPtch;
             return d3.svg.line()([[x1, y], [x2, y]]);
         })
-        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.column.rowPtch - c.cellPad)) + ')'});
+        .attr('transform', function(d) {return 'translate(0 -' + d.column.rowPtch + ')'});
 
     var cellText = columnCell.selectAll('.cellText')
         .data(repeat, keyFun);
@@ -459,10 +459,9 @@ function renderColumnBlocks(columnBlock) {
     cellText
         .attr('dy', function(d) {
             var rowPitch = d.column.rowPtch;
-            var fontSize = d.font.size;
             return ({
-                top: -rowPitch + fontSize,
-                middle: -rowPitch / 2 + fontSize * 0.2 + c.cellPad / 2,
+                top: -rowPitch + c.cellPad,
+                middle: -rowPitch / 2,
                 bottom: -c.cellPad
             })[d.valign];
         })
@@ -490,6 +489,13 @@ function renderColumnBlocks(columnBlock) {
                 right: d.column.columnWidth - c.cellPad,
                 center: '50%'
             })[d.align];
+        })
+        .attr('alignment-baseline', function(d) {
+            return ({
+                top: "hanging",
+                middle: "central",
+                bottom: "alphabetic"
+            })[d.valign];
         })
         .text(function(d) {
             var col = d.column.xIndex;

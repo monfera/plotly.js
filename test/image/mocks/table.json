@@ -92,7 +92,7 @@
             "height": 24,
 
             "align": ["center", "right", "center", "right", "right", "right", "left", "right", "right", "right"],
-            "valign": "middle",
+            "valign": ["top", "bottom", "middle"],
 
             "line": {
                 "color": [
