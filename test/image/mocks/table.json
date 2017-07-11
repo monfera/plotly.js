@@ -24,6 +24,8 @@
 
         "header": {
 
+            "height": 50,
+
             "values": [
                 "Cylinder",
                 "Height",

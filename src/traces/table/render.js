@@ -75,7 +75,7 @@ function model(layout, d, i) {
             align: trace.header.align,
             valign: trace.header.valign,
             font: trace.header.font,
-            cellHeights: trace.cells.height,
+            cellHeights: trace.header.height,
             fillColor: trace.header.fill.color,
             lineWidth: trace.header.line.width,
             lineColor: trace.header.line.color
@@ -258,9 +258,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('columnBoundaryRect', true);
 
     columnBoundaryRect
-        .attr('y', function(d) {return -21})
+        .attr('y', function(d) {return -d.model.headerCells.cellHeights + c.uplift;})
         .attr('width', function(d) {return d.columnWidth;})
-        .attr('height', function(d) {return d.height + c.uplift + 21;})
+        .attr('height', function(d) {return d.height + d.model.headerCells.cellHeights + c.uplift;})
         .attr('visible', 'none')
         .attr('fill', 'none')
         .attr('stroke', 'none');
@@ -274,6 +274,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     key: 'header',
                     yOffset: 0,
                     values: d.model.headerCells.values[d.xIndex],
+                    rowPtch: d.model.headerCells.cellHeights,
                     dragHandle: true,
                     model: Object.assign(
                         {},
@@ -295,6 +296,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         yOffset: d.rowPitch,
                         dragHandle: false,
                         values: d.model.cells.values[d.xIndex],
+                        rowPtch: d.model.cells.cellHeights,
                         model: d.model
                     }
                 ),
@@ -307,6 +309,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         yOffset: d.rowPitch + 500,
                         dragHandle: false,
                         values: d.model.cells.values[d.xIndex],
+                        rowPtch: d.model.cells.cellHeights,
                         model: d.model
                     }
                 ),
@@ -391,7 +394,7 @@ function renderColumnBlocks(columnBlock) {
 
     columnCell
         .attr('transform', function(d, i) {
-            return 'translate(' + 0 + ',' + i * d.column.rowPitch + ')';
+            return 'translate(' + 0 + ',' + i * d.column.rowPtch + ')';
         })
         .each(function(d, i) {
             var spec = d.model.cells.font;
@@ -419,8 +422,8 @@ function renderColumnBlocks(columnBlock) {
 
     cellRect
         .attr('width', function(d) {return d.column.columnWidth - d.cellBorderWidth;})
-        .attr('height', function(d) {return d.column.rowPitch - d.cellBorderWidth;})
-        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.column.rowPitch - c.cellPad)) + ')'})
+        .attr('height', function(d) {return d.column.rowPtch - d.cellBorderWidth;})
+        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.column.rowPtch - c.cellPad)) + ')'})
         .attr('stroke', function(d) {
             return gridPick(d.model.cells.lineColor, d.column.xIndex, d.rowNumber);
         })
@@ -441,10 +444,10 @@ function renderColumnBlocks(columnBlock) {
         .attr('d', function(d) {
             var x1 = 0;
             var x2 = d.column.columnWidth;
-            var y = d.column.rowPitch;
+            var y = d.column.rowPtch;
             return d3.svg.line()([[x1, y], [x2, y]]);
         })
-        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.column.rowPitch - c.cellPad)) + ')'});
+        .attr('transform', function(d) {return 'translate(' + 0 + ' ' + (-(d.column.rowPtch - c.cellPad)) + ')'});
 
     var cellText = columnCell.selectAll('.cellText')
         .data(repeat, keyFun);
@@ -455,7 +458,7 @@ function renderColumnBlocks(columnBlock) {
 
     cellText
         .attr('dy', function(d) {
-            var rowPitch = d.column.rowPitch;
+            var rowPitch = d.column.rowPtch;
             var fontSize = d.font.size;
             return ({
                 top: -rowPitch + fontSize,
