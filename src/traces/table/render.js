@@ -111,7 +111,6 @@ function viewModel(model) {
             x: undefined, // initialized below
             parent: viewModel,
             model: model,
-            rowPitch: model.cells.cellHeights,
             columnWidth: model.columnWidths[i]
         };
     });
@@ -258,8 +257,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('columnBoundaryRect', true);
 
     columnBoundaryRect
+        .attr('x', function(d) {return /*-d.cellBorderWidth*/-0.5 / 2  ;})
         .attr('y', function(d) {return -d.model.headerCells.cellHeights + 0*c.uplift;})
-        .attr('width', function(d) {return d.columnWidth;})
+        .attr('width', function(d) {return d.columnWidth +  0.5 /*+ d.cellBorderWidth*/;})
         .attr('height', function(d) {return d.height + d.model.headerCells.cellHeights + 0*c.uplift;})
         .attr('visible', 'none')
         .attr('fill', 'none')
@@ -293,7 +293,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     {
                         key: 'cells1',
                         type: 'cells',
-                        yOffset: d.rowPitch,
+                        yOffset: d.model.cells.cellHeights,
                         dragHandle: false,
                         values: d.model.cells.values[d.xIndex],
                         rowPtch: d.model.cells.cellHeights,
@@ -306,7 +306,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     {
                         key: 'cells2',
                         type: 'cells',
-                        yOffset: d.rowPitch + 500,
+                        yOffset: d.model.cells.cellHeights + 500,
                         dragHandle: false,
                         values: d.model.cells.values[d.xIndex],
                         rowPtch: d.model.cells.cellHeights,
