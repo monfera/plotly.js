@@ -173,9 +173,20 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .style('box-sizing', 'content-box');
 
     tableControlView
-        .attr('transform', function(d) {return 'translate(' + d.model.pad.l + ',' + d.model.pad.t + ')';});
+        .attr('transform', function(d) {return 'translate(' + d.model.pad.l + ',' + d.model.pad.t + ')';})
+        .attr('clip-path', function(d) {return 'url(#scrollAreaBottomClip_' + d.key + ')';});
 
-    var scrollAreaBottomClipRect = tableControlView.selectAll('.scrollAreaBottomClipRect')
+    var scrollAreaBottomClip = tableControlView.selectAll('.scrollAreaBottomClip')
+        .data(repeat, keyFun);
+
+    scrollAreaBottomClip.enter()
+        .append('clipPath')
+        .classed('scrollAreaBottomClip', true);
+
+    scrollAreaBottomClip
+        .attr('id', function(d) { return 'scrollAreaBottomClip_' + d.key;})
+
+    var scrollAreaBottomClipRect = scrollAreaBottomClip.selectAll('.scrollAreaBottomClipRect')
         .data(repeat, keyFun);
 
     scrollAreaBottomClipRect.enter()
@@ -184,8 +195,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     scrollAreaBottomClipRect
         .attr('width', function(d) {return d.model.width + 2 * c.overdrag;})
-        .attr('height', function(d) {return d.model.height;})
+        .attr('height', function(d) {return d.model.height + d.model.headerCells.cellHeights + c.overdrag;})
         .attr('x', -c.overdrag)
+        .attr('y', function(d) {return -(d.model.headerCells.cellHeights + c.overdrag);})
         .attr('stroke', 'red')
         .attr('stroke-width', '1')
         .attr('fill', 'none');
