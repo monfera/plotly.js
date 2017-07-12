@@ -175,6 +175,22 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
     tableControlView
         .attr('transform', function(d) {return 'translate(' + d.model.pad.l + ',' + d.model.pad.t + ')';});
 
+    var scrollAreaBottomClipRect = tableControlView.selectAll('.scrollAreaBottomClipRect')
+        .data(repeat, keyFun);
+
+    scrollAreaBottomClipRect.enter()
+        .append('rect')
+        .classed('scrollAreaBottomClipRect', true);
+
+    scrollAreaBottomClipRect
+        .attr('width', function(d) {return d.model.width + 2 * c.overdrag;})
+        .attr('height', function(d) {return d.model.height;})
+        .attr('x', -c.overdrag)
+        .attr('stroke', 'red')
+        .attr('stroke-width', '1')
+        .attr('fill', 'none');
+
+
     var yColumn = tableControlView.selectAll('.yColumn')
         .data(function(vm) {return vm.columns;}, keyFun);
 
@@ -257,10 +273,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .classed('columnBoundaryRect', true);
 
     columnBoundaryRect
-        .attr('x', function(d) {return /*-d.cellBorderWidth*/-0.5 / 2  ;})
         .attr('y', function(d) {return -d.model.headerCells.cellHeights + 0*c.uplift;})
-        .attr('width', function(d) {return d.columnWidth +  0.5 /*+ d.cellBorderWidth*/;})
-        .attr('height', function(d) {return d.height + d.model.headerCells.cellHeights + 0*c.uplift;})
+        .attr('width', function(d) {return d.columnWidth;})
+        .attr('height', function(d) {return d.height + d.model.headerCells.cellHeights + c.uplift;})
         .attr('visible', 'none')
         .attr('fill', 'none')
         .attr('stroke', 'none');
@@ -421,8 +436,8 @@ function renderColumnBlocks(columnBlock) {
         .classed('cellRect', true);
 
     cellRect
-        .attr('width', function(d) {return d.column.columnWidth - d.cellBorderWidth;})
-        .attr('height', function(d) {return d.column.rowPtch - d.cellBorderWidth;})
+        .attr('width', function(d) {return d.column.columnWidth /*- d.cellBorderWidth*/;})
+        .attr('height', function(d) {return d.column.rowPtch /*- d.cellBorderWidth*/;})
         .attr('transform', function(d) {return 'translate(0 -' + d.column.rowPtch + ')'})
         .attr('stroke-width', function(d) {return d.cellBorderWidth;})
         .attr('stroke', function(d) {
