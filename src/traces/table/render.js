@@ -180,7 +180,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .data(repeat, keyFun);
 
     scrollAreaBottomClip.enter()
-        .append('clipPath')
+        .append(c.clipView ? 'g' : 'clipPath')
         .classed('scrollAreaBottomClip', true);
 
     scrollAreaBottomClip
@@ -199,7 +199,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('x', -c.overdrag)
         .attr('y', function(d) {return -(d.model.headerCells.cellHeights + c.uplift);})
         .attr('stroke', 'red')
-        .attr('stroke-width', '1')
+        .attr('stroke-width', 1)
         .attr('fill', 'none');
 
 
@@ -271,7 +271,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     // SVG spec doesn't mandate wrapping into a <defs> and doesn't seem to cause a speed difference
     columnBoundaryClippath.enter()
-        .append('clipPath')
+        .append(c.clipView ? 'g' : 'clipPath')
         .classed('columnBoundaryClippath', true);
 
     columnBoundaryClippath
@@ -288,9 +288,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('y', function(d) {return -d.model.headerCells.cellHeights + 0*c.uplift;})
         .attr('width', function(d) {return d.columnWidth;})
         .attr('height', function(d) {return d.height + d.model.headerCells.cellHeights + c.uplift;})
-        .attr('visible', 'none')
-        .attr('fill', 'none')
-        .attr('stroke', 'none');
+        .attr('stroke', 'magenta')
+        .attr('stroke-width', 2);
 
     var columnBlock = yColumn.selectAll('.columnBlock')
         .data(function(d) {

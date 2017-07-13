@@ -18,5 +18,6 @@ module.exports = {
     transitionEase: 'cubic-out',
     transitionDuration: 100,
     releaseTransitionEase: 'elastic',
-    releaseTransitionDuration: 300
+    releaseTransitionDuration: 300,
+    clipView: true
 };
