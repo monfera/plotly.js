@@ -176,24 +176,24 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('transform', function(d) {return 'translate(' + d.model.pad.l + ',' + d.model.pad.t + ')';})
         .attr('clip-path', function(d) {return 'url(#scrollAreaBottomClip_' + d.key + ')';});
 
-    var scrollAreaBottomClip = tableControlView.selectAll('.scrollAreaBottomClip')
+    var scrollAreaClip = tableControlView.selectAll('.scrollAreaClip')
         .data(repeat, keyFun);
 
-    scrollAreaBottomClip.enter()
+    scrollAreaClip.enter()
         .append(c.clipView ? 'g' : 'clipPath')
-        .classed('scrollAreaBottomClip', true);
+        .classed('scrollAreaClip', true);
 
-    scrollAreaBottomClip
+    scrollAreaClip
         .attr('id', function(d) { return 'scrollAreaBottomClip_' + d.key;})
 
-    var scrollAreaBottomClipRect = scrollAreaBottomClip.selectAll('.scrollAreaBottomClipRect')
+    var scrollAreaClipRect = scrollAreaClip.selectAll('.scrollAreaClipRect')
         .data(repeat, keyFun);
 
-    scrollAreaBottomClipRect.enter()
+    scrollAreaClipRect.enter()
         .append('rect')
-        .classed('scrollAreaBottomClipRect', true);
+        .classed('scrollAreaClipRect', true);
 
-    scrollAreaBottomClipRect
+    scrollAreaClipRect
         .attr('width', function(d) {return d.model.width + 2 * c.overdrag;})
         .attr('height', function(d) {return d.model.height + d.model.headerCells.cellHeights + c.uplift;})
         .attr('x', -c.overdrag)
@@ -201,7 +201,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('stroke', 'red')
         .attr('stroke-width', 1)
         .attr('fill', 'none');
-
 
     var yColumn = tableControlView.selectAll('.yColumn')
         .data(function(vm) {return vm.columns;}, keyFun);
