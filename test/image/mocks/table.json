@@ -3,11 +3,6 @@
         "width": 1200,
         "height": 500,
         "title": "Widget parameters and cost",
-        "font": {
-            "color": "blue",
-            "size": 200,
-            "family": "sans-serif"
-        },
         "margin": {"t": 106, "r": 60, "b": 54, "l": 60}
     },
 
@@ -52,7 +47,7 @@
             },
 
             "font": {
-                "family": "PT Sans Narrow",
+                "family": "Arial",
                 "size": 16,
                 "color": "white"
             }
@@ -109,6 +104,7 @@
             },
 
             "font": {
+                "family": "verdana",
                 "size": 12,
                 "color": ["black", "red", "black"]
             }
