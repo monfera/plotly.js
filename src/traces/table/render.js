@@ -195,9 +195,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     scrollAreaBottomClipRect
         .attr('width', function(d) {return d.model.width + 2 * c.overdrag;})
-        .attr('height', function(d) {return d.model.height + d.model.headerCells.cellHeights + c.overdrag;})
+        .attr('height', function(d) {return d.model.height + d.model.headerCells.cellHeights + c.uplift;})
         .attr('x', -c.overdrag)
-        .attr('y', function(d) {return -(d.model.headerCells.cellHeights + c.overdrag);})
+        .attr('y', function(d) {return -(d.model.headerCells.cellHeights + c.uplift);})
         .attr('stroke', 'red')
         .attr('stroke-width', '1')
         .attr('fill', 'none');
@@ -301,7 +301,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     key: 'header',
                     yOffset: 0,
                     values: d.model.headerCells.values[d.xIndex],
-                    rowPtch: d.model.headerCells.cellHeights,
+                    rowPitch: d.model.headerCells.cellHeights,
                     dragHandle: true,
                     model: Object.assign(
                         {},
@@ -323,7 +323,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         yOffset: d.model.cells.cellHeights,
                         dragHandle: false,
                         values: d.model.cells.values[d.xIndex],
-                        rowPtch: d.model.cells.cellHeights,
+                        rowPitch: d.model.cells.cellHeights,
                         model: d.model
                     }
                 ),
@@ -336,7 +336,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         yOffset: d.model.cells.cellHeights + 500,
                         dragHandle: false,
                         values: d.model.cells.values[d.xIndex],
-                        rowPtch: d.model.cells.cellHeights,
+                        rowPitch: d.model.cells.cellHeights,
                         model: d.model
                     }
                 ),
@@ -421,7 +421,7 @@ function renderColumnBlocks(columnBlock) {
 
     columnCell
         .attr('transform', function(d, i) {
-            return 'translate(' + 0 + ',' + i * d.column.rowPtch + ')';
+            return 'translate(' + 0 + ',' + i * d.column.rowPitch + ')';
         })
         .each(function(d, i) {
             var spec = d.model.cells.font;
@@ -449,8 +449,8 @@ function renderColumnBlocks(columnBlock) {
 
     cellRect
         .attr('width', function(d) {return d.column.columnWidth /*- d.cellBorderWidth*/;})
-        .attr('height', function(d) {return d.column.rowPtch /*- d.cellBorderWidth*/;})
-        .attr('transform', function(d) {return 'translate(0 -' + d.column.rowPtch + ')'})
+        .attr('height', function(d) {return d.column.rowPitch /*- d.cellBorderWidth*/;})
+        .attr('transform', function(d) {return 'translate(0 -' + d.column.rowPitch + ')'})
         .attr('stroke-width', function(d) {return d.cellBorderWidth;})
         .attr('stroke', function(d) {
             return gridPick(d.model.cells.lineColor, d.column.xIndex, d.rowNumber);
@@ -471,10 +471,10 @@ function renderColumnBlocks(columnBlock) {
         .attr('d', function(d) {
             var x1 = 0;
             var x2 = d.column.columnWidth;
-            var y = d.column.rowPtch;
+            var y = d.column.rowPitch;
             return d3.svg.line()([[x1, y], [x2, y]]);
         })
-        .attr('transform', function(d) {return 'translate(0 -' + d.column.rowPtch + ')'});
+        .attr('transform', function(d) {return 'translate(0 -' + d.column.rowPitch + ')'});
 
     var cellText = columnCell.selectAll('.cellText')
         .data(repeat, keyFun);
@@ -485,7 +485,7 @@ function renderColumnBlocks(columnBlock) {
 
     cellText
         .attr('dy', function(d) {
-            var rowPitch = d.column.rowPtch;
+            var rowPitch = d.column.rowPitch;
             return ({
                 top: -rowPitch + c.cellPad,
                 middle: -rowPitch / 2,
