@@ -44,7 +44,6 @@ function model(layout, d, i) {
 
     var pad = layout.margin || {l: 80, r: 80, t: 100, b: 80};
     var rowContentWidth = groupWidth;
-    var rowHeight = groupHeight;
 
     return {
         key: i,
@@ -53,7 +52,7 @@ function model(layout, d, i) {
         translateY: layout.height - domain.y[1] * layout.height,
         pad: pad,
         width: rowContentWidth,
-        height: rowHeight,
+        height: groupHeight,
         columnWidths: columnWidths,
 
         cells: {
