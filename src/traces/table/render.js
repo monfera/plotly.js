@@ -176,32 +176,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .attr('transform', function(d) {return 'translate(' + d.model.pad.l + ',' + d.model.pad.t + ')';})
         .attr('clip-path', function(d) {return 'url(#scrollAreaBottomClip_' + d.key + ')';});
 
-    var scrollAreaClip = tableControlView.selectAll('.scrollAreaClip')
-        .data(repeat, keyFun);
-
-    scrollAreaClip.enter()
-        .append(c.clipView ? 'g' : 'clipPath')
-        .classed('scrollAreaClip', true);
-
-    scrollAreaClip
-        .attr('id', function(d) { return 'scrollAreaBottomClip_' + d.key;})
-
-    var scrollAreaClipRect = scrollAreaClip.selectAll('.scrollAreaClipRect')
-        .data(repeat, keyFun);
-
-    scrollAreaClipRect.enter()
-        .append('rect')
-        .classed('scrollAreaClipRect', true);
-
-    scrollAreaClipRect
-        .attr('width', function(d) {return d.model.width + 2 * c.overdrag;})
-        .attr('height', function(d) {return d.model.height + d.model.headerCells.cellHeights + c.uplift;})
-        .attr('x', -c.overdrag)
-        .attr('y', function(d) {return -(d.model.headerCells.cellHeights + c.uplift);})
-        .attr('stroke', 'red')
-        .attr('stroke-width', 1)
-        .attr('fill', 'none');
-
     var yColumn = tableControlView.selectAll('.yColumn')
         .data(function(vm) {return vm.columns;}, keyFun);
 
@@ -257,38 +231,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     yColumn.exit()
         .remove();
-
-    var columnBoundary = yColumn.selectAll('.columnBoundary')
-        .data(repeat, keyFun);
-
-    columnBoundary.enter()
-        .append('g')
-        .classed('columnBoundary', true);
-
-    var columnBoundaryClippath = yColumn.selectAll('.columnBoundaryClippath')
-        .data(repeat, keyFun);
-
-    // SVG spec doesn't mandate wrapping into a <defs> and doesn't seem to cause a speed difference
-    columnBoundaryClippath.enter()
-        .append(c.clipView ? 'g' : 'clipPath')
-        .classed('columnBoundaryClippath', true);
-
-    columnBoundaryClippath
-        .attr('id', function(d) {return 'columnBoundaryClippath_' + d.xIndex;});
-
-    var columnBoundaryRect = columnBoundaryClippath.selectAll('.columnBoundaryRect')
-        .data(repeat, keyFun);
-
-    columnBoundaryRect.enter()
-        .append('rect')
-        .classed('columnBoundaryRect', true);
-
-    columnBoundaryRect
-        .attr('y', function(d) {return -d.model.headerCells.cellHeights + 0*c.uplift;})
-        .attr('width', function(d) {return d.columnWidth;})
-        .attr('height', function(d) {return d.height + d.model.headerCells.cellHeights + c.uplift;})
-        .attr('stroke', 'magenta')
-        .attr('stroke-width', 2);
 
     var columnBlock = yColumn.selectAll('.columnBlock')
         .data(function(d) {
@@ -393,6 +335,67 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         );
 
     renderColumnBlocks(columnBlock);
+
+    var scrollAreaClip = tableControlView.selectAll('.scrollAreaClip')
+        .data(repeat, keyFun);
+
+    scrollAreaClip.enter()
+        .append(c.clipView ? 'g' : 'clipPath')
+        .classed('scrollAreaClip', true);
+
+    scrollAreaClip
+        .attr('id', function(d) { return 'scrollAreaBottomClip_' + d.key;})
+
+    var scrollAreaClipRect = scrollAreaClip.selectAll('.scrollAreaClipRect')
+        .data(repeat, keyFun);
+
+    scrollAreaClipRect.enter()
+        .append('rect')
+        .classed('scrollAreaClipRect', true);
+
+    scrollAreaClipRect
+        .attr('width', function(d) {return d.model.width + 2 * c.overdrag;})
+        .attr('height', function(d) {return d.model.height + d.model.headerCells.cellHeights + c.uplift;})
+        .attr('x', -c.overdrag)
+        .attr('y', function(d) {return -(d.model.headerCells.cellHeights + c.uplift);})
+        .attr('stroke', 'orange')
+        .attr('stroke-width', 2)
+        .attr('fill', 'none')
+        .style('pointer-events', 'stroke');
+
+    var columnBoundary = yColumn.selectAll('.columnBoundary')
+        .data(repeat, keyFun);
+
+    columnBoundary.enter()
+        .append('g')
+        .classed('columnBoundary', true);
+
+    var columnBoundaryClippath = yColumn.selectAll('.columnBoundaryClippath')
+        .data(repeat, keyFun);
+
+    // SVG spec doesn't mandate wrapping into a <defs> and doesn't seem to cause a speed difference
+    columnBoundaryClippath.enter()
+        .append(c.clipView ? 'g' : 'clipPath')
+        .classed('columnBoundaryClippath', true);
+
+    columnBoundaryClippath
+        .attr('id', function(d) {return 'columnBoundaryClippath_' + d.xIndex;});
+
+    var columnBoundaryRect = columnBoundaryClippath.selectAll('.columnBoundaryRect')
+        .data(repeat, keyFun);
+
+    columnBoundaryRect.enter()
+        .append('rect')
+        .classed('columnBoundaryRect', true);
+
+    columnBoundaryRect
+        .attr('y', function(d) {return -d.model.headerCells.cellHeights + 0*c.uplift;})
+        .attr('width', function(d) {return d.columnWidth;})
+        .attr('height', function(d) {return d.height + d.model.headerCells.cellHeights + c.uplift;})
+        .attr('fill', 'none')
+        .attr('stroke', 'magenta')
+        .attr('stroke-width', 2)
+        .style('pointer-events', 'stroke');
 };
 
 function renderColumnBlocks(columnBlock) {
