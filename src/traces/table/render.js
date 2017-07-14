@@ -327,7 +327,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         var anchor = -gpd.scrollY - offset;
                         var value = offset + d.yOffset;
                         if(anchor !== d.anchor) {
-                            anchorChanged = {};
+                            if(!anchorChanged) anchorChanged = {};
                             anchorChanged[d.key] = true;
                         }
                         d.anchor = anchor;
@@ -337,7 +337,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     //console.log('anchor changed ', anchorChanged);
                     Object.keys(anchorChanged).forEach(function(k) {
                         // fixme hardcoding down here
-                        renderColumnBlocks(columnBlock.filter(function(d) {return d.key === 'cells1' || d.key === 'cells2';}));
+                        renderColumnBlocks(columnBlock.filter(function(d) {return d.key === k;}));
                     })
                     anchorChanged = false;
                 }
