@@ -319,7 +319,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             .on('drag', function() {
                 var gpd = this.parentElement.parentElement.parentElement.__data__; // fixme reach vm more appropriately
                 gpd.scrollY -= d3.event.dy;
-                //console.log('scrollY', gpd.scrollY);
                 var anchorChanged = false;
                 cellsColumnBlock
                     .attr('transform', function(d) {
@@ -334,7 +333,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         return 'translate(0 ' + value + ')';
                     });
                 if(anchorChanged) {
-                    //console.log('anchor changed ', anchorChanged);
                     Object.keys(anchorChanged).forEach(function(k) {
                         // fixme hardcoding down here
                         renderColumnBlocks(columnBlock.filter(function(d) {return d.key === k;}));
@@ -430,9 +428,8 @@ function renderColumnBlocks(columnBlock) {
             var rowFrom = (Math.floor(scrollY / d.model.panelHeight) + (d.rowBlockOffset ? 1 : 0)) * d.model.rowsPerPanel;
             var rowTo = rowFrom +  (d.rowBlockOffset ? 1 : 1) * d.model.rowsPerPanel;
 
-            console.log(d.key)
 
-            if(d.xIndex === 0) {
+            if(false && d.xIndex === 0) {
                 //console.log(d.key)
                 console.log('reslicing: ', rowFrom, rowTo);
                 console.log('scrollY in row splitting part:', scrollY)
@@ -485,7 +482,6 @@ function renderColumnBlocks(columnBlock) {
         })
         .attr('fill', function(d) {
             return ({cells1: 'blue', cells2: 'red'})[d.column.key];
-            return gridPick(d.model.cells.fillColor, d.column.xIndex, d.rowNumber);
             return gridPick(d.model.cells.fillColor, d.column.xIndex, d.rowNumber);
         });
 
