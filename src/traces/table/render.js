@@ -301,15 +301,14 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     columnBlock.enter()
         .append('g')
-        .classed('columnBlock', true);
+        .classed('columnBlock', true)
+        .style('user-select', 'none');
 
     var cellsColumnBlock = columnBlock.filter(function(d) {return d.type === 'cells';});
 
     columnBlock
-        .attr('transform', function(d) {return 'translate(0 ' + d.yOffset + ')';})
         .style('cursor', function(d) {return d.dragHandle ? 'ew-resize' : 'ns-resize';})
-        .style('user-select', 'none');
-        //.style('pointer-events', 'auto')
+        .attr('transform', function(d) {return 'translate(0 ' + d.yOffset + ')';});
 
     cellsColumnBlock
         .call(d3.behavior.drag()
