@@ -264,7 +264,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 }
             );
 
-            return [
+            var result = [
                 Object.assign(
                     {},
                     d,
@@ -285,7 +285,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     {
                         key: 'cells2',
                         type: 'cells',
-                        yOffset: d.model.cells.cellHeights + d.model.panelHeight + 10,
+                        yOffset: d.model.cells.cellHeights + d.model.panelHeight,
                         dragHandle: false,
                         values: d.model.cells.values[d.xIndex],
                         rowPitch: d.model.cells.cellHeights,
@@ -295,6 +295,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 ),
                 blockDataHeader
             ];
+
+            return result;
         }, keyFun);
 
     columnBlock.enter()
@@ -318,6 +320,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             .on('drag', function() {
                 var gpd = this.parentElement.parentElement.parentElement.__data__; // fixme reach vm more appropriately
                 gpd.scrollY -= d3.event.dy;
+                //console.log('scrollY', gpd.scrollY);
                 var anchorChanged = false;
                 cellsColumnBlock
                     .attr('transform', function(d) {
@@ -334,7 +337,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 if(anchorChanged) {
                     //console.log('anchor changed ', anchorChanged);
                     Object.keys(anchorChanged).forEach(function(k) {
-                        renderColumnBlocks(columnBlock.filter(function(d) {return d.key === k;}));
+                        // fixme hardcoding down here
+                        renderColumnBlocks(columnBlock.filter(function(d) {return d.key === 'cells1' || d.key === 'cells2';}));
                     })
                     anchorChanged = false;
                 }
@@ -410,7 +414,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 function renderColumnBlocks(columnBlock) {
 
     // this is performance critical code as scrolling calls it on every revolver switch
-    //console.log('rendering columnBlocks', columnBlock)
 
     var columnCells = columnBlock.selectAll('.columnCells')
         .data(repeat, keyFun);
@@ -424,10 +427,17 @@ function renderColumnBlocks(columnBlock) {
 
     var columnCell = columnCells.selectAll('.columnCell')
         .data(function(d) {
-            console.log('reslicing')
             var scrollY = d.viewModel.scrollY;
-            var rowFrom = Math.floor(scrollY / d.model.panelHeight + (d.rowBlockOffset ? 1 : 0)) * d.model.rowsPerPanel;
-            var rowTo = rowFrom +  (d.rowBlockOffset ? 2 : 1) * d.model.rowsPerPanel;
+            var rowFrom = (Math.floor(scrollY / d.model.panelHeight) + (d.rowBlockOffset ? 1 : 0)) * d.model.rowsPerPanel;
+            var rowTo = rowFrom +  (d.rowBlockOffset ? 1 : 1) * d.model.rowsPerPanel;
+
+            console.log(d.key)
+
+            if(d.xIndex === 0) {
+                //console.log(d.key)
+                console.log('reslicing: ', rowFrom, rowTo);
+                console.log('scrollY in row splitting part:', scrollY)
+            }
 
             return d.values.slice(rowFrom, rowTo).map(function(v, i) {return {key: /*d.model.fromRow + */i, column: d, model: d.model, value: v};});
         }, keyFun);
@@ -435,6 +445,8 @@ function renderColumnBlocks(columnBlock) {
     columnCell.enter()
         .append('g')
         .classed('columnCell', true);
+
+    columnCell.exit().remove();
 
     columnCell
         .attr('transform', function(d, i) {
@@ -473,6 +485,8 @@ function renderColumnBlocks(columnBlock) {
             return gridPick(d.model.cells.lineColor, d.column.xIndex, d.rowNumber);
         })
         .attr('fill', function(d) {
+            return ({cells1: 'blue', cells2: 'red'})[d.column.key];
+            return gridPick(d.model.cells.fillColor, d.column.xIndex, d.rowNumber);
             return gridPick(d.model.cells.fillColor, d.column.xIndex, d.rowNumber);
         });
 
