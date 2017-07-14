@@ -1,7 +1,7 @@
 {
     "layout": {
         "width": 1200,
-        "height": 500,
+        "height": 300,
         "title": "Widget parameters and cost",
         "margin": {"t": 106, "r": 60, "b": 54, "l": 60}
     },
@@ -15,13 +15,14 @@
             "y": [0.06, 0.89]
         },
 
-        "columnwidth": [90, 110, 60, 90, 80, 70, 80, 60, 100, 70],
+        "columnwidth": [40, 90, 110, 60, 90, 80, 70, 80, 60, 100, 70],
 
         "header": {
 
             "height": 50,
 
             "values": [
+                "Index",
                 "Cylinder",
                 "Height",
                 "Width",
@@ -34,7 +35,7 @@
                 "RF block"
             ],
 
-            "align": ["center", "right", "center", "right", "right", "right", "left", "right", "right", "right"],
+            "align": ["right", "center", "right", "center", "right", "right", "right", "left", "right", "right", "right"],
             "valign": "middle",
 
             "line": {
@@ -56,6 +57,7 @@
         "cells": {
 
             "values": [
+                [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],
                 ["A", "A", "B", "AB", "Y", "Z", "Z", "A", "B", "B", "Y", "Y", "Z", "A", "A", "B", "Y", "Y", "Z", "Z"].slice(0, 20),
                 [32000, 162666, 32000, 162666, 32000, 162666, 32000, 162666, 32000, 162666, 32000, 162666, 32000, 162666, 32000, 162666, 32000, 162666, 32000, 162666].slice(0, 20),
                 [268630, 489543, 379086, 600000, 489543, 268630, 600000, 379086, 268630, 489543, 379086, 600000, 489543, 268630, 600000, 379086, 268630, 489543, 379086, 600000].slice(0, 20),
@@ -70,6 +72,7 @@
 
             "format": [
                 null,
+                null,
                 ".2s",
                 "#0x",
                 [",.0f", ",.1f", ",.2f", ",.3f", ",.2f"],
@@ -81,13 +84,13 @@
                 ",.0f"
             ],
 
-            "prefix": ["", "", "", "", "US ", ""],
-            "suffix": ["", "m", ""],
+            "prefix": ["", "", "", "", "", "US ", ""],
+            "suffix": ["", "", "m", ""],
 
             "height": 24,
 
-            "align": ["center", "right", "center", "right", "right", "right", "left", "right", "right", "right"],
-            "valign": ["top", "bottom", "middle"],
+            "align": ["right", "center", "right", "center", "right", "right", "right", "left", "right", "right", "right"],
+            "valign": ["middle", "top", "bottom", "middle"],
 
             "line": {
                 "color": [

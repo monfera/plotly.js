@@ -45,6 +45,9 @@ function model(layout, d, i) {
     var pad = layout.margin || {l: 80, r: 80, t: 100, b: 80};
     var rowContentWidth = groupWidth;
 
+    var rowCount = Math.ceil((groupHeight + c.uplift) / trace.cells.height);
+    var panelHeight = rowCount * trace.cells.height;
+
     return {
         key: i,
         colCount: colCount,
@@ -54,6 +57,9 @@ function model(layout, d, i) {
         width: rowContentWidth,
         height: groupHeight,
         columnWidths: columnWidths,
+
+        panelHeight: panelHeight,
+        rowsPerPanel: rowCount,
 
         cells: {
             values: trace.cells.values,
@@ -92,7 +98,8 @@ function viewModel(model) {
 
     var viewModel = {
         key: model.key,
-        model: model
+        model: model,
+        scrollY: 0 // this'll be mutated on vertical scroll, initially 0
     };
 
     var uniqueKeys = {};
@@ -110,7 +117,8 @@ function viewModel(model) {
             x: undefined, // initialized below
             parent: viewModel,
             model: model,
-            columnWidth: model.columnWidths[i]
+            columnWidth: model.columnWidths[i],
+            viewModel: viewModel
         };
     });
 
@@ -233,6 +241,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     var columnBlock = yColumn.selectAll('.columnBlock')
         .data(function(d) {
+            var scrollY = d.viewModel.scrollY;
+            var rowFrom = Math.floor(scrollY / d.model.panelHeight) * d.model.rowsPerPanel;
+            console.log('rowFrom:', rowFrom)
             var blockDataHeader = Object.assign(
                 {},
                 d,
@@ -242,6 +253,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     values: d.model.headerCells.values[d.xIndex],
                     rowPitch: d.model.headerCells.cellHeights,
                     dragHandle: true,
+                    rowBlockOffset: 0,
                     model: Object.assign(
                         {},
                         d.model,
@@ -263,6 +275,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         dragHandle: false,
                         values: d.model.cells.values[d.xIndex],
                         rowPitch: d.model.cells.cellHeights,
+                        rowBlockOffset: 0,
                         model: d.model
                     }
                 ),
@@ -272,10 +285,11 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     {
                         key: 'cells2',
                         type: 'cells',
-                        yOffset: d.model.cells.cellHeights + 500,
+                        yOffset: d.model.cells.cellHeights + d.model.panelHeight + 10,
                         dragHandle: false,
                         values: d.model.cells.values[d.xIndex],
                         rowPitch: d.model.cells.cellHeights,
+                        rowBlockOffset: 1,
                         model: d.model
                     }
                 ),
@@ -299,20 +313,16 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .call(d3.behavior.drag()
             .origin(function(d) {
                 d3.event.stopPropagation();
-                var gpd = this.parentElement.parentElement.parentElement.__data__;
-                if(gpd.scrollY === undefined) {
-                    gpd.scrollY = 0;
-                }
                 return d;
             })
             .on('drag', function() {
-                var gpd = this.parentElement.parentElement.parentElement.__data__;
-                gpd.scrollY += d3.event.dy;
+                var gpd = this.parentElement.parentElement.parentElement.__data__; // fixme reach vm more appropriately
+                gpd.scrollY -= d3.event.dy;
                 var anchorChanged = false;
                 cellsColumnBlock
                     .attr('transform', function(d) {
-                        var offset = gpd.scrollY  % 500;
-                        var anchor = gpd.scrollY - offset;
+                        var offset = -gpd.scrollY % d.model.panelHeight;
+                        var anchor = -gpd.scrollY - offset;
                         var value = offset + d.yOffset;
                         if(anchor !== d.anchor) {
                             anchorChanged = {};
@@ -322,7 +332,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         return 'translate(0 ' + value + ')';
                     });
                 if(anchorChanged) {
-                    console.log('anchor changed ', anchorChanged);
+                    //console.log('anchor changed ', anchorChanged);
                     Object.keys(anchorChanged).forEach(function(k) {
                         renderColumnBlocks(columnBlock.filter(function(d) {return d.key === k;}));
                     })
@@ -400,7 +410,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 function renderColumnBlocks(columnBlock) {
 
     // this is performance critical code as scrolling calls it on every revolver switch
-    console.log('rendering columnBlocks', columnBlock)
+    //console.log('rendering columnBlocks', columnBlock)
 
     var columnCells = columnBlock.selectAll('.columnCells')
         .data(repeat, keyFun);
@@ -413,7 +423,14 @@ function renderColumnBlocks(columnBlock) {
         .remove();
 
     var columnCell = columnCells.selectAll('.columnCell')
-        .data(function(d) {return d.values.map(function(v, i) {return {key: i, column: d, model: d.model, value: v};});}, keyFun);
+        .data(function(d) {
+            console.log('reslicing')
+            var scrollY = d.viewModel.scrollY;
+            var rowFrom = Math.floor(scrollY / d.model.panelHeight + (d.rowBlockOffset ? 1 : 0)) * d.model.rowsPerPanel;
+            var rowTo = rowFrom +  (d.rowBlockOffset ? 2 : 1) * d.model.rowsPerPanel;
+
+            return d.values.slice(rowFrom, rowTo).map(function(v, i) {return {key: /*d.model.fromRow + */i, column: d, model: d.model, value: v};});
+        }, keyFun);
 
     columnCell.enter()
         .append('g')
