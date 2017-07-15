@@ -477,7 +477,7 @@ function renderColumnBlocks(columnBlock) {
             return gridPick(d.model.cells.lineColor, d.column.xIndex, d.rowNumber);
         })
         .attr('fill', function(d) {
-            return ({cells1: 'blue', cells2: 'red'})[d.column.key];
+            //return ({cells1: 'blue', cells2: 'red'})[d.column.key];
             return gridPick(d.model.cells.fillColor, d.column.xIndex, d.rowNumber);
         });
 
