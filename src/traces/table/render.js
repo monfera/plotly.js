@@ -250,6 +250,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 {
                     key: 'header',
                     yOffset: 0,
+                    anchor: 0,
                     values: d.model.headerCells.values[d.xIndex],
                     rowPitch: d.model.headerCells.cellHeights,
                     dragHandle: true,
@@ -285,9 +286,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     d,
                     {
                         key: 'cells2',
-                        anchor: 0,
+                        anchor: d.model.panelHeight,
                         type: 'cells',
-                        yOffset: d.model.cells.cellHeights + d.model.panelHeight,
+                        yOffset: d.model.cells.cellHeights,
                         dragHandle: false,
                         values: d.model.cells.values[d.xIndex],
                         rowPitch: d.model.cells.cellHeights,
@@ -310,7 +311,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
 
     columnBlock
         .style('cursor', function(d) {return d.dragHandle ? 'ew-resize' : 'ns-resize';})
-        .attr('transform', function(d) {return 'translate(0 ' + d.yOffset + ')';});
+        .attr('transform', function(d) {return 'translate(0 ' + (d.anchor + d.yOffset) + ')';});
 
     cellsColumnBlock
         .call(d3.behavior.drag()
@@ -323,9 +324,12 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 gpd.scrollY -= d3.event.dy;
                 cellsColumnBlock
                     .attr('transform', function(d) {
+                        var docY = gpd.scrollY;
+/*
                         var anchorChanged = false;
-                        var offset = -gpd.scrollY % d.model.panelHeight;
-                        var anchor = -gpd.scrollY - offset;
+
+                        var offset = -docY % d.model.panelHeight;
+                        var anchor = -docY - offset;
                         if(anchor !== d.anchor) {
                             anchorChanged = true;
                         }
@@ -336,7 +340,14 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         if(anchorChanged) {//debugger
                             renderColumnBlocks(columnBlock.filter(function(dd) {return dd.key === d.key;}))
                         }
-                        return 'translate(0 ' + (offset + d.yOffset) + ')';
+                        var translateY = offset + d.anchor + d.yOffset;
+
+                        console.log(gpd.scrollY)
+                        //console.log(d.key, ':', translateY)
+*/
+                        var blockY = d.anchor - docY
+                        console.log(d.key, blockY)
+                        return 'translate(0 ' + (blockY + d.yOffset ) + ')';
 
                     });
 /*
