@@ -329,55 +329,20 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         var anchorChanged = false;
 
                         if(d.anchor - blockY + d.model.panelHeight < 0) {
-                            console.log('forward updating anchor of', d.key, 'from', d.anchor, 'to', d.anchor + 2 * d.model.panelHeight)
                             d.anchor += 2 * d.model.panelHeight;
-                           // anchorChanged = true;
-                        }
-
-                        if(d.anchor - blockY > d.model.panelHeight) {
-                            console.log('reverse updating anchor of', d.key, 'from', d.anchor, 'to', d.anchor - 2 * d.model.panelHeight)
+                           anchorChanged = true;
+                        } else if(d.anchor - blockY > d.model.panelHeight) {
                             d.anchor -= 2 * d.model.panelHeight;
-                            // anchorChanged = true;
-                        }
-
-
-                        if(anchorChanged) {//debugger
-                            renderColumnBlocks(columnBlock.filter(function(dd) {return dd.key === d.key;}))
-                        }
-
-/*
-                        var anchorChanged = false;
-
-                        var offset = -docY % d.model.panelHeight;
-                        var anchor = -docY - offset;
-                        if(anchor !== d.anchor) {
                             anchorChanged = true;
                         }
+
                         if(anchorChanged) {
-                            console.log('anchor changed')
-                        }
-                        d.anchor = anchor;
-                        if(anchorChanged) {//debugger
                             renderColumnBlocks(columnBlock.filter(function(dd) {return dd.key === d.key;}))
                         }
-                        var translateY = offset + d.anchor + d.yOffset;
 
-                        console.log(gpd.scrollY)
-                        //console.log(d.key, ':', translateY)
-*/
-                        //if(d.key === 'cells1') console.log(d.key, blockY + d.anchor )
                         return 'translate(0 ' + (d.anchor + d.yOffset - blockY) + ')';
 
                     });
-/*
-                if(anchorChanged) {
-                    Object.keys(anchorChanged).forEach(function(k) {
-                        // fixme hardcoding down here
-                        renderColumnBlocks(columnBlock.filter(function(d) {return d.key === k;}));
-                    })
-                    anchorChanged = false;
-                }
-*/
             })
             .on('dragend', function(d) {
             })
@@ -463,17 +428,8 @@ function renderColumnBlocks(columnBlock) {
 
     var columnCell = columnCells.selectAll('.columnCell')
         .data(function(d) {
-            var scrollY = d.viewModel.scrollY;
-            console.log(scrollY)
-            var rowFrom = (Math.floor(scrollY / (2 * d.model.panelHeight)) + (d.rowBlockOffset ? 1 : 0)) * (d.model.rowsPerPanel);
-            var rowTo = rowFrom +  (d.rowBlockOffset ? 1 : 1) * d.model.rowsPerPanel;
-
-
-            if(false && d.xIndex === 0) {
-                //console.log(d.key)
-                console.log('reslicing: ', rowFrom, rowTo);
-                console.log('scrollY in row splitting part:', scrollY)
-            }
+            var rowFrom = Math.round(d.anchor / d.model.cells.cellHeights);
+            var rowTo = rowFrom + (rowFrom >= 0 ? d.model.rowsPerPanel : 0);
 
             return d.values.slice(rowFrom, rowTo).map(function(v, i) {return {key: /*d.model.fromRow + */i, column: d, model: d.model, value: v};});
         }, keyFun);
