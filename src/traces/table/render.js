@@ -325,6 +325,19 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 cellsColumnBlock
                     .attr('transform', function(d) {
                         var docY = gpd.scrollY;
+
+                        var anchorChanged = true;
+
+                        var blockY = - docY
+                        if(blockY + d.anchor + d.model.panelHeight < 0) {
+                            console.log('updating anchor of', d.key, 'from', d.anchor, 'to', d.anchor + 2 * d.model.panelHeight)
+                            d.anchor += 2 * d.model.panelHeight;
+                        }
+
+                        if(anchorChanged) {//debugger
+                            renderColumnBlocks(columnBlock.filter(function(dd) {return dd.key === d.key;}))
+                        }
+
 /*
                         var anchorChanged = false;
 
@@ -345,9 +358,8 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         console.log(gpd.scrollY)
                         //console.log(d.key, ':', translateY)
 */
-                        var blockY = d.anchor - docY
-                        console.log(d.key, blockY)
-                        return 'translate(0 ' + (blockY + d.yOffset ) + ')';
+                        if(d.key === 'cells1') console.log(d.key, blockY + d.anchor )
+                        return 'translate(0 ' + (blockY + d.anchor + d.yOffset ) + ')';
 
                     });
 /*
@@ -445,7 +457,7 @@ function renderColumnBlocks(columnBlock) {
     var columnCell = columnCells.selectAll('.columnCell')
         .data(function(d) {
             var scrollY = d.viewModel.scrollY;
-            var rowFrom = (Math.floor(scrollY / d.model.panelHeight) + (d.rowBlockOffset ? 1 : 0)) * d.model.rowsPerPanel;
+            var rowFrom = (Math.floor(scrollY / (2 * d.model.panelHeight)) + (d.rowBlockOffset ? 1 : 0)) * (d.model.rowsPerPanel);
             var rowTo = rowFrom +  (d.rowBlockOffset ? 1 : 1) * d.model.rowsPerPanel;
 
 
