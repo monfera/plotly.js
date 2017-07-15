@@ -324,11 +324,10 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 gpd.scrollY -= d3.event.dy;
                 cellsColumnBlock
                     .attr('transform', function(d) {
-                        var docY = gpd.scrollY;
+                        var blockY = -gpd.scrollY;
 
                         var anchorChanged = true;
 
-                        var blockY = - docY
                         if(blockY + d.anchor + d.model.panelHeight < 0) {
                             console.log('updating anchor of', d.key, 'from', d.anchor, 'to', d.anchor + 2 * d.model.panelHeight)
                             d.anchor += 2 * d.model.panelHeight;
