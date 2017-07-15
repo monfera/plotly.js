@@ -243,7 +243,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .data(function(d) {
             var scrollY = d.viewModel.scrollY;
             var rowFrom = Math.floor(scrollY / d.model.panelHeight) * d.model.rowsPerPanel;
-            console.log('rowFrom:', rowFrom)
+            //console.log('rowFrom:', rowFrom)
             var blockDataHeader = Object.assign(
                 {},
                 d,
@@ -271,6 +271,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     {
                         key: 'cells1',
                         type: 'cells',
+                        anchor: 0,
                         yOffset: d.model.cells.cellHeights,
                         dragHandle: false,
                         values: d.model.cells.values[d.xIndex],
@@ -284,6 +285,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     d,
                     {
                         key: 'cells2',
+                        anchor: 0,
                         type: 'cells',
                         yOffset: d.model.cells.cellHeights + d.model.panelHeight,
                         dragHandle: false,
@@ -324,13 +326,16 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     .attr('transform', function(d) {
                         var offset = -gpd.scrollY % d.model.panelHeight;
                         var anchor = -gpd.scrollY - offset;
-                        var value = offset + d.yOffset;
                         if(anchor !== d.anchor) {
                             if(!anchorChanged) anchorChanged = {};
                             anchorChanged[d.key] = true;
                         }
+                        if(anchorChanged) {
+                            console.log(Object.keys(anchorChanged))
+                            debugger
+                        }
                         d.anchor = anchor;
-                        return 'translate(0 ' + value + ')';
+                        return 'translate(0 ' + (offset + d.yOffset) + ')';
                     });
                 if(anchorChanged) {
                     Object.keys(anchorChanged).forEach(function(k) {
