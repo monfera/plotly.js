@@ -321,22 +321,25 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
             .on('drag', function() {
                 var gpd = this.parentElement.parentElement.parentElement.__data__; // fixme reach vm more appropriately
                 gpd.scrollY -= d3.event.dy;
-                var anchorChanged = false;
                 cellsColumnBlock
                     .attr('transform', function(d) {
+                        var anchorChanged = false;
                         var offset = -gpd.scrollY % d.model.panelHeight;
                         var anchor = -gpd.scrollY - offset;
                         if(anchor !== d.anchor) {
-                            if(!anchorChanged) anchorChanged = {};
-                            anchorChanged[d.key] = true;
+                            anchorChanged = true;
                         }
                         if(anchorChanged) {
-                            console.log(Object.keys(anchorChanged))
-                            debugger
+                            console.log('anchor changed')
                         }
                         d.anchor = anchor;
+                        if(anchorChanged) {//debugger
+                            renderColumnBlocks(columnBlock.filter(function(dd) {return dd.key === d.key;}))
+                        }
                         return 'translate(0 ' + (offset + d.yOffset) + ')';
+
                     });
+/*
                 if(anchorChanged) {
                     Object.keys(anchorChanged).forEach(function(k) {
                         // fixme hardcoding down here
@@ -344,6 +347,7 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                     })
                     anchorChanged = false;
                 }
+*/
             })
             .on('dragend', function(d) {
             })
