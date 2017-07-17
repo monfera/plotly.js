@@ -243,7 +243,6 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
         .data(function(d) {
             var scrollY = d.viewModel.scrollY;
             var rowFrom = Math.floor(scrollY / d.model.panelHeight) * d.model.rowsPerPanel;
-            //console.log('rowFrom:', rowFrom)
             var blockDataHeader = Object.assign(
                 {},
                 d,
@@ -431,7 +430,7 @@ function renderColumnBlocks(columnBlock) {
             var rowFrom = Math.round(d.anchor / d.model.cells.cellHeights);
             var rowTo = rowFrom + (rowFrom >= 0 ? d.model.rowsPerPanel : 0);
 
-            return d.values.slice(rowFrom, rowTo).map(function(v, i) {return {key: /*d.model.fromRow + */i, column: d, model: d.model, value: v};});
+            return d.values.slice(rowFrom, rowTo).map(function(v, i) {return {key: i, column: d, model: d.model, value: v};});
         }, keyFun);
 
     columnCell.enter()
@@ -469,15 +468,14 @@ function renderColumnBlocks(columnBlock) {
         .classed('cellRect', true);
 
     cellRect
-        .attr('width', function(d) {return d.column.columnWidth /*- d.cellBorderWidth*/;})
-        .attr('height', function(d) {return d.column.rowPitch /*- d.cellBorderWidth*/;})
+        .attr('width', function(d) {return d.column.columnWidth;})
+        .attr('height', function(d) {return d.column.rowPitch;})
         .attr('transform', function(d) {return 'translate(0 -' + d.column.rowPitch + ')'})
         .attr('stroke-width', function(d) {return d.cellBorderWidth;})
         .attr('stroke', function(d) {
             return gridPick(d.model.cells.lineColor, d.column.xIndex, d.rowNumber);
         })
         .attr('fill', function(d) {
-            //return ({cells1: 'blue', cells2: 'red'})[d.column.key];
             return gridPick(d.model.cells.fillColor, d.column.xIndex, d.rowNumber);
         });
 
