@@ -323,8 +323,9 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                 gpd.scrollY -= d3.event.dy;
                 cellsColumnBlock
                     .attr('transform', function(d) {
+                        var bottom = (d.model.cells.values[0].length + 1) * d.model.cells.cellHeights - d.model.panelHeight + c.uplift;
+                        gpd.scrollY = Math.min(bottom, Math.max(0, gpd.scrollY));
                         var blockY = gpd.scrollY;
-
                         var anchorChanged = false;
 
                         if(d.anchor - blockY + d.model.panelHeight < 0) {
