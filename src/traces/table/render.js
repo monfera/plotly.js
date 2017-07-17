@@ -336,10 +336,15 @@ module.exports = function(root, svg, styledData, layout, callbacks) {
                         }
 
                         if(anchorChanged) {
-                            renderColumnBlocks(columnBlock.filter(function(dd) {return dd.key === d.key;}))
+                            window.setTimeout(function() {
+                                // setTimeout might lag rendering but yields a smoother scroll
+                                renderColumnBlocks(columnBlock.filter(function(dd) {return dd.key === d.key;}));
+                            });
                         }
 
-                        return 'translate(0 ' + (d.anchor + d.yOffset - blockY) + ')';
+                        var yTranslate = d.anchor - blockY + d.yOffset;
+
+                        return 'translate(0 ' + yTranslate + ')';
 
                     });
             })
