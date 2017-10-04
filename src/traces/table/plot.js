@@ -20,6 +20,9 @@ var splitData = require('./data_split_helpers');
 
 module.exports = function plot(gd, wrappedTraceHolders) {
 
+    if(gd.data[0].rendered) return;
+    gd.data[0].rendered = true;
+
     if(c.clipView) {
         gd._fullLayout._paper.attr('height', 2000);
     }
