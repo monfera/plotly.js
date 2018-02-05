@@ -240,7 +240,6 @@ function styleExtentTexts(selection) {
 }
 
 module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, callbacks) {
-    var domainBrushing = false;
     var linePickActive = true;
 
     function enterSvgDefs(root) {
@@ -301,6 +300,7 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
 
     var lastHovered = null;
 
+    // emit hover / unhover event
     parcoordsLineLayer
         .filter(function(d) {
             return d.pick;
@@ -454,15 +454,13 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
     yAxis
         .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
 
+    // drag column for reordering columns
     yAxis
         .call(d3.behavior.drag()
             .origin(function(d) {return d;})
             .on('drag', function(d) {
                 var p = d.parent;
                 linePickActive = false;
-                if(domainBrushing) {
-                    return;
-                }
                 d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag, d3.event.x));
                 d.canvasX = d.x * d.model.canvasPixelRatio;
                 yAxis
@@ -484,12 +482,6 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
             })
             .on('dragend', function(d) {
                 var p = d.parent;
-                if(domainBrushing) {
-                    if(domainBrushing === 'ending') {
-                        domainBrushing = false;
-                    }
-                    return;
-                }
                 d.x = d.xScale(d.xIndex);
                 d.canvasX = d.x * d.model.canvasPixelRatio;
                 updatePanelLayout(yAxis, p);
@@ -643,6 +635,7 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
         .append('g')
         .classed(c.cn.axisBrush, true);
 
+    // brush on axis for selection
     axisBrush
         .each(function(d) {
             if(!d.brush) {
@@ -651,9 +644,11 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
                     .on('brushstart', axisBrushStarted)
                     .on('brush', axisBrushMoved)
                     .on('brushend', axisBrushEnded);
+                // set the brush programmatically if data requires so, eg. Plotly `constraintrange` is specified
                 if(d.filter[0] !== 0 || d.filter[1] !== 1) {
                     d.brush.extent(d.filter);
                 }
+                // establish the D3 brush on each axis
                 d3.select(this).call(d.brush);
             }
         });
@@ -690,8 +685,8 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
     var contextShown = false;
 
     function axisBrushStarted() {
+        d3.event.sourceEvent.stopPropagation();
         justStarted = true;
-        domainBrushing = true;
     }
 
     function axisBrushMoved(dimension) {
@@ -722,6 +717,7 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
     }
 
     function axisBrushEnded(dimension) {
+        //d3.event.sourceEvent.stopPropagation()
         var p = dimension.parent;
         var extent = dimension.brush.extent();
         var empty = extent[0] === extent[1];
@@ -739,7 +735,6 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
         }
         p.pickLayer && p.pickLayer.render(p.panels, true);
         linePickActive = true;
-        domainBrushing = 'ending';
         if(callbacks && callbacks.filterChanged) {
             var invScale = dimension.domainToUnitScale.invert;
 
