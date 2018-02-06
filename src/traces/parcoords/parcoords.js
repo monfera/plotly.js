@@ -125,6 +125,74 @@ function unitToColorScale(cscale) {
     };
 }
 
+function someFiltersActive(view) {
+    return view.dimensions.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
+}
+
+function axisBrushStarted(state) {
+    return function axisBrushStarted() {
+        // axes should not be dragged sideways while brushing (although fun to try)
+        d3.event.sourceEvent.stopPropagation();
+        state.linePickActive(false);
+    };
+}
+
+function axisBrushMoved(state) {
+    return function axisBrushMoved(dimension) {
+        var p = dimension.parent;
+        var extent = dimension.brush.extent();
+        var dimensions = p.dimensions;
+        var filter = dimensions[dimension.xIndex].filter;
+        var reset = extent[0] === extent[1];
+        if(reset) {
+            dimension.brush.clear();
+            d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
+        }
+        var newExtent = reset ? [0, 1] : extent.slice();
+        if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
+            dimensions[dimension.xIndex].filter = newExtent;
+            p.focusLayer && p.focusLayer.render(p.panels, true);
+            var filtersActive = someFiltersActive(p);
+            if(!state.contextShown() && filtersActive) {
+                p.contextLayer && p.contextLayer.render(p.panels, true);
+                state.contextShown(true);
+            } else if(state.contextShown() && !filtersActive) {
+                p.contextLayer && p.contextLayer.render(p.panels, true, true);
+                state.contextShown(false);
+            }
+        }
+    };
+}
+
+function axisBrushEnded(state, callbacks) {
+    return function axisBrushEnded (dimension) {
+        var p = dimension.parent;
+        var extent = dimension.brush.extent();
+        var empty = extent[0] === extent[1];
+        var dimensions = p.dimensions;
+        var f = dimensions[dimension.xIndex].filter;
+        if(!empty && dimension.ordinal) {
+            f[0] = ordinalScaleSnap(dimension.ordinalScale, f[0]);
+            f[1] = ordinalScaleSnap(dimension.ordinalScale, f[1]);
+            if(f[0] === f[1]) {
+                f[0] = Math.max(0, f[0] - 0.05);
+                f[1] = Math.min(1, f[1] + 0.05);
+            }
+            d3.select(this).transition().duration(150).call(dimension.brush.extent(f));
+            p.focusLayer.render(p.panels, true);
+        }
+        p.pickLayer && p.pickLayer.render(p.panels, true);
+        state.linePickActive(true);
+        if(callbacks && callbacks.filterChanged) {
+            var invScale = dimension.domainToUnitScale.invert;
+
+            // update gd.data as if a Plotly.restyle were fired
+            var newRange = f.map(invScale);
+            callbacks.filterChanged(p.key, dimension.visibleIndex, newRange);
+        }
+    };
+}
+
 function model(layout, d, i) {
     var cd0 = unwrap(d),
         trace = cd0.trace,
@@ -175,7 +243,7 @@ function model(layout, d, i) {
     };
 }
 
-function viewModel(model) {
+function viewModel(state, callbacks, model) {
 
     var width = model.width;
     var height = model.height;
@@ -201,6 +269,7 @@ function viewModel(model) {
         var foundKey = uniqueKeys[dimension.label];
         uniqueKeys[dimension.label] = (foundKey || 0) + 1;
         var key = dimension.label + (foundKey ? '__' + foundKey : '');
+        var uScale = unitScale(height, c.verticalPadding);
         return {
             key: key,
             label: dimension.label,
@@ -218,13 +287,18 @@ function viewModel(model) {
             xScale: xScale,
             x: xScale(i),
             canvasX: xScale(i) * canvasPixelRatio,
-            unitScale: unitScale(height, c.verticalPadding),
+            unitScale: uScale,
             domainScale: domainScale(height, c.verticalPadding, dimension),
             ordinalScale: ordinalScale(dimension),
             domainToUnitScale: domainToUnit,
             filter: dimension.constraintrange ? dimension.constraintrange.map(domainToUnit) : [0, 1],
             parent: viewModel,
-            model: model
+            model: model,
+            brush: d3.svg.brush()
+                .y(uScale)
+                .on('brushstart', axisBrushStarted(state))
+                .on('brush', axisBrushMoved(state))
+                .on('brushend', axisBrushEnded(state, callbacks))
         };
     });
 
@@ -239,8 +313,18 @@ function styleExtentTexts(selection) {
         .style('user-select', 'none');
 }
 
-module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, callbacks) {
+function parcoordsInteractionState() {
     var linePickActive = true;
+    var contextShown = false;
+    return {
+        linePickActive: function(val) {return arguments.length ? linePickActive = !!val : linePickActive;},
+        contextShown: function(val) {return arguments.length ? contextShown = !!val : contextShown}
+    };
+}
+
+module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, callbacks) {
+
+    var state = parcoordsInteractionState();
 
     function enterSvgDefs(root) {
         var defs = root.selectAll('defs')
@@ -283,7 +367,7 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
     var vm = styledData
         .filter(function(d) { return unwrap(d).trace.visible; })
         .map(model.bind(0, layout))
-        .map(viewModel);
+        .map(viewModel.bind(0, state, callbacks));
 
     parcoordsLineLayers.each(function(d, i) {
         return Lib.extendFlat(d, vm[i]);
@@ -296,18 +380,15 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
             d.model = d.viewModel ? d.viewModel.model : null;
         });
 
-    var tweakables = {renderers: [], dimensions: []};
-
     var lastHovered = null;
 
+    var pickLayer = parcoordsLineLayer.filter(function(d) {return d.pick;});
+
     // emit hover / unhover event
-    parcoordsLineLayer
-        .filter(function(d) {
-            return d.pick;
-        })
+    pickLayer
         .style('pointer-events', 'auto')
         .on('mousemove', function(d) {
-            if(linePickActive && d.lineLayer && callbacks && callbacks.hover) {
+            if(state.linePickActive() && d.lineLayer && callbacks && callbacks.hover) {
                 var event = d3.event;
                 var cw = this.width;
                 var ch = this.height;
@@ -383,10 +464,6 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
     var yAxis = parcoordsControlView.selectAll('.' + c.cn.yAxis)
         .data(function(vm) {return vm.dimensions;}, keyFun);
 
-    function someFiltersActive(view) {
-        return view.dimensions.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
-    }
-
     function updatePanelLayoutParcoords(yAxis, vm) {
         var panels = vm.panels || (vm.panels = []);
         var yAxes = yAxis.each(function(d) {return d;})[vm.key].map(function(e) {return e.__data__;});
@@ -435,8 +512,7 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
 
     yAxis.enter()
         .append('g')
-        .classed(c.cn.yAxis, true)
-        .each(function(d) {tweakables.dimensions.push(d);});
+        .classed(c.cn.yAxis, true);
 
     parcoordsControlView.each(function(vm) {
         updatePanelLayout(yAxis, vm);
@@ -447,7 +523,6 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
         .each(function(d) {
             d.lineLayer = lineLayerMaker(this, d, c.scatter);
             d.viewModel[d.key] = d.lineLayer;
-            tweakables.renderers.push(function() {d.lineLayer.render(d.viewModel.panels, true);});
             d.lineLayer.render(d.viewModel.panels, !d.context);
         });
 
@@ -460,7 +535,7 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
             .origin(function(d) {return d;})
             .on('drag', function(d) {
                 var p = d.parent;
-                linePickActive = false;
+                state.linePickActive(false);
                 d.x = Math.max(-c.overdrag, Math.min(d.model.width + c.overdrag, d3.event.x));
                 d.canvasX = d.x * d.model.canvasPixelRatio;
                 yAxis
@@ -490,7 +565,7 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
                 p.contextLayer && p.contextLayer.render(p.panels, false, !someFiltersActive(p));
                 p.focusLayer && p.focusLayer.render(p.panels);
                 p.pickLayer && p.pickLayer.render(p.panels, true);
-                linePickActive = true;
+                state.linePickActive(true);
 
                 if(callbacks && callbacks.axesMoved) {
                     callbacks.axesMoved(p.key, p.dimensions.map(function(dd) {return dd.crossfilterDimensionIndex;}));
@@ -636,20 +711,21 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
         .classed(c.cn.axisBrush, true);
 
     // brush on axis for selection
+    axisBrushEnter
+        .each(function establishBrush(d) {
+            // establish the D3 brush on each axis so mouse capture etc. are set up
+            d3.select(this).call(d.brush);
+        });
+
     axisBrush
-        .each(function(d) {
-            if(!d.brush) {
-                d.brush = d3.svg.brush()
-                    .y(d.unitScale)
-                    .on('brushstart', axisBrushStarted)
-                    .on('brush', axisBrushMoved)
-                    .on('brushend', axisBrushEnded);
-                // Set the brush programmatically if data requires so, eg. Plotly `constraintrange` is specified.
-                // This is only to ensure the SVG brush is correct; WebGL lines are controlled from `d.filter` directly.
-                if(d.filter[0] !== 0 || d.filter[1] !== 1) {
-                    d.brush.extent(d.filter);
-                }
-                // establish the D3 brush on each axis
+        .each(function updateBrushExtent(d) {
+            // Set the brush programmatically if data requires so, eg. Plotly `constraintrange` is specified.
+            // This is only to ensure the SVG brush is correct; WebGL lines are controlled from `d.filter` directly.
+            if(d.filter[0] !== 0 || d.filter[1] !== 1) {
+                d.brush.extent(d.filter);
+                // the brush has to be reapplied on the DOM element to actually show the (new) extent, because D3 3.*
+                // `d3.svg.brush` doesn't maintain references to the DOM elements:
+                // https://github.com/d3/d3/issues/2918#issuecomment-235090514
                 d3.select(this).call(d.brush);
             }
         });
@@ -681,66 +757,4 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
         .selectAll('.resize.s rect')
         .style('cursor', 's-resize')
         .attr('y', c.bar.handleoverlap);
-
-    var contextShown = false;
-
-    function axisBrushStarted() {
-        d3.event.sourceEvent.stopPropagation();
-    }
-
-    function axisBrushMoved(dimension) {
-        linePickActive = false;
-        var p = dimension.parent;
-        var extent = dimension.brush.extent();
-        var dimensions = p.dimensions;
-        var filter = dimensions[dimension.xIndex].filter;
-        var reset = extent[0] === extent[1];
-        if(reset) {
-            dimension.brush.clear();
-            d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
-        }
-        var newExtent = reset ? [0, 1] : extent.slice();
-        if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
-            dimensions[dimension.xIndex].filter = newExtent;
-            p.focusLayer && p.focusLayer.render(p.panels, true);
-            var filtersActive = someFiltersActive(p);
-            if(!contextShown && filtersActive) {
-                p.contextLayer && p.contextLayer.render(p.panels, true);
-                contextShown = true;
-            } else if(contextShown && !filtersActive) {
-                p.contextLayer && p.contextLayer.render(p.panels, true, true);
-                contextShown = false;
-            }
-        }
-    }
-
-    function axisBrushEnded(dimension) {
-        //d3.event.sourceEvent.stopPropagation()
-        var p = dimension.parent;
-        var extent = dimension.brush.extent();
-        var empty = extent[0] === extent[1];
-        var dimensions = p.dimensions;
-        var f = dimensions[dimension.xIndex].filter;
-        if(!empty && dimension.ordinal) {
-            f[0] = ordinalScaleSnap(dimension.ordinalScale, f[0]);
-            f[1] = ordinalScaleSnap(dimension.ordinalScale, f[1]);
-            if(f[0] === f[1]) {
-                f[0] = Math.max(0, f[0] - 0.05);
-                f[1] = Math.min(1, f[1] + 0.05);
-            }
-            d3.select(this).transition().duration(150).call(dimension.brush.extent(f));
-            p.focusLayer.render(p.panels, true);
-        }
-        p.pickLayer && p.pickLayer.render(p.panels, true);
-        linePickActive = true;
-        if(callbacks && callbacks.filterChanged) {
-            var invScale = dimension.domainToUnitScale.invert;
-
-            // update gd.data as if a Plotly.restyle were fired
-            var newRange = f.map(invScale);
-            callbacks.filterChanged(p.key, dimension.visibleIndex, newRange);
-        }
-    }
-
-    return tweakables;
 };
