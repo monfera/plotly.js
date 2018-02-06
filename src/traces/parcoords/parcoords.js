@@ -719,15 +719,17 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
 
     axisBrush
         .each(function updateBrushExtent(d) {
-            // Set the brush programmatically if data requires so, eg. Plotly `constraintrange` is specified.
+            // Set the brush programmatically if data requires so, eg. Plotly `constraintrange` specifies a proper subset.
             // This is only to ensure the SVG brush is correct; WebGL lines are controlled from `d.filter` directly.
-            if(d.filter[0] !== 0 || d.filter[1] !== 1) {
+            if(d.filter[0] > 0 || d.filter[1] < 1) {
                 d.brush.extent(d.filter);
-                // the brush has to be reapplied on the DOM element to actually show the (new) extent, because D3 3.*
-                // `d3.svg.brush` doesn't maintain references to the DOM elements:
-                // https://github.com/d3/d3/issues/2918#issuecomment-235090514
-                d3.select(this).call(d.brush);
+            } else {
+                d.brush.clear();
             }
+            // the brush has to be reapplied on the DOM element to actually show the (new) extent, because D3 3.*
+            // `d3.svg.brush` doesn't maintain references to the DOM elements:
+            // https://github.com/d3/d3/issues/2918#issuecomment-235090514
+            d3.select(this).call(d.brush);
         });
 
     axisBrushEnter
