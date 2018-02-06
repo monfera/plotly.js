@@ -644,7 +644,8 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
                     .on('brushstart', axisBrushStarted)
                     .on('brush', axisBrushMoved)
                     .on('brushend', axisBrushEnded);
-                // set the brush programmatically if data requires so, eg. Plotly `constraintrange` is specified
+                // Set the brush programmatically if data requires so, eg. Plotly `constraintrange` is specified.
+                // This is only to ensure the SVG brush is correct; WebGL lines are controlled from `d.filter` directly.
                 if(d.filter[0] !== 0 || d.filter[1] !== 1) {
                     d.brush.extent(d.filter);
                 }
@@ -681,12 +682,10 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
         .style('cursor', 's-resize')
         .attr('y', c.bar.handleoverlap);
 
-    var justStarted = false;
     var contextShown = false;
 
     function axisBrushStarted() {
         d3.event.sourceEvent.stopPropagation();
-        justStarted = true;
     }
 
     function axisBrushMoved(dimension) {
@@ -695,7 +694,7 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
         var extent = dimension.brush.extent();
         var dimensions = p.dimensions;
         var filter = dimensions[dimension.xIndex].filter;
-        var reset = justStarted && (extent[0] === extent[1]);
+        var reset = extent[0] === extent[1];
         if(reset) {
             dimension.brush.clear();
             d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
@@ -713,7 +712,6 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
                 contextShown = false;
             }
         }
-        justStarted = false;
     }
 
     function axisBrushEnded(dimension) {
