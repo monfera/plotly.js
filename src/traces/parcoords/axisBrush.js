@@ -13,6 +13,38 @@ var d3 = require('d3');
 var keyFun = require('../../lib/gup').keyFun;
 var repeat = require('../../lib/gup').repeat;
 
+function addFilterBarDefs(defs) {
+    var filterBarPattern = defs.selectAll('#' + c.id.filterBarPattern)
+        .data(repeat, keyFun);
+
+    filterBarPattern.enter()
+        .append('pattern')
+        .attr('id', c.id.filterBarPattern)
+        .attr('patternUnits', 'userSpaceOnUse');
+
+    filterBarPattern
+        .attr('x', -c.bar.width)
+        .attr('width', c.bar.capturewidth)
+        .attr('height', function(d) {return d.model.height;});
+
+    var filterBarPatternGlyph = filterBarPattern.selectAll('rect')
+        .data(repeat, keyFun);
+
+    filterBarPatternGlyph.enter()
+        .append('rect')
+        .attr('shape-rendering', 'crispEdges');
+
+    filterBarPatternGlyph
+        .attr('height', function(d) {return d.model.height;})
+        .attr('width', c.bar.width)
+        .attr('x', c.bar.width / 2)
+        .attr('fill', c.bar.fillcolor)
+        .attr('fill-opacity', c.bar.fillopacity)
+        .attr('stroke', c.bar.strokecolor)
+        .attr('stroke-opacity', c.bar.strokeopacity)
+        .attr('stroke-width', c.bar.strokewidth);
+}
+
 function ordinalScaleSnap(scale, v) {
     var i, a, prevDiff, prevValue, diff;
     for(i = 0, a = scale.range(), prevDiff = Infinity, prevValue = a[0]; i < a.length; i++) {
@@ -178,6 +210,7 @@ function ensureAxisBrush(axisOverlays) {
 }
 
 module.exports = {
+    addFilterBarDefs: addFilterBarDefs,
     makeBrush: makeBrush,
     ensureAxisBrush: ensureAxisBrush,
     someFiltersActive: someFiltersActive

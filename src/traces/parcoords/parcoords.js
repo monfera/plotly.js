@@ -230,6 +230,16 @@ function styleExtentTexts(selection) {
         .style('user-select', 'none');
 }
 
+function enterSvgDefs(root) {
+    var defs = root.selectAll('defs')
+        .data(repeat, keyFun);
+
+    defs.enter()
+        .append('defs');
+
+    brush.addFilterBarDefs(defs);
+}
+
 function parcoordsInteractionState() {
     var linePickActive = true;
     var contextShown = false;
@@ -242,44 +252,6 @@ function parcoordsInteractionState() {
 module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, callbacks) {
 
     var state = parcoordsInteractionState();
-
-    function enterSvgDefs(root) {
-        var defs = root.selectAll('defs')
-            .data(repeat, keyFun);
-
-        defs.enter()
-            .append('defs');
-
-        var filterBarPattern = defs.selectAll('#' + c.id.filterBarPattern)
-            .data(repeat, keyFun);
-
-        filterBarPattern.enter()
-            .append('pattern')
-            .attr('id', c.id.filterBarPattern)
-            .attr('patternUnits', 'userSpaceOnUse');
-
-        filterBarPattern
-            .attr('x', -c.bar.width)
-            .attr('width', c.bar.capturewidth)
-            .attr('height', function(d) {return d.model.height;});
-
-        var filterBarPatternGlyph = filterBarPattern.selectAll('rect')
-            .data(repeat, keyFun);
-
-        filterBarPatternGlyph.enter()
-            .append('rect')
-            .attr('shape-rendering', 'crispEdges');
-
-        filterBarPatternGlyph
-            .attr('height', function(d) {return d.model.height;})
-            .attr('width', c.bar.width)
-            .attr('x', c.bar.width / 2)
-            .attr('fill', c.bar.fillcolor)
-            .attr('fill-opacity', c.bar.fillopacity)
-            .attr('stroke', c.bar.strokecolor)
-            .attr('stroke-opacity', c.bar.strokeopacity)
-            .attr('stroke-width', c.bar.strokewidth);
-    }
 
     var vm = styledData
         .filter(function(d) { return unwrap(d).trace.visible; })
