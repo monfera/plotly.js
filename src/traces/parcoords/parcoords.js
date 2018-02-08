@@ -16,6 +16,7 @@ var Drawing = require('../../components/drawing');
 var keyFun = require('../../lib/gup').keyFun;
 var repeat = require('../../lib/gup').repeat;
 var unwrap = require('../../lib/gup').unwrap;
+var brush = require('./axisBrush');
 
 function visible(dimension) {return !('visible' in dimension) || dimension.visible;}
 
@@ -49,18 +50,6 @@ function dimensionExtent(dimension) {
     }
 
     return [lo, hi];
-}
-
-function ordinalScaleSnap(scale, v) {
-    var i, a, prevDiff, prevValue, diff;
-    for(i = 0, a = scale.range(), prevDiff = Infinity, prevValue = a[0], diff; i < a.length; i++) {
-        if((diff = Math.abs(a[i] - v)) > prevDiff) {
-            return prevValue;
-        }
-        prevDiff = diff;
-        prevValue = a[i];
-    }
-    return a[a.length - 1];
 }
 
 function toText(formatter, texts) {
@@ -123,157 +112,6 @@ function unitToColorScale(cscale) {
             return s(d);
         });
     };
-}
-
-function someFiltersActive(view) {
-    return view.dimensions.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
-}
-
-function makeBrush(uScale, state, callbacks) {
-    return d3.svg.brush()
-        .y(uScale)
-        .on('brushstart', axisBrushStarted(state))
-        .on('brush', axisBrushMoved(state))
-        .on('brushend', axisBrushEnded(state, callbacks));
-}
-
-function axisBrushStarted(state) {
-    return function axisBrushStarted() {
-        // axes should not be dragged sideways while brushing (although fun to try)
-        d3.event.sourceEvent.stopPropagation();
-        state.linePickActive(false);
-    };
-}
-
-function axisBrushMoved(state) {
-    return function axisBrushMoved(dimension) {
-        var p = dimension.parent;
-        var extent = dimension.brush.extent();
-        var dimensions = p.dimensions;
-        var filter = dimensions[dimension.xIndex].filter;
-        var reset = extent[0] === extent[1];
-        if(reset) {
-            dimension.brush.clear();
-            d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
-        }
-        var newExtent = reset ? [0, 1] : extent.slice();
-        if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
-            dimensions[dimension.xIndex].filter = newExtent;
-            p.focusLayer && p.focusLayer.render(p.panels, true);
-            var filtersActive = someFiltersActive(p);
-            if(!state.contextShown() && filtersActive) {
-                p.contextLayer && p.contextLayer.render(p.panels, true);
-                state.contextShown(true);
-            } else if(state.contextShown() && !filtersActive) {
-                p.contextLayer && p.contextLayer.render(p.panels, true, true);
-                state.contextShown(false);
-            }
-        }
-    };
-}
-
-function axisBrushEnded(state, callbacks) {
-    return function axisBrushEnded (dimension) {
-        var p = dimension.parent;
-        var extent = dimension.brush.extent();
-        var empty = extent[0] === extent[1];
-        var dimensions = p.dimensions;
-        var f = dimensions[dimension.xIndex].filter;
-        if(!empty && dimension.ordinal) {
-            f[0] = ordinalScaleSnap(dimension.ordinalScale, f[0]);
-            f[1] = ordinalScaleSnap(dimension.ordinalScale, f[1]);
-            if(f[0] === f[1]) {
-                f[0] = Math.max(0, f[0] - 0.05);
-                f[1] = Math.min(1, f[1] + 0.05);
-            }
-            d3.select(this).transition().duration(150).call(dimension.brush.extent(f));
-            p.focusLayer.render(p.panels, true);
-        }
-        p.pickLayer && p.pickLayer.render(p.panels, true);
-        state.linePickActive(true);
-        if(callbacks && callbacks.filterChanged) {
-            var invScale = dimension.domainToUnitScale.invert;
-
-            // update gd.data as if a Plotly.restyle were fired
-            var newRange = f.map(invScale);
-            callbacks.filterChanged(p.key, dimension.visibleIndex, newRange);
-        }
-    };
-}
-
-function setAxisBrush(axisBrush) {
-    axisBrush
-        .each(function updateBrushExtent(d) {
-            // Set the brush programmatically if data requires so, eg. Plotly `constraintrange` specifies a proper subset.
-            // This is only to ensure the SVG brush is correct; WebGL lines are controlled from `d.filter` directly.
-            if(d.filter[0] <= 0 && d.filter[1] >= 1 || d.filter[0] === d.filter[1]) {
-                d.brush.clear();
-            } else {
-                d.brush.extent(d.filter);
-            }
-        });
-}
-
-function renderAxisBrushEnter(axisBrushEnter) {
-
-    axisBrushEnter
-        .each(function establishBrush(d) {
-            // establish the D3 brush on each axis so mouse capture etc. are set up
-            d3.select(this).call(d.brush);
-        });
-
-    axisBrushEnter
-        .selectAll('rect')
-        .attr('x', -c.bar.capturewidth / 2)
-        .attr('width', c.bar.capturewidth);
-
-    axisBrushEnter
-        .selectAll('rect.extent')
-        .attr('fill', 'url(#' + c.id.filterBarPattern + ')')
-        .style('cursor', 'ns-resize')
-        .filter(function (d) {
-            return d.filter[0] === 0 && d.filter[1] === 1;
-        })
-        .attr('y', -100); //  // zero-size rectangle pointer issue workaround
-
-    axisBrushEnter
-        .selectAll('.resize rect')
-        .attr('height', c.bar.handleheight)
-        .attr('opacity', 0)
-        .style('visibility', 'visible');
-
-    axisBrushEnter
-        .selectAll('.resize.n rect')
-        .style('cursor', 'n-resize')
-        .attr('y', c.bar.handleoverlap - c.bar.handleheight);
-
-    axisBrushEnter
-        .selectAll('.resize.s rect')
-        .style('cursor', 's-resize')
-        .attr('y', c.bar.handleoverlap);
-}
-
-function renderAxisBrush(axisBrush) {
-    axisBrush
-        .each(function updateBrushExtent (d) {
-            // the brush has to be reapplied on the DOM element to actually show the (new) extent, because D3 3.*
-            // `d3.svg.brush` doesn't maintain references to the DOM elements:
-            // https://github.com/d3/d3/issues/2918#issuecomment-235090514
-            d3.select(this).call(d.brush);
-        });
-}
-
-function ensureAxisBrush(axisOverlays) {
-    var axisBrush = axisOverlays.selectAll('.' + c.cn.axisBrush)
-        .data(repeat, keyFun);
-
-    var axisBrushEnter = axisBrush.enter()
-        .append('g')
-        .classed(c.cn.axisBrush, true);
-
-    setAxisBrush(axisBrush);
-    renderAxisBrushEnter(axisBrushEnter);
-    renderAxisBrush(axisBrush);
 }
 
 function model(layout, d, i) {
@@ -377,7 +215,7 @@ function viewModel(state, callbacks, model) {
             filter: dimension.constraintrange ? dimension.constraintrange.map(domainToUnit) : [0, 1],
             parent: viewModel,
             model: model,
-            brush: makeBrush(uScale, state, callbacks)
+            brush: brush.makeBrush(uScale, state, callbacks)
         };
     });
 
@@ -631,7 +469,7 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                 d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                 yAxis.each(function(dd, i, ii) {if(ii === d.parent.key) p.dimensions[i] = dd;});
-                p.contextLayer && p.contextLayer.render(p.panels, false, !someFiltersActive(p));
+                p.contextLayer && p.contextLayer.render(p.panels, false, !brush.someFiltersActive(p));
                 p.focusLayer.render && p.focusLayer.render(p.panels);
             })
             .on('dragend', function(d) {
@@ -641,7 +479,7 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
                 updatePanelLayout(yAxis, p);
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                p.contextLayer && p.contextLayer.render(p.panels, false, !someFiltersActive(p));
+                p.contextLayer && p.contextLayer.render(p.panels, false, !brush.someFiltersActive(p));
                 p.focusLayer && p.focusLayer.render(p.panels);
                 p.pickLayer && p.pickLayer.render(p.panels, true);
                 state.linePickActive(true);
@@ -782,5 +620,5 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
         .text(function(d) {return formatExtreme(d)(d.domainScale.domain()[0]);})
         .each(function(d) {Drawing.font(axisExtentBottomText, d.model.rangeFont);});
 
-    ensureAxisBrush(axisOverlays);
+    brush.ensureAxisBrush(axisOverlays);
 };
