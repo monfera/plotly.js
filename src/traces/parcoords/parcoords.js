@@ -129,6 +129,14 @@ function someFiltersActive(view) {
     return view.dimensions.some(function(p) {return p.filter[0] !== 0 || p.filter[1] !== 1;});
 }
 
+function makeBrush(uScale, state, callbacks) {
+    return d3.svg.brush()
+        .y(uScale)
+        .on('brushstart', axisBrushStarted(state))
+        .on('brush', axisBrushMoved(state))
+        .on('brushend', axisBrushEnded(state, callbacks));
+}
+
 function axisBrushStarted(state) {
     return function axisBrushStarted() {
         // axes should not be dragged sideways while brushing (although fun to try)
@@ -191,6 +199,81 @@ function axisBrushEnded(state, callbacks) {
             callbacks.filterChanged(p.key, dimension.visibleIndex, newRange);
         }
     };
+}
+
+function setAxisBrush(axisBrush) {
+    axisBrush
+        .each(function updateBrushExtent(d) {
+            // Set the brush programmatically if data requires so, eg. Plotly `constraintrange` specifies a proper subset.
+            // This is only to ensure the SVG brush is correct; WebGL lines are controlled from `d.filter` directly.
+            if(d.filter[0] <= 0 && d.filter[1] >= 1 || d.filter[0] === d.filter[1]) {
+                d.brush.clear();
+            } else {
+                d.brush.extent(d.filter);
+            }
+        });
+}
+
+function renderAxisBrushEnter(axisBrushEnter) {
+
+    axisBrushEnter
+        .each(function establishBrush(d) {
+            // establish the D3 brush on each axis so mouse capture etc. are set up
+            d3.select(this).call(d.brush);
+        });
+
+    axisBrushEnter
+        .selectAll('rect')
+        .attr('x', -c.bar.capturewidth / 2)
+        .attr('width', c.bar.capturewidth);
+
+    axisBrushEnter
+        .selectAll('rect.extent')
+        .attr('fill', 'url(#' + c.id.filterBarPattern + ')')
+        .style('cursor', 'ns-resize')
+        .filter(function (d) {
+            return d.filter[0] === 0 && d.filter[1] === 1;
+        })
+        .attr('y', -100); //  // zero-size rectangle pointer issue workaround
+
+    axisBrushEnter
+        .selectAll('.resize rect')
+        .attr('height', c.bar.handleheight)
+        .attr('opacity', 0)
+        .style('visibility', 'visible');
+
+    axisBrushEnter
+        .selectAll('.resize.n rect')
+        .style('cursor', 'n-resize')
+        .attr('y', c.bar.handleoverlap - c.bar.handleheight);
+
+    axisBrushEnter
+        .selectAll('.resize.s rect')
+        .style('cursor', 's-resize')
+        .attr('y', c.bar.handleoverlap);
+}
+
+function renderAxisBrush(axisBrush) {
+    axisBrush
+        .each(function updateBrushExtent (d) {
+            // the brush has to be reapplied on the DOM element to actually show the (new) extent, because D3 3.*
+            // `d3.svg.brush` doesn't maintain references to the DOM elements:
+            // https://github.com/d3/d3/issues/2918#issuecomment-235090514
+            d3.select(this).call(d.brush);
+        });
+}
+
+function ensureAxisBrush(axisOverlays) {
+    var axisBrush = axisOverlays.selectAll('.' + c.cn.axisBrush)
+        .data(repeat, keyFun);
+
+    var axisBrushEnter = axisBrush.enter()
+        .append('g')
+        .classed(c.cn.axisBrush, true);
+
+    setAxisBrush(axisBrush);
+    renderAxisBrushEnter(axisBrushEnter);
+    renderAxisBrush(axisBrush);
 }
 
 function model(layout, d, i) {
@@ -294,11 +377,7 @@ function viewModel(state, callbacks, model) {
             filter: dimension.constraintrange ? dimension.constraintrange.map(domainToUnit) : [0, 1],
             parent: viewModel,
             model: model,
-            brush: d3.svg.brush()
-                .y(uScale)
-                .on('brushstart', axisBrushStarted(state))
-                .on('brush', axisBrushMoved(state))
-                .on('brushend', axisBrushEnded(state, callbacks))
+            brush: makeBrush(uScale, state, callbacks)
         };
     });
 
@@ -703,60 +782,5 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
         .text(function(d) {return formatExtreme(d)(d.domainScale.domain()[0]);})
         .each(function(d) {Drawing.font(axisExtentBottomText, d.model.rangeFont);});
 
-    var axisBrush = axisOverlays.selectAll('.' + c.cn.axisBrush)
-        .data(repeat, keyFun);
-
-    var axisBrushEnter = axisBrush.enter()
-        .append('g')
-        .classed(c.cn.axisBrush, true);
-
-    // brush on axis for selection
-    axisBrushEnter
-        .each(function establishBrush(d) {
-            // establish the D3 brush on each axis so mouse capture etc. are set up
-            d3.select(this).call(d.brush);
-        });
-
-    axisBrush
-        .each(function updateBrushExtent(d) {
-            // Set the brush programmatically if data requires so, eg. Plotly `constraintrange` specifies a proper subset.
-            // This is only to ensure the SVG brush is correct; WebGL lines are controlled from `d.filter` directly.
-            if(d.filter[0] > 0 || d.filter[1] < 1) {
-                d.brush.extent(d.filter);
-            } else {
-                d.brush.clear();
-            }
-            // the brush has to be reapplied on the DOM element to actually show the (new) extent, because D3 3.*
-            // `d3.svg.brush` doesn't maintain references to the DOM elements:
-            // https://github.com/d3/d3/issues/2918#issuecomment-235090514
-            d3.select(this).call(d.brush);
-        });
-
-    axisBrushEnter
-        .selectAll('rect')
-        .attr('x', -c.bar.capturewidth / 2)
-        .attr('width', c.bar.capturewidth);
-
-    axisBrushEnter
-        .selectAll('rect.extent')
-        .attr('fill', 'url(#' + c.id.filterBarPattern + ')')
-        .style('cursor', 'ns-resize')
-        .filter(function(d) {return d.filter[0] === 0 && d.filter[1] === 1;})
-        .attr('y', -100); //  // zero-size rectangle pointer issue workaround
-
-    axisBrushEnter
-        .selectAll('.resize rect')
-        .attr('height', c.bar.handleheight)
-        .attr('opacity', 0)
-        .style('visibility', 'visible');
-
-    axisBrushEnter
-        .selectAll('.resize.n rect')
-        .style('cursor', 'n-resize')
-        .attr('y', c.bar.handleoverlap - c.bar.handleheight);
-
-    axisBrushEnter
-        .selectAll('.resize.s rect')
-        .style('cursor', 's-resize')
-        .attr('y', c.bar.handleoverlap);
+    ensureAxisBrush(axisOverlays);
 };
