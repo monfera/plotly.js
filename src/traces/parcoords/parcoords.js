@@ -191,6 +191,7 @@ function viewModel(state, callbacks, model) {
         uniqueKeys[dimension.label] = (foundKey || 0) + 1;
         var key = dimension.label + (foundKey ? '__' + foundKey : '');
         var uScale = unitScale(height, c.verticalPadding);
+        var specifiedFilterRange = dimension.constraintrange ? dimension.constraintrange.map(domainToUnit) : [0, 1];
         return {
             key: key,
             label: dimension.label,
@@ -212,10 +213,9 @@ function viewModel(state, callbacks, model) {
             domainScale: domainScale(height, c.verticalPadding, dimension),
             ordinalScale: ordinalScale(dimension),
             domainToUnitScale: domainToUnit,
-            filter: dimension.constraintrange ? dimension.constraintrange.map(domainToUnit) : [0, 1],
             parent: viewModel,
             model: model,
-            brush: brush.makeBrush(uScale, state, callbacks)
+            brush: brush.makeBrush(uScale, state, callbacks, specifiedFilterRange)
         };
     });
 

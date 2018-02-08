@@ -58,12 +58,20 @@ function ordinalScaleSnap(scale, v) {
     return a[a.length - 1];
 }
 
-function someFiltersActive(view) {
-    return view.dimensions.some(function(p) {return p.filter[0] > 0 || p.filter[1] < 1;});
+function filterActive(f) {
+    // filter is active if it represents a proper subset of the [0, 1] domain AND a non-degenerate (non-zero width) domain
+    return (f[0] > 0 || f[1] < 1) && f[0] < f[1];
 }
 
-function makeBrush(uScale, state, callbacks) {
+function someFiltersActive(view) {
+    return view.dimensions.some(function(p) {
+        return filterActive(p.brush.filter);
+    });
+}
+
+function makeBrush(uScale, state, callbacks, initialRange) {
     return {
+        filter: initialRange,
         d3brush: d3.svg.brush()
             .y(uScale)
             .on('brushstart', axisBrushStarted(state))
@@ -85,7 +93,7 @@ function axisBrushMoved(state) {
         var p = dimension.parent;
         var extent = dimension.brush.d3brush.extent();
         var dimensions = p.dimensions;
-        var filter = dimensions[dimension.xIndex].filter;
+        var filter = dimensions[dimension.xIndex].brush.filter;
         var reset = extent[0] === extent[1];
         if(reset) {
             dimension.brush.d3brush.clear();
@@ -93,7 +101,7 @@ function axisBrushMoved(state) {
         }
         var newExtent = reset ? [0, 1] : extent.slice();
         if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
-            dimensions[dimension.xIndex].filter = newExtent;
+            dimensions[dimension.xIndex].brush.filter = newExtent;
             p.focusLayer && p.focusLayer.render(p.panels, true);
             var filtersActive = someFiltersActive(p);
             if(!state.contextShown() && filtersActive) {
@@ -113,7 +121,7 @@ function axisBrushEnded(state, callbacks) {
         var extent = dimension.brush.d3brush.extent();
         var empty = extent[0] === extent[1];
         var dimensions = p.dimensions;
-        var f = dimensions[dimension.xIndex].filter;
+        var f = dimensions[dimension.xIndex].brush.filter;
         if(!empty && dimension.ordinal) {
             f[0] = ordinalScaleSnap(dimension.ordinalScale, f[0]);
             f[1] = ordinalScaleSnap(dimension.ordinalScale, f[1]);
@@ -140,11 +148,12 @@ function setAxisBrush(axisBrush) {
     axisBrush
         .each(function updateBrushExtent(d) {
             // Set the brush programmatically if data requires so, eg. Plotly `constraintrange` specifies a proper subset.
-            // This is only to ensure the SVG brush is correct; WebGL lines are controlled from `d.filter` directly.
-            if(d.filter[0] <= 0 && d.filter[1] >= 1 || d.filter[0] === d.filter[1]) {
-                d.brush.d3brush.clear();
+            // This is only to ensure the SVG brush is correct; WebGL lines are controlled from `d.brush.filter` directly.
+            var f = d.brush.filter;
+            if(filterActive(f)) {
+                d.brush.d3brush.extent(f);
             } else {
-                d.brush.d3brush.extent(d.filter);
+                d.brush.d3brush.clear();
             }
         });
 }
@@ -167,7 +176,7 @@ function renderAxisBrushEnter(axisBrushEnter) {
         .attr('fill', 'url(#' + c.id.filterBarPattern + ')')
         .style('cursor', 'ns-resize')
         .filter(function (d) {
-            return d.filter[0] === 0 && d.filter[1] === 1;
+            return !filterActive(d.brush.filter);
         })
         .attr('y', -100); //  // zero-size rectangle pointer issue workaround
 
