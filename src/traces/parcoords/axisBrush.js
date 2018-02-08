@@ -63,11 +63,13 @@ function someFiltersActive(view) {
 }
 
 function makeBrush(uScale, state, callbacks) {
-    return d3.svg.brush()
-        .y(uScale)
-        .on('brushstart', axisBrushStarted(state))
-        .on('brush', axisBrushMoved(state))
-        .on('brushend', axisBrushEnded(state, callbacks));
+    return {
+        d3brush: d3.svg.brush()
+            .y(uScale)
+            .on('brushstart', axisBrushStarted(state))
+            .on('brush', axisBrushMoved(state))
+            .on('brushend', axisBrushEnded(state, callbacks))
+    };
 }
 
 function axisBrushStarted(state) {
@@ -81,12 +83,12 @@ function axisBrushStarted(state) {
 function axisBrushMoved(state) {
     return function axisBrushMoved(dimension) {
         var p = dimension.parent;
-        var extent = dimension.brush.extent();
+        var extent = dimension.brush.d3brush.extent();
         var dimensions = p.dimensions;
         var filter = dimensions[dimension.xIndex].filter;
         var reset = extent[0] === extent[1];
         if(reset) {
-            dimension.brush.clear();
+            dimension.brush.d3brush.clear();
             d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
         }
         var newExtent = reset ? [0, 1] : extent.slice();
@@ -108,7 +110,7 @@ function axisBrushMoved(state) {
 function axisBrushEnded(state, callbacks) {
     return function axisBrushEnded (dimension) {
         var p = dimension.parent;
-        var extent = dimension.brush.extent();
+        var extent = dimension.brush.d3brush.extent();
         var empty = extent[0] === extent[1];
         var dimensions = p.dimensions;
         var f = dimensions[dimension.xIndex].filter;
@@ -119,7 +121,7 @@ function axisBrushEnded(state, callbacks) {
                 f[0] = Math.max(0, f[0] - 0.05);
                 f[1] = Math.min(1, f[1] + 0.05);
             }
-            d3.select(this).transition().duration(150).call(dimension.brush.extent(f));
+            d3.select(this).transition().duration(150).call(dimension.brush.d3brush.extent(f));
             p.focusLayer.render(p.panels, true);
         }
         p.pickLayer && p.pickLayer.render(p.panels, true);
@@ -140,9 +142,9 @@ function setAxisBrush(axisBrush) {
             // Set the brush programmatically if data requires so, eg. Plotly `constraintrange` specifies a proper subset.
             // This is only to ensure the SVG brush is correct; WebGL lines are controlled from `d.filter` directly.
             if(d.filter[0] <= 0 && d.filter[1] >= 1 || d.filter[0] === d.filter[1]) {
-                d.brush.clear();
+                d.brush.d3brush.clear();
             } else {
-                d.brush.extent(d.filter);
+                d.brush.d3brush.extent(d.filter);
             }
         });
 }
@@ -152,7 +154,7 @@ function renderAxisBrushEnter(axisBrushEnter) {
     axisBrushEnter
         .each(function establishBrush(d) {
             // establish the D3 brush on each axis so mouse capture etc. are set up
-            d3.select(this).call(d.brush);
+            d3.select(this).call(d.brush.d3brush);
         });
 
     axisBrushEnter
@@ -188,11 +190,11 @@ function renderAxisBrushEnter(axisBrushEnter) {
 
 function renderAxisBrush(axisBrush) {
     axisBrush
-        .each(function updateBrushExtent (d) {
+        .each(function updateBrushExtent(d) {
             // the brush has to be reapplied on the DOM element to actually show the (new) extent, because D3 3.*
             // `d3.svg.brush` doesn't maintain references to the DOM elements:
             // https://github.com/d3/d3/issues/2918#issuecomment-235090514
-            d3.select(this).call(d.brush);
+            d3.select(this).call(d.brush.d3brush);
         });
 }
 
