@@ -90,9 +90,9 @@ function d3_setBrushExtentWithTween(selection, brush, extent) {
 }
 
 
-function d3_clearBrushExtent(brush) {
+function d3_clearBrushExtent(brush, root) {
     brush.d3brush.clear();
-    d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
+    root.select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
 }
 
 function d3_makeBrush(uScale, state, brushStartCallback, brushCallback, brushEndCallback) {
@@ -124,7 +124,7 @@ function axisBrushMoved(callback) {
         var filter = dimension.brush.filter;
         var reset = extent[0] === extent[1];
         if(reset) {
-            d3_clearBrushExtent(dimension.brush);
+            d3_clearBrushExtent(dimension.brush, d3.select(this));
         }
         var newExtent = reset ? [0, 1] : extent.slice();
         if(!sameFilterExtents(filter, newExtent)) {
@@ -180,7 +180,7 @@ function axisBrushEnded(state, callback) {
     };
 }
 
-function setAxisBrush(axisBrush) {
+function setAxisBrush(axisBrush, root) {
     axisBrush
         .each(function updateBrushExtent(d) {
             // Set the brush programmatically if data requires so, eg. Plotly `constraintrange` specifies a proper subset.
@@ -190,7 +190,7 @@ function setAxisBrush(axisBrush) {
             if(filterActive(b)) {
                 d3_setBrushExtent(b, f);
             } else {
-                d3_clearBrushExtent(b);
+                d3_clearBrushExtent(b, root);
             }
         });
 }
@@ -252,7 +252,7 @@ function ensureAxisBrush(axisOverlays) {
         .append('g')
         .classed(c.cn.axisBrush, true);
 
-    setAxisBrush(axisBrush);
+    setAxisBrush(axisBrush, axisBrushEnter);
     renderAxisBrushEnter(axisBrushEnter);
     renderAxisBrush(axisBrush);
 }
