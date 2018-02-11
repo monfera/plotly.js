@@ -133,6 +133,9 @@ function ensureAxisBrush(axisOverlays) {
     renderAxisBrush(axisBrush);
 }
 
+function moveNullRectOutOfTheWay(root) {
+    root.select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
+}
 
 /**
  * D3 specific part
@@ -150,10 +153,9 @@ function d3_setBrushExtentWithTween(selection, brush, extent) {
     selection.transition().duration(150).call(brush.d3brush.extent(extent));
 }
 
-
 function d3_clearBrushExtent(brush, root) {
     brush.d3brush.clear();
-    root.select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
+    moveNullRectOutOfTheWay(root);
 }
 
 function d3_makeBrush(uScale, state, brushStartCallback, brushCallback, brushEndCallback) {
