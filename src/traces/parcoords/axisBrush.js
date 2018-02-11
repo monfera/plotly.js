@@ -71,6 +71,67 @@ function axisBrushStarted(callback) {
     };
 }
 
+function renderAxisBrushEnter(axisBrushEnter) {
+
+    axisBrushEnter
+        .each(function establishBrush(d) {
+            // establish the D3 brush on each axis so mouse capture etc. are set up
+            d.brush.d3brush(d3.select(this));
+        });
+
+    axisBrushEnter
+        .selectAll('rect')
+        .attr('x', -c.bar.capturewidth / 2)
+        .attr('width', c.bar.capturewidth);
+
+    axisBrushEnter
+        .selectAll('rect.extent')
+        .attr('fill', 'url(#' + c.id.filterBarPattern + ')')
+        .style('cursor', 'ns-resize')
+        .filter(function (d) {
+            return !filterActive(d.brush);
+        })
+        .attr('y', -100); //  // zero-size rectangle pointer issue workaround
+
+    axisBrushEnter
+        .selectAll('.resize rect')
+        .attr('height', c.bar.handleheight)
+        .attr('opacity', 0)
+        .style('visibility', 'visible');
+
+    axisBrushEnter
+        .selectAll('.resize.n rect')
+        .style('cursor', 'n-resize')
+        .attr('y', c.bar.handleoverlap - c.bar.handleheight);
+
+    axisBrushEnter
+        .selectAll('.resize.s rect')
+        .style('cursor', 's-resize')
+        .attr('y', c.bar.handleoverlap);
+}
+
+function renderAxisBrush(axisBrush) {
+    axisBrush
+        .each(function updateBrushExtent(d) {
+            // the brush has to be reapplied on the DOM element to actually show the (new) extent, because D3 3.*
+            // `d3.svg.brush` doesn't maintain references to the DOM elements:
+            // https://github.com/d3/d3/issues/2918#issuecomment-235090514
+            d.brush.d3brush(d3.select(this));
+        });
+}
+
+function ensureAxisBrush(axisOverlays) {
+    var axisBrush = axisOverlays.selectAll('.' + c.cn.axisBrush)
+        .data(repeat, keyFun);
+
+    var axisBrushEnter = axisBrush.enter()
+        .append('g')
+        .classed(c.cn.axisBrush, true);
+
+    setAxisBrush(axisBrush, axisBrushEnter);
+    renderAxisBrushEnter(axisBrushEnter);
+    renderAxisBrush(axisBrush);
+}
 
 
 /**
@@ -134,24 +195,6 @@ function axisBrushMoved(callback) {
     };
 }
 
-function makeBrush(uScale, state, initialRange, brushStartCallback, brushCallback, brushEndCallback) {
-    return {
-        filter: initialRange,
-        d3brush: d3_makeBrush(uScale, state, brushStartCallback, brushCallback, brushEndCallback)
-    };
-}
-
-
-
-/**
- * Shouldn't be here as they deal with the entire view ratehr than a single dimension brush
- */
-
-
-/**
- * Unhandled so far
- */
-
 function axisBrushEnded(callback) {
     return function axisBrushEnded (dimension) {
         var extent = d3_getBrushExtent(dimension.brush);
@@ -185,67 +228,13 @@ function setAxisBrush(axisBrush, root) {
         });
 }
 
-function renderAxisBrushEnter(axisBrushEnter) {
-
-    axisBrushEnter
-        .each(function establishBrush(d) {
-            // establish the D3 brush on each axis so mouse capture etc. are set up
-            d3.select(this).call(d.brush.d3brush);
-        });
-
-    axisBrushEnter
-        .selectAll('rect')
-        .attr('x', -c.bar.capturewidth / 2)
-        .attr('width', c.bar.capturewidth);
-
-    axisBrushEnter
-        .selectAll('rect.extent')
-        .attr('fill', 'url(#' + c.id.filterBarPattern + ')')
-        .style('cursor', 'ns-resize')
-        .filter(function (d) {
-            return !filterActive(d.brush);
-        })
-        .attr('y', -100); //  // zero-size rectangle pointer issue workaround
-
-    axisBrushEnter
-        .selectAll('.resize rect')
-        .attr('height', c.bar.handleheight)
-        .attr('opacity', 0)
-        .style('visibility', 'visible');
-
-    axisBrushEnter
-        .selectAll('.resize.n rect')
-        .style('cursor', 'n-resize')
-        .attr('y', c.bar.handleoverlap - c.bar.handleheight);
-
-    axisBrushEnter
-        .selectAll('.resize.s rect')
-        .style('cursor', 's-resize')
-        .attr('y', c.bar.handleoverlap);
+function makeBrush(uScale, state, initialRange, brushStartCallback, brushCallback, brushEndCallback) {
+    return {
+        filter: initialRange,
+        d3brush: d3_makeBrush(uScale, state, brushStartCallback, brushCallback, brushEndCallback)
+    };
 }
 
-function renderAxisBrush(axisBrush) {
-    axisBrush
-        .each(function updateBrushExtent(d) {
-            // the brush has to be reapplied on the DOM element to actually show the (new) extent, because D3 3.*
-            // `d3.svg.brush` doesn't maintain references to the DOM elements:
-            // https://github.com/d3/d3/issues/2918#issuecomment-235090514
-            d3.select(this).call(d.brush.d3brush);
-        });
-}
-
-function ensureAxisBrush(axisOverlays) {
-    var axisBrush = axisOverlays.selectAll('.' + c.cn.axisBrush)
-        .data(repeat, keyFun);
-
-    var axisBrushEnter = axisBrush.enter()
-        .append('g')
-        .classed(c.cn.axisBrush, true);
-
-    setAxisBrush(axisBrush, axisBrushEnter);
-    renderAxisBrushEnter(axisBrushEnter);
-    renderAxisBrush(axisBrush);
-}
 
 module.exports = {
     addFilterBarDefs: addFilterBarDefs,
