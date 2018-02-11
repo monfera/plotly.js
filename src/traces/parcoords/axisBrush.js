@@ -141,24 +141,24 @@ function moveNullRectOutOfTheWay(root) {
  * D3 specific part
  */
 
-function d3_getBrushExtent(brush) {
+function getBrushExtent(brush) {
     return brush.d3brush.extent();
 }
 
-function d3_setBrushExtent(brush, range) {
+function setBrushExtent(brush, range) {
     brush.d3brush.extent(range);
 }
 
-function d3_setBrushExtentWithTween(selection, brush, extent) {
+function setBrushExtentWithTween(selection, brush, extent) {
     selection.transition().duration(150).call(brush.d3brush.extent(extent));
 }
 
-function d3_clearBrushExtent(brush, root) {
+function clearBrushExtent(brush, root) {
     brush.d3brush.clear();
     moveNullRectOutOfTheWay(root);
 }
 
-function d3_makeBrush(uScale, state, brushStartCallback, brushCallback, brushEndCallback) {
+function makeSvgBrush(uScale, state, brushStartCallback, brushCallback, brushEndCallback) {
     return d3.svg.brush()
         .y(uScale)
         .on('brushstart', axisBrushStarted(brushStartCallback))
@@ -183,11 +183,11 @@ function sameFilterExtents(prev, next) {
 
 function axisBrushMoved(callback) {
     return function axisBrushMoved(dimension) {
-        var extent = d3_getBrushExtent(dimension.brush);
+        var extent = getBrushExtent(dimension.brush);
         var filter = dimension.brush.filter;
         var reset = extent[0] === extent[1];
         if(reset) {
-            d3_clearBrushExtent(dimension.brush, d3.select(this));
+            clearBrushExtent(dimension.brush, d3.select(this));
         }
         var newExtent = reset ? [0, 1] : extent.slice();
         if(!sameFilterExtents(filter, newExtent)) {
@@ -199,7 +199,7 @@ function axisBrushMoved(callback) {
 
 function axisBrushEnded(callback) {
     return function axisBrushEnded (dimension) {
-        var extent = d3_getBrushExtent(dimension.brush);
+        var extent = getBrushExtent(dimension.brush);
         var empty = extent[0] === extent[1];
         var f = dimension.brush.filter;
         if(!empty && dimension.ordinal) {
@@ -209,7 +209,7 @@ function axisBrushEnded(callback) {
                 f[0] = Math.max(0, f[0] - 0.05);
                 f[1] = Math.min(1, f[1] + 0.05);
             }
-            d3_setBrushExtentWithTween(d3.select(this), dimension.brush, f);
+            setBrushExtentWithTween(d3.select(this), dimension.brush, f);
         }
         callback(f);
     };
@@ -223,9 +223,9 @@ function setAxisBrush(axisBrush, root) {
             var b = d.brush;
             var f = b.filter;
             if(filterActive(b)) {
-                d3_setBrushExtent(b, f);
+                setBrushExtent(b, f);
             } else {
-                d3_clearBrushExtent(b, root);
+                clearBrushExtent(b, root);
             }
         });
 }
@@ -233,7 +233,7 @@ function setAxisBrush(axisBrush, root) {
 function makeBrush(uScale, state, initialRange, brushStartCallback, brushCallback, brushEndCallback) {
     return {
         filter: initialRange,
-        d3brush: d3_makeBrush(uScale, state, brushStartCallback, brushCallback, brushEndCallback)
+        d3brush: makeSvgBrush(uScale, state, brushStartCallback, brushCallback, brushEndCallback)
     };
 }
 
