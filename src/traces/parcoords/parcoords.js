@@ -114,6 +114,12 @@ function unitToColorScale(cscale) {
     };
 }
 
+function someFiltersActive(view) {
+    return view.dimensions.some(function(p) {
+        return brush.filterActive(p.brush);
+    });
+}
+
 function model(layout, d, i) {
     var cd0 = unwrap(d),
         trace = cd0.trace,
@@ -215,7 +221,28 @@ function viewModel(state, callbacks, model) {
             domainToUnitScale: domainToUnit,
             parent: viewModel,
             model: model,
-            brush: brush.makeBrush(uScale, state, specifiedFilterRange, function() {state.linePickActive(false)}, function() {}, callbacks.filterChanged)
+            brush: brush.makeBrush(
+                uScale,
+                state,
+                specifiedFilterRange,
+                function() {
+                    state.linePickActive(false);
+                },
+                function() {
+                    var p = viewModel;
+                    p.focusLayer && p.focusLayer.render(p.panels, true);
+                    var filtersActive = someFiltersActive(p);
+                    if(!state.contextShown() && filtersActive) {
+                        p.contextLayer && p.contextLayer.render(p.panels, true);
+                        state.contextShown(true);
+                    } else if(state.contextShown() && !filtersActive) {
+                        p.contextLayer && p.contextLayer.render(p.panels, true, true);
+                        state.contextShown(false);
+                    }
+
+                },
+                callbacks.filterChanged
+            )
         };
     });
 
@@ -441,7 +468,7 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
                     .attr('transform', function(d) {return 'translate(' + d.xScale(d.xIndex) + ', 0)';});
                 d3.select(this).attr('transform', 'translate(' + d.x + ', 0)');
                 yAxis.each(function(dd, i, ii) {if(ii === d.parent.key) p.dimensions[i] = dd;});
-                p.contextLayer && p.contextLayer.render(p.panels, false, !brush.someFiltersActive(p));
+                p.contextLayer && p.contextLayer.render(p.panels, false, !someFiltersActive(p));
                 p.focusLayer.render && p.focusLayer.render(p.panels);
             })
             .on('dragend', function(d) {
@@ -451,7 +478,7 @@ module.exports = function(root, svg, parcoordsLineLayers, styledData, layout, ca
                 updatePanelLayout(yAxis, p);
                 d3.select(this)
                     .attr('transform', function(d) {return 'translate(' + d.x + ', 0)';});
-                p.contextLayer && p.contextLayer.render(p.panels, false, !brush.someFiltersActive(p));
+                p.contextLayer && p.contextLayer.render(p.panels, false, !someFiltersActive(p));
                 p.focusLayer && p.focusLayer.render(p.panels);
                 p.pickLayer && p.pickLayer.render(p.panels, true);
                 state.linePickActive(true);

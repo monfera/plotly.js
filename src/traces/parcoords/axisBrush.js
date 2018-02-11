@@ -63,6 +63,15 @@ function ordinalScaleSnap(scale, v) {
     return a[a.length - 1];
 }
 
+function axisBrushStarted(callback) {
+    return function axisBrushStarted() {
+        // axes should not be dragged sideways while brushing (although fun to try)
+        d3.event.sourceEvent.stopPropagation();
+        callback();
+    };
+}
+
+
 
 /**
  * D3 specific part
@@ -90,33 +99,40 @@ function d3_makeBrush(uScale, state, brushStartCallback, brushCallback, brushEnd
     return d3.svg.brush()
         .y(uScale)
         .on('brushstart', axisBrushStarted(brushStartCallback))
-        .on('brush', axisBrushMoved(state))
+        .on('brush', axisBrushMoved(brushCallback))
         .on('brushend', axisBrushEnded(state, brushEndCallback));
 }
 
 
 /**
- * Assumes one filter range
+ * Assumes one filter range ATM
  */
 
-function filterActive(f) {
+function filterActive(brush) {
+    var f = brush.filter;
     // filter is active if it represents a proper subset of the [0, 1] domain AND a non-degenerate (non-zero width) domain
     return (f[0] > 0 || f[1] < 1) && f[0] < f[1];
 }
 
-
-/**
- * Shouldn't be here as they deal with the entire view ratehr than a single dimension brush
- */
-
-function someFiltersActive(view) {
-    return view.dimensions.some(function(p) {
-        return filterActive(p.brush.filter);
-    });
+function sameFilterExtents(prev, next) {
+    return next[0] === prev[0] && next[1] === prev[1];
 }
 
-
-
+function axisBrushMoved(callback) {
+    return function axisBrushMoved(dimension) {
+        var extent = d3_getBrushExtent(dimension.brush);
+        var filter = dimension.brush.filter;
+        var reset = extent[0] === extent[1];
+        if(reset) {
+            d3_clearBrushExtent(dimension.brush);
+        }
+        var newExtent = reset ? [0, 1] : extent.slice();
+        if(!sameFilterExtents(filter, newExtent)) {
+            dimension.brush.filter = newExtent;
+            callback();
+        }
+    };
+}
 
 function makeBrush(uScale, state, initialRange, brushStartCallback, brushCallback, brushEndCallback) {
     return {
@@ -125,38 +141,16 @@ function makeBrush(uScale, state, initialRange, brushStartCallback, brushCallbac
     };
 }
 
-function axisBrushStarted(callback) {
-    return function axisBrushStarted() {
-        // axes should not be dragged sideways while brushing (although fun to try)
-        d3.event.sourceEvent.stopPropagation();
-        callback();
-    };
-}
 
-function axisBrushMoved(stateThatWeIdeallyRemove) {
-    return function axisBrushMoved(dimension) {
-        var p = dimension.parent;
-        var extent = d3_getBrushExtent(dimension.brush);
-        var filter = dimension.brush.filter;
-        var reset = extent[0] === extent[1];
-        if(reset) {
-            d3_clearBrushExtent(dimension.brush);
-        }
-        var newExtent = reset ? [0, 1] : extent.slice();
-        if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
-            dimension.brush.filter = newExtent;
-            p.focusLayer && p.focusLayer.render(p.panels, true);
-            var filtersActive = someFiltersActive(p);
-            if(!stateThatWeIdeallyRemove.contextShown() && filtersActive) {
-                p.contextLayer && p.contextLayer.render(p.panels, true);
-                stateThatWeIdeallyRemove.contextShown(true);
-            } else if(stateThatWeIdeallyRemove.contextShown() && !filtersActive) {
-                p.contextLayer && p.contextLayer.render(p.panels, true, true);
-                stateThatWeIdeallyRemove.contextShown(false);
-            }
-        }
-    };
-}
+
+/**
+ * Shouldn't be here as they deal with the entire view ratehr than a single dimension brush
+ */
+
+
+/**
+ * Unhandled so far
+ */
 
 function axisBrushEnded(state, callback) {
     return function axisBrushEnded (dimension) {
@@ -191,11 +185,12 @@ function setAxisBrush(axisBrush) {
         .each(function updateBrushExtent(d) {
             // Set the brush programmatically if data requires so, eg. Plotly `constraintrange` specifies a proper subset.
             // This is only to ensure the SVG brush is correct; WebGL lines are controlled from `d.brush.filter` directly.
-            var f = d.brush.filter;
-            if(filterActive(f)) {
-                d3_setBrushExtent(d.brush, f);
+            var b = d.brush;
+            var f = b.filter;
+            if(filterActive(b)) {
+                d3_setBrushExtent(b, f);
             } else {
-                d3_clearBrushExtent(d.brush);
+                d3_clearBrushExtent(b);
             }
         });
 }
@@ -218,7 +213,7 @@ function renderAxisBrushEnter(axisBrushEnter) {
         .attr('fill', 'url(#' + c.id.filterBarPattern + ')')
         .style('cursor', 'ns-resize')
         .filter(function (d) {
-            return !filterActive(d.brush.filter);
+            return !filterActive(d.brush);
         })
         .attr('y', -100); //  // zero-size rectangle pointer issue workaround
 
@@ -266,5 +261,5 @@ module.exports = {
     addFilterBarDefs: addFilterBarDefs,
     makeBrush: makeBrush,
     ensureAxisBrush: ensureAxisBrush,
-    someFiltersActive: someFiltersActive
+    filterActive: filterActive
 }
