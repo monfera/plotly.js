@@ -31,14 +31,14 @@ function clearBrushExtent(brush) {
     d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
 }
 
-function makeBrush(uScale, state, callbacks, initialRange) {
+function makeBrush(uScale, state, callback, initialRange) {
     return {
         filter: initialRange,
         d3brush: d3.svg.brush()
             .y(uScale)
             .on('brushstart', axisBrushStarted(state))
             .on('brush', axisBrushMoved(state))
-            .on('brushend', axisBrushEnded(state, callbacks))
+            .on('brushend', axisBrushEnded(state, callback))
     };
 }
 
@@ -132,7 +132,7 @@ function axisBrushMoved(state) {
     };
 }
 
-function axisBrushEnded(state, callbacks) {
+function axisBrushEnded(state, callback) {
     return function axisBrushEnded (dimension) {
         var p = dimension.parent;
         var extent = getBrushExtent(dimension.brush);
@@ -151,12 +151,12 @@ function axisBrushEnded(state, callbacks) {
         }
         p.pickLayer && p.pickLayer.render(p.panels, true);
         state.linePickActive(true);
-        if(callbacks && callbacks.filterChanged) {
+        if(callback) {
             var invScale = dimension.domainToUnitScale.invert;
 
             // update gd.data as if a Plotly.restyle were fired
             var newRange = f.map(invScale);
-            callbacks.filterChanged(p.key, dimension.visibleIndex, newRange);
+            callback(p.key, dimension.visibleIndex, newRange);
         }
     };
 }

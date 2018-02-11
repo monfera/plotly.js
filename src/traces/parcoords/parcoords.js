@@ -215,7 +215,7 @@ function viewModel(state, callbacks, model) {
             domainToUnitScale: domainToUnit,
             parent: viewModel,
             model: model,
-            brush: brush.makeBrush(uScale, state, callbacks, specifiedFilterRange)
+            brush: brush.makeBrush(uScale, state, callbacks.filterChanged, specifiedFilterRange)
         };
     });
 
