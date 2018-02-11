@@ -137,16 +137,14 @@ function axisBrushMoved(stateThatWeIdeallyRemove) {
     return function axisBrushMoved(dimension) {
         var p = dimension.parent;
         var extent = d3_getBrushExtent(dimension.brush);
-        var dimensions = p.dimensions;
-        var filter = dimensions[dimension.xIndex].brush.filter;
-        if(dimensions[dimension.xIndex] !== dimension) debugger
+        var filter = dimension.brush.filter;
         var reset = extent[0] === extent[1];
         if(reset) {
             d3_clearBrushExtent(dimension.brush);
         }
         var newExtent = reset ? [0, 1] : extent.slice();
         if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
-            dimensions[dimension.xIndex].brush.filter = newExtent;
+            dimension.brush.filter = newExtent;
             p.focusLayer && p.focusLayer.render(p.panels, true);
             var filtersActive = someFiltersActive(p);
             if(!stateThatWeIdeallyRemove.contextShown() && filtersActive) {
@@ -165,8 +163,7 @@ function axisBrushEnded(state, callback) {
         var p = dimension.parent;
         var extent = d3_getBrushExtent(dimension.brush);
         var empty = extent[0] === extent[1];
-        var dimensions = p.dimensions;
-        var f = dimensions[dimension.xIndex].brush.filter;
+        var f = dimension.brush.filter;
         if(!empty && dimension.ordinal) {
             f[0] = ordinalScaleSnap(dimension.ordinalScale, f[0]);
             f[1] = ordinalScaleSnap(dimension.ordinalScale, f[1]);
