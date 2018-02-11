@@ -76,7 +76,7 @@ function renderAxisBrushEnter(axisBrushEnter) {
     axisBrushEnter
         .each(function establishBrush(d) {
             // establish the D3 brush on each axis so mouse capture etc. are set up
-            d.brush.d3brush(d3.select(this));
+            renderAxisSvgBrush(d.brush, d3.select(this));
         });
 
     axisBrushEnter
@@ -116,7 +116,7 @@ function renderAxisBrush(axisBrush) {
             // the brush has to be reapplied on the DOM element to actually show the (new) extent, because D3 3.*
             // `d3.svg.brush` doesn't maintain references to the DOM elements:
             // https://github.com/d3/d3/issues/2918#issuecomment-235090514
-            d.brush.d3brush(d3.select(this));
+            renderAxisSvgBrush(d.brush, d3.select(this));
         });
 }
 
@@ -137,9 +137,27 @@ function moveNullRectOutOfTheWay(root) {
     root.select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
 }
 
+function clearBrushExtent(brush, root) {
+    brushClear(brush);
+    moveNullRectOutOfTheWay(root);
+}
+
+
 /**
  * D3 specific part
  */
+
+function makeSvgBrush(uScale, state, brushStartCallback, brushCallback, brushEndCallback) {
+    return d3.svg.brush()
+        .y(uScale)
+        .on('brushstart', axisBrushStarted(brushStartCallback))
+        .on('brush', axisBrushMoved(brushCallback))
+        .on('brushend', axisBrushEnded(brushEndCallback));
+}
+
+function renderAxisSvgBrush(brush, root) {
+    brush.d3brush(root);
+}
 
 function getBrushExtent(brush) {
     return brush.d3brush.extent();
@@ -153,17 +171,8 @@ function setBrushExtentWithTween(selection, brush, extent) {
     selection.transition().duration(150).call(brush.d3brush.extent(extent));
 }
 
-function clearBrushExtent(brush, root) {
+function brushClear(brush) {
     brush.d3brush.clear();
-    moveNullRectOutOfTheWay(root);
-}
-
-function makeSvgBrush(uScale, state, brushStartCallback, brushCallback, brushEndCallback) {
-    return d3.svg.brush()
-        .y(uScale)
-        .on('brushstart', axisBrushStarted(brushStartCallback))
-        .on('brush', axisBrushMoved(brushCallback))
-        .on('brushend', axisBrushEnded(brushEndCallback));
 }
 
 
