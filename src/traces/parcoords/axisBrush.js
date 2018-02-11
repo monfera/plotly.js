@@ -13,34 +13,10 @@ var d3 = require('d3');
 var keyFun = require('../../lib/gup').keyFun;
 var repeat = require('../../lib/gup').repeat;
 
-function getBrushExtent(brush) {
-    return brush.d3brush.extent();
-}
 
-function setBrushExtent(brush, range) {
-    brush.d3brush.extent(range);
-}
-
-function setBrushExtentWithTween(selection, brush, extent) {
-    selection.transition().duration(150).call(brush.d3brush.extent(extent));
-}
-
-
-function clearBrushExtent(brush) {
-    brush.d3brush.clear();
-    d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
-}
-
-function makeBrush(uScale, state, callback, initialRange) {
-    return {
-        filter: initialRange,
-        d3brush: d3.svg.brush()
-            .y(uScale)
-            .on('brushstart', axisBrushStarted(state))
-            .on('brush', axisBrushMoved(state))
-            .on('brushend', axisBrushEnded(state, callback))
-    };
-}
+/**
+ * Works with both D3 and new thing
+ */
 
 function addFilterBarDefs(defs) {
     var filterBarPattern = defs.selectAll('#' + c.id.filterBarPattern)
@@ -87,10 +63,51 @@ function ordinalScaleSnap(scale, v) {
     return a[a.length - 1];
 }
 
+
+/**
+ * D3 specific part
+ */
+
+function d3_getBrushExtent(brush) {
+    return brush.d3brush.extent();
+}
+
+function d3_setBrushExtent(brush, range) {
+    brush.d3brush.extent(range);
+}
+
+function d3_setBrushExtentWithTween(selection, brush, extent) {
+    selection.transition().duration(150).call(brush.d3brush.extent(extent));
+}
+
+
+function d3_clearBrushExtent(brush) {
+    brush.d3brush.clear();
+    d3.select(this).select('rect.extent').attr('y', -100); // zero-size rectangle pointer issue workaround
+}
+
+function d3_makeBrush(uScale, state, brushStartCallback, brushCallback, brushEndCallback) {
+    return d3.svg.brush()
+        .y(uScale)
+        .on('brushstart', axisBrushStarted(brushStartCallback))
+        .on('brush', axisBrushMoved(state))
+        .on('brushend', axisBrushEnded(state, brushEndCallback));
+}
+
+
+/**
+ * Assumes one filter range
+ */
+
 function filterActive(f) {
     // filter is active if it represents a proper subset of the [0, 1] domain AND a non-degenerate (non-zero width) domain
     return (f[0] > 0 || f[1] < 1) && f[0] < f[1];
 }
+
+
+/**
+ * Shouldn't be here as they deal with the entire view ratehr than a single dimension brush
+ */
 
 function someFiltersActive(view) {
     return view.dimensions.some(function(p) {
@@ -98,35 +115,46 @@ function someFiltersActive(view) {
     });
 }
 
-function axisBrushStarted(state) {
-    return function axisBrushStarted() {
-        // axes should not be dragged sideways while brushing (although fun to try)
-        d3.event.sourceEvent.stopPropagation();
-        state.linePickActive(false);
+
+
+
+function makeBrush(uScale, state, initialRange, brushStartCallback, brushCallback, brushEndCallback) {
+    return {
+        filter: initialRange,
+        d3brush: d3_makeBrush(uScale, state, brushStartCallback, brushCallback, brushEndCallback)
     };
 }
 
-function axisBrushMoved(state) {
+function axisBrushStarted(callback) {
+    return function axisBrushStarted() {
+        // axes should not be dragged sideways while brushing (although fun to try)
+        d3.event.sourceEvent.stopPropagation();
+        callback();
+    };
+}
+
+function axisBrushMoved(stateThatWeIdeallyRemove) {
     return function axisBrushMoved(dimension) {
         var p = dimension.parent;
-        var extent = getBrushExtent(dimension.brush);
+        var extent = d3_getBrushExtent(dimension.brush);
         var dimensions = p.dimensions;
         var filter = dimensions[dimension.xIndex].brush.filter;
+        if(dimensions[dimension.xIndex] !== dimension) debugger
         var reset = extent[0] === extent[1];
         if(reset) {
-            clearBrushExtent(dimension.brush);
+            d3_clearBrushExtent(dimension.brush);
         }
         var newExtent = reset ? [0, 1] : extent.slice();
         if(newExtent[0] !== filter[0] || newExtent[1] !== filter[1]) {
             dimensions[dimension.xIndex].brush.filter = newExtent;
             p.focusLayer && p.focusLayer.render(p.panels, true);
             var filtersActive = someFiltersActive(p);
-            if(!state.contextShown() && filtersActive) {
+            if(!stateThatWeIdeallyRemove.contextShown() && filtersActive) {
                 p.contextLayer && p.contextLayer.render(p.panels, true);
-                state.contextShown(true);
-            } else if(state.contextShown() && !filtersActive) {
+                stateThatWeIdeallyRemove.contextShown(true);
+            } else if(stateThatWeIdeallyRemove.contextShown() && !filtersActive) {
                 p.contextLayer && p.contextLayer.render(p.panels, true, true);
-                state.contextShown(false);
+                stateThatWeIdeallyRemove.contextShown(false);
             }
         }
     };
@@ -135,7 +163,7 @@ function axisBrushMoved(state) {
 function axisBrushEnded(state, callback) {
     return function axisBrushEnded (dimension) {
         var p = dimension.parent;
-        var extent = getBrushExtent(dimension.brush);
+        var extent = d3_getBrushExtent(dimension.brush);
         var empty = extent[0] === extent[1];
         var dimensions = p.dimensions;
         var f = dimensions[dimension.xIndex].brush.filter;
@@ -146,7 +174,7 @@ function axisBrushEnded(state, callback) {
                 f[0] = Math.max(0, f[0] - 0.05);
                 f[1] = Math.min(1, f[1] + 0.05);
             }
-            setBrushExtentWithTween(d3.select(this), dimension.brush, f);
+            d3_setBrushExtentWithTween(d3.select(this), dimension.brush, f);
             p.focusLayer.render(p.panels, true);
         }
         p.pickLayer && p.pickLayer.render(p.panels, true);
@@ -168,9 +196,9 @@ function setAxisBrush(axisBrush) {
             // This is only to ensure the SVG brush is correct; WebGL lines are controlled from `d.brush.filter` directly.
             var f = d.brush.filter;
             if(filterActive(f)) {
-                setBrushExtent(d.brush, f);
+                d3_setBrushExtent(d.brush, f);
             } else {
-                clearBrushExtent(d.brush);
+                d3_clearBrushExtent(d.brush);
             }
         });
 }
