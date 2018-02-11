@@ -100,7 +100,7 @@ function d3_makeBrush(uScale, state, brushStartCallback, brushCallback, brushEnd
         .y(uScale)
         .on('brushstart', axisBrushStarted(brushStartCallback))
         .on('brush', axisBrushMoved(brushCallback))
-        .on('brushend', axisBrushEnded(state, brushEndCallback));
+        .on('brushend', axisBrushEnded(brushEndCallback));
 }
 
 
@@ -152,9 +152,8 @@ function makeBrush(uScale, state, initialRange, brushStartCallback, brushCallbac
  * Unhandled so far
  */
 
-function axisBrushEnded(state, callback) {
+function axisBrushEnded(callback) {
     return function axisBrushEnded (dimension) {
-        var p = dimension.parent;
         var extent = d3_getBrushExtent(dimension.brush);
         var empty = extent[0] === extent[1];
         var f = dimension.brush.filter;
@@ -166,17 +165,8 @@ function axisBrushEnded(state, callback) {
                 f[1] = Math.min(1, f[1] + 0.05);
             }
             d3_setBrushExtentWithTween(d3.select(this), dimension.brush, f);
-            p.focusLayer.render(p.panels, true);
         }
-        p.pickLayer && p.pickLayer.render(p.panels, true);
-        state.linePickActive(true);
-        if(callback) {
-            var invScale = dimension.domainToUnitScale.invert;
-
-            // update gd.data as if a Plotly.restyle were fired
-            var newRange = f.map(invScale);
-            callback(p.key, dimension.visibleIndex, newRange);
-        }
+        callback(f);
     };
 }
 

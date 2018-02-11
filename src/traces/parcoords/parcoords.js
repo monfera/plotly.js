@@ -239,9 +239,20 @@ function viewModel(state, callbacks, model) {
                         p.contextLayer && p.contextLayer.render(p.panels, true, true);
                         state.contextShown(false);
                     }
-
                 },
-                callbacks.filterChanged
+                function(f) {
+                    var p = viewModel;
+                    p.focusLayer.render(p.panels, true);
+                    p.pickLayer && p.pickLayer.render(p.panels, true);
+                    state.linePickActive(true);
+                    if(callbacks && callbacks.filterChanged) {
+                        var invScale = domainToUnit.invert;
+
+                        // update gd.data as if a Plotly.restyle were fired
+                        var newRange = f.map(invScale);
+                        callbacks.filterChanged(p.key, dimension._index, newRange);
+                    }
+                }
             )
         };
     });
